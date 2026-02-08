@@ -8,13 +8,10 @@
     <style>
         :root {
             --primary-green: #27ae60;
-            --dark-green: #1e8449;
-            --tech-blue: #3498db;
             --text-main: #1a202c;
             --text-light: #718096;
-            --bg-white: #ffffff;
             --bg-gray: #f7fafc;
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition: all 0.3s ease;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -23,197 +20,142 @@
             font-family: 'Inter', -apple-system, sans-serif;
             color: var(--text-main);
             line-height: 1.6;
-            background-color: var(--bg-white);
-            overflow-x: hidden;
+            background-color: #fff;
         }
 
+        /* Navigation */
         nav {
-            position: sticky;
-            top: 0;
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            z-index: 1000;
-            padding: 1rem 5%;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
+            position: sticky; top: 0; background: rgba(255,255,255,0.9);
+            backdrop-filter: blur(10px); z-index: 1000; padding: 1rem 5%;
+            border-bottom: 1px solid #eee;
         }
 
         .nav-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            max-width: 1200px;
-            margin: 0 auto;
+            display: flex; justify-content: space-between; align-items: center;
+            max-width: 1100px; margin: 0 auto;
         }
 
         .logo {
-            font-weight: 800;
-            font-size: 1.5rem;
-            color: var(--primary-green);
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .logo-icon {
-            width: 32px;
-            height: 32px;
-            background: var(--primary-green);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 18px;
-        }
-
-        .btn-primary {
-            background: var(--primary-green);
-            color: white;
-            border: none;
-            padding: 0.75rem 1.8rem;
-            border-radius: 12px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: var(--transition);
-            box-shadow: 0 4px 14px 0 rgba(39, 174, 96, 0.3);
-            text-decoration: none;
-            display: inline-block;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            background: var(--dark-green);
-            box-shadow: 0 6px 20px 0 rgba(39, 174, 96, 0.4);
-        }
-
-        .btn-secondary {
-            background: white;
-            color: var(--text-main);
-            border: 1px solid #e2e8f0;
-            padding: 0.75rem 1.8rem;
-            border-radius: 12px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: var(--transition);
-            text-decoration: none;
-            display: inline-block;
-        }
-
-        .btn-secondary:hover {
-            background: var(--bg-gray);
-            border-color: var(--text-light);
+            font-weight: 800; font-size: 1.4rem; color: var(--primary-green);
+            text-decoration: none; display: flex; align-items: center; gap: 8px;
         }
 
         /* Hero Section */
         .hero {
-            padding: 10rem 5% 6rem;
-            text-align: center;
+            padding: 8rem 5% 4rem; text-align: center;
             background: radial-gradient(circle at top, #f0fdf4 0%, #ffffff 100%);
         }
 
         .hero h1 {
-            font-size: clamp(2.8rem, 6vw, 4.5rem);
-            line-height: 1.1;
-            margin-bottom: 1.5rem;
-            font-weight: 800;
-            letter-spacing: -0.03em;
+            font-size: clamp(2.5rem, 5vw, 4rem); line-height: 1.2;
+            margin-bottom: 1.5rem; letter-spacing: -0.02em;
         }
 
         .hero p {
-            font-size: 1.3rem;
-            color: var(--text-light);
-            max-width: 700px;
-            margin: 0 auto 3.5rem;
+            font-size: 1.2rem; color: var(--text-light);
+            max-width: 600px; margin: 0 auto 3rem;
         }
 
-        .cta-group {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 1.5rem;
-        }
+        .cta-group { display: flex; flex-direction: column; align-items: center; gap: 1rem; }
 
         .waitlist-form {
-            display: flex;
-            gap: 0.8rem;
-            width: 100%;
-            max-width: 580px;
-            background: white;
-            padding: 10px;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.08);
-            border: 1px solid #edf2f7;
+            display: flex; width: 100%; max-width: 500px;
+            background: white; padding: 6px; border-radius: 14px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08); border: 1px solid #eee;
         }
 
         .waitlist-form input {
-            flex: 1;
-            padding: 1rem;
-            border: none;
-            outline: none;
-            font-size: 1.1rem;
-            padding-left: 1.5rem;
+            flex: 1; padding: 0.8rem 1rem; border: none; outline: none; font-size: 1rem;
         }
 
-        /* Features Section */
-        .features {
-            padding: 8rem 5%;
-            max-width: 1200px;
-            margin: 0 auto;
+        .btn-primary {
+            background: var(--primary-green); color: white; border: none;
+            padding: 0.8rem 1.5rem; border-radius: 10px; cursor: pointer;
+            font-weight: 600; transition: var(--transition); text-decoration: none;
         }
 
+        .btn-primary:hover { transform: translateY(-2px); opacity: 0.9; }
+
+        .btn-secondary {
+            color: var(--text-main); text-decoration: none; font-weight: 600;
+            font-size: 0.95rem; padding: 0.5rem; border-bottom: 2px solid var(--primary-green);
+        }
+
+        /* Features */
+        .features { padding: 5rem 5%; max-width: 1100px; margin: 0 auto; }
         .feature-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 2.5rem;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem;
         }
 
         .feature-card {
-            padding: 3rem;
-            border-radius: 32px;
-            background: var(--bg-gray);
-            border: 1px solid #f1f5f9;
-            transition: var(--transition);
+            padding: 2rem; border-radius: 20px; background: var(--bg-gray);
+            border: 1px solid #f1f5f9; transition: var(--transition);
         }
 
-        .feature-card:hover {
-            background: white;
-            transform: translateY(-8px);
-            box-shadow: 0 30px 60px -12px rgba(0,0,0,0.05);
-        }
+        .feature-card:hover { background: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
 
-        /* Amazon KDP Section */
-        .ecosystem-hint {
-            margin-top: 6rem;
-            padding: 3rem;
-            border-top: 1px dashed #cbd5e0;
-            text-align: center;
+        /* Amazon KDP */
+        .kdp-section {
+            margin-top: 4rem; text-align: center; padding: 2rem;
+            border-top: 1px dashed #ddd;
         }
 
         .kdp-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 12px;
-            background: #fff;
-            padding: 0.8rem 1.5rem;
-            border-radius: 50px;
-            font-size: 1rem;
-            color: #4a5568;
-            border: 1px solid #e2e8f0;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+            display: inline-flex; align-items: center; gap: 10px;
+            padding: 0.6rem 1.2rem; background: #fff; border-radius: 30px;
+            border: 1px solid #eee; font-size: 0.9rem;
         }
 
-        footer {
-            padding: 5rem 5% 3rem;
-            background: #fff;
-            text-align: center;
-            border-top: 1px solid #eee;
-        }
+        footer { padding: 4rem 5%; text-align: center; border-top: 1px solid #eee; color: var(--text-light); font-size: 0.9rem; }
 
-        @media (max-width: 768px) {
-            .waitlist-form { flex-direction: column; background: transparent; border: none; box-shadow: none; padding: 0; }
-            .waitlist-form input { border: 1px solid #eee; border-radius: 14px; margin-bottom: 0.5rem; padding: 1.2rem; }
-            .hero { padding-top: 7rem; }
+        @media (max-width: 600px) {
+            .waitlist-form { flex-direction: column; background: none; border: none; box-shadow: none; }
+            .waitlist-form input { border: 1px solid #eee; border-radius: 10px; margin-bottom: 0.5rem; }
         }
     </style>
+</head>
+<body>
+
+    <nav>
+        <div class="nav-container">
+            <a href="#" class="logo">🌲 Trees Pinyin</a>
+            <a href="#waitlist" class="btn-primary" style="padding: 0.5rem 1rem; font-size: 0.9rem;">Get Started</a>
+        </div>
+    </nav>
+
+    <section class="hero" id="waitlist">
+        <h1>解码汉字，<br><span style="color: var(--primary-green);">从每一片叶子开始</span></h1>
+        <p>Trees Pinyin 致力于通过现代化的交互设计，让拼音学习与中文注音变得直观、高效、充满乐趣。</p>
+        
+        <div class="cta-group">
+            <div class="waitlist-form">
+                <input type="email" placeholder="输入邮箱获取早期体验..." required>
+                <button class="btn-primary">加入候补名单</button>
+            </div>
+            
+            <a href="#" class="btn-secondary">
+                🌐 Request Access to Chrome Extension (Beta)
+            </a>
+        </div>
+    </section>
+
+    <section class="features">
+        <div class="feature-grid">
+            <div class="feature-card">
+                <div style="font-size: 2rem; margin-bottom: 1rem;">🌳</div>
+                <h3>原生语义注音</h3>
+                <p>智能识别多音字，通过上下文感知确保 100% 的注音准确性。</p>
+            </div>
+            <div class="feature-card">
+                <div style="font-size: 2rem; margin-bottom: 1rem;">✨</div>
+                <h3>极简设计美学</h3>
+                <p>像 Notion 一样纯净，抛弃臃肿，让你的注意力回归内容本身。</p>
+            </div>
+            <div class="feature-card">
+                <div style="font-size: 2rem; margin-bottom: 1rem;">🔌</div>
+                <h3>工作流集成</h3>
+                <p>从浏览器插件到移动端，Trees Pinyin 随时随地为你开启辅助。</p>
+            </div>
+        </div>
+
+        <div class="k
