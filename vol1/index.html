@@ -1,1270 +1,162 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Volume 1 点读词表</title>
+    <title>Volume 1 Vocabulary List</title>
     <style>
-        body { background: #121212; color: #eee; font-family: sans-serif; padding: 20px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; max-width: 1200px; margin: 0 auto; }
-        .card { background: #1e1e1e; border-radius: 15px; padding: 20px 10px; text-align: center; cursor: pointer; transition: 0.2s; border: 1px solid #333; display: flex; flex-direction: column; justify-content: center; min-height: 120px; }
-        .card:active { background: #333; transform: scale(0.95); }
-        .zh { font-size: 22px; font-weight: bold; margin-bottom: 5px; color: #fff; }
-        .en { font-size: 14px; color: #888; margin-bottom: 8px; font-style: italic; }
-        .hint { font-size: 10px; color: #444; }
-        h1 { text-align: center; color: #4CAF50; }
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1 {
+            color: #4CAF50;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        .download-link {
+            color: #b39ddb;
+            text-decoration: none;
+            font-size: 16px;
+            margin-bottom: 40px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .download-link:hover {
+            text-decoration: underline;
+        }
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+            width: 100%;
+            max-width: 1200px;
+        }
+        .card {
+            background-color: #1e1e1e;
+            border: 1px solid #2d2d2d;
+            border-radius: 16px;
+            padding: 30px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s, border-color 0.2s;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 160px;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: #4CAF50;
+            background-color: #252525;
+        }
+        .chinese {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+        .english {
+            font-size: 16px;
+            color: #aaaaaa;
+            font-style: italic;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+        .audio-btn {
+            font-size: 13px;
+            color: #888888;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+        .card:hover .audio-btn {
+            color: #ffffff;
+        }
     </style>
 </head>
 <body>
-    <h1>Volume 1 点读词表</h1>
-        <p style="text-align: center;"><a href="https://treespinyin.com" download>📥 Download Anki Flashcards Deck</a></p>
 
-    <div class="grid">
-        <div class="card" onclick="playAudio('audio/snd_0.mp3')">
-            <div class="zh">二</div>
-            <div class="en">Two (2)</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
+    <h1>Volume 1 Vocabulary List</h1>
+    <a href="Easy_Mandarin_Speaking_Trees_Pinyin_Book_1.apkg" class="download-link">📩 Download Anki Flashcards Deck</a>
 
-        <div class="card" onclick="playAudio('audio/snd_1.mp3')">
-            <div class="zh">三</div>
-            <div class="en">Three (3)</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
+    <div class="grid-container" id="grid"></div>
 
-        <div class="card" onclick="playAudio('audio/snd_2.mp3')">
-            <div class="zh">四</div>
-            <div class="en">Four (4)</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_3.mp3')">
-            <div class="zh">五</div>
-            <div class="en">Five (5)</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_4.mp3')">
-            <div class="zh">六</div>
-            <div class="en">Six (6)</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_5.mp3')">
-            <div class="zh">七 </div>
-            <div class="en">Seven (7)</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_6.mp3')">
-            <div class="zh">八</div>
-            <div class="en">Eight (8)</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_7.mp3')">
-            <div class="zh">九 </div>
-            <div class="en">Nine (9)</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_8.mp3')">
-            <div class="zh">十</div>
-            <div class="en">Ten (10)</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_9.mp3')">
-            <div class="zh">百 </div>
-            <div class="en">Hundred (100)</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_10.mp3')">
-            <div class="zh">千</div>
-            <div class="en">Thousand (1,000)</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_11.mp3')">
-            <div class="zh">万</div>
-            <div class="en">Ten thousan(10,000)</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_12.mp3')">
-            <div class="zh">亿</div>
-            <div class="en">One hundred million(100,000,000)</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_13.mp3')">
-            <div class="zh">万亿</div>
-            <div class="en">Trillion(1,000,000,000,000)</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_14.mp3')">
-            <div class="zh">二十五</div>
-            <div class="en">Twenty-five（25）</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_15.mp3')">
-            <div class="zh">三百二十五</div>
-            <div class="en">Three hundred and twenty-five（325）</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_16.mp3')">
-            <div class="zh">两千三百二十五</div>
-            <div class="en">Two thousand three hundred and twenty-five（2,325）</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_17.mp3')">
-            <div class="zh">十万两千三百二十五</div>
-            <div class="en">A hundred and two thousand three hundred and twenty-five（102,325）</div>
-            <div class="hint">Click for Audio 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_18.mp3')">
-            <div class="zh">你好</div>
-            <div class="en">Hello/How are you?/How's it going?...</div>
-            <div class="hint">Click for Audio 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_19.mp3')">
-            <div class="zh">你</div>
-            <div class="en">You(Second Person Singular)</div>
-            <div class="hint">Click for Audio 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_20.mp3')">
-            <div class="zh">好</div>
-            <div class="en">Good</div>
-            <div class="hint">Click for Audio 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_21.mp3')">
-            <div class="zh">早上好</div>
-            <div class="en">Good morning.</div>
-            <div class="hint">Click for Audio 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_22.mp3')">
-            <div class="zh">早上</div>
-            <div class="en">morning</div>
-            <div class="hint">Click for Audio 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_23.mp3')">
-            <div class="zh">大家好</div>
-            <div class="en">Hello everyone!</div>
-            <div class="hint">Click for Audio 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_24.mp3')">
-            <div class="zh">大</div>
-            <div class="en">big</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_25.mp3')">
-            <div class="zh">家</div>
-            <div class="en">home/family</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_26.mp3')">
-            <div class="zh">新年快乐！</div>
-            <div class="en">Happy New Year!</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_27.mp3')">
-            <div class="zh">快乐</div>
-            <div class="en">Happy</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_28.mp3')">
-            <div class="zh">新</div>
-            <div class="en">New</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_29.mp3')">
-            <div class="zh">年</div>
-            <div class="en">Year</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_30.mp3')">
-            <div class="zh">恭喜发财</div>
-            <div class="en">Congratulations and be prosperous(Wish you to be rich).</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_31.mp3')">
-            <div class="zh">恭喜！</div>
-            <div class="en">Congratulations</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_32.mp3')">
-            <div class="zh">发财</div>
-            <div class="en">To be rich/prosperous</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_33.mp3')">
-            <div class="zh">请问</div>
-            <div class="en">Could you tell me…?/May I ask...?/Excuse me</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_34.mp3')">
-            <div class="zh">谢谢</div>
-            <div class="en">Thank you!/ I appreciate it.</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_35.mp3')">
-            <div class="zh">再见</div>
-            <div class="en">See ya/ See you/Good-bye/Bye-Bye</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_36.mp3')">
-            <div class="zh">不客气。</div>
-            <div class="en">You are welcome.</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_37.mp3')">
-            <div class="zh">对不起。</div>
-            <div class="en">I’m sorry./Pardon me.</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_38.mp3')">
-            <div class="zh">对</div>
-            <div class="en">Right/Yes/correct</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_39.mp3')">
-            <div class="zh">不</div>
-            <div class="en">Not / no</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_40.mp3')">
-            <div class="zh">没关系</div>
-            <div class="en">qi/Get up/Seven/Wife…</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_41.mp3')">
-            <div class="zh">不气</div>
-            <div class="en">It doesn't matter/ It's OK.</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_42.mp3')">
-            <div class="zh">别生气。</div>
-            <div class="en">Don't get angry.</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_43.mp3')">
-            <div class="zh">生</div>
-            <div class="en">Get/Birth/Sound</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_44.mp3')">
-            <div class="zh">医生</div>
-            <div class="en">Doctor</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_45.mp3')">
-            <div class="zh">生日</div>
-            <div class="en">Birthday</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_46.mp3')">
-            <div class="zh">日</div>
-            <div class="en">day/sun</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_47.mp3')">
-            <div class="zh">生日快乐！</div>
-            <div class="en">Happy birthday!</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_48.mp3')">
-            <div class="zh">一个</div>
-            <div class="en">a/an</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_49.mp3')">
-            <div class="zh">这/这个</div>
-            <div class="en">This/The</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_50.mp3')">
-            <div class="zh">是</div>
-            <div class="en">Was/is/am/are/were/been</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_51.mp3')">
-            <div class="zh">是的</div>
-            <div class="en">Yes</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_52.mp3')">
-            <div class="zh">我的</div>
-            <div class="en">My/mine</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_53.mp3')">
-            <div class="zh">这是我的。</div>
-            <div class="en">This is mine.</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_54.mp3')">
-            <div class="zh">这是我的吉他。</div>
-            <div class="en">This is my guitar.</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_55.mp3')">
-            <div class="zh">这个吉他是我的。</div>
-            <div class="en">The guitar is mine.</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_56.mp3')">
-            <div class="zh">我</div>
-            <div class="en">I / me</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_57.mp3')">
-            <div class="zh">的 </div>
-            <div class="en">of / ’s</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_58.mp3')">
-            <div class="zh">他是我最好的朋友。</div>
-            <div class="en">He is my best friend.</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_59.mp3')">
-            <div class="zh">最好的</div>
-            <div class="en">best</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_60.mp3')">
-            <div class="zh">朋友</div>
-            <div class="en">friend</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_61.mp3')">
-            <div class="zh">你</div>
-            <div class="en">You(Second Person Singular)</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_62.mp3')">
-            <div class="zh">你的</div>
-            <div class="en">Your/Yours（Second Person Singular）</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_63.mp3')">
-            <div class="zh">它</div>
-            <div class="en">It/he/she/him/her</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_64.mp3')">
-            <div class="zh">它的</div>
-            <div class="en">Its/her/hers/his</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_65.mp3')">
-            <div class="zh">们</div>
-            <div class="en">mer n</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_66.mp3')">
-            <div class="zh">我们</div>
-            <div class="en">We/us</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_67.mp3')">
-            <div class="zh">我们的</div>
-            <div class="en">Our/Ours</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_68.mp3')">
-            <div class="zh">你们</div>
-            <div class="en">You（Second Person Plural）</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_69.mp3')">
-            <div class="zh">你们的</div>
-            <div class="en">Your/Yours（Second Person Plural）</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_70.mp3')">
-            <div class="zh">他们</div>
-            <div class="en">They/Them</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_71.mp3')">
-            <div class="zh">他们的</div>
-            <div class="en">Their/Theirs</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_72.mp3')">
-            <div class="zh">我是利奥。</div>
-            <div class="en">I am Leo.</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_73.mp3')">
-            <div class="zh">这是我的弟弟胡安。</div>
-            <div class="en">This is my younger brother ‘Juan’.</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_74.mp3')">
-            <div class="zh">弟弟/弟</div>
-            <div class="en">younger brother</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_75.mp3')">
-            <div class="zh">哥哥/哥</div>
-            <div class="en">elder brother</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_76.mp3')">
-            <div class="zh">国</div>
-            <div class="en">country</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_77.mp3')">
-            <div class="zh">美国</div>
-            <div class="en">the United States</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_78.mp3')">
-            <div class="zh">我们是美国人。</div>
-            <div class="en">We are  Amerian.</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_79.mp3')">
-            <div class="zh">人</div>
-            <div class="en">human/man/people/peson/Individual</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_80.mp3')">
-            <div class="zh">中国</div>
-            <div class="en">China</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_81.mp3')">
-            <div class="zh">韩国</div>
-            <div class="en">Korea</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_82.mp3')">
-            <div class="zh">泰国</div>
-            <div class="en">Thailand</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_83.mp3')">
-            <div class="zh">英国</div>
-            <div class="en">England/U.K.</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_84.mp3')">
-            <div class="zh">德国</div>
-            <div class="en">Germany</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_85.mp3')">
-            <div class="zh">法国</div>
-            <div class="en">France</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_86.mp3')">
-            <div class="zh">我喜欢中国。</div>
-            <div class="en">I like China.</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_87.mp3')">
-            <div class="zh">喜欢</div>
-            <div class="en">like/love</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_88.mp3')">
-            <div class="zh">是的，我是</div>
-            <div class="en">Yes-no questions</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_89.mp3')">
-            <div class="zh">你是莉莉吗？</div>
-            <div class="en">Are you Lily?</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_90.mp3')">
-            <div class="zh">不，我不是。</div>
-            <div class="en">No, I am not.</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_91.mp3')">
-            <div class="zh">我不是莉莉。</div>
-            <div class="en">I am not Lily.</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_92.mp3')">
-            <div class="zh">我会弹吉他。</div>
-            <div class="en">I can play  guitar.</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_93.mp3')">
-            <div class="zh">会</div>
-            <div class="en">can</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_94.mp3')">
-            <div class="zh">弹</div>
-            <div class="en">play</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_95.mp3')">
-            <div class="zh">吉他</div>
-            <div class="en">guitar</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_96.mp3')">
-            <div class="zh">你会弹吉他吗？</div>
-            <div class="en">Can you play  guitar?</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_97.mp3')">
-            <div class="zh">吗</div>
-            <div class="en">mah</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_98.mp3')">
-            <div class="zh">是的，我会</div>
-            <div class="en">Yes, I can.</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_99.mp3')">
-            <div class="zh">不，我不会</div>
-            <div class="en">No, I can’t.</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_100.mp3')">
-            <div class="zh">我不会弹吉他。</div>
-            <div class="en">I can't play guitar.</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_101.mp3')">
-            <div class="zh">我喜欢唱歌。</div>
-            <div class="en">I like singing.</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_102.mp3')">
-            <div class="zh">唱歌</div>
-            <div class="en">singing/sing a song</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_103.mp3')">
-            <div class="zh">你喜欢唱歌吗？</div>
-            <div class="en">Do you like singing?</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_104.mp3')">
-            <div class="zh">是的，我喜欢</div>
-            <div class="en">Yes , I do.</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_105.mp3')">
-            <div class="zh">不，我喜欢</div>
-            <div class="en">No, I don’t.</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_106.mp3')">
-            <div class="zh">我不喜欢唱歌。</div>
-            <div class="en">I don’t like singing.</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_107.mp3')">
-            <div class="zh">你喜欢什么？</div>
-            <div class="en">What do you like?/What are you into?</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_108.mp3')">
-            <div class="zh">什么</div>
-            <div class="en">What</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_109.mp3')">
-            <div class="zh">你喜欢什么电影/书？</div>
-            <div class="en">What movie/sports/book do you like?</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_110.mp3')">
-            <div class="zh">你找谁？</div>
-            <div class="en">Who are you looking for?</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_111.mp3')">
-            <div class="zh">这个吉他是我的。</div>
-            <div class="en">Who</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_112.mp3')">
-            <div class="zh">找</div>
-            <div class="en">look for/be looking for</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_113.mp3')">
-            <div class="zh">这是谁的吉他？</div>
-            <div class="en">Whose guitar is this?</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_114.mp3')">
-            <div class="zh">谁的</div>
-            <div class="en">Whose</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_115.mp3')">
-            <div class="zh">你最喜欢哪个？</div>
-            <div class="en">Which do you like best?</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_116.mp3')">
-            <div class="zh">哪个</div>
-            <div class="en">Which</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_117.mp3')">
-            <div class="zh">会议是什么时候？</div>
-            <div class="en">When is the meeting?</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_118.mp3')">
-            <div class="zh">会议</div>
-            <div class="en">meeting（fixed phrase）</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_119.mp3')">
-            <div class="zh">什么时候</div>
-            <div class="en">When/what time</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_120.mp3')">
-            <div class="zh">时候</div>
-            <div class="en">time（fixed phrase）</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_121.mp3')">
-            <div class="zh">你来自哪里？</div>
-            <div class="en">Where are you from?</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_122.mp3')">
-            <div class="zh">来自</div>
-            <div class="en">From</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_123.mp3')">
-            <div class="zh">哪里</div>
-            <div class="en">Where（fixed phrase）</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_124.mp3')">
-            <div class="zh">为什么不</div>
-            <div class="en">Why not?</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_125.mp3')">
-            <div class="zh">为什么</div>
-            <div class="en">Why</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_126.mp3')">
-            <div class="zh">最近的超市怎么走</div>
-            <div class="en">How to go to the nearest supermarket?</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_127.mp3')">
-            <div class="zh">怎么</div>
-            <div class="en">How</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_128.mp3')">
-            <div class="zh">走</div>
-            <div class="en">go/to go to</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_129.mp3')">
-            <div class="zh">最近的</div>
-            <div class="en">nearest</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_130.mp3')">
-            <div class="zh">超市</div>
-            <div class="en">supermarket</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_131.mp3')">
-            <div class="zh">多远？</div>
-            <div class="en">How far (is it)?</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_132.mp3')">
-            <div class="zh">多</div>
-            <div class="en">How</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_133.mp3')">
-            <div class="zh">远</div>
-            <div class="en">far</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_134.mp3')">
-            <div class="zh">多少</div>
-            <div class="en">How many/How much</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_135.mp3')">
-            <div class="zh">多少钱</div>
-            <div class="en">How much (is it)?</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_136.mp3')">
-            <div class="zh">多大</div>
-            <div class="en">How old （are you）?</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_137.mp3')">
-            <div class="zh">欢迎。</div>
-            <div class="en">Welcome.</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_138.mp3')">
-            <div class="zh">您几位？</div>
-            <div class="en">How many in your party/of you?</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_139.mp3')">
-            <div class="zh">几位</div>
-            <div class="en">how many(people)</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_140.mp3')">
-            <div class="zh">两位</div>
-            <div class="en">Two.</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_141.mp3')">
-            <div class="zh">这边请</div>
-            <div class="en">This way, please.</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_142.mp3')">
-            <div class="zh">这是菜单。</div>
-            <div class="en">Here’s the menu.</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_143.mp3')">
-            <div class="zh">这是</div>
-            <div class="en">Here’s</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_144.mp3')">
-            <div class="zh">菜单</div>
-            <div class="en">the menu</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_145.mp3')">
-            <div class="zh">谢谢。</div>
-            <div class="en">Thank you.</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_146.mp3')">
-            <div class="zh">你想要喝什么？</div>
-            <div class="en">What would you like to drink?</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_147.mp3')">
-            <div class="zh">想要</div>
-            <div class="en">would like= want</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_148.mp3')">
-            <div class="zh">喝</div>
-            <div class="en">to drink</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_149.mp3')">
-            <div class="zh">两杯奶茶。</div>
-            <div class="en">Two cups of milk tea.</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_150.mp3')">
-            <div class="zh">杯</div>
-            <div class="en">cup</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_151.mp3')">
-            <div class="zh">奶</div>
-            <div class="en">milk</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_152.mp3')">
-            <div class="zh">茶</div>
-            <div class="en">tea</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_153.mp3')">
-            <div class="zh">你们的招牌菜是什么？</div>
-            <div class="en">What are your specialties ?</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_154.mp3')">
-            <div class="zh">招牌菜</div>
-            <div class="en">specialties</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_155.mp3')">
-            <div class="zh">陈皮鸡</div>
-            <div class="en">Orange Chicken</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_156.mp3')">
-            <div class="zh">芥蓝牛</div>
-            <div class="en">Broccoli beef</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_157.mp3')">
-            <div class="zh">饺子</div>
-            <div class="en">Dumplings</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_158.mp3')">
-            <div class="zh">麻婆豆腐</div>
-            <div class="en">Mapo Tofu</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_159.mp3')">
-            <div class="zh">不要辣</div>
-            <div class="en">No spicy</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_160.mp3')">
-            <div class="zh">辣</div>
-            <div class="en">spicy</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_161.mp3')">
-            <div class="zh">微辣</div>
-            <div class="en">Mildly spicy</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_162.mp3')">
-            <div class="zh">买单</div>
-            <div class="en">4.Check,(please).</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_163.mp3')">
-            <div class="zh">下午好。</div>
-            <div class="en">Good afternoon.</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_164.mp3')">
-            <div class="zh">下午</div>
-            <div class="en">afternoon</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_165.mp3')">
-            <div class="zh">怎么啦 ？</div>
-            <div class="en">What’s the matter ?</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_166.mp3')">
-            <div class="zh">啦</div>
-            <div class="en">lah</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_167.mp3')">
-            <div class="zh">我头疼。</div>
-            <div class="en">I have a headache.</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_168.mp3')">
-            <div class="zh">头</div>
-            <div class="en">head</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_169.mp3')">
-            <div class="zh">疼</div>
-            <div class="en">ache</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_170.mp3')">
-            <div class="zh">流鼻涕</div>
-            <div class="en">I have a runny nose</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_171.mp3')">
-            <div class="zh">流</div>
-            <div class="en">runny</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_172.mp3')">
-            <div class="zh">多久啦</div>
-            <div class="en">How long (have you had it)?</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_173.mp3')">
-            <div class="zh">久</div>
-            <div class="en">long</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_174.mp3')">
-            <div class="zh">三天</div>
-            <div class="en">Three days</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_175.mp3')">
-            <div class="zh">天</div>
-            <div class="en">day</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_176.mp3')">
-            <div class="zh">量体温</div>
-            <div class="en">Take your temperature</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_177.mp3')">
-            <div class="zh">量</div>
-            <div class="en">take/measure</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_178.mp3')">
-            <div class="zh">体温</div>
-            <div class="en">temperature</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_179.mp3')">
-            <div class="zh">张开嘴。</div>
-            <div class="en">Open your mouth.</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_180.mp3')">
-            <div class="zh">张开</div>
-            <div class="en">open</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_181.mp3')">
-            <div class="zh">嘴</div>
-            <div class="en">mouth</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_182.mp3')">
-            <div class="zh">说“啊”。</div>
-            <div class="en">Say ‘ah’.</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_183.mp3')">
-            <div class="zh">普通感冒</div>
-            <div class="en">(It's just) a common cold.</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_184.mp3')">
-            <div class="zh">普</div>
-            <div class="en">common</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_185.mp3')">
-            <div class="zh">感冒</div>
-            <div class="en">cold</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_186.mp3')">
-            <div class="zh">多休息，多喝水。</div>
-            <div class="en">Get more rest and drink more water.</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_187.mp3')">
-            <div class="zh">多</div>
-            <div class="en">more</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_188.mp3')">
-            <div class="zh">休息</div>
-            <div class="en">rest</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_189.mp3')">
-            <div class="zh">喝</div>
-            <div class="en">drink</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_190.mp3')">
-            <div class="zh">水</div>
-            <div class="en">water</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_191.mp3')">
-            <div class="zh">护照</div>
-            <div class="en">passport</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_192.mp3')">
-            <div class="zh">驾照</div>
-            <div class="en">driver’s license（fixed phrase）</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_193.mp3')">
-            <div class="zh">拍照</div>
-            <div class="en">take a photo</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_194.mp3')">
-            <div class="zh">指纹</div>
-            <div class="en">fingerprint</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_195.mp3')">
-            <div class="zh">姓名</div>
-            <div class="en">name</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_196.mp3')">
-            <div class="zh">名</div>
-            <div class="en">First name</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_197.mp3')">
-            <div class="zh">姓什么</div>
-            <div class="en">Last name</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_198.mp3')">
-            <div class="zh">签名</div>
-            <div class="en">signature</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_199.mp3')">
-            <div class="zh">电话</div>
-            <div class="en">Telephone</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_200.mp3')">
-            <div class="zh">地址</div>
-            <div class="en">address</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_201.mp3')">
-            <div class="zh">排队</div>
-            <div class="en">Line up</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_202.mp3')">
-            <div class="zh">下一个</div>
-            <div class="en">Next/next one</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_203.mp3')">
-            <div class="zh">等一下</div>
-            <div class="en">(wait) a moment</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_204.mp3')">
-            <div class="zh">听懂了</div>
-            <div class="en">Got it/understand.</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_205.mp3')">
-            <div class="zh">了</div>
-            <div class="en">Ler (了/le)</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-
-        <div class="card" onclick="playAudio('audio/snd_206.mp3')">
-            <div class="zh">听懂了吗？</div>
-            <div class="en">Got it?</div>
-            <div class="hint">点击发音 🔊</div>
-        </div>
-</div>
     <script>
-        const audio = new Audio();
-        function playAudio(src) { audio.src = src; audio.play(); }
+        function parseCSVLine(line) {
+            const result = [];
+            let current = '';
+            let inQuotes = false;
+            for (let i = 0; i < line.length; i++) {
+                const char = line[i];
+                if (char === '"') {
+                    inQuotes = !inQuotes;
+                } else if (char === ',' && !inQuotes) {
+                    result.push(current.trim());
+                    current = '';
+                } else {
+                    current += char;
+                }
+            }
+            result.push(current.trim());
+            return result;
+        }
+
+        async function loadCards() {
+            try {
+                const response = await fetch('words.csv');
+                if (!response.ok) {
+                    document.getElementById('grid').innerHTML = '<p style="color:red;">Error: words.csv not found.</p>';
+                    return;
+                }
+                const text = await response.text();
+                const lines = text.split(/\r?\n/);
+                const grid = document.getElementById('grid');
+                
+                let audioIndex = 0;
+
+                lines.forEach((line) => {
+                    if (!line.trim()) return;
+                    
+                    const parts = parseCSVLine(line);
+                    if (parts.length < 2) return;
+                    
+                    audioIndex++; 
+                    
+                    const english = parts[0]; // A栏英文
+                    const chinese = parts[1]; // B栏中文
+                    
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    
+                    // 点击卡片：只播放中文发音
+                    card.onclick = () => {
+                        const audio = new Audio('audio/' + audioIndex + '.mp3');
+                        audio.play();
+                    };
+
+                    // 卡片内容：同时塞入了中文汉字和英文翻译，底部是 Click to Listen
+                    card.innerHTML = `
+                        <div class="chinese">${chinese}</div>
+                        <div class="english">${english}</div>
+                        <div class="audio-btn">Click to Listen 🔊</div>
+                    `;
+                    grid.appendChild(card);
+                });
+            } catch (error) {
+                console.error('Failed to load list:', error);
+            }
+        }
+
+        window.onload = loadCards;
     </script>
 </body>
 </html>
