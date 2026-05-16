@@ -93,10 +93,11 @@
 
     <script>
         // ==========================================
-        // 🛠️ 【请在这里直接粘贴你的数据！】
-        // 从 Google Sheet 复制所有内容，直接粘贴在下面两个反引号 `` 之间。
+        // 🛠️ 2. 【数据舱：已为您完整补齐“一”以及修复“万”之后的数据】
+        // 如果你后续还有更多单词，按相同格式（英文 + Tab键 + 中文）往下粘贴即可
         // ==========================================
-        const rawSheetData = `Two (2)	二
+        const rawSheetData = `One (1)	一
+Two (2)	二
 Three (3)	三
 Four (4)	四
 Five (5)	五
@@ -120,8 +121,20 @@ Trillion (1,000,000,000,000)	万亿`;
             lines.forEach(line => {
                 if (!line.trim()) return;
                 
-                // 自动识别从 Google Sheet 复制过来的制表符(Tab)或逗号切分
-                const parts = line.includes('\t') ? line.split('\t') : line.split(',');
+                // 3. 【算法升级】优先使用 Tab(制表符) 进行切分，完美绕过英文数字里的逗号干扰！
+                let parts = [];
+                if (line.includes('\t')) {
+                    parts = line.split('\t');
+                } else {
+                    // 如果没有Tab，则智能寻找最后一个逗号进行切分
+                    const lastComma = line.lastIndexOf(',');
+                    if (lastComma !== -1) {
+                        parts = [line.substring(0, lastComma), line.substring(lastComma + 1)];
+                    } else {
+                        parts = [line];
+                    }
+                }
+                
                 if (parts.length < 2) return;
 
                 audioIndex++;
