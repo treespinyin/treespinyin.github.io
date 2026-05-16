@@ -3,98 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trees Pinyin - Learning Platform</title>
-    <style>
-        body {
-            background-color: #0d1117;
-            color: #ffffff;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 60px 20px;
-        }
-        h1 { font-size: 48px; margin-bottom: 5px; color: #4CAF50; }
-        p.subtitle { font-size: 20px; color: #8b949e; margin-bottom: 50px; }
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 25px;
-            width: 100%;
-            max-width: 1100px;
-        }
-        .card {
-            background-color: #161b22;
-            border: 1px solid #30363d;
-            border-radius: 12px;
-            padding: 40px 30px;
-            text-align: center;
-            text-decoration: none;
-            color: inherit;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-        .card:hover {
-            border-color: #4CAF50;
-            transform: translateY(-5px);
-            background-color: #1c2128;
-        }
-        .card h2 { color: #4CAF50; margin-bottom: 15px; font-size: 28px; }
-        .card p { color: #8b949e; font-size: 16px; line-height: 1.5; }
-        .card.disabled { cursor: not-allowed; opacity: 0.7; }
-        .card.disabled:hover { transform: none; border-color: #30363d; }
-    </style>
-</head>
-<body>
-
-    <h1>Trees Pinyin</h1>
-    <p class="subtitle">Read Chinese Like English</p>
-
-    <div class="grid">
-        <a href="vol1/index.html" class="card">
-            <h2>Volume 1</h2>
-            <p>Fundamental Vocabulary & Reading (200+ Words & Sentences)</p>
-        </a>
-
-        <div class="card disabled">
-            <h2>Volume 2</h2>
-            <p>Coming Soon</p>
-        </div>
-
-        <div class="card disabled">
-            <h2>Volume 3</h2>
-            <p>Coming Soon</p>
-        </div>
-    </div>
-
-</body>
-</html>
-
-### 2. Volume 1 Page (`vol1/index.html`)
-Replace the `index.html` inside your **`vol1`** folder with this localized version:
-
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Volume 1 - Trees Pinyin</title>
+    <title>Volume 1 Vocabulary List</title>
     <style>
         body {
             background-color: #121212;
             color: #ffffff;
-            font-family: -apple-system, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
             margin: 0;
             padding: 40px 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
         }
-        h1 { color: #4CAF50; font-size: 32px; margin-bottom: 10px; }
-        .back-btn { color: #888; text-decoration: none; margin-bottom: 20px; font-size: 14px; }
-        .back-btn:hover { color: #fff; }
+        .back-link {
+            color: #888888;
+            text-decoration: none;
+            font-size: 14px;
+            margin-bottom: 20px;
+            align-self: flex-start;
+        }
+        .back-link:hover { color: #ffffff; }
+        h1 {
+            color: #4CAF50;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
         .download-link {
             color: #b39ddb;
             text-decoration: none;
@@ -104,6 +37,7 @@ Replace the `index.html` inside your **`vol1`** folder with this localized versi
             align-items: center;
             gap: 8px;
         }
+        .download-link:hover { text-decoration: underline; }
         .grid-container {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -118,32 +52,67 @@ Replace the `index.html` inside your **`vol1`** folder with this localized versi
             padding: 30px 20px;
             text-align: center;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: transform 0.2s, border-color 0.2s;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             min-height: 160px;
         }
-        .card:hover { transform: translateY(-5px); border-color: #4CAF50; background-color: #252525; }
-        .chinese { font-size: 36px; font-weight: bold; margin-bottom: 10px; }
-        .english { font-size: 16px; color: #aaaaaa; font-style: italic; margin-bottom: 20px; }
-        .audio-btn { font-size: 13px; color: #888; }
-        .card:hover .audio-btn { color: #fff; }
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: #4CAF50;
+            background-color: #252525;
+        }
+        .chinese {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+        .english {
+            font-size: 16px;
+            color: #aaaaaa;
+            font-style: italic;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+        .audio-btn {
+            font-size: 13px;
+            color: #888888;
+        }
+        .card:hover .audio-btn { color: #ffffff; }
     </style>
 </head>
 <body>
 
-    <a href="../index.html" class="back-btn">← Back to Volumes</a>
+    <a href="../index.html" class="back-link">← Back to Volumes</a>
     <h1>Volume 1 Vocabulary List</h1>
-    <a href="Easy_Mandarin_Speaking_Trees_Pinyin_Book_1.apkg" class="download-link">📩 Download Anki Flashcards Deck</a>
+    <a href="../Easy_Mandarin_Speaking_Trees_Pinyin_Book_1.apkg" class="download-link">📩 Download Anki Flashcards Deck</a>
 
     <div class="grid-container" id="grid"></div>
 
     <script>
-        // Automatic CSV parser for English (A) and Chinese (B)
+        function parseCSVLine(line) {
+            const result = [];
+            let current = '';
+            let inQuotes = false;
+            for (let i = 0; i < line.length; i++) {
+                const char = line[i];
+                if (char === '"') { inQuotes = !inQuotes; }
+                else if (char === ',' && !inQuotes) { result.push(current.trim()); current = ''; }
+                else { current += char; }
+            }
+            result.push(current.trim());
+            return result;
+        }
+
         async function loadCards() {
             try {
                 const response = await fetch('words.csv');
+                if (!response.ok) {
+                    document.getElementById('grid').innerHTML = '<p style="color:red; font-size:18px;">Error: words.csv not found inside vol1 folder.</p>';
+                    return;
+                }
                 const text = await response.text();
                 const lines = text.split(/\r?\n/);
                 const grid = document.getElementById('grid');
@@ -151,16 +120,20 @@ Replace the `index.html` inside your **`vol1`** folder with this localized versi
 
                 lines.forEach((line) => {
                     if (!line.trim()) return;
-                    const parts = line.split(','); 
+                    const parts = parseCSVLine(line);
                     if (parts.length < 2) return;
                     
-                    audioIndex++;
-                    const english = parts[0].trim();
-                    const chinese = parts[1].trim();
+                    audioIndex++; 
+                    const english = parts[0]; 
+                    const chinese = parts[1]; 
                     
                     const card = document.createElement('div');
                     card.className = 'card';
-                    card.onclick = () => { new Audio('audio/' + audioIndex + '.mp3').play(); };
+                    card.onclick = () => {
+                        const audio = new Audio('audio/' + audioIndex + '.mp3');
+                        audio.play();
+                    };
+
                     card.innerHTML = `
                         <div class="chinese">${chinese}</div>
                         <div class="english">${english}</div>
@@ -168,10 +141,11 @@ Replace the `index.html` inside your **`vol1`** folder with this localized versi
                     `;
                     grid.appendChild(card);
                 });
-            } catch (e) { console.error(e); }
+            } catch (error) {
+                console.error(error);
+            }
         }
         window.onload = loadCards;
     </script>
 </body>
 </html>
-
