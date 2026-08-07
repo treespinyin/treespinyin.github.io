@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trees Pinyin Interactive Diagnostic Quiz</title>
+    <style>
+        :root {
+            --primary-green: #2E7D32;
+            --dark-green: #1B5E20;
+            --accent-green: #E8F5E9;
+            --text-dark: #333333;
+            --muted-gray: #757575;
+            --white: #ffffff;
+            --blue-trees: #1565C0;
+            --orange-anchor: #E65100;
+        }
+        body {
+            background-color: #f4f6f4;
+            color: var(--text-dark);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            padding: 24px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: var(--white);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        h1 {
+            color: var(--primary-green);
+            font-size: 26px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .intro {
+            color: var(--muted-gray);
+            margin-bottom: 30px;
+            font-size: 15px;
+        }
+        .question-box {
+            display: none;
+        }
+        .question-box.active {
+            display: block;
+        }
+        .q-num {
+            font-size: 14px;
+            color: var(--primary-green);
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+        .q-text {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--text-dark);
+        }
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+        .option-btn {
+            background-color: #fafafa;
+            border: 2px solid #eeeeee;
+            padding: 14px 20px;
+            border-radius: 8px;
+            text-align: left;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            outline: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .option-btn:hover {
+            border-color: var(--primary-green);
+            background-color: var(--accent-green);
+        }
+        .option-btn.correct {
+            border-color: var(--primary-green);
+            background-color: #E8F5E9;
+            color: var(--dark-green);
+            font-weight: bold;
+        }
+        .option-btn.incorrect {
+            border-color: #D32F2F;
+            background-color: #FFEBEE;
+            color: #C62828;
+        }
+        .explain-box {
+            display: none;
+            background-color: #FFF3E0;
+            border-left: 5px solid var(--orange-anchor);
+            padding: 20px;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 25px;
+            font-size: 14px;
+            color: #5c3e12;
+            line-height: 1.6;
+        }
+        .explain-box h4 {
+            color: var(--orange-anchor);
+            margin-bottom: 6px;
+            font-size: 15px;
+            font-weight: bold;
+        }
+        .btn-nav {
+            display: flex;
+            justify-content: space-between;
+        }
+        .quiz-btn {
+            background-color: var(--primary-green);
+            color: var(--white);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 15px;
+            transition: background-color 0.2s;
+        }
+        .quiz-btn:hover {
+            background-color: var(--dark-green);
+        }
+        .quiz-btn:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        /* Results Section */
+        .results-box {
+            display: none;
+            text-align: center;
+            padding: 30px 10px;
+        }
+        .score-circle {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%%;
+            background-color: var(--accent-green);
+            color: var(--dark-green);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            font-weight: bold;
+            margin: 0 auto 25px auto;
+            border: 5px solid var(--primary-green);
+        }
+        .achievement-badge {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--orange-anchor);
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧩 Trees Pinyin: Interactive Tone & Vocabulary Quiz</h1>
+        <p class="intro">Test your intuition and master Mandarin tones through your familiar English listening instincts. Correct answers will play natural audio. (請點擊最接近您直覺發音聯想的選項！)</p>
+        
+        <div id="quiz-wrapper">
+            <!-- Question 1 -->
+            <div class="question-box active" id="q-1">
+                <div class="q-num">Question 1 of 5</div>
+                <div class="q-text">When you say the English word "Do" with strong emphasis and absolute certainty, like in "Yes, I DO!", which Chinese tone are you naturally pronouncing?</div>
+                <div class="options-list">
+                    <button class="option-btn" onclick="checkAnswer(1, 'A', false)">A) Tone 1 (doo) — High and steady</button>
+                    <button class="option-btn" onclick="checkAnswer(1, 'B', false)">B) Tone 2 (doo2) — Rising surprise query</button>
+                    <button class="option-btn" onclick="checkAnswer(1, 'C', false)">C) Tone 3 (doo3) — Low dip-and-scoop query</button>
+                    <button class="option-btn" onclick="checkAnswer(1, 'D', true)">D) Tone 4 (doo4) — Falling with emphasis and certainty</button>
+                </div>
+                <div class="explain-box" id="explain-1">
+                    <h4>💡 Explanation & Mnemonic (解析):</h4>
+                    The English assertive "Yes, I <strong>DO</strong>" falling tone corresponds perfectly to Chinese Tone 4 (去聲). It is short, punchy, and moves forcefully downward from high to low pitch!
+                </div>
+            </div>
+
+            <!-- Question 2 -->
+            <div class="question-box" id="q-2">
+                <div class="q-num">Question 2 of 5</div>
+                <div class="q-text">In Chapter 1, "Five" is pronounced as "woo3" (五). Which English context gives the dipping-and-rising Tone 3 feeling?</div>
+                <div class="options-list">
+                    <button class="option-btn" onclick="checkAnswer(2, 'A', false)">A) Saying "woo" to scare someone like a ghost</button>
+                    <button class="option-btn" onclick="checkAnswer(2, 'B', true)">B) In "Do you like reading?" — dipping low, then rising with curiosity</button>
+                    <button class="option-btn" onclick="checkAnswer(2, 'C', false)">C) Saying "woo" flatly while looking at a boring painting</button>
+                    <button class="option-btn" onclick="checkAnswer(2, 'D', false)">D) In "Yes, I do!" — dropping the voice instantly</button>
+                </div>
+                <div class="explain-box" id="explain-2">
+                    <h4>💡 Explanation & Mnemonic (解析):</h4>
+                    Correct! Tone 3 (上聲) is a "dip and rise" curve. In "Do you like reading?", "Do" dips down in pitch before the rest of the question rises, creating the perfect muscle memory for "woo3".
+                </div>
+            </div>
+
+            <!-- Question 3 -->
+            <div class="question-box" id="q-3">
+                <div class="q-num">Question 3 of 5</div>
+                <div class="q-text">Which "Number-Tone Anchor" represents December and the cozy winter holiday season, linking directly to "Beef" (neeoh2 (r)th4) and "Colleague" (ter oong2 (r)s4)?</div>
+                <div class="options-list">
+                    <button class="option-btn" onclick="checkAnswer(3, 'A', false)">A) Anchor 9-10 (Perfect & Long-lasting)</button>
+                    <button class="option-btn" onclick="checkAnswer(3, 'B', true)">B) Anchor 12 (Twelve / Holiday Season)</button>
+                    <button class="option-btn" onclick="checkAnswer(3, 'C', false)">C) Anchor 15 (Full Moon Reunion)</button>
+                    <button class="option-btn" onclick="checkAnswer(3, 'D', false)">D) Anchor 24 (明清 24位皇帝)</button>
+                </div>
+                <div class="explain-box" id="explain-3">
+                    <h4>💡 Explanation & Mnemonic (解析):</h4>
+                    Yes! Anchor 12 represents 12 December (the cozy holiday season). Holiday words like "Beef" (neeoh2 (r)th4) and "Colleague" (ter oong2 (r)s4) share this exact 2nd-and-4th tone pattern, rendering them highly memorable.
+                </div>
+            </div>
+
+            <!-- Question 4 -->
+            <div class="question-box" id="q-4">
+                <div class="q-num">Question 4 of 5</div>
+                <div class="q-text">The English word blend "food Jean" represents "nearby" in Trees Pinyin. What is its exact spelling and pronunciation in standard pinyin?</div>
+                <div class="options-list">
+                    <button class="option-btn" onclick="checkAnswer(4, 'A', false)">A) fáng jiān (房間) with rising Tone 2-1</button>
+                    <button class="option-btn" onclick="checkAnswer(4, 'B', false)">B) fēn jìn (分進) with flat Tone 1-4</button>
+                    <button class="option-btn" onclick="checkAnswer(4, 'C', true)">C) fù jìn (附近) with double assertive Tone 4-4</button>
+                    <button class="option-btn" onclick="checkAnswer(4, 'D', false)">D) fǔ jǐn (府緊) with dipping Tone 3-3</button>
+                </div>
+                <div class="explain-box" id="explain-4">
+                    <h4>💡 Explanation & Mnemonic (解析):</h4>
+                    You got it! "food Jean" blends into "foo4 jeen4", representing the standard pinyin "fù jìn" (附近). The double 4th tone represents the short, sharp assertiveness of "Yes, I DO!".
+                </div>
+            </div>
+
+            <!-- Question 5 -->
+            <div class="question-box" id="q-5">
+                <div class="q-num">Question 5 of 5</div>
+                <div class="q-text">On the Great Wall (长城), Dwayne's wife challenges him to pronounce "Winding away into the distance": "wan yan2 yee(oo)an3 tsee(oo)4" (蜿蜒远去). Why is this phrase famous in Trees Pinyin?</div>
+                <div class="options-list">
+                    <button class="option-btn" onclick="checkAnswer(5, 'A', false)">A) It is the hardest tongue twister with silent guides</button>
+                    <button class="option-btn" onclick="checkAnswer(5, 'B', false)">B) It has 4 consecutive 3rd tones</button>
+                    <button class="option-btn" onclick="checkAnswer(5, 'C', true)">C) Its tones (1, 2, 3, 4) climb up physically like the Great Wall's rising steps</button>
+                    <button class="option-btn" onclick="checkAnswer(5, 'D', false)">D) It contains a silent homophone for Dwayne's guitar</button>
+                </div>
+                <div class="explain-box" id="explain-5">
+                    <h4>💡 Explanation & Mnemonic (解析):</h4>
+                    Magnificent! The phrase "wan yan2 yee(oo)an3 tsee(oo)4" (蜿蜒远去) uses Tone 1, 2, 3, 4 in perfect order. The vocal pitch rises systematically, echoing the physically climbing steps of the Great Wall. This is the ultimate peak of pronunciation art!
+                </div>
+            </div>
+
+            <div class="btn-nav">
+                <button class="quiz-btn" id="prev-btn" onclick="changeQuestion(-1)" disabled>Previous</button>
+                <button class="quiz-btn" id="next-btn" onclick="changeQuestion(1)" disabled>Next</button>
+            </div>
+        </div>
+
+        <div class="results-box" id="results">
+            <div class="score-circle" id="score-text">5/5</div>
+            <div class="achievement-badge" id="achievement-badge">🏆 MANDARIN MASTER</div>
+            <p id="results-desc">Fantastic! Your listening intuition and tonal muscle memory are pristine. You are fully ready to converse in Mandarin with standard native confidence!</p>
+            <button class="quiz-btn" style="margin-top: 15px;" onclick="restartQuiz()">Restart Quiz</button>
+        </div>
+    </div>
+
+    <script>
+        let currentQuestion = 1;
+        const totalQuestions = 5;
+        let score = 0;
+        const answersRecorded = {};
+
+        function checkAnswer(qNum, option, isCorrect) {
+            if (answersRecorded[qNum] !== undefined) return; 
+            
+            answersRecorded[qNum] = isCorrect;
+            const explainBox = document.getElementById('explain-' + qNum);
+            explainBox.style.display = 'block';
+
+            const qBox = document.getElementById('q-' + qNum);
+            const buttons = qBox.querySelectorAll('.option-btn');
+            
+            buttons.forEach(btn => {
+                if (btn.innerText.startsWith(option)) {
+                    btn.classList.add(isCorrect ? 'correct' : 'incorrect');
+                } else if (isCorrect === false && btn.innerText.startsWith('D') && qNum === 1) {
+                    btn.classList.add('correct');
+                } else if (isCorrect === false && btn.innerText.startsWith('B') && qNum === 2) {
+                    btn.classList.add('correct');
+                } else if (isCorrect === false && btn.innerText.startsWith('B') && qNum === 3) {
+                    btn.classList.add('correct');
+                } else if (isCorrect === false && btn.innerText.startsWith('C') && qNum === 4) {
+                    btn.classList.add('correct');
+                } else if (isCorrect === false && btn.innerText.startsWith('C') && qNum === 5) {
+                    btn.classList.add('correct');
+                }
+            });
+
+            if (isCorrect) {
+                score++;
+                let successWord = "";
+                if (qNum === 1) successWord = "四";
+                if (qNum === 2) successWord = "五";
+                if (qNum === 3) successWord = "十二";
+                if (qNum === 4) successWord = "附近";
+                if (qNum === 5) successWord = "蜿蜒远去";
+                speak(successWord);
+            }
+
+            document.getElementById('next-btn').removeAttribute('disabled');
+        }
+
+        function changeQuestion(direction) {
+            const currentBox = document.getElementById('q-' + currentQuestion);
+            currentBox.classList.remove('active');
+
+            currentQuestion += direction;
+
+            if (currentQuestion > totalQuestions) {
+                showResults();
+                return;
+            }
+
+            const nextBox = document.getElementById('q-' + currentQuestion);
+            nextBox.classList.add('active');
+
+            document.getElementById('prev-btn').disabled = currentQuestion === 1;
+            
+            if (answersRecorded[currentQuestion] !== undefined) {
+                document.getElementById('next-btn').removeAttribute('disabled');
+            } else {
+                document.getElementById('next-btn').setAttribute('disabled', 'true');
+            }
+        }
+
+        function showResults() {
+            document.getElementById('quiz-wrapper').style.display = 'none';
+            const results = document.getElementById('results');
+            results.style.display = 'block';
+
+            const scoreText = document.getElementById('score-text');
+            scoreText.innerText = score + '/' + totalQuestions;
+
+            const badge = document.getElementById('achievement-badge');
+            const desc = document.getElementById('results-desc');
+
+            if (score === 5) {
+                badge.innerText = "🏆 MANDARIN MASTER";
+                desc.innerText = "Fantastic! Your listening intuition and tonal muscle memory are pristine. You are fully ready to converse in Mandarin with standard native confidence!";
+            } else if (score >= 3) {
+                badge.innerText = "⭐ PINYIN ADVENTURER";
+                desc.innerText = "Great job! You have a solid grasp of Trees Pinyin anchors and phonetic spelling rules. Just a little more listening practice with the online point-and-read player!";
+            } else {
+                badge.innerText = "🌱 TONAL EXPLORER";
+                desc.innerText = "A good start! The four tones take a little getting used to. Spend a few minutes repeating the 'Do-Rap' rhythm in Episode 0, and you will master it in no time.";
+            }
+        }
+
+        function restartQuiz() {
+            currentQuestion = 1;
+            score = 0;
+            for (let k in answersRecorded) delete answersRecorded[k];
+
+            document.querySelectorAll('.explain-box').forEach(box => box.style.display = 'none');
+            document.querySelectorAll('.option-btn').forEach(btn => {
+                btn.classList.remove('correct', 'incorrect');
+            });
+
+            document.getElementById('quiz-wrapper').style.display = 'block';
+            document.getElementById('results').style.display = 'none';
+            document.getElementById('q-1').classList.add('active');
+            for (let i = 2; i <= totalQuestions; i++) {
+                document.getElementById('q-' + i).classList.remove('active');
+            }
+
+            document.getElementById('prev-btn').disabled = true;
+            document.getElementById('next-btn').setAttribute('disabled', 'true');
+        }
+
+        function speak(word) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(word);
+                utterance.lang = 'zh-CN';
+                utterance.rate = 0.85;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+    </script>
+</body>
+</html>
