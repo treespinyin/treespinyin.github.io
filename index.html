@@ -1,92 +1,201 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trees Pinyin - Learning Navigation</title>
+    <title>Trees Pinyin - Interactive Learning Portal</title>
     <style>
-        body {
-            background-color: #121212;
-            color: #ffffff;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        :root {
+            --primary-green: #2E7D32;
+            --dark-green: #1B5E20;
+            --accent-green: #E8F5E9;
+            --text-dark: #333333;
+            --white: #ffffff;
+        }
+        * {
+            box-sizing: border-box;
             margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+        body {
             display: flex;
             flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            background-color: #f4f6f4;
+        }
+        /* Top Navigation Bar */
+        .navbar {
+            background-color: var(--primary-green);
+            color: var(--white);
+            display: flex;
             align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            padding: 20px;
+            justify-content: space-between;
+            padding: 12px 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            z-index: 1000;
+            position: relative;
         }
-        h1 {
-            color: #4CAF50;
-            font-size: 48px;
-            margin-bottom: 10px;
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
         }
-        .subtitle {
-            color: #aaaaaa;
+        .logo-icon {
+            font-size: 24px;
+            background: var(--white);
+            color: var(--primary-green);
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+        .logo-text {
             font-size: 20px;
-            margin-bottom: 50px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
         }
-        .grid-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 25px;
-            width: 100%;
-            max-width: 1000px;
+        /* Desktop Links */
+        .nav-links {
+            display: flex;
+            gap: 8px;
         }
-        .card {
-            background-color: #1e1e1e;
-            border: 1px solid #2d2d2d;
-            border-radius: 16px;
-            padding: 40px 20px;
-            text-align: center;
+        .nav-links a {
+            color: var(--white);
             text-decoration: none;
-            color: inherit;
-            transition: transform 0.2s, border-color 0.2s;
+            padding: 10px 16px;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 14px;
+            transition: all 0.2s ease;
         }
-        .card:hover:not(.disabled) {
-            transform: translateY(-5px);
-            border-color: #4CAF50;
-            background-color: #252525;
+        .nav-links a:hover, .nav-links a.active {
+            background-color: rgba(255, 255, 255, 0.15);
         }
-        .card h2 {
-            color: #4CAF50;
-            margin: 0 0 15px 0;
-            font-size: 28px;
+        .nav-links a.active {
+            background-color: var(--dark-green);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
         }
-        .card p {
-            color: #888888;
-            font-size: 16px;
-            margin: 0;
-            line-height: 1.5;
+        /* Hamburger Mobile Icon */
+        .menu-toggle {
+            display: none;
+            font-size: 24px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            color: var(--white);
         }
-        .disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
+        /* Iframe Main Portal Area */
+        .portal-frame {
+            flex-grow: 1;
+            width: 100%;
+            height: calc(100vh - 64px);
+            border: none;
+            background-color: #ffffff;
+        }
+        /* Mobile Navigation Overlay */
+        .mobile-nav {
+            display: none;
+            flex-direction: column;
+            background-color: var(--primary-green);
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 999;
+            padding: 8px 16px;
+            gap: 4px;
+        }
+        .mobile-nav a {
+            color: var(--white);
+            text-decoration: none;
+            padding: 12px 16px;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 15px;
+            display: block;
+        }
+        .mobile-nav a.active {
+            background-color: var(--dark-green);
+        }
+        @media (max-width: 900px) {
+            .nav-links {
+                display: none;
+            }
+            .menu-toggle {
+                display: block;
+            }
+            .mobile-nav.open {
+                display: flex;
+            }
         }
     </style>
 </head>
 <body>
 
-    <h1>treespinyin</h1>
-    <div class="subtitle">Read Chinese Like English</div>
-
-    <div class="grid-container">
-        <a href="vol1/index.html" class="card">
-            <h2>Volume 1</h2>
-            <p>Essential Vocabulary & Audio Practice<br>(200+ Words & Sentences)</p>
-        </a>
-
-        <div class="card disabled">
-            <h2>Volume 2</h2>
-            <p>Coming Soon</p>
+    <header class="navbar">
+        <div class="logo-area" onclick="navigateTo('about.html', this)">
+            <span class="logo-icon">🌴</span>
+            <span class="logo-text">Trees Pinyin</span>
         </div>
+        <button class="menu-toggle" onclick="toggleMobileMenu()">☰</button>
+        
+        <nav class="nav-links" id="nav-links">
+            <a href="about.html" target="content-frame" class="active" onclick="setActiveLink(this)">Home 🏡</a>
+            <a href="book1.html" target="content-frame" onclick="setActiveLink(this)">Book 1 🔊</a>
+            <a href="book2.html" target="content-frame" onclick="setActiveLink(this)">Book 2 🔊</a>
+            <a href="quiz.html" target="content-frame" onclick="setActiveLink(this)">Interactive Quiz 🧩</a>
+            <a href="updates.html" target="content-frame" onclick="setActiveLink(this)">What's New 📢</a>
+            <a href="subscribe.html" target="content-frame" onclick="setActiveLink(this)">Feedback & Join 📩</a>
+            <a href="courses.html" target="content-frame" onclick="setActiveLink(this)">Classes & Store 💎</a>
+        </nav>
+    </header>
 
-        <div class="card disabled">
-            <h2>Volume 3</h2>
-            <p>Coming Soon</p>
-        </div>
-    </div>
+    <nav class="mobile-nav" id="mobile-nav">
+        <a href="about.html" target="content-frame" class="active" onclick="handleMobileClick(this)">Home 🏡</a>
+        <a href="book1.html" target="content-frame" onclick="handleMobileClick(this)">Book 1 🔊</a>
+        <a href="book2.html" target="content-frame" onclick="handleMobileClick(this)">Book 2 🔊</a>
+        <a href="quiz.html" target="content-frame" onclick="handleMobileClick(this)">Interactive Quiz 🧩</a>
+        <a href="updates.html" target="content-frame" onclick="handleMobileClick(this)">What's New 📢</a>
+        <a href="subscribe.html" target="content-frame" onclick="handleMobileClick(this)">Feedback & Join 📩</a>
+        <a href="courses.html" target="content-frame" onclick="handleMobileClick(this)">Classes & Store 💎</a>
+    </nav>
 
+    <iframe id="content-frame" name="content-frame" src="about.html" class="portal-frame"></iframe>
+
+    <script>
+        function toggleMobileMenu() {
+            var mobileNav = document.getElementById('mobile-nav');
+            mobileNav.classList.toggle('open');
+        }
+
+        function setActiveLink(clickedLink) {
+            var links = document.querySelectorAll('.nav-links a, .mobile-nav a');
+            links.forEach(function(link) {
+                link.classList.remove('active');
+            });
+            var href = clickedLink.getAttribute('href');
+            var matchingLinks = document.querySelectorAll('a[href="' + href + '"]');
+            matchingLinks.forEach(function(link) {
+                link.classList.add('active');
+            });
+        }
+
+        function handleMobileClick(link) {
+            setActiveLink(link);
+            document.getElementById('mobile-nav').classList.remove('open');
+        }
+
+        function navigateTo(url, element) {
+            var frame = document.getElementById('content-frame');
+            frame.src = url;
+            var homeLink = document.querySelector('a[href="' + url + '"]');
+            if (homeLink) {
+                setActiveLink(homeLink);
+            }
+        }
+    </script>
 </body>
 </html>
