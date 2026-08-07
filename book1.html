@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book 1 point-and-read player</title>
+    <style>
+        :root {
+            --primary-green: #2E7D32;
+            --dark-green: #1B5E20;
+            --accent-green: #E8F5E9;
+            --text-dark: #333333;
+            --muted-gray: #757575;
+            --white: #ffffff;
+            --blue-trees: #1565C0;
+            --orange-anchor: #E65100;
+        }
+        body {
+            background-color: #f4f6f4;
+            color: var(--text-dark);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            padding: 24px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: var(--white);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        h1 {
+            color: var(--primary-green);
+            font-size: 26px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .search-area {
+            display: flex;
+            gap: 12px;
+            width: 100%;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .search-input {
+            flex-grow: 2;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 2px solid var(--accent-green);
+            font-size: 15px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .search-input:focus {
+            border-color: var(--primary-green);
+        }
+        .chapter-select {
+            flex-grow: 1;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 2px solid var(--accent-green);
+            font-size: 15px;
+            outline: none;
+            background-color: var(--white);
+            cursor: pointer;
+        }
+        .chapter-select:focus {
+            border-color: var(--primary-green);
+        }
+        /* Table Layout */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            text-align: left;
+            padding: 14px 16px;
+            border-bottom: 1px solid #eeeeee;
+        }
+        th {
+            background-color: var(--accent-green);
+            color: var(--dark-green);
+            font-weight: 700;
+        }
+        tr:hover {
+            background-color: #fafafa;
+        }
+        .hanzi-btn {
+            background: none;
+            border: none;
+            font-size: 22px;
+            font-weight: bold;
+            color: var(--primary-green);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: transform 0.15s;
+        }
+        .hanzi-btn:hover {
+            transform: scale(1.08);
+        }
+        .hanzi-btn span {
+            font-size: 14px;
+        }
+        .trees-pinyin {
+            font-size: 17px;
+            font-weight: bold;
+            color: var(--blue-trees);
+            font-style: italic;
+        }
+        .std-pinyin {
+            font-size: 13px;
+            color: var(--muted-gray);
+        }
+        .anchor-badge {
+            font-size: 13px;
+            color: var(--orange-anchor);
+            background-color: #FFF3E0;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: 500;
+            display: inline-block;
+        }
+        .chapter-cell {
+            font-size: 13px;
+            color: var(--muted-gray);
+        }
+        .tips-link {
+            color: var(--blue-trees);
+            font-weight: bold;
+            text-decoration: underline;
+            font-size: 13px;
+        }
+        .footer-action {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 30px;
+            background-color: #fafafa;
+            padding: 16px 20px;
+            border-radius: 8px;
+            border: 1px solid #eee;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .anki-btn {
+            background-color: var(--primary-green);
+            color: var(--white);
+            padding: 10px 18px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 14px;
+            transition: background-color 0.2s;
+        }
+        .anki-btn:hover {
+            background-color: var(--dark-green);
+        }
+        @media (max-width: 768px) {
+            table, thead, tbody, th, td, tr {
+                display: block;
+            }
+            thead {
+                display: none;
+            }
+            tr {
+                border-bottom: 2px solid var(--accent-green);
+                padding: 15px 0;
+            }
+            td {
+                border: none;
+                padding: 6px 12px;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+            td::before {
+                content: attr(data-label);
+                font-weight: bold;
+                color: var(--dark-green);
+                min-width: 100px;
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📘 Book 1 Point-and-Read Audio Player</h1>
+        </div>
+        
+        <div class="search-area">
+            <input type="text" id="search" class="search-input" placeholder="Search by English, Hanzi, or Pinyin...">
+            <select id="chapter-filter" class="chapter-select">
+                <option value="">All Chapters (全部章節)</option>
+                <option value="Ch. 1">Chapter 1: Number</option>
+                <option value="Ch. 2">Chapter 2: Everyday Conversation</option>
+                <option value="Ch. 4">Chapter 4: Self-introduction</option>
+                <option value="Ch. 7">Chapter 7: Restaurant</option>
+                <option value="Ch. 9">Chapter 9: Public Services</option>
+            </select>
+        </div>
+
+        <table id="vocab-table">
+            <thead>
+                <tr>
+                    <th>English Meaning</th>
+                    <th>Hanzi (点读 🔊)</th>
+                    <th>Trees Pinyin (特色)</th>
+                    <th>Standard Pinyin</th>
+                    <th>Tone Anchor</th>
+                    <th>Chapter</th>
+                    <th>Mnemonic Link</th>
+                </tr>
+            </thead>
+            <tbody id="table-body">
+                <!-- Javascript will insert vocabulary here -->
+            </tbody>
+        </table>
+
+        <div class="footer-action">
+            <span>🎁 Double-click an apk download, or download our premium pre-built deck here:</span>
+            <a href="https://www.treespinyin.com/vol1/Easy_Mandarin_Speaking_Trees_Pinyin_Book_1.apkg" class="anki-btn">📩 Download Book 1 Anki Deck</a>
+        </div>
+    </div>
+
+    <script>
+        const vocabulary = [
+    {
+        "id": 1,
+        "english": "One / 1",
+        "hanzi": "一",
+        "pinyin": "yī",
+        "trees": "ee",
+        "anchor": "1 (Flat)",
+        "chapter": "Ch. 1: Number"
+    },
+    {
+        "id": 2,
+        "english": "Two / 2",
+        "hanzi": "二",
+        "pinyin": "èr",
+        "trees": "uh er4",
+        "anchor": "4 (Falling)",
+        "chapter": "Ch. 1: Number"
+    },
+    {
+        "id": 3,
+        "english": "Three / 3",
+        "hanzi": "三",
+        "pinyin": "sān",
+        "trees": "san",
+        "anchor": "1 (Flat)",
+        "chapter": "Ch. 1: Number"
+    },
+    {
+        "id": 4,
+        "english": "Four / 4",
+        "hanzi": "四",
+        "pinyin": "sì",
+        "trees": "s4",
+        "anchor": "4 (Falling)",
+        "chapter": "Ch. 1: Number"
+    },
+    {
+        "id": 5,
+        "english": "Five / 5",
+        "hanzi": "五",
+        "pinyin": "wǔ",
+        "trees": "woo3",
+        "anchor": "3 (Dipping)",
+        "chapter": "Ch. 1: Number"
+    },
+    {
+        "id": 6,
+        "english": "Six / 6",
+        "hanzi": "六",
+        "pinyin": "liù",
+        "trees": "Leeoo4",
+        "anchor": "4 (Falling)",
+        "chapter": "Ch. 1: Number"
+    },
+    {
+        "id": 7,
+        "english": "Seven / 7",
+        "hanzi": "七",
+        "pinyin": "qī",
+        "trees": "tsee",
+        "anchor": "1 (Flat)",
+        "chapter": "Ch. 1: Number"
+    },
+    {
+        "id": 8,
+        "english": "Eight / 8",
+        "hanzi": "八",
+        "pinyin": "bā",
+        "trees": "bah",
+        "anchor": "1 (Flat)",
+        "chapter": "Ch. 1: Number"
+    },
+    {
+        "id": 9,
+        "english": "Nine / 9",
+        "hanzi": "九",
+        "pinyin": "jiǔ",
+        "trees": "jeeoo3",
+        "anchor": "3 (Dipping)",
+        "chapter": "Ch. 1: Number"
+    },
+    {
+        "id": 10,
+        "english": "Ten / 10",
+        "hanzi": "十",
+        "pinyin": "shí",
+        "trees": "(r)s2",
+        "anchor": "2 (Rising)",
+        "chapter": "Ch. 1: Number"
+    },
+    {
+        "id": 11,
+        "english": "Hello / How are you?",
+        "hanzi": "你好",
+        "pinyin": "nǐ hǎo",
+        "trees": "nee3 haw3",
+        "anchor": "3-3 Tone Change",
+        "chapter": "Ch. 2: Everyday Conversation"
+    },
+    {
+        "id": 12,
+        "english": "Good morning",
+        "hanzi": "早上好",
+        "pinyin": "zǎo shang hǎo",
+        "trees": "dsaw3 (r)sang4 haw3",
+        "anchor": "3, 4, 3 combo",
+        "chapter": "Ch. 2: Everyday Conversation"
+    },
+    {
+        "id": 13,
+        "english": "Congratulations & Be Prosperous",
+        "hanzi": "恭喜发财",
+        "pinyin": "gōng xǐ fā cái",
+        "trees": "ger oong see3 fah tsie2",
+        "anchor": "1, 3, 1, 2 combo",
+        "chapter": "Ch. 2: Everyday Conversation"
+    },
+    {
+        "id": 14,
+        "english": "Could you tell me...?",
+        "hanzi": "请问",
+        "pinyin": "qǐng wèn",
+        "trees": "tsing3 wer n4",
+        "anchor": "3, 4 combo",
+        "chapter": "Ch. 2: Everyday Conversation"
+    },
+    {
+        "id": 15,
+        "english": "Thank you!",
+        "hanzi": "谢谢",
+        "pinyin": "xiè xie",
+        "trees": "seeer4 seeer",
+        "anchor": "4, 5 (Light)",
+        "chapter": "Ch. 2: Everyday Conversation"
+    },
+    {
+        "id": 16,
+        "english": "See ya / Goodbye",
+        "hanzi": "再见",
+        "pinyin": "dsie4 jeean4",
+        "trees": "dsie4 jeean4",
+        "anchor": "4, 4 combo",
+        "chapter": "Ch. 2: Everyday Conversation"
+    },
+    {
+        "id": 17,
+        "english": "You are welcome",
+        "hanzi": "不客气",
+        "pinyin": "bú kè qi",
+        "trees": "boo2 ker4 tsee",
+        "anchor": "2, 4, 5 (Light)",
+        "chapter": "Ch. 2: Everyday Conversation"
+    },
+    {
+        "id": 18,
+        "english": "I'm sorry",
+        "hanzi": "对不起",
+        "pinyin": "duì bù qǐ",
+        "trees": "dooay4 boo4 tsee3",
+        "anchor": "4, 4, 3 combo",
+        "chapter": "Ch. 2: Everyday Conversation"
+    },
+    {
+        "id": 19,
+        "english": "It doesn't matter",
+        "hanzi": "没关系",
+        "pinyin": "méi guān xi",
+        "trees": "may2 gooan see",
+        "anchor": "2, 1, 5 (Light)",
+        "chapter": "Ch. 2: Everyday Conversation"
+    },
+    {
+        "id": 20,
+        "english": "China",
+        "hanzi": "中国",
+        "pinyin": "zhōng guó",
+        "trees": "(r)dser oong gooer2",
+        "anchor": "1, 2 combo",
+        "chapter": "Ch. 4: Self-introduction"
+    },
+    {
+        "id": 21,
+        "english": "The United States",
+        "hanzi": "美国",
+        "pinyin": "měi guó",
+        "trees": "may3 gooer2",
+        "anchor": "3, 2 combo",
+        "chapter": "Ch. 4: Self-introduction"
+    },
+    {
+        "id": 22,
+        "english": "Welcome",
+        "hanzi": "欢迎",
+        "pinyin": "huān yíng",
+        "trees": "hooan ying2",
+        "anchor": "1, 2 combo",
+        "chapter": "Ch. 7: Restaurant"
+    },
+    {
+        "id": 23,
+        "english": "Dumplings",
+        "hanzi": "饺子",
+        "pinyin": "jiǎo zi",
+        "trees": "jeeaw3 ds",
+        "anchor": "3, 5 (Light)",
+        "chapter": "Ch. 7: Restaurant"
+    },
+    {
+        "id": 24,
+        "english": "Check (please)",
+        "hanzi": "买单",
+        "pinyin": "mǎi dān",
+        "trees": "mie3 dan",
+        "anchor": "3, 1 combo",
+        "chapter": "Ch. 7: Restaurant"
+    },
+    {
+        "id": 25,
+        "english": "Passport",
+        "hanzi": "护照",
+        "pinyin": "hù zhào",
+        "trees": "hoo4 (r)dsaw4",
+        "anchor": "4, 4 combo",
+        "chapter": "Ch. 9: Public Services"
+    },
+    {
+        "id": 26,
+        "english": "Got it / Understand",
+        "hanzi": "听懂了",
+        "pinyin": "tīng dǒng le",
+        "trees": "ting der oong3 Ler",
+        "anchor": "1, 3, 5 (Light)",
+        "chapter": "Ch. 9: Public Services"
+    }
+];
+
+        const tableBody = document.getElementById('table-body');
+        const searchInput = document.getElementById('search');
+        const chapterFilter = document.getElementById('chapter-filter');
+
+        function renderTable(data) {
+            tableBody.innerHTML = '';
+            data.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td data-label="English">${item.english}</td>
+                    <td data-label="Hanzi">
+                        <button class="hanzi-btn" onclick="speak('${item.hanzi}')">
+                            ${item.hanzi} <span>🔊</span>
+                        </button>
+                    </td>
+                    <td data-label="Trees Pinyin" class="trees-pinyin">${item.trees}</td>
+                    <td data-label="Standard Pinyin" class="std-pinyin">${item.pinyin}</td>
+                    <td data-label="Tone Anchor"><span class="anchor-badge">${item.anchor}</span></td>
+                    <td data-label="Chapter" class="chapter-cell">${item.chapter}</td>
+                    <td data-label="Link">
+                        <a href="https://a.co/d/0aGVdcPJ" target="_blank" class="tips-link">Memory Tips</a>
+                    </td>
+                `;
+                tableBody.appendChild(tr);
+            });
+        }
+
+        function filterData() {
+            const query = searchInput.value.toLowerCase();
+            const selectedChapter = chapterFilter.value;
+
+            const filtered = vocabulary.filter(item => {
+                const matchesSearch = item.english.toLowerCase().includes(query) || 
+                                      item.hanzi.includes(query) || 
+                                      item.pinyin.toLowerCase().includes(query) || 
+                                      item.trees.toLowerCase().includes(query);
+                const matchesChapter = selectedChapter === "" || item.chapter.startsWith(selectedChapter);
+                return matchesSearch && matchesChapter;
+            });
+            renderTable(filtered);
+        }
+
+        function speak(word) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(word);
+                utterance.lang = 'zh-CN';
+                utterance.rate = 0.85; // Natural learning speed
+                window.speechSynthesis.speak(utterance);
+            } else {
+                alert('Audio point-and-read is not supported in this browser. Please try Chrome, Safari, or Edge.');
+            }
+        }
+
+        searchInput.addEventListener('input', filterData);
+        chapterFilter.addEventListener('change', filterData);
+
+        // Initial render
+        renderTable(vocabulary);
+    </script>
+</body>
+</html>
