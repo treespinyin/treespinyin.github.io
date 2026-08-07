@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>What's New - Trees Pinyin</title>
+    <style>
+        :root {
+            --primary-green: #2E7D32;
+            --accent-green: #E8F5E9;
+            --text-dark: #333333;
+            --muted-gray: #666666;
+            --white: #ffffff;
+        }
+        body {
+            background-color: #f4f6f4;
+            color: var(--text-dark);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            padding: 30px;
+        }
+        .container {
+            max-width: 850px;
+            margin: 0 auto;
+            background: var(--white);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        h1 {
+            color: var(--primary-green);
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+        .badge-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        .social-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            border-radius: 6px;
+            color: var(--white);
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 14px;
+            transition: opacity 0.2s;
+        }
+        .social-badge:hover {
+            opacity: 0.9;
+        }
+        .badge-yt { background-color: #FF0000; }
+        .badge-fb { background-color: #1877F2; }
+        .badge-tt { background-color: #000000; }
+        
+        .video-box {
+            background-color: #000;
+            aspect-ratio: 16/9;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            margin-bottom: 35px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+        .video-box iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%%;
+            height: 100%%;
+            border: none;
+        }
+        .update-item {
+            border-bottom: 1px solid #eee;
+            padding: 24px 0;
+        }
+        .update-item:last-child {
+            border-bottom: none;
+        }
+        .update-date {
+            font-size: 13px;
+            color: var(--muted-gray);
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+        .update-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--primary-green);
+            margin-bottom: 10px;
+        }
+        .update-content {
+            font-size: 15px;
+            color: #444;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📢 What's New & Media Updates</h1>
+        
+        <div class="badge-bar">
+            <a href="https://www.youtube.com/@TreesPinyin" target="_blank" class="social-badge badge-yt">🎬 YouTube channel</a>
+            <a href="https://www.facebook.com/treespinyin" target="_blank" class="social-badge badge-fb">👥 Facebook Page</a>
+            <a href="#" target="_blank" class="social-badge badge-tt">🎵 TikTok Short Video</a>
+        </div>
+
+        <div class="video-box">
+            <iframe src="https://www.youtube.com/embed/RBKKuvZWcD0" allowfullscreen></iframe>
+        </div>
+
+        <h2>Latest Release Notes (最新動態與圖書預告)</h2>
+        
+        <div class="update-item">
+            <div class="update-date">AUGUST 2026</div>
+            <div class="update-title">✨ Book 2 & Supporting Portal Live!</div>
+            <div class="update-content">
+                We are thrilled to announce that <strong>Trees Pinyin Volume 2 (Tonal Mastery & Beijing Tour)</strong> is officially live! Accompanying the book release, we have upgraded this digital sensory hub to include real-time point-and-read tables, interactive multi-choice quizzes, and CSS-shielded 100%% pure-audio Anki flashcards.
+            </div>
+        </div>
+
+        <div class="update-item">
+            <div class="update-date">COMING IN FALL 2026</div>
+            <div class="update-title">🚧 Book 3 (Everyday Shopping & Travel Scenarios) & Book 4 (Advanced Business Mandarin)</div>
+            <div class="update-content">
+                Our drafting pipeline has already begun for <strong>Book 3 and Book 4</strong>! We will tackle shopping negotiations, high-speed rail, taxi hailing, hotel bookings, and business contracts using our signature sound-meaning associations. Stay tuned by joining our mailing list!
+            </div>
+        </div>
+    </div>
+</body>
+</html>
