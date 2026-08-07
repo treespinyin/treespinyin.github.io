@@ -31,7 +31,7 @@
         }
         h1 {
             color: var(--primary-green);
-            font-size: 26px;
+            font-size: 24px;
             margin-bottom: 20px;
             display: flex;
             align-items: center;
@@ -145,7 +145,7 @@
         .score-circle {
             width: 140px;
             height: 140px;
-            border-radius: 50%%;
+            border-radius: 50%;
             background-color: var(--accent-green);
             color: var(--dark-green);
             display: flex;
@@ -271,7 +271,7 @@
         const answersRecorded = {};
 
         function checkAnswer(qNum, option, isCorrect) {
-            if (answersRecorded[qNum] !== undefined) return; 
+            if (answersRecorded[qNum] !== undefined) return;
             
             answersRecorded[qNum] = isCorrect;
             const explainBox = document.getElementById('explain-' + qNum);
