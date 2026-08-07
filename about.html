@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Trees Pinyin</title>
+    <style>
+        :root {
+            --primary-green: #2E7D32;
+            --accent-green: #E8F5E9;
+            --text-dark: #333333;
+            --muted-gray: #666666;
+            --white: #ffffff;
+        }
+        body {
+            background-color: #f4f6f4;
+            color: var(--text-dark);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            padding: 30px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--white);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        h1 {
+            color: var(--primary-green);
+            font-size: 32px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .subtitle {
+            font-size: 18px;
+            color: var(--muted-gray);
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+        .divider {
+            height: 2px;
+            background-color: var(--accent-green);
+            margin: 20px 0 30px 0;
+        }
+        h2 {
+            color: var(--primary-green);
+            font-size: 22px;
+            margin-top: 30px;
+            margin-bottom: 12px;
+        }
+        p {
+            margin-bottom: 16px;
+            color: #444;
+            text-align: justify;
+        }
+        .card-grid {
+            display: grid;
+            grid-template-cols: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-top: 35px;
+        }
+        .card {
+            background-color: #fafafa;
+            border-left: 5px solid var(--primary-green);
+            padding: 20px;
+            border-radius: 0 8px 8px 0;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            color: inherit;
+        }
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+            background-color: var(--accent-green);
+        }
+        .card-title {
+            font-weight: bold;
+            font-size: 18px;
+            color: var(--primary-green);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .card-desc {
+            font-size: 14px;
+            color: var(--muted-gray);
+        }
+        .highlight-box {
+            background-color: var(--accent-green);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 25px 0;
+            border: 1px solid rgba(46, 125, 50, 0.15);
+        }
+        .highlight-box p {
+            margin-bottom: 0;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌴 Trees Pinyin: Multi-Sensory Hub</h1>
+        <p class="subtitle">Easier languages, a friendlier world.</p>
+        <div class="divider"></div>
+        
+        <h2>Our Philosophy (我們的核心教學法)</h2>
+        <p>
+            Welcome to the <strong>Trees Pinyin</strong> immersive learning platform! We "lock" Mandarin vocabulary into your long-term memory by linking it to logical English narratives. Once the meaning is anchored, you'll master speech through sound: Using familiar English "Semantic Homophones" to mimic Mandarin pronunciation. No Chinese characters, no confusing Pinyin layouts — just your native English logic bridging the gap to instant fluency.
+        </p>
+        <p>
+            For example, the Mandarin word for <strong>"from"</strong> (來自/lái zì) sounds remarkably similar to the English word <strong>"Lies"</strong>.
+            Just think: <em>"The truth <strong>LIES</strong> in where you come <strong>FROM</strong>."</em> The English word mimics the sound, while the sentence locks in the meaning perfectly!
+        </p>
+
+        <div class="highlight-box">
+            <p>🎵 <strong>Tone Breakthrough (The "Do-Rap" Game):</strong> We break Mandarin into 4 basic tones using the English word "do" in natural dialogues: Tone 1 (high & steady: "Do me a favor"), Tone 2 (rising surprised query: "Will it do?"), Tone 3 (dipping with curiosity: "Do you like reading?"), and Tone 4 (short assertive reply: "Yes, I do!").</p>
+        </div>
+
+        <h2>Explore Our Interactive Tools (探索伴學數字中心)</h2>
+        <div class="card-grid">
+            <a href="book1.html" class="card">
+                <div class="card-title">📘 Book 1 Point-and-Read</div>
+                <div class="card-desc">Master the basics of pronunciation, elementary everyday numbers, conversations, dining, and seeing a doctor.</div>
+            </a>
+            <a href="book2.html" class="card">
+                <div class="card-title">📗 Book 2 Point-and-Read</div>
+                <div class="card-desc">Explore the 205-word searchable audio database of Beijing cultural scenes (Forbidden City, Great Wall, Summer Palace).</div>
+            </a>
+            <a href="quiz.html" class="card">
+                <div class="card-title">🧩 Interactive Quiz</div>
+                <div class="card-desc">Test your intuition with our 15-question tonal and pinyin diagnostic tool with detailed explanations.</div>
+            </a>
+            <a href="courses.html" class="card">
+                <div class="card-title">💎 Store & Private Coaching</div>
+                <div class="card-desc">Shop our official physical books on Amazon, and book your VIP Elite 1-on-1 private lesson.</div>
+            </a>
+        </div>
+    </div>
+</body>
+</html>
