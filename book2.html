@@ -39,10 +39,32 @@
         }
         h1 {
             color: var(--primary-green);
-            font-size: 26px;
+            font-size: 24px;
             display: flex;
             align-items: center;
             gap: 8px;
+            margin: 0;
+        }
+        .voice-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background-color: var(--accent-green);
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            color: var(--dark-green);
+            font-weight: 600;
+        }
+        .voice-dropdown {
+            padding: 6px 10px;
+            border-radius: 6px;
+            border: 1px solid var(--primary-green);
+            outline: none;
+            font-size: 13px;
+            background-color: var(--white);
+            cursor: pointer;
+            color: var(--text-dark);
         }
         .search-area {
             display: flex;
@@ -198,13 +220,20 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>📗 Book 2 Searchable point-and-read Audio Player</h1>
+            <h1>📗 Book 2 Searchable Point-and-Read Audio Player</h1>
+            <div class="voice-control">
+                <span>🔊 Voice (發音人):</span>
+                <select id="voice-select" class="voice-dropdown" onchange="changeVoice()">
+                    <!-- Voices populated dynamically by JavaScript -->
+                </select>
+            </div>
         </div>
         
         <div class="search-area">
             <input type="text" id="search" class="search-input" placeholder="Search by English, Hanzi, or Pinyin...">
             <select id="chapter-filter" class="chapter-select">
                 <option value="">All Chapters (全部章節)</option>
+                
                 <option value="Ch. 1">Ch 1: Numbers & Tones</option>
                 <option value="Ch. 2">Ch 2: Word Order</option>
                 <option value="Ch. 3">Ch 3: Train to Beijing</option>
@@ -213,6 +242,7 @@
                 <option value="Ch. 6">Ch 6: Qianmen Cuisine</option>
                 <option value="Ch. 7">Ch 7: The Great Wall</option>
                 <option value="Ch. 8">Ch 8: Summer Palace</option>
+        
             </select>
         </div>
 
@@ -235,7 +265,7 @@
 
         <div class="footer-action">
             <span>🎁 Double-click an apk download, or download our premium pre-built deck here:</span>
-            <a href="https://www.treespinyin.com/vol1/Easy_Mandarin_Speaking_Trees_Pinyin_Book_2.apkg" class="anki-btn">📩 Download Book 2 Anki Deck</a>
+            <a href="https://www.treespinyin.com/vol2/Easy_Mandarin_Speaking_Trees_Pinyin_Book_2.apkg" class="anki-btn">📩 Download Book 2 Anki Deck</a>
         </div>
     </div>
 
@@ -2091,6 +2121,53 @@
         const tableBody = document.getElementById('table-body');
         const searchInput = document.getElementById('search');
         const chapterFilter = document.getElementById('chapter-filter');
+        const voiceSelect = document.getElementById('voice-select');
+
+        let voices = [];
+
+        function populateVoices() {
+            if (typeof speechSynthesis === 'undefined') return;
+            voices = window.speechSynthesis.getVoices();
+            voiceSelect.innerHTML = '';
+            
+            // Filter out Chinese voices
+            let zhVoices = voices.filter(v => v.lang.includes('zh') || v.lang.includes('ZH'));
+            
+            if (zhVoices.length === 0) {
+                zhVoices = voices; // Fallback
+            }
+            
+            // Prioritize high-quality voices like Microsoft Yaoyao, Huihui, Apple Tingting, Premium, Google
+            zhVoices.sort((a, b) => {
+                const nameA = a.name.toLowerCase();
+                const nameB = b.name.toLowerCase();
+                const score = (name) => {
+                    if (name.includes('tingting')) return 10;
+                    if (name.includes('huihui')) return 9;
+                    if (name.includes('yaoyao')) return 8;
+                    if (name.includes('premium')) return 7;
+                    if (name.includes('google')) return 6;
+                    if (name.includes('microsoft')) return 5;
+                    if (name.includes('female') || name.includes('woman') || name.includes('girl')) return 4;
+                    if (name.includes('zh')) return 3;
+                    return 0;
+                };
+                return score(nameB) - score(nameA);
+            });
+            
+            zhVoices.forEach((voice, index) => {
+                let option = document.createElement('option');
+                option.textContent = voice.name + ' (' + voice.lang + ')';
+                option.value = voice.name;
+                if (index === 0) option.selected = true;
+                voiceSelect.appendChild(option);
+            });
+        }
+
+        populateVoices();
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = populateVoices;
+        }
 
         function renderTable(data) {
             tableBody.innerHTML = '';
@@ -2135,7 +2212,13 @@
                 window.speechSynthesis.cancel();
                 const utterance = new SpeechSynthesisUtterance(word);
                 utterance.lang = 'zh-CN';
-                utterance.rate = 0.85; // Natural learning speed
+                utterance.rate = 0.85; // Learn natural speed
+                
+                const selectedVoiceName = voiceSelect.value;
+                const selectedVoice = voices.find(v => v.name === selectedVoiceName);
+                if (selectedVoice) {
+                    utterance.voice = selectedVoice;
+                }
                 window.speechSynthesis.speak(utterance);
             } else {
                 alert('Audio point-and-read is not supported in this browser. Please try Chrome, Safari, or Edge.');
@@ -2150,3 +2233,4 @@
     </script>
 </body>
 </html>
+
