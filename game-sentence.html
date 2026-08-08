@@ -1,0 +1,1197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trees Pinyin - Sentence Builder Sandbox</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+    <style>
+        :root {
+            --primary-green: #2E7D32;
+            --dark-green: #1B5E20;
+            --accent-green: #E8F5E9;
+            --text-dark: #333333;
+            --muted-gray: #757575;
+            --white: #ffffff;
+            --blue-trees: #1565C0;
+            --orange-anchor: #E65100;
+            --red-tone: #C62828;
+            --amber-glow: #FFC107;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f1f3f1;
+            color: var(--text-dark);
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        #app-wrapper {
+            display: flex;
+            flex-direction: column;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        header {
+            background-color: var(--white);
+            padding: 12px 24px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .logo-area h1 {
+            margin: 0;
+            font-size: 20px;
+            color: var(--primary-green);
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo-area p {
+            margin: 2px 0 0 0;
+            font-size: 11px;
+            color: var(--muted-gray);
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .back-btn {
+            background-color: #f0f4f0;
+            border: 1.5px solid #d0ebd0;
+            color: var(--dark-green);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .back-btn:hover {
+            background-color: var(--accent-green);
+            transform: translateY(-1px);
+        }
+
+        .select-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background-color: var(--accent-green);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--dark-green);
+            border: 1px solid rgba(46, 125, 50, 0.15);
+        }
+
+        .select-wrapper select {
+            border: none;
+            background: transparent;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--dark-green);
+            outline: none;
+            cursor: pointer;
+        }
+
+        .diff-bar {
+            display: flex;
+            background-color: #e2ebe2;
+            padding: 3px;
+            border-radius: 20px;
+            gap: 2px;
+        }
+
+        .diff-btn {
+            border: none;
+            background: transparent;
+            font-size: 11px;
+            font-weight: 800;
+            padding: 6px 12px;
+            border-radius: 15px;
+            cursor: pointer;
+            color: var(--muted-gray);
+            transition: all 0.15s;
+        }
+
+        .diff-btn.active.easy {
+            background-color: #4CAF50;
+            color: white;
+            box-shadow: 0 2px 6px rgba(76, 175, 80, 0.3);
+        }
+        .diff-btn.active.medium {
+            background-color: #FF9800;
+            color: white;
+            box-shadow: 0 2px 6px rgba(255, 152, 0, 0.3);
+        }
+        .diff-btn.active.hard {
+            background-color: #F44336;
+            color: white;
+            box-shadow: 0 2px 6px rgba(244, 67, 54, 0.3);
+        }
+
+        #game-workspace {
+            flex-grow: 1;
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: radial-gradient(circle, #fcfdfc 0%, #edf1ed 100%);
+        }
+
+        .g2-container {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+            padding: 20px;
+        }
+
+        .g2-top-bar {
+            text-align: center;
+            margin-bottom: 10px;
+            z-index: 10;
+        }
+
+        .context-chapter {
+            display: inline-block;
+            background-color: #e8f0fe;
+            color: #1a73e8;
+            font-size: 10px;
+            font-weight: 800;
+            padding: 3px 10px;
+            border-radius: 10px;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+
+        .target-sentence-eng {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--orange-anchor);
+            margin: 0;
+        }
+
+        .target-sentence-tip {
+            font-size: 11px;
+            color: var(--muted-gray);
+            margin: 4px 0 0 0;
+            font-weight: 500;
+        }
+
+        .g2-word-card {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 120px;
+            height: 70px;
+            background-color: var(--white);
+            border: 2.5px solid var(--primary-green);
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 6px;
+            box-sizing: border-box;
+            cursor: grab;
+            text-align: center;
+            z-index: 5;
+            transition: border-color 0.15s, box-shadow 0.15s;
+        }
+
+        .g2-word-card:active {
+            cursor: grabbing;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15) !important;
+        }
+
+        .g2-word-card .hanzi {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--primary-green);
+            pointer-events: none;
+        }
+
+        .g2-word-card .trees {
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--blue-trees);
+            font-style: italic;
+            margin-top: 3px;
+            pointer-events: none;
+        }
+
+        .g2-assembly-dock {
+            margin-top: auto;
+            margin-bottom: 40px;
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            z-index: 20;
+            flex-wrap: wrap;
+        }
+
+        .dock-slot {
+            width: 125px;
+            height: 75px;
+            border: 2.5px dashed #b0d0b0;
+            background-color: rgba(232, 245, 233, 0.4);
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 11px;
+            font-weight: 800;
+            color: #8da88d;
+            box-sizing: border-box;
+            transition: all 0.2s ease;
+        }
+
+        .dock-slot.highlight {
+            border-color: var(--primary-green);
+            background-color: rgba(232, 245, 233, 0.8);
+            box-shadow: 0 0 10px rgba(46, 125, 50, 0.25);
+        }
+
+        .dock-slot.filled {
+            border-style: solid;
+            border-color: var(--primary-green);
+            background-color: var(--white);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+        }
+
+        #sentence-success-overlay {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(4px);
+            justify-content: center;
+            align-items: center;
+            z-index: 600;
+        }
+
+        .sentence-reveal-card {
+            background-color: var(--white);
+            width: 440px;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+            border: 3px solid var(--primary-green);
+            text-align: center;
+            animation: scaleIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-sizing: border-box;
+        }
+
+        .sentence-reveal-card .success-badge {
+            font-size: 32px;
+            font-weight: 800;
+            color: #4CAF50;
+            margin-bottom: 12px;
+        }
+
+        .sentence-reveal-card .stars-container {
+            font-size: 24px;
+            color: #FFC107;
+            margin-bottom: 15px;
+        }
+
+        .sentence-reveal-card .full-hanzi-sentence {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--primary-green);
+            margin-bottom: 14px;
+            letter-spacing: 1px;
+        }
+
+        .sentence-reveal-card .full-trees-sentence {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--blue-trees);
+            font-style: italic;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .sentence-reveal-card .full-eng-translation {
+            font-size: 14px;
+            color: var(--muted-gray);
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .sentence-reveal-card .btn-row {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .sentence-reveal-card .btn-action {
+            border: none;
+            padding: 12px 28px;
+            border-radius: 24px;
+            font-size: 14px;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: all 0.2s ease;
+        }
+
+        .sentence-reveal-card .btn-repeat {
+            background-color: #f0f4f0;
+            color: var(--dark-green);
+            border: 1.5px solid #d0ebd0;
+        }
+        .sentence-reveal-card .btn-repeat:hover {
+            background-color: var(--accent-green);
+            transform: translateY(-1.5px);
+        }
+
+        .sentence-reveal-card .btn-next {
+            background-color: var(--primary-green);
+            color: var(--white);
+            flex-grow: 1;
+        }
+
+        .sentence-reveal-card .btn-next:hover {
+            transform: translateY(-1.5px);
+            background-color: var(--dark-green);
+            box-shadow: 0 4px 12px rgba(46, 125, 50, 0.25);
+        }
+
+        #confetti-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        @keyframes scaleIn {
+            0% { transform: scale(0.7); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="app-wrapper">
+        <header>
+            <div class="logo-area">
+                <h1>🧩 Sentence Builder Sandbox</h1>
+                <p>Drag and snap Chinese words in the correct grammatical order</p>
+            </div>
+            
+            <div class="header-controls">
+                <div class="diff-bar">
+                    <button class="diff-btn easy active" onclick="setDifficulty('easy')">EASY 🟢</button>
+                    <button class="diff-btn medium" onclick="setDifficulty('medium')">MEDIUM 🟡</button>
+                    <button class="diff-btn hard" onclick="setDifficulty('hard')">HARD 🔴</button>
+                </div>
+
+                <div class="select-wrapper">
+                    <span>🎤 Voice:</span>
+                    <select id="voice-select" onchange="changeVoice()"></select>
+                </div>
+
+                <a href="arcade.html" class="back-btn">◀ Back to Arcade</a>
+            </div>
+        </header>
+
+        <div id="game-workspace">
+            <canvas id="confetti-canvas"></canvas>
+
+            <div class="g2-container">
+                <div class="g2-top-bar">
+                    <span class="context-chapter" id="sentence-chapter">Ch. 4: Self-introduction</span>
+                    <h2 class="target-sentence-eng" id="g2-target-english">Translate: "I come from the United States."</h2>
+                    <p class="target-sentence-tip">Drag and drop the word cards into the correct order in the docks below!</p>
+                </div>
+
+                <div id="sentence-success-overlay">
+                    <div class="sentence-reveal-card">
+                        <div class="success-badge">🎉 EXCELLENT!</div>
+                        <div class="stars-container" id="star-rating">⭐⭐⭐</div>
+                        <div class="full-hanzi-sentence" id="reveal-sent-hanzi">我來自美國。</div>
+                        <div class="full-trees-sentence" id="reveal-sent-trees">wer3 Lie2 ds4 may3 gooer2.</div>
+                        <div class="full-eng-translation" id="reveal-sent-eng">"I come from the United States."</div>
+                        <div class="btn-row">
+                            <button class="btn-action btn-repeat" onclick="repeatSentence()">Practice Again 🔄</button>
+                            <button class="btn-action btn-next" onclick="loadNextSentence()">Next Sentence ➡️</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="g2-assembly-dock" id="g2-dock-container"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const sentenceDatabase = [
+            // EASY 🟢
+            {
+                id: 101,
+                difficulty: "easy",
+                chapter: "Ch. 2: Everyday Conversation",
+                english: "Good morning.",
+                words: [
+                    { hanzi: "早上", correctIndex: 0 },
+                    { hanzi: "好", correctIndex: 1 }
+                ],
+                distractors: [
+                    { hanzi: "累", trees: "Lay4" },
+                    { hanzi: "二", trees: "uh er4" }
+                ]
+            },
+            {
+                id: 102,
+                difficulty: "easy",
+                chapter: "Ch. 2: Everyday Conversation",
+                english: "Good-bye.",
+                words: [
+                    { hanzi: "再见", correctIndex: 0 }
+                ],
+                distractors: [
+                    { hanzi: "坐", trees: "dsooer4" },
+                    { hanzi: "不", trees: "boo2" }
+                ]
+            },
+            {
+                id: 103,
+                difficulty: "easy",
+                chapter: "Ch. 4: Self-introduction",
+                english: "I am Leo.",
+                words: [
+                    { hanzi: "我", correctIndex: 0 },
+                    { hanzi: "是", correctIndex: 1 },
+                    { hanzi: "利奥", correctIndex: 2 }
+                ],
+                distractors: [
+                    { hanzi: "二", trees: "uh er4" },
+                    { hanzi: "一杯", trees: "ee4 bay" }
+                ]
+            },
+            {
+                id: 104,
+                difficulty: "easy",
+                chapter: "Ch. 4: Self-introduction",
+                english: "I like China.",
+                words: [
+                    { hanzi: "我", correctIndex: 0 },
+                    { hanzi: "喜欢", correctIndex: 1 },
+                    { hanzi: "中国", correctIndex: 2 }
+                ],
+                distractors: [
+                    { hanzi: "四", trees: "s4" },
+                    { hanzi: "微信", trees: "way seen4" }
+                ]
+            },
+            {
+                id: 105,
+                difficulty: "easy",
+                chapter: "Ch. 7: Restaurant",
+                english: "Welcome.",
+                words: [
+                    { hanzi: "欢迎", correctIndex: 0 }
+                ],
+                distractors: [
+                    { hanzi: "跑", trees: "pow3" },
+                    { hanzi: "聽", trees: "ting1" }
+                ]
+            },
+            {
+                id: 106,
+                difficulty: "easy",
+                chapter: "Ch. 8: See a doctor",
+                english: "I have a headache.",
+                words: [
+                    { hanzi: "我", correctIndex: 0 },
+                    { hanzi: "头疼", correctIndex: 1 }
+                ],
+                distractors: [
+                    { hanzi: "累", trees: "Lay4" },
+                    { hanzi: "跑", trees: "pow3" }
+                ]
+            },
+
+            // MEDIUM 🟡
+            {
+                id: 201,
+                difficulty: "medium",
+                chapter: "Ch. 4: Self-introduction",
+                english: "I come from the United States.",
+                words: [
+                    { hanzi: "我", correctIndex: 0 },
+                    { hanzi: "来自", correctIndex: 1 },
+                    { hanzi: "美国", correctIndex: 2 }
+                ],
+                distractors: [
+                    { hanzi: "二", trees: "uh er4" },
+                    { hanzi: "一杯", trees: "ee4 bay" }
+                ]
+            },
+            {
+                id: 202,
+                difficulty: "medium",
+                chapter: "Ch. 3: Articles & Pronouns",
+                english: "This is my guitar.",
+                words: [
+                    { hanzi: "这", correctIndex: 0 },
+                    { hanzi: "是", correctIndex: 1 },
+                    { hanzi: "我的", correctIndex: 2 },
+                    { hanzi: "吉他", correctIndex: 3 }
+                ],
+                distractors: [
+                    { hanzi: "附近", trees: "foo4 jeen4" },
+                    { hanzi: "累", trees: "Lay4" }
+                ]
+            },
+            {
+                id: 203,
+                difficulty: "medium",
+                chapter: "Ch. 5: Basic Sentence Patterns",
+                english: "I can play guitar.",
+                words: [
+                    { hanzi: "我", correctIndex: 0 },
+                    { hanzi: "会", correctIndex: 1 },
+                    { hanzi: "弹吉他", correctIndex: 2 }
+                ],
+                distractors: [
+                    { hanzi: "聽", trees: "ting1" },
+                    { hanzi: "坐", trees: "dsooer4" }
+                ]
+            },
+            {
+                id: 204,
+                difficulty: "medium",
+                chapter: "Ch. 5: Basic Sentence Patterns",
+                english: "Do you have WeChat?",
+                words: [
+                    { hanzi: "你", correctIndex: 0 },
+                    { hanzi: "有", correctIndex: 1 },
+                    { hanzi: "微信", correctIndex: 2 },
+                    { hanzi: "吗", correctIndex: 3 }
+                ],
+                distractors: [
+                    { hanzi: "一杯", trees: "ee4 bay" },
+                    { hanzi: "来自", correctIndex: 1 }
+                ]
+            },
+            {
+                id: 205,
+                difficulty: "medium",
+                chapter: "Ch. 7: Restaurant",
+                english: "Here's the menu.",
+                words: [
+                    { hanzi: "这", correctIndex: 0 },
+                    { hanzi: "是", correctIndex: 1 },
+                    { hanzi: "菜单", correctIndex: 2 }
+                ],
+                distractors: [
+                    { hanzi: "累", trees: "Lay4" },
+                    { hanzi: "跑", trees: "pow3" }
+                ]
+            },
+            {
+                id: 206,
+                difficulty: "medium",
+                chapter: "Ch. 8: See a doctor",
+                english: "Open your mouth.",
+                words: [
+                    { hanzi: "张开", correctIndex: 0 },
+                    { hanzi: "嘴", correctIndex: 1 }
+                ],
+                distractors: [
+                    { hanzi: "二", trees: "uh er4" },
+                    { hanzi: "一杯", trees: "ee4 bay" }
+                ]
+            },
+
+            // HARD 🔴
+            {
+                id: 301,
+                difficulty: "hard",
+                chapter: "Ch. 3: Articles & Pronouns",
+                english: "He is my best friend.",
+                words: [
+                    { hanzi: "他", correctIndex: 0 },
+                    { hanzi: "是", correctIndex: 1 },
+                    { hanzi: "我", correctIndex: 2 },
+                    { hanzi: "最好的", correctIndex: 3 },
+                    { hanzi: "朋友", correctIndex: 4 }
+                ],
+                distractors: [
+                    { hanzi: "聽", trees: "ting1" },
+                    { hanzi: "坐", trees: "dsooer4" }
+                ]
+            },
+            {
+                id: 302,
+                difficulty: "hard",
+                chapter: "Ch. 4: Self-introduction",
+                english: "We are Americans.",
+                words: [
+                    { hanzi: "我们", correctIndex: 0 },
+                    { hanzi: "是", correctIndex: 1 },
+                    { hanzi: "美国人", correctIndex: 2 }
+                ],
+                distractors: [
+                    { hanzi: "五", trees: "woo3" },
+                    { hanzi: "附近", trees: "foo4 jeen4" }
+                ]
+            },
+            {
+                id: 303,
+                difficulty: "hard",
+                chapter: "Ch. 6: Wh-questions",
+                english: "Where are you from?",
+                words: [
+                    { hanzi: "你", correctIndex: 0 },
+                    { hanzi: "来自", correctIndex: 1 },
+                    { hanzi: "哪里", correctIndex: 2 }
+                ],
+                distractors: [
+                    { hanzi: "二", trees: "uh er4" },
+                    { hanzi: "累", trees: "Lay4" }
+                ]
+            },
+            {
+                id: 304,
+                difficulty: "hard",
+                chapter: "Ch. 6: Wh-questions",
+                english: "How to go to the nearest supermarket?",
+                words: [
+                    { hanzi: "最近的", correctIndex: 0 },
+                    { hanzi: "超市", correctIndex: 1 },
+                    { hanzi: "怎么走", correctIndex: 2 }
+                ],
+                distractors: [
+                    { hanzi: "歷史", trees: "Lee4 (r)s3" },
+                    { hanzi: "坐", trees: "dsooer4" }
+                ]
+            },
+            {
+                id: 305,
+                difficulty: "hard",
+                chapter: "Ch. 7: Restaurant",
+                english: "What would you like to drink?",
+                words: [
+                    { hanzi: "你", correctIndex: 0 },
+                    { hanzi: "想要", correctIndex: 1 },
+                    { hanzi: "喝", correctIndex: 2 },
+                    { hanzi: "什么", correctIndex: 3 }
+                ],
+                distractors: [
+                    { hanzi: "菜单", trees: "tsie4 dan" },
+                    { hanzi: "附近", trees: "foo4 jeen4" }
+                ]
+            },
+            {
+                id: 306,
+                difficulty: "hard",
+                chapter: "Ch. 7: Restaurant",
+                english: "What are your specialties?",
+                words: [
+                    { hanzi: "你们的", correctIndex: 0 },
+                    { hanzi: "招牌菜", correctIndex: 1 },
+                    { hanzi: "是", correctIndex: 2 },
+                    { hanzi: "什么", correctIndex: 3 }
+                ],
+                distractors: [
+                    { hanzi: "吉他", trees: "jee2 tah" },
+                    { hanzi: "累", trees: "Lay4" }
+                ]
+            },
+            {
+                id: 307,
+                difficulty: "hard",
+                chapter: "Ch. 7: Restaurant",
+                english: "I'd like a cup of coffee.",
+                words: [
+                    { hanzi: "我", correctIndex: 0 },
+                    { hanzi: "要", correctIndex: 1 },
+                    { hanzi: "一杯", correctIndex: 2 },
+                    { hanzi: "咖啡", correctIndex: 3 }
+                ],
+                distractors: [
+                    { hanzi: "歷史", trees: "Lee4 (r)s3" },
+                    { hanzi: "附近", trees: "foo4 jeen4" }
+                ]
+            },
+            {
+                id: 308,
+                difficulty: "hard",
+                chapter: "Ch. 9: Public Services",
+                english: "Do you understand?",
+                words: [
+                    { hanzi: "你", correctIndex: 0 },
+                    { hanzi: "听懂", correctIndex: 1 },
+                    { hanzi: "了", correctIndex: 2 },
+                    { hanzi: "吗", correctIndex: 3 }
+                ],
+                distractors: [
+                    { hanzi: "坐", trees: "dsooer4" },
+                    { hanzi: "跑", trees: "pow3" }
+                ]
+            }
+        ];
+
+        const masterVocab = [{"id": 1, "english": "One / 1", "hanzi": "一", "pinyin": "yī", "trees": "ee", "anchor": "1 (Flat)", "chapter": "Ch. 1: Number", "mnemonic": "Remember the Trees Pinyin sounds like English: 'One / 1'"}, {"id": 2, "english": "Two / 2", "hanzi": "二", "pinyin": "èr", "trees": "uh er4", "anchor": "4 (Falling)", "chapter": "Ch. 1: Number", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Two / 2'"}, {"id": 3, "english": "Three / 3", "hanzi": "三", "pinyin": "sān", "trees": "san", "anchor": "1 (Flat)", "chapter": "Ch. 1: Number", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Three / 3'"}, {"id": 4, "english": "Four / 4", "hanzi": "四", "pinyin": "sì", "trees": "s4", "anchor": "4 (Falling)", "chapter": "Ch. 1: Number", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Four / 4'"}, {"id": 5, "english": "Five / 5", "hanzi": "五", "pinyin": "wǔ", "trees": "woo3", "anchor": "3 (Dipping)", "chapter": "Ch. 1: Number", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Five / 5'"}, {"id": 6, "english": "Six / 6", "hanzi": "六", "pinyin": "liù", "trees": "Leeoo4", "anchor": "4 (Falling)", "chapter": "Ch. 1: Number", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Six / 6'"}, {"id": 7, "english": "Seven / 7", "hanzi": "七", "pinyin": "qī", "trees": "tsee", "anchor": "1 (Flat)", "chapter": "Ch. 1: Number", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Seven / 7'"}, {"id": 8, "english": "Eight / 8", "hanzi": "八", "pinyin": "bā", "trees": "bah", "anchor": "1 (Flat)", "chapter": "Ch. 1: Number", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Eight / 8'"}, {"id": 9, "english": "Nine / 9", "hanzi": "九", "pinyin": "jiǔ", "trees": "jeeoo3", "anchor": "3 (Dipping)", "chapter": "Ch. 1: Number", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Nine / 9'"}, {"id": 10, "english": "Ten / 10", "hanzi": "十", "pinyin": "shí", "trees": "(r)s2", "anchor": "2 (Rising)", "chapter": "Ch. 1: Number", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Ten / 10'"}, {"id": 11, "english": "Hundred (100)", "hanzi": "百", "pinyin": "bǎi", "trees": "bie3", "anchor": "3 (Dipping)", "chapter": "Ch. 1: Number", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Hundred (100)'"}, {"id": 12, "english": "Thousand (1,000)", "hanzi": "千", "pinyin": "qiān", "trees": "tseean", "anchor": "1 (Flat)", "chapter": "Ch. 1: Number", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Thousand (1,000)'"}, {"id": 13, "english": "Ten thousand (10,000)", "hanzi": "万", "pinyin": "wàn", "trees": "wan4", "anchor": "4 (Falling)", "chapter": "Ch. 1: Number", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Ten thousand (10,000)'"}, {"id": 14, "english": "One hundred million (100,000,000)", "hanzi": "亿", "pinyin": "yì", "trees": "ee4", "anchor": "4 (Falling)", "chapter": "Ch. 1: Number", "mnemonic": "Remember the Trees Pinyin sounds like English: 'One hundred million (100,000,000)'"}, {"id": 15, "english": "Trillion (1,000,000,000,000)", "hanzi": "万亿", "pinyin": "wàn yì", "trees": "won4 ee4", "anchor": "4,4", "chapter": "Ch. 1: Number", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Trillion (1,000,000,000,000)'"}, {"id": 16, "english": "Twenty-five (25)", "hanzi": "二十五", "pinyin": "èr shí wǔ", "trees": "uh er4 (r)s2 woo3", "anchor": "4,2,3", "chapter": "Ch. 1: Number", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Twenty-five (25)'"}, {"id": 17, "english": "Three hundred and twenty-five (325)", "hanzi": "三百二十五", "pinyin": "sān bǎi èr shí wǔ", "trees": "san bie3 uh er4 (r)s2 woo3", "anchor": "1,3,4,2,3", "chapter": "Ch. 1: Number", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Three hundred and twenty-five (325)'"}, {"id": 18, "english": "Two thousand three hundred and twenty-five (2,325)", "hanzi": "两千三百二十五", "pinyin": "liǎng qiān sān bǎi èr shí wǔ", "trees": "Leeang3 tseean san bie3 uh er4 (r)s2 woo3", "anchor": "3,1,1,3,4,2,3", "chapter": "Ch. 1: Number", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Two thousand three hundred and twenty-five (2,325)'"}, {"id": 19, "english": "A hundred and two thousand three hundred and twenty-five (102,325)", "hanzi": "十万两千三百二十五", "pinyin": "shí wàn liǎng qiān sān bǎi èr shí wǔ", "trees": "(r)s2 wan4 Leeang3 tseean san bie3 uh er4 (r)s2 woo3", "anchor": "2,4,3,1,1,3,4,2,3", "chapter": "Ch. 1: Number", "mnemonic": "Remember the Trees Pinyin sounds like English: 'A hundred and two thousand three hundred and twenty-five (102,325)'"}, {"id": 20, "english": "Hello/How are you?/How's it going?...", "hanzi": "你好", "pinyin": "nǐ hǎo", "trees": "nee3 haw3", "anchor": "3,3", "chapter": "Ch. 2: Everyday Conversation", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Hello/How are you?/How's it going?...'"}, {"id": 21, "english": "You (Second Person Singular)", "hanzi": "你", "pinyin": "nǐ", "trees": "nee3", "anchor": "3 (Dipping)", "chapter": "Ch. 2: Everyday Conversation", "mnemonic": "Remember the Trees Pinyin sounds like English: 'You (Second Person Singular)'"}, {"id": 22, "english": "Good", "hanzi": "好", "pinyin": "hǎo", "trees": "haw3", "anchor": "3 (Dipping)", "chapter": "Ch. 2: Everyday Conversation", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Good'"}, {"id": 23, "english": "Good morning.", "hanzi": "早上好", "pinyin": "zǎo shang hǎo", "trees": "dsaw3 (r)sang4 haw3", "anchor": "3,4,3", "chapter": "Ch. 2: Everyday Conversation", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Good morning.'"}, {"id": 24, "english": "morning", "hanzi": "早上", "pinyin": "zǎo shang", "trees": "dsaw3 (r)sang4", "anchor": "3,4", "chapter": "Ch. 2: Everyday Conversation", "mnemonic": "Remember the Trees Pinyin sounds like English: 'morning'"}, {"id": 25, "english": "Hello everyone!", "hanzi": "大家好", "pinyin": "dà jiā hǎo", "trees": "dah4 jeeah haw3", "anchor": "4,1,3", "chapter": "Ch. 2: Everyday Conversation", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Hello everyone!'"}, {"id": 26, "english": "big", "hanzi": "大", "pinyin": "dà", "trees": "dah4", "anchor": "4 (Falling)", "chapter": "Ch. 2: Everyday Conversation", "mnemonic": "Remember the Trees Pinyin sounds like English: 'big'"}, {"id": 27, "english": "home/family", "hanzi": "家", "pinyin": "jiā", "trees": "jeeah", "anchor": "1 (Flat)", "chapter": "Ch. 2: Everyday Conversation", "mnemonic": "Remember the Trees Pinyin sounds like English: 'home/family'"}, {"id": 28, "english": "Happy New Year!", "hanzi": "新年快乐！", "pinyin": "xīn nián kuài lè", "trees": "seen neean2 kooie4 Ler4", "anchor": "1,2,4,4", "chapter": "Ch. 2: Everyday Conversation", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Happy New Year!'"}, {"id": 29, "english": "Happy", "hanzi": "快乐", "pinyin": "kuài lè", "trees": "kooie4 Ler4", "anchor": "4,4", "chapter": "Ch. 2: Everyday Conversation", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Happy'"}, {"id": 30, "english": "New", "hanzi": "新", "pinyin": "xīn", "trees": "seen", "anchor": "1 (Flat)", "chapter": "Ch. 2: Everyday Conversation", "mnemonic": "Remember the Trees Pinyin sounds like English: 'New'"}, {"id": 31, "english": "Year", "hanzi": "年", "pinyin": "nián", "trees": "neean2", "anchor": "2 (Rising)", "chapter": "Ch. 2: Everyday Conversation", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Year'"}, {"id": 32, "english": "Congratulations and be prosperous (Wish you to be rich).", "hanzi": "恭喜发财", "pinyin": "gōng xǐ fā cái", "trees": "ger oong see3 fah tsie2", "anchor": "1,3,1,2", "chapter": "Ch. 2: Everyday Conversation", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Congratulations and be prosperous (Wish you to be rich).'"}, {"id": 33, "english": "Congratulations", "hanzi": "恭喜！", "pinyin": "gōng xǐ", "trees": "ger oong see3", "anchor": "1,3", "chapter": "Ch. 2: Everyday Conversation", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Congratulations'"}, {"id": 34, "english": "To be rich/prosperous", "hanzi": "发财", "pinyin": "fā cái", "trees": "fah tsie2", "anchor": "1,2", "chapter": "Ch. 2: Everyday Conversation", "mnemonic": "Remember the Trees Pinyin sounds like English: 'To be rich/prosperous'"}, {"id": 35, "english": "Could you tell me…?/May I ask...?/Excuse me", "hanzi": "请问", "pinyin": "qǐng wèn", "trees": "tsing3 wer n4", "anchor": "3,4", "chapter": "Ch. 2: Everyday Conversation", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Could you tell me…?/May I ask...?/Excuse me'"}, {"id": 36, "english": "Thank you!/ I appreciate it.", "hanzi": "谢谢", "pinyin": "xiè xie", "trees": "seeer4 seeer", "anchor": "4,0", "chapter": "Ch. 2: Everyday Conversation", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Thank you!/ I appreciate it.'"}, {"id": 37, "english": "See ya/ See you/Good-bye/Bye-Bye", "hanzi": "再见", "pinyin": "zài jiàn", "trees": "dsie4 jeean4", "anchor": "4,4", "chapter": "Ch. 2: Everyday Conversation", "mnemonic": "Remember the Trees Pinyin sounds like English: 'See ya/ See you/Good-bye/Bye-Bye'"}, {"id": 38, "english": "You are welcome.", "hanzi": "不客气。", "pinyin": "bú kè qi", "trees": "boo2 ker4 tsee", "anchor": "2,4,0", "chapter": "Ch. 2: Everyday Conversation", "mnemonic": "Remember the Trees Pinyin sounds like English: 'You are welcome.'"}, {"id": 39, "english": "I'm sorry./Pardon me.", "hanzi": "对不起。", "pinyin": "duì bù qǐ", "trees": "dooay4 boo4 tsee3", "anchor": "4,4,3", "chapter": "Ch. 2: Everyday Conversation", "mnemonic": "Remember the Trees Pinyin sounds like English: 'I'm sorry./Pardon me.'"}, {"id": 40, "english": "Right/Yes/correct", "hanzi": "对", "pinyin": "duì", "trees": "dooay4", "anchor": "4 (Falling)", "chapter": "Ch. 2: Everyday Conversation", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Right/Yes/correct'"}, {"id": 41, "english": "Not / no", "hanzi": "不", "pinyin": "bù", "trees": "boo2/boo4", "anchor": "4 (Falling)", "chapter": "Ch. 2: Everyday Conversation", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Not / no'"}, {"id": 42, "english": "qi/Get up/Seven/Wife…", "hanzi": "气", "pinyin": "qì", "trees": "tsee4", "anchor": "4 (Falling)", "chapter": "Ch. 2: Everyday Conversation", "mnemonic": "Remember the Trees Pinyin sounds like English: 'qi/Get up/Seven/Wife…'"}, {"id": 43, "english": "It doesn't matter/ It's OK.", "hanzi": "没关系", "pinyin": "méi guān xi", "trees": "may2 gooan see", "anchor": "2,1,0", "chapter": "Ch. 2: Everyday Conversation", "mnemonic": "Remember the Trees Pinyin sounds like English: 'It doesn't matter/ It's OK.'"}, {"id": 44, "english": "Don't get angry.", "hanzi": "别生气。", "pinyin": "bié shēng qì", "trees": "beeer2 (r)ser ng tsee4", "anchor": "2,1,4", "chapter": "Ch. 2: Everyday Conversation", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Don't get angry.'"}, {"id": 45, "english": "Get/Birth/Sound", "hanzi": "生", "pinyin": "shēng", "trees": "(r)ser ng", "anchor": "1 (Flat)", "chapter": "Ch. 2: Everyday Conversation", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Get/Birth/Sound'"}, {"id": 46, "english": "Doctor", "hanzi": "医生", "pinyin": "yī shēng", "trees": "ee (r)ser ng", "anchor": "1,1", "chapter": "Ch. 2: Everyday Conversation", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Doctor'"}, {"id": 47, "english": "Birthday", "hanzi": "生日", "pinyin": "shēng rì", "trees": "(r)ser ng (r)th4", "anchor": "1,4", "chapter": "Ch. 2: Everyday Conversation", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Birthday'"}, {"id": 48, "english": "day/sun", "hanzi": "日", "pinyin": "rì", "trees": "(r)th4", "anchor": "4 (Falling)", "chapter": "Ch. 2: Everyday Conversation", "mnemonic": "Remember the Trees Pinyin sounds like English: 'day/sun'"}, {"id": 49, "english": "Happy birthday!", "hanzi": "生日快乐！", "pinyin": "shēng rì kuài lè", "trees": "(r)ser ng (r)th4 kooie4 Ler4", "anchor": "1,4,4,4", "chapter": "Ch. 2: Everyday Conversation", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Happy birthday!'"}, {"id": 50, "english": "a/an", "hanzi": "一个", "pinyin": "yí gè", "trees": "ee2 ger4", "anchor": "2,4", "chapter": "Ch. 3: Articles & Pronouns", "mnemonic": "Remember the Trees Pinyin sounds like English: 'a/an'"}, {"id": 51, "english": "This/The", "hanzi": "这/这个", "pinyin": "zhè / zhè ge", "trees": "(r)dser4 / (r)dser4 ger", "anchor": "4 / 4,0", "chapter": "Ch. 3: Articles & Pronouns", "mnemonic": "Remember the Trees Pinyin sounds like English: 'This/The'"}, {"id": 52, "english": "Was/is/am/are/were/been", "hanzi": "是", "pinyin": "shì", "trees": "(r)s4", "anchor": "4 (Falling)", "chapter": "Ch. 3: Articles & Pronouns", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Was/is/am/are/were/been'"}, {"id": 53, "english": "Yes", "hanzi": "是的", "pinyin": "shì de", "trees": "(r)s4 / (r)s4 der", "anchor": "4 / 4,0", "chapter": "Ch. 3: Articles & Pronouns", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Yes'"}, {"id": 54, "english": "My/mine", "hanzi": "我的", "pinyin": "wǒ de", "trees": "wer3 der", "anchor": "3,0", "chapter": "Ch. 3: Articles & Pronouns", "mnemonic": "Remember the Trees Pinyin sounds like English: 'My/mine'"}, {"id": 55, "english": "This is mine.", "hanzi": "这是我的。", "pinyin": "zhè_shì_wǒ_de", "trees": "(r)dser4 (r)s4 wer3 der", "anchor": "4,4,3,0", "chapter": "Ch. 3: Articles & Pronouns", "mnemonic": "Remember the Trees Pinyin sounds like English: 'This is mine.'"}, {"id": 56, "english": "This is my guitar.", "hanzi": "这是我的吉他。", "pinyin": "zhè shì wǒ de jí tā", "trees": "(r)dser4 (r)s4 wer3 der jee2 tah", "anchor": "4,4,3,0,2,1", "chapter": "Ch. 3: Articles & Pronouns", "mnemonic": "Remember the Trees Pinyin sounds like English: 'This is my guitar.'"}, {"id": 57, "english": "The guitar is mine.", "hanzi": "这个吉他是我的。", "pinyin": "zhè ge jí tā shì wǒ de", "trees": "(r)dser4 ger jee2 tah (r)s4 wer3 der", "anchor": "4,0,2,1,4,3,0", "chapter": "Ch. 3: Articles & Pronouns", "mnemonic": "Remember the Trees Pinyin sounds like English: 'The guitar is mine.'"}, {"id": 58, "english": "I / me", "hanzi": "我", "pinyin": "wǒ", "trees": "wer3", "anchor": "3 (Dipping)", "chapter": "Ch. 3: Articles & Pronouns", "mnemonic": "Remember the Trees Pinyin sounds like English: 'I / me'"}, {"id": 59, "english": "of / 's", "hanzi": "的", "pinyin": "de", "trees": "der", "anchor": "0 (Neutral)", "chapter": "Ch. 3: Articles & Pronouns", "mnemonic": "Remember the Trees Pinyin sounds like English: 'of / 's'"}, {"id": 60, "english": "He is my best friend.", "hanzi": "他是我最好的朋友。", "pinyin": "tā_shì_wǒ_de_zuì_hǎo_de_péng_yǒu", "trees": "tah (r)s4 wer3 der dsooay4 haw3 der per ng2 yoh", "anchor": "1,4,3,0,4,3,0,2,1", "chapter": "Ch. 3: Articles & Pronouns", "mnemonic": "Remember the Trees Pinyin sounds like English: 'He is my best friend.'"}, {"id": 61, "english": "best", "hanzi": "最好的", "pinyin": "zuì hǎo de", "trees": "dsooay4 haw3 der", "anchor": "4,3,0", "chapter": "Ch. 3: Articles & Pronouns", "mnemonic": "Remember the Trees Pinyin sounds like English: 'best'"}, {"id": 62, "english": "friend", "hanzi": "朋友", "pinyin": "péng yǒu", "trees": "per ng2 yoh", "anchor": "2,1", "chapter": "Ch. 3: Articles & Pronouns", "mnemonic": "Remember the Trees Pinyin sounds like English: 'friend'"}, {"id": 63, "english": "Your/Yours (Second Person Singular)", "hanzi": "你的", "pinyin": "nǐ de", "trees": "nee3 der", "anchor": "3,0", "chapter": "Ch. 3: Articles & Pronouns", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Your/Yours (Second Person Singular)'"}, {"id": 64, "english": "It/he/she/him/her", "hanzi": "它", "pinyin": "tā", "trees": "tah", "anchor": "1 (Flat)", "chapter": "Ch. 3: Articles & Pronouns", "mnemonic": "Remember the Trees Pinyin sounds like English: 'It/he/she/him/her'"}, {"id": 65, "english": "Its/her/hers/his", "hanzi": "它的", "pinyin": "tā de", "trees": "tah der", "anchor": "1,0", "chapter": "Ch. 3: Articles & Pronouns", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Its/her/hers/his'"}, {"id": 66, "english": "mer n", "hanzi": "们", "pinyin": "men", "trees": "mer n", "anchor": "0 (Neutral)", "chapter": "Ch. 3: Articles & Pronouns", "mnemonic": "Remember the Trees Pinyin sounds like English: 'mer n'"}, {"id": 67, "english": "We/us", "hanzi": "我们", "pinyin": "wǒ men", "trees": "wer3 mer n", "anchor": "3,0", "chapter": "Ch. 3: Articles & Pronouns", "mnemonic": "Remember the Trees Pinyin sounds like English: 'We/us'"}, {"id": 68, "english": "Our/Ours", "hanzi": "我们的", "pinyin": "wǒ men de", "trees": "wer3 mer n der", "anchor": "3,0,0", "chapter": "Ch. 3: Articles & Pronouns", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Our/Ours'"}, {"id": 69, "english": "You (Second Person Plural)", "hanzi": "你们", "pinyin": "nǐ men", "trees": "nee3 mer n", "anchor": "3,0", "chapter": "Ch. 3: Articles & Pronouns", "mnemonic": "Remember the Trees Pinyin sounds like English: 'You (Second Person Plural)'"}, {"id": 70, "english": "Your/Yours (Second Person Plural)", "hanzi": "你们的", "pinyin": "nǐ men de", "trees": "nee3 mer n der", "anchor": "3,0,0", "chapter": "Ch. 3: Articles & Pronouns", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Your/Yours (Second Person Plural)'"}, {"id": 71, "english": "They/Them", "hanzi": "他们", "pinyin": "tā men", "trees": "tah mer n", "anchor": "1,0", "chapter": "Ch. 3: Articles & Pronouns", "mnemonic": "Remember the Trees Pinyin sounds like English: 'They/Them'"}, {"id": 72, "english": "Their/Theirs", "hanzi": "他们的", "pinyin": "tā men de", "trees": "tah mer n der", "anchor": "1,0,0", "chapter": "Ch. 3: Articles & Pronouns", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Their/Theirs'"}, {"id": 73, "english": "I am Leo.", "hanzi": "我是利奥。", "pinyin": "wǒ shì lì ào", "trees": "wer3 (r)s4 Leo", "anchor": "3,4,1,4", "chapter": "Ch. 4: Self-introduction", "mnemonic": "Remember the Trees Pinyin sounds like English: 'I am Leo.'"}, {"id": 74, "english": "This is my younger brother 'Juan'.", "hanzi": "这是我的弟弟胡安。", "pinyin": "zhè shì wǒ de dì di hú ān", "trees": "(r)dser4 (r)s4 wer3 der dee4 dee hoo2 an", "anchor": "4,4,3,0,4,4,2,1", "chapter": "Ch. 4: Self-introduction", "mnemonic": "Remember the Trees Pinyin sounds like English: 'This is my younger brother 'Juan'.'"}, {"id": 75, "english": "younger brother", "hanzi": "弟弟", "pinyin": "dì di", "trees": "dee4 dee", "anchor": "4,4", "chapter": "Ch. 4: Self-introduction", "mnemonic": "Remember the Trees Pinyin sounds like English: 'younger brother'"}, {"id": 76, "english": "elder brother", "hanzi": "哥哥", "pinyin": "gē ge", "trees": "ger ger", "anchor": "1,1", "chapter": "Ch. 4: Self-introduction", "mnemonic": "Remember the Trees Pinyin sounds like English: 'elder brother'"}, {"id": 77, "english": "country", "hanzi": "国", "pinyin": "guó", "trees": "gooer2", "anchor": "2 (Rising)", "chapter": "Ch. 4: Self-introduction", "mnemonic": "Remember the Trees Pinyin sounds like English: 'country'"}, {"id": 78, "english": "the United States", "hanzi": "美国", "pinyin": "měi guó", "trees": "may3 gooer2", "anchor": "3,2", "chapter": "Ch. 4: Self-introduction", "mnemonic": "Remember the Trees Pinyin sounds like English: 'the United States'"}, {"id": 79, "english": "We are Americans.", "hanzi": "我们是美国人。", "pinyin": "wǒ men  shì měi guó rén", "trees": "wer3 mer n (r)s4 may3 gooer2 (r)ther n2", "anchor": "3,0,4,3,2,2", "chapter": "Ch. 4: Self-introduction", "mnemonic": "Remember the Trees Pinyin sounds like English: 'We are Americans.'"}, {"id": 80, "english": "human/man/people/person/Individual", "hanzi": "人", "pinyin": "rén", "trees": "(r)ther n2", "anchor": "2 (Rising)", "chapter": "Ch. 4: Self-introduction", "mnemonic": "Remember the Trees Pinyin sounds like English: 'human/man/people/person/Individual'"}, {"id": 81, "english": "China", "hanzi": "中国", "pinyin": "zhōng guó", "trees": "(r)dser oong gooer2", "anchor": "1,2", "chapter": "Ch. 4: Self-introduction", "mnemonic": "Remember the Trees Pinyin sounds like English: 'China'"}, {"id": 82, "english": "Korea", "hanzi": "韩国", "pinyin": "hán guó", "trees": "han2 gooer2", "anchor": "2,2", "chapter": "Ch. 4: Self-introduction", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Korea'"}, {"id": 83, "english": "Thailand", "hanzi": "泰国", "pinyin": "tài guó", "trees": "tie4 gooer2", "anchor": "4,2", "chapter": "Ch. 4: Self-introduction", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Thailand'"}, {"id": 84, "english": "England/U.K.", "hanzi": "英国", "pinyin": "yīng guó", "trees": "ying gooer2", "anchor": "1,2", "chapter": "Ch. 4: Self-introduction", "mnemonic": "Remember the Trees Pinyin sounds like English: 'England/U.K.'"}, {"id": 85, "english": "Germany", "hanzi": "德国", "pinyin": "dé guó", "trees": "der2 gooer2", "anchor": "2,2", "chapter": "Ch. 4: Self-introduction", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Germany'"}, {"id": 86, "english": "France", "hanzi": "法国", "pinyin": "fǎ guó", "trees": "fah3 gooer2", "anchor": "3,2", "chapter": "Ch. 4: Self-introduction", "mnemonic": "Remember the Trees Pinyin sounds like English: 'France'"}, {"id": 87, "english": "I like China.", "hanzi": "我喜欢中国。", "pinyin": "wǒ xǐ huān zhōng guó", "trees": "wer3 see3 hooan (r)dser oong gooer2", "anchor": "3,3,1,1,2", "chapter": "Ch. 4: Self-introduction", "mnemonic": "Remember the Trees Pinyin sounds like English: 'I like China.'"}, {"id": 88, "english": "like/love", "hanzi": "喜欢", "pinyin": "xǐ huān", "trees": "see3 hooan", "anchor": "3,1", "chapter": "Ch. 4: Self-introduction", "mnemonic": "Remember the Trees Pinyin sounds like English: 'like/love'"}, {"id": 89, "english": "Yes-no questions", "hanzi": "是的，我是", "pinyin": "shì de, wǒ  shì", "trees": "(r)s4 der, wer3 (r)s4", "anchor": "4,0,3,4", "chapter": "Ch. 5: Basic Sentence Patterns", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Yes-no questions'"}, {"id": 90, "english": "Are you Lily?", "hanzi": "你是莉莉吗？", "pinyin": "nǐ shì lì lì ma", "trees": "nee3 (r)s4 Lee4 Lee mah", "anchor": "3,4,4,4,0", "chapter": "Ch. 5: Basic Sentence Patterns", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Are you Lily?'"}, {"id": 91, "english": "No, I am not.", "hanzi": "不，我不是。", "pinyin": "bù, wǒ bú_shì", "trees": "boo4, wer3 boo2 (r)s4", "anchor": "4,3,2,4", "chapter": "Ch. 5: Basic Sentence Patterns", "mnemonic": "Remember the Trees Pinyin sounds like English: 'No, I am not.'"}, {"id": 92, "english": "I am not Lily.", "hanzi": "我不是莉莉。", "pinyin": "wǒ bú_shì lì lì", "trees": "wer3 boo2 (r)s4 Lee4 Lee", "anchor": "3,2,4,4,4", "chapter": "Ch. 5: Basic Sentence Patterns", "mnemonic": "Remember the Trees Pinyin sounds like English: 'I am not Lily.'"}, {"id": 93, "english": "I can play guitar.", "hanzi": "我会弹吉他。", "pinyin": "wǒ huì tán jí tā", "trees": "wer3 hooay4 tan2 gee2 tah", "anchor": "3,4,2,2,1", "chapter": "Ch. 5: Basic Sentence Patterns", "mnemonic": "Remember the Trees Pinyin sounds like English: 'I can play guitar.'"}, {"id": 94, "english": "can", "hanzi": "会", "pinyin": "huì", "trees": "hooay4", "anchor": "4 (Falling)", "chapter": "Ch. 5: Basic Sentence Patterns", "mnemonic": "Remember the Trees Pinyin sounds like English: 'can'"}, {"id": 95, "english": "play", "hanzi": "弹", "pinyin": "tán", "trees": "tan2", "anchor": "2 (Rising)", "chapter": "Ch. 5: Basic Sentence Patterns", "mnemonic": "Remember the Trees Pinyin sounds like English: 'play'"}, {"id": 96, "english": "guitar", "hanzi": "吉他", "pinyin": "jí tā", "trees": "gee2 tah", "anchor": "2,1", "chapter": "Ch. 5: Basic Sentence Patterns", "mnemonic": "Remember the Trees Pinyin sounds like English: 'guitar'"}, {"id": 97, "english": "Can you play guitar?", "hanzi": "你会弹吉他吗？", "pinyin": "nǐ huì tán jí tā ma", "trees": "nee3 hooay4 tan2 gee2 tah mah", "anchor": "3,4,2,2,1,0", "chapter": "Ch. 5: Basic Sentence Patterns", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Can you play guitar?'"}, {"id": 98, "english": "mah", "hanzi": "吗", "pinyin": "ma", "trees": "mah", "anchor": "0 (Neutral)", "chapter": "Ch. 5: Basic Sentence Patterns", "mnemonic": "Remember the Trees Pinyin sounds like English: 'mah'"}, {"id": 99, "english": "Yes, I can.", "hanzi": "是的，我会", "pinyin": "shì de, wǒ_huì", "trees": "(r)s4 der, wer3 hooay4", "anchor": "4,0,3,4", "chapter": "Ch. 5: Basic Sentence Patterns", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Yes, I can.'"}, {"id": 100, "english": "No, I can't.", "hanzi": "不，我不会", "pinyin": "bù, wǒ bú_huì", "trees": "boo4, wer3 boo2 hooay4", "anchor": "4,3,2,4", "chapter": "Ch. 5: Basic Sentence Patterns", "mnemonic": "Remember the Trees Pinyin sounds like English: 'No, I can't.'"}, {"id": 101, "english": "I can't play guitar.", "hanzi": "我不会弹吉他。", "pinyin": "wǒ bú huì_tán jí tā", "trees": "wer3 boo2 hooay4 tan2 gee2 tah", "anchor": "3,2,4,2,2,1", "chapter": "Ch. 5: Basic Sentence Patterns", "mnemonic": "Remember the Trees Pinyin sounds like English: 'I can't play guitar.'"}, {"id": 102, "english": "I like singing.", "hanzi": "我喜欢唱歌。", "pinyin": "wǒ xǐ huān chàng gē", "trees": "wer3 see3 hooan (r)tsang4 ger", "anchor": "3,3,1,4,1", "chapter": "Ch. 5: Basic Sentence Patterns", "mnemonic": "Remember the Trees Pinyin sounds like English: 'I like singing.'"}, {"id": 103, "english": "singing/sing a song", "hanzi": "唱歌", "pinyin": "chàng gē", "trees": "(r)tsang4 ger", "anchor": "4,1", "chapter": "Ch. 5: Basic Sentence Patterns", "mnemonic": "Remember the Trees Pinyin sounds like English: 'singing/sing a song'"}, {"id": 104, "english": "Do you like singing?", "hanzi": "你喜欢唱歌吗？", "pinyin": "nǐ xǐ huān chàng gē ma", "trees": "nee3 see3 hooan (r)tsang4 ger mah", "anchor": "3,3,1,4,1,0", "chapter": "Ch. 5: Basic Sentence Patterns", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Do you like singing?'"}, {"id": 105, "english": "Yes , I do.", "hanzi": "是的，我喜欢", "pinyin": "shì de, wǒ xǐ huān", "trees": "(r)s4 der, wer3 see3 hooan", "anchor": "4,0,3,3,1", "chapter": "Ch. 5: Basic Sentence Patterns", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Yes , I do.'"}, {"id": 106, "english": "No, I don't.", "hanzi": "不，我不喜欢", "pinyin": "bù, wǒ bù_xǐ huān", "trees": "boo4, wer3 boo4 see3 hooan", "anchor": "4,3,4,3,1", "chapter": "Ch. 5: Basic Sentence Patterns", "mnemonic": "Remember the Trees Pinyin sounds like English: 'No, I don't.'"}, {"id": 107, "english": "I don't like singing.", "hanzi": "我不喜欢唱歌。", "pinyin": "wǒ bù xǐ huān chàng gē", "trees": "wer3 boo4 see3 hooan (r)tsang4 ger", "anchor": "3,4,3,1,4,1", "chapter": "Ch. 5: Basic Sentence Patterns", "mnemonic": "Remember the Trees Pinyin sounds like English: 'I don't like singing.'"}, {"id": 108, "english": "What do you like?/What are you into?", "hanzi": "你喜欢什么？", "pinyin": "nǐ xǐ huān shén me", "trees": "nee3 see3 hooan (r)ser n2 mer", "anchor": "3,3,1,2,0", "chapter": "Ch. 6: Wh-questions", "mnemonic": "Remember the Trees Pinyin sounds like English: 'What do you like?/What are you into?'"}, {"id": 109, "english": "What", "hanzi": "什么", "pinyin": "shén me", "trees": "(r)ser n2 mer", "anchor": "2,0", "chapter": "Ch. 6: Wh-questions", "mnemonic": "Remember the Trees Pinyin sounds like English: 'What'"}, {"id": 110, "english": "What book do you like?", "hanzi": "你喜欢什么书？", "pinyin": "nǐ xǐ huān shén me shū", "trees": "nee3 see3 hooan (r)ser n2 mer (r)soo", "anchor": "3,3,1,2,0,1", "chapter": "Ch. 6: Wh-questions", "mnemonic": "Remember the Trees Pinyin sounds like English: 'What book do you like?'"}, {"id": 111, "english": "Who are you looking for?", "hanzi": "你找谁？", "pinyin": "nǐ zhǎo shuí", "trees": "nee3 (r)dsaw3 (r)sooay2", "anchor": "3,3,2", "chapter": "Ch. 6: Wh-questions", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Who are you looking for?'"}, {"id": 112, "english": "Who", "hanzi": "谁", "pinyin": "shuí", "trees": "(r)sooay2", "anchor": "2 (Rising)", "chapter": "Ch. 6: Wh-questions", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Who'"}, {"id": 113, "english": "look for/be looking for", "hanzi": "找", "pinyin": "zhǎo", "trees": "(r)dsaw3", "anchor": "3 (Dipping)", "chapter": "Ch. 6: Wh-questions", "mnemonic": "Remember the Trees Pinyin sounds like English: 'look for/be looking for'"}, {"id": 114, "english": "Whose guitar is this?", "hanzi": "这是谁的吉他？", "pinyin": "zhè shì shuí de jí tā", "trees": "(r)dser4 (r)s4 (r)sooay2 der gee2 tah", "anchor": "4,4,2,0,2,1", "chapter": "Ch. 6: Wh-questions", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Whose guitar is this?'"}, {"id": 115, "english": "Whose", "hanzi": "谁的", "pinyin": "shuí de", "trees": "(r)sooay2 der", "anchor": "2,0", "chapter": "Ch. 6: Wh-questions", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Whose'"}, {"id": 116, "english": "Which do you like best?", "hanzi": "你最喜欢哪个？", "pinyin": "nǐ zuì xǐ huān nǎ ge", "trees": "nee3 dsooay4 see3 hooan nah3 ger", "anchor": "3,4,3,1,3,0", "chapter": "Ch. 6: Wh-questions", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Which do you like best?'"}, {"id": 117, "english": "Which", "hanzi": "哪个", "pinyin": "nǎ ge", "trees": "nah3 ger", "anchor": "3,0", "chapter": "Ch. 6: Wh-questions", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Which'"}, {"id": 118, "english": "When is the meeting?", "hanzi": "会议是什么时候？", "pinyin": "huì yì shì shén me shí hou", "trees": "hooay4 ee4 (r)s4 (r)ser n2 mer (r)s2 hoh", "anchor": "4,4,4,2,0,2,0", "chapter": "Ch. 6: Wh-questions", "mnemonic": "Remember the Trees Pinyin sounds like English: 'When is the meeting?'"}, {"id": 119, "english": "meeting", "hanzi": "会议", "pinyin": "huì_yì", "trees": "hooay4 ee4", "anchor": "4,4", "chapter": "Ch. 6: Wh-questions", "mnemonic": "Remember the Trees Pinyin sounds like English: 'meeting'"}, {"id": 120, "english": "When/what time", "hanzi": "什么时候", "pinyin": "shén me shí hou", "trees": "(r)ser n2 mer (r)s2 hoh", "anchor": "2,0,2,0", "chapter": "Ch. 6: Wh-questions", "mnemonic": "Remember the Trees Pinyin sounds like English: 'When/what time'"}, {"id": 121, "english": "time", "hanzi": "时候", "pinyin": "shí hou", "trees": "(r)s2 hoh", "anchor": "2,0", "chapter": "Ch. 6: Wh-questions", "mnemonic": "Remember the Trees Pinyin sounds like English: 'time'"}, {"id": 122, "english": "Where are you from?", "hanzi": "你来自哪里？", "pinyin": "nǐ lái zì nǎ lǐ", "trees": "nee3 lie2 ds4 nah3 Lee3", "anchor": "3,2,4,3,3", "chapter": "Ch. 6: Wh-questions", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Where are you from?'"}, {"id": 123, "english": "From", "hanzi": "来自", "pinyin": "lái zì", "trees": "lie2 ds4", "anchor": "2,4", "chapter": "Ch. 6: Wh-questions", "mnemonic": "Remember the Trees Pinyin sounds like English: 'From'"}, {"id": 124, "english": "Where", "hanzi": "哪里", "pinyin": "nǎ lǐ", "trees": "nah3 Lee3", "anchor": "3,3", "chapter": "Ch. 6: Wh-questions", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Where'"}, {"id": 125, "english": "Why not?", "hanzi": "为什么不", "pinyin": "wèi shén me bù", "trees": "way4 (r)ser n2 mer boo4", "anchor": "4,2,0,4", "chapter": "Ch. 6: Wh-questions", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Why not?'"}, {"id": 126, "english": "Why", "hanzi": "为什么", "pinyin": "wèi shén me", "trees": "way4 (r)ser n2 mer", "anchor": "4,2,0", "chapter": "Ch. 6: Wh-questions", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Why'"}, {"id": 127, "english": "How to go to the nearest supermarket?", "hanzi": "最近的超市怎么走", "pinyin": "zuì jìn de chāo shì zěn me zǒu", "trees": "dsooay4 jeen4 der (r)tsaw (r)s4 dser n3 mer dsoh3", "anchor": "4,4,0,1,4,3,0,3", "chapter": "Ch. 6: Wh-questions", "mnemonic": "Remember the Trees Pinyin sounds like English: 'How to go to the nearest supermarket?'"}, {"id": 128, "english": "How", "hanzi": "怎么", "pinyin": "zěn me", "trees": "dser n3 mer", "anchor": "3,0", "chapter": "Ch. 6: Wh-questions", "mnemonic": "Remember the Trees Pinyin sounds like English: 'How'"}, {"id": 129, "english": "go/to go to", "hanzi": "走", "pinyin": "zǒu", "trees": "dsoh3", "anchor": "3 (Dipping)", "chapter": "Ch. 6: Wh-questions", "mnemonic": "Remember the Trees Pinyin sounds like English: 'go/to go to'"}, {"id": 130, "english": "nearest", "hanzi": "最近的", "pinyin": "zuì jìn de", "trees": "dsooay4 jeen4 der", "anchor": "4,4,0", "chapter": "Ch. 6: Wh-questions", "mnemonic": "Remember the Trees Pinyin sounds like English: 'nearest'"}, {"id": 131, "english": "supermarket", "hanzi": "超市", "pinyin": "chāo_shì", "trees": "(r)tsaw (r)s4", "anchor": "1,4", "chapter": "Ch. 6: Wh-questions", "mnemonic": "Remember the Trees Pinyin sounds like English: 'supermarket'"}, {"id": 132, "english": "How far (is it)?", "hanzi": "多远？", "pinyin": "duō yuǎn", "trees": "dooer yee(oo)an3", "anchor": "1,3", "chapter": "Ch. 6: Wh-questions", "mnemonic": "Remember the Trees Pinyin sounds like English: 'How far (is it)?'"}, {"id": 133, "english": "How", "hanzi": "多", "pinyin": "duō", "trees": "dooer", "anchor": "1 (Flat)", "chapter": "Ch. 6: Wh-questions", "mnemonic": "Remember the Trees Pinyin sounds like English: 'How'"}, {"id": 134, "english": "far", "hanzi": "远", "pinyin": "yuǎn", "trees": "yee(oo)an3", "anchor": "3 (Dipping)", "chapter": "Ch. 6: Wh-questions", "mnemonic": "Remember the Trees Pinyin sounds like English: 'far'"}, {"id": 135, "english": "How many/How much", "hanzi": "多少", "pinyin": "duō shǎo", "trees": "dooer (r)saw3", "anchor": "1,3", "chapter": "Ch. 6: Wh-questions", "mnemonic": "Remember the Trees Pinyin sounds like English: 'How many/How much'"}, {"id": 136, "english": "How much (is it)?", "hanzi": "多少钱", "pinyin": "duō shǎo qián", "trees": "dooer (r)saw3 tseean2", "anchor": "1,3,2", "chapter": "Ch. 6: Wh-questions", "mnemonic": "Remember the Trees Pinyin sounds like English: 'How much (is it)?'"}, {"id": 137, "english": "How old （are you）?", "hanzi": "多大", "pinyin": "duō dà", "trees": "dooer_dah4", "anchor": "1,4", "chapter": "Ch. 6: Wh-questions", "mnemonic": "Remember the Trees Pinyin sounds like English: 'How old （are you）?'"}, {"id": 138, "english": "Welcome.", "hanzi": "欢迎。", "pinyin": "huān yíng", "trees": "hooan ying2", "anchor": "1,2", "chapter": "Ch. 7: Restaurant", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Welcome.'"}, {"id": 139, "english": "How many in your party/of you?", "hanzi": "您几位？", "pinyin": "nín jǐ wèi", "trees": "neen2 jee3 way4", "anchor": "2,3,4", "chapter": "Ch. 7: Restaurant", "mnemonic": "Remember the Trees Pinyin sounds like English: 'How many in your party/of you?'"}, {"id": 140, "english": "how many(people)", "hanzi": "几位", "pinyin": "jǐ wèi", "trees": "jee3 way4", "anchor": "3,4", "chapter": "Ch. 7: Restaurant", "mnemonic": "Remember the Trees Pinyin sounds like English: 'how many(people)'"}, {"id": 141, "english": "Two.", "hanzi": "两位", "pinyin": "liǎng wèi", "trees": "Leeang3 way4", "anchor": "3,4", "chapter": "Ch. 7: Restaurant", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Two.'"}, {"id": 142, "english": "This way, please.", "hanzi": "这边请", "pinyin": "zhè biān qǐng", "trees": "(r)dser4 beean tsing3", "anchor": "4,1,3", "chapter": "Ch. 7: Restaurant", "mnemonic": "Remember the Trees Pinyin sounds like English: 'This way, please.'"}, {"id": 143, "english": "Here's the menu.", "hanzi": "这是菜单。", "pinyin": "zhè_shì_cài_dān", "trees": "(r)dser4 (r)s4 tsie4 dan", "anchor": "4,4,4,1", "chapter": "Ch. 7: Restaurant", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Here's the menu.'"}, {"id": 144, "english": "Here's", "hanzi": "这是", "pinyin": "zhè__shì", "trees": "(r)dser4 (r)s4", "anchor": "4,4", "chapter": "Ch. 7: Restaurant", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Here's'"}, {"id": 145, "english": "menu", "hanzi": "菜单", "pinyin": "cài_dān", "trees": "tsie4 dan", "anchor": "4,1", "chapter": "Ch. 7: Restaurant", "mnemonic": "Remember the Trees Pinyin sounds like English: 'menu'"}, {"id": 146, "english": "Thank you.", "hanzi": "谢谢。", "pinyin": "xiè_xie", "trees": "seeer4 seeer", "anchor": "4,0", "chapter": "Ch. 7: Restaurant", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Thank you.'"}, {"id": 147, "english": "What would you like to drink?", "hanzi": "你想要喝什么？", "pinyin": "nǐ_xiǎng_yào_hē_shén_me", "trees": "nee3 seeang3 yaw4 her (r)ser n2 mer", "anchor": "3,3,4,1,2,0", "chapter": "Ch. 7: Restaurant", "mnemonic": "Remember the Trees Pinyin sounds like English: 'What would you like to drink?'"}, {"id": 148, "english": "would like= want", "hanzi": "想要", "pinyin": "xiǎng yào", "trees": "seeang3 yaw4", "anchor": "3,4", "chapter": "Ch. 7: Restaurant", "mnemonic": "Remember the Trees Pinyin sounds like English: 'would like= want'"}, {"id": 149, "english": "to drink", "hanzi": "喝", "pinyin": "hē", "trees": "her", "anchor": "1 (Flat)", "chapter": "Ch. 7: Restaurant", "mnemonic": "Remember the Trees Pinyin sounds like English: 'to drink'"}, {"id": 150, "english": "Two cups of milk tea.", "hanzi": "两杯奶茶。", "pinyin": "liǎng bēi nǎi chá", "trees": "Leeang3 bay nie3 (r)tsah2", "anchor": "3,1,3,2", "chapter": "Ch. 7: Restaurant", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Two cups of milk tea.'"}, {"id": 151, "english": "cup", "hanzi": "杯", "pinyin": "bēi", "trees": "bay", "anchor": "1 (Flat)", "chapter": "Ch. 7: Restaurant", "mnemonic": "Remember the Trees Pinyin sounds like English: 'cup'"}, {"id": 152, "english": "milk", "hanzi": "奶", "pinyin": "nǎi", "trees": "nie3", "anchor": "3 (Dipping)", "chapter": "Ch. 7: Restaurant", "mnemonic": "Remember the Trees Pinyin sounds like English: 'milk'"}, {"id": 153, "english": "tea", "hanzi": "茶", "pinyin": "chá", "trees": "(r)tsah2", "anchor": "2 (Rising)", "chapter": "Ch. 7: Restaurant", "mnemonic": "Remember the Trees Pinyin sounds like English: 'tea'"}, {"id": 154, "english": "What are your specialties ?", "hanzi": "你们的招牌菜是什么？", "pinyin": "nǐ men de zhāo pái cài shì shén me", "trees": "nee3 mer n der (r)dsaw pie2 tsie4 (r)s4 (r)ser n2 mer", "anchor": "3,0,0,1,2,4,4,2,0", "chapter": "Ch. 7: Restaurant", "mnemonic": "Remember the Trees Pinyin sounds like English: 'What are your specialties ?'"}, {"id": 155, "english": "specialties", "hanzi": "招牌菜", "pinyin": "zhāo_pái_cài", "trees": "(r)dsaw pie2 tsie4", "anchor": "1,2,4", "chapter": "Ch. 7: Restaurant", "mnemonic": "Remember the Trees Pinyin sounds like English: 'specialties'"}, {"id": 156, "english": "Orange Chicken", "hanzi": "陈皮鸡", "pinyin": "chén pí jī", "trees": "(r)tser n2 pee2 jee", "anchor": "2,2,1", "chapter": "Ch. 7: Restaurant", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Orange Chicken'"}, {"id": 157, "english": "Broccoli beef", "hanzi": "芥蓝牛", "pinyin": "jiè lán niú", "trees": "Jeeer4 Lan2_neeoo2", "anchor": "4,2,2", "chapter": "Ch. 7: Restaurant", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Broccoli beef'"}, {"id": 158, "english": "Dumplings", "hanzi": "饺子", "pinyin": "jiǎo zi", "trees": "jeeaw3 ds", "anchor": "3,0", "chapter": "Ch. 7: Restaurant", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Dumplings'"}, {"id": 159, "english": "Mapo Tofu", "hanzi": "麻婆豆腐", "pinyin": "má pó dòu fu", "trees": "mah2 pooer2 doh4 foo", "anchor": "2,2,4,0", "chapter": "Ch. 7: Restaurant", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Mapo Tofu'"}, {"id": 160, "english": "No spicy", "hanzi": "不要辣", "pinyin": "bú yào là", "trees": "boo2 yaw4 Lah4", "anchor": "2,4,4", "chapter": "Ch. 7: Restaurant", "mnemonic": "Remember the Trees Pinyin sounds like English: 'No spicy'"}, {"id": 161, "english": "spicy", "hanzi": "辣", "pinyin": "là", "trees": "Lah4", "anchor": "4 (Falling)", "chapter": "Ch. 7: Restaurant", "mnemonic": "Remember the Trees Pinyin sounds like English: 'spicy'"}, {"id": 162, "english": "Mildly spicy", "hanzi": "微辣", "pinyin": "wēi là", "trees": "way_Lah4", "anchor": "1,4", "chapter": "Ch. 7: Restaurant", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Mildly spicy'"}, {"id": 163, "english": "Check,(please).", "hanzi": "买单", "pinyin": "mǎi dān", "trees": "mie3 dan", "anchor": "3,1", "chapter": "Ch. 7: Restaurant", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Check,(please).'"}, {"id": 164, "english": "Good afternoon.", "hanzi": "下午好。", "pinyin": "xià wǔ hǎo", "trees": "seeah4 woo3 haw3", "anchor": "4,3,3", "chapter": "Ch. 8: See a doctor", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Good afternoon.'"}, {"id": 165, "english": "afternoon", "hanzi": "下午", "pinyin": "xià wǔ", "trees": "seeah4 woo3", "anchor": "4,3", "chapter": "Ch. 8: See a doctor", "mnemonic": "Remember the Trees Pinyin sounds like English: 'afternoon'"}, {"id": 166, "english": "What's the matter ?", "hanzi": "怎么啦 ？", "pinyin": "zěn me la", "trees": "dser n3 mer Lah", "anchor": "3,0,0", "chapter": "Ch. 8: See a doctor", "mnemonic": "Remember the Trees Pinyin sounds like English: 'What's the matter ?'"}, {"id": 167, "english": "lah", "hanzi": "啦", "pinyin": "la", "trees": "Lah", "anchor": "0 (Neutral)", "chapter": "Ch. 8: See a doctor", "mnemonic": "Remember the Trees Pinyin sounds like English: 'lah'"}, {"id": 168, "english": "I have a headache.", "hanzi": "我头疼。", "pinyin": "wǒ tóu téng", "trees": "wer3 toh2_ter_ng2", "anchor": "3,2,2", "chapter": "Ch. 8: See a doctor", "mnemonic": "Remember the Trees Pinyin sounds like English: 'I have a headache.'"}, {"id": 169, "english": "head", "hanzi": "头", "pinyin": "tóu", "trees": "toh2", "anchor": "2 (Rising)", "chapter": "Ch. 8: See a doctor", "mnemonic": "Remember the Trees Pinyin sounds like English: 'head'"}, {"id": 170, "english": "ache", "hanzi": "疼", "pinyin": "téng", "trees": "ter_ng2", "anchor": "2 (Rising)", "chapter": "Ch. 8: See a doctor", "mnemonic": "Remember the Trees Pinyin sounds like English: 'ache'"}, {"id": 171, "english": "I have a runny nose", "hanzi": "流鼻涕", "pinyin": "liú bí tì", "trees": "Leeoo2_bee2_tee4", "anchor": "2,2,4", "chapter": "Ch. 8: See a doctor", "mnemonic": "Remember the Trees Pinyin sounds like English: 'I have a runny nose'"}, {"id": 172, "english": "runny", "hanzi": "流", "pinyin": "liú", "trees": "Leeoo2", "anchor": "2 (Rising)", "chapter": "Ch. 8: See a doctor", "mnemonic": "Remember the Trees Pinyin sounds like English: 'runny'"}, {"id": 173, "english": "How long (have you had it)?", "hanzi": "多久啦", "pinyin": "duō jiǔ la", "trees": "dooer jeeoo3_Lah", "anchor": "1,3,0", "chapter": "Ch. 8: See a doctor", "mnemonic": "Remember the Trees Pinyin sounds like English: 'How long (have you had it)?'"}, {"id": 174, "english": "long", "hanzi": "久", "pinyin": "jiǔ", "trees": "jeeoo3", "anchor": "3 (Dipping)", "chapter": "Ch. 8: See a doctor", "mnemonic": "Remember the Trees Pinyin sounds like English: 'long'"}, {"id": 175, "english": "Three days", "hanzi": "三天", "pinyin": "sān tiān", "trees": "san_teean", "anchor": "1,1", "chapter": "Ch. 8: See a doctor", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Three days'"}, {"id": 176, "english": "day", "hanzi": "天", "pinyin": "tiān", "trees": "teean", "anchor": "1 (Flat)", "chapter": "Ch. 8: See a doctor", "mnemonic": "Remember the Trees Pinyin sounds like English: 'day'"}, {"id": 177, "english": "Take your temperature", "hanzi": "量体温", "pinyin": "liáng tǐ wēn", "trees": "Leeang2_tee3_wer_n", "anchor": "2,3,1", "chapter": "Ch. 8: See a doctor", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Take your temperature'"}, {"id": 178, "english": "take/measure", "hanzi": "量", "pinyin": "liáng", "trees": "Leeang2", "anchor": "2 (Rising)", "chapter": "Ch. 8: See a doctor", "mnemonic": "Remember the Trees Pinyin sounds like English: 'take/measure'"}, {"id": 179, "english": "temperature", "hanzi": "体温", "pinyin": "tǐ wēn", "trees": "tee3_wer_n", "anchor": "3,1", "chapter": "Ch. 8: See a doctor", "mnemonic": "Remember the Trees Pinyin sounds like English: 'temperature'"}, {"id": 180, "english": "Open your mouth.", "hanzi": "张开嘴。", "pinyin": "zhāng kāi zuǐ", "trees": "(r)dsang kie_dsooay3", "anchor": "1,1,3", "chapter": "Ch. 8: See a doctor", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Open your mouth.'"}, {"id": 181, "english": "open", "hanzi": "张开", "pinyin": "zhāng kāi", "trees": "(r)dsang kie", "anchor": "1,1", "chapter": "Ch. 8: See a doctor", "mnemonic": "Remember the Trees Pinyin sounds like English: 'open'"}, {"id": 182, "english": "mouth", "hanzi": "嘴", "pinyin": "zuǐ", "trees": "dsooay3", "anchor": "3 (Dipping)", "chapter": "Ch. 8: See a doctor", "mnemonic": "Remember the Trees Pinyin sounds like English: 'mouth'"}, {"id": 183, "english": "Say 'ah'.", "hanzi": "说“啊”。", "pinyin": "shuō a", "trees": "(r)sooer 'ah'", "anchor": "1,0", "chapter": "Ch. 8: See a doctor", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Say 'ah'.'"}, {"id": 184, "english": "(It's just) a common cold.", "hanzi": "普通感冒", "pinyin": "pǔ tōng gǎn mào", "trees": "poo3 ter oong gan3 maw4", "anchor": "3,1,3,4", "chapter": "Ch. 8: See a doctor", "mnemonic": "Remember the Trees Pinyin sounds like English: '(It's just) a common cold.'"}, {"id": 185, "english": "common", "hanzi": "普通", "pinyin": "pǔ tōng", "trees": "poo3_ter_oong", "anchor": "3,1", "chapter": "Ch. 8: See a doctor", "mnemonic": "Remember the Trees Pinyin sounds like English: 'common'"}, {"id": 186, "english": "cold", "hanzi": "感冒", "pinyin": "gǎn mào", "trees": "gan3_maw4", "anchor": "3,4", "chapter": "Ch. 8: See a doctor", "mnemonic": "Remember the Trees Pinyin sounds like English: 'cold'"}, {"id": 187, "english": "Get more rest and drink more water.", "hanzi": "多休息，多喝水。", "pinyin": "duō xiū xi, duō hē shuǐ", "trees": "dooer seeoh see3, dooer her (r)sooay3", "anchor": "1,1,3,1,1,3", "chapter": "Ch. 8: See a doctor", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Get more rest and drink more water.'"}, {"id": 188, "english": "more", "hanzi": "多", "pinyin": "duō", "trees": "dooer", "anchor": "1 (Flat)", "chapter": "Ch. 8: See a doctor", "mnemonic": "Remember the Trees Pinyin sounds like English: 'more'"}, {"id": 189, "english": "rest", "hanzi": "休息", "pinyin": "xiū xi", "trees": "seeoh_see3", "anchor": "1,3", "chapter": "Ch. 8: See a doctor", "mnemonic": "Remember the Trees Pinyin sounds like English: 'rest'"}, {"id": 190, "english": "drink", "hanzi": "喝", "pinyin": "hē", "trees": "her", "anchor": "1 (Flat)", "chapter": "Ch. 8: See a doctor", "mnemonic": "Remember the Trees Pinyin sounds like English: 'drink'"}, {"id": 191, "english": "water", "hanzi": "水", "pinyin": "shuǐ", "trees": "(r)sooay3", "anchor": "3 (Dipping)", "chapter": "Ch. 8: See a doctor", "mnemonic": "Remember the Trees Pinyin sounds like English: 'water'"}, {"id": 192, "english": "passport", "hanzi": "护照", "pinyin": "hù zhào", "trees": "hoo4 (r)dsaw4", "anchor": "4,4", "chapter": "Ch. 9: Public Services", "mnemonic": "Remember the Trees Pinyin sounds like English: 'passport'"}, {"id": 193, "english": "driver's license", "hanzi": "驾照", "pinyin": "jià zhào", "trees": "jeeah4 (r)dsaw4", "anchor": "4,4", "chapter": "Ch. 9: Public Services", "mnemonic": "Remember the Trees Pinyin sounds like English: 'driver's license'"}, {"id": 194, "english": "take a photo", "hanzi": "拍照", "pinyin": "pāi zhào", "trees": "pie (r)dsaw4", "anchor": "1,4", "chapter": "Ch. 9: Public Services", "mnemonic": "Remember the Trees Pinyin sounds like English: 'take a photo'"}, {"id": 195, "english": "fingerprint", "hanzi": "指纹", "pinyin": "zhǐ wén", "trees": "(r)ds3 wer n2", "anchor": "3,2", "chapter": "Ch. 9: Public Services", "mnemonic": "Remember the Trees Pinyin sounds like English: 'fingerprint'"}, {"id": 196, "english": "name", "hanzi": "姓名", "pinyin": "xìng míng", "trees": "sing4_ming2", "anchor": "4,2", "chapter": "Ch. 9: Public Services", "mnemonic": "Remember the Trees Pinyin sounds like English: 'name'"}, {"id": 197, "english": "First name", "hanzi": "名字", "pinyin": "míng zi", "trees": "ming2_ds", "anchor": "2,0", "chapter": "Ch. 9: Public Services", "mnemonic": "Remember the Trees Pinyin sounds like English: 'First name'"}, {"id": 198, "english": "Last name", "hanzi": "姓什么", "pinyin": "xìng shén me", "trees": "sing4 (r)ser n2_mer", "anchor": "4,2,0", "chapter": "Ch. 9: Public Services", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Last name'"}, {"id": 199, "english": "signature", "hanzi": "签名", "pinyin": "qiān míng", "trees": "tseean_ming2", "anchor": "1,2", "chapter": "Ch. 9: Public Services", "mnemonic": "Remember the Trees Pinyin sounds like English: 'signature'"}, {"id": 200, "english": "Telephone", "hanzi": "电话", "pinyin": "diàn huà", "trees": "deean4_hooah4", "anchor": "4,4", "chapter": "Ch. 9: Public Services", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Telephone'"}, {"id": 201, "english": "address", "hanzi": "地址", "pinyin": "dì zhǐ", "trees": "dee4 (r)ds3", "anchor": "4,3", "chapter": "Ch. 9: Public Services", "mnemonic": "Remember the Trees Pinyin sounds like English: 'address'"}, {"id": 202, "english": "Line up", "hanzi": "排队", "pinyin": "pái duì", "trees": "pie2_dooay4", "anchor": "2,4", "chapter": "Ch. 9: Public Services", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Line up'"}, {"id": 203, "english": "Next/next one", "hanzi": "下一个", "pinyin": "xià yī gè", "trees": "seeah4_ee_ger4", "anchor": "4,1,4", "chapter": "Ch. 9: Public Services", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Next/next one'"}, {"id": 204, "english": "(wait) a moment", "hanzi": "等一下", "pinyin": "děng yī xià", "trees": "der_ng3_ee_seeah4", "anchor": "3,1,4", "chapter": "Ch. 9: Public Services", "mnemonic": "Remember the Trees Pinyin sounds like English: '(wait) a moment'"}, {"id": 205, "english": "Got it/understand.", "hanzi": "听懂了", "pinyin": "tīng dǒng le", "trees": "ting_der_oong3_Ler", "anchor": "1,3,0", "chapter": "Ch. 9: Public Services", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Got it/understand.'"}, {"id": 206, "english": "Ler", "hanzi": "了", "pinyin": "le", "trees": "Ler", "anchor": "0 (Neutral)", "chapter": "Ch. 9: Public Services", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Ler'"}, {"id": 207, "english": "Got it?", "hanzi": "听懂了吗？", "pinyin": "tīng dǒng le ma", "trees": "ting_der_oong3_Ler_mah?", "anchor": "1,3,0,0", "chapter": "Ch. 9: Public Services", "mnemonic": "Remember the Trees Pinyin sounds like English: 'Got it?'"}] ;
+
+        function getTreesPinyin(hanzi) {
+            const match = masterVocab.find(function(item) { return item.hanzi === hanzi; });
+            return match ? match.trees : hanzi;
+        }
+
+        sentenceDatabase.forEach(function(sentence) {
+            sentence.words.forEach(function(word) {
+                word.trees = getTreesPinyin(word.hanzi);
+            });
+            sentence.distractors.forEach(function(word) {
+                if (!word.trees) {
+                    word.trees = getTreesPinyin(word.hanzi);
+                }
+            });
+        });
+
+        let currentDifficulty = "easy";
+        let currentSentence = null;
+        let sentenceSlots = [];
+        let errorsThisTurn = 0;
+        let hasSpokenWhole = false;
+
+        let engineG2 = null;
+        let worldG2 = null;
+        let runnerG2 = null;
+        let g2Entities = [];
+
+        const { Engine, Render, Runner, Bodies, Composite, Body, Events, Mouse, MouseConstraint } = Matter;
+
+        const container = document.getElementById('game-workspace');
+        let width = container.clientWidth || window.innerWidth;
+        let height = container.clientHeight || (window.innerHeight - 60);
+
+        function getSentenceStarRating(id) {
+            return parseInt(localStorage.getItem('trees_sent_star_' + id)) || 0;
+        }
+
+        function setSentenceStarRating(id, rating) {
+            localStorage.setItem('trees_sent_star_' + id, rating);
+        }
+
+        function selectSentenceByAdaptiveWeight() {
+            const pool = sentenceDatabase.filter(function(s) { return s.difficulty === currentDifficulty; });
+            if (pool.length === 0) return sentenceDatabase[0];
+
+            const weights = pool.map(function(s) {
+                const stars = getSentenceStarRating(s.id);
+                if (stars === 0) return 1.0;
+                if (stars === 1) return 0.6;
+                if (stars === 2) return 0.3;
+                return 0.05;
+            });
+
+            const sumOfWeights = weights.reduce(function(a, b) { return a + b; }, 0);
+            let randomNum = Math.random() * sumOfWeights;
+
+            for (let i = 0; i < pool.length; i++) {
+                randomNum -= weights[i];
+                if (randomNum <= 0) {
+                    return pool[i];
+                }
+            }
+            return pool[pool.length - 1];
+        }
+
+        let preferredVoice = null;
+
+        function populateVoiceList() {
+            if (!('speechSynthesis' in window)) return;
+            const voices = window.speechSynthesis.getVoices();
+            const voiceSelect = document.getElementById('voice-select');
+            voiceSelect.innerHTML = '';
+
+            const zhVoices = voices.filter(function(v) { return v.lang.toLowerCase().includes('zh'); });
+            
+            const femaleKeywords = ['xiaoxiao', 'huihui', 'tingting', 'sinji', 'mei-jia', 'kyoko', 'yating', 'female', 'lulu'];
+            let bestFemale = null;
+
+            zhVoices.forEach(function(voice) {
+                const option = document.createElement('option');
+                option.value = voice.name;
+                option.textContent = voice.name + ' (' + voice.lang + ')';
+                voiceSelect.appendChild(option);
+
+                const nameLower = voice.name.toLowerCase();
+                const isFemale = femaleKeywords.some(function(keyword) { return nameLower.includes(keyword); }) || 
+                                 (!nameLower.includes('kangkang') && !nameLower.includes('liao'));
+                
+                if (isFemale && !bestFemale) {
+                    bestFemale = voice;
+                }
+            });
+
+            preferredVoice = bestFemale || zhVoices[0] || voices.find(function(v) { return v.lang.toLowerCase().includes('zh'); }) || null;
+
+            if (preferredVoice) {
+                voiceSelect.value = preferredVoice.name;
+            }
+        }
+
+        if (window.speechSynthesis && window.speechSynthesis.onvoiceschanged !== undefined) {
+            window.speechSynthesis.onvoiceschanged = populateVoiceList;
+        }
+
+        function changeVoice() {
+            const select = document.getElementById('voice-select');
+            const voices = window.speechSynthesis.getVoices();
+            preferredVoice = voices.find(function(v) { return v.name === select.value; }) || null;
+        }
+
+        function speakChinese(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                
+                if (preferredVoice) {
+                    utterance.voice = preferredVoice;
+                } else {
+                    utterance.lang = 'zh-CN';
+                }
+
+                utterance.rate = 0.75;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        const confettiCanvas = document.getElementById('confetti-canvas');
+        const ctxConfetti = confettiCanvas.getContext('2d');
+        let confettiParticles = [];
+        let confettiAnimationId = null;
+
+        function resizeConfettiCanvas() {
+            confettiCanvas.width = container.clientWidth || window.innerWidth;
+            confettiCanvas.height = container.clientHeight || (window.innerHeight - 60);
+        }
+        window.addEventListener('resize', resizeConfettiCanvas);
+        resizeConfettiCanvas();
+
+        class ConfettiParticle {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.size = Math.random() * 8 + 5;
+                this.color = ['#2E7D32', '#1565C0', '#E65100', '#C62828', '#FFC107', '#E8F5E9'][Math.floor(Math.random() * 6)];
+                this.vx = Math.random() * 10 - 5;
+                this.vy = Math.random() * -12 - 5;
+                this.rotation = Math.random() * 360;
+                this.rotationSpeed = Math.random() * 10 - 5;
+                this.gravity = 0.3;
+                this.opacity = 1;
+            }
+
+            update() {
+                this.vy += this.gravity;
+                this.x += this.vx;
+                this.y += this.vy;
+                this.rotation += this.rotationSpeed;
+                if (this.y > confettiCanvas.height) {
+                    this.opacity -= 0.02;
+                }
+            }
+
+            draw() {
+                ctxConfetti.save();
+                ctxConfetti.translate(this.x, this.y);
+                ctxConfetti.rotate((this.rotation * Math.PI) / 180);
+                ctxConfetti.globalAlpha = this.opacity;
+                ctxConfetti.fillStyle = this.color;
+                ctxConfetti.fillRect(-this.size / 2, -this.size / 2, this.size, this.size);
+                ctxConfetti.restore();
+            }
+        }
+
+        function triggerConfettiBurst(x, y) {
+            for (let i = 0; i < 80; i++) {
+                confettiParticles.push(new ConfettiParticle(x, y));
+            }
+            if (!confettiAnimationId) {
+                animateConfetti();
+            }
+        }
+
+        function animateConfetti() {
+            ctxConfetti.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+            for (let i = confettiParticles.length - 1; i >= 0; i--) {
+                const p = confettiParticles[i];
+                p.update();
+                p.draw();
+                if (p.opacity <= 0) {
+                    confettiParticles.splice(i, 1);
+                }
+            }
+            if (confettiParticles.length > 0) {
+                confettiAnimationId = requestAnimationFrame(animateConfetti);
+            } else {
+                confettiAnimationId = null;
+                ctxConfetti.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+            }
+        }
+
+        function setDifficulty(diff) {
+            currentDifficulty = diff;
+            document.querySelectorAll('.diff-btn').forEach(function(btn) { btn.classList.remove('active'); });
+            document.querySelector('.diff-btn.' + diff).classList.add('active');
+            initGameSentence();
+        }
+
+        function initGameSentence() {
+            errorsThisTurn = 0;
+            hasSpokenWhole = false;
+            document.getElementById('sentence-success-overlay').style.display = 'none';
+
+            if (engineG2) {
+                Matter.World.clear(worldG2);
+                Engine.clear(engineG2);
+                runnerG2 && Runner.stop(runnerG2);
+                g2Entities.forEach(function(e) { e.el.remove(); });
+                g2Entities = [];
+            }
+
+            engineG2 = Engine.create();
+            worldG2 = engineG2.world;
+            engineG2.gravity.y = 0.5;
+
+            const wallThickness = 100;
+            const wallOptions = { isStatic: true, restitution: 0.3, friction: 0.1 };
+            let ground = Bodies.rectangle(width / 2, height + wallThickness/2 - 130, width * 2, wallThickness, wallOptions);
+            let ceiling = Bodies.rectangle(width / 2, -wallThickness/2, width * 2, wallThickness, wallOptions);
+            let leftWall = Bodies.rectangle(-wallThickness/2, height / 2, wallThickness, height * 2, wallOptions);
+            let rightWall = Bodies.rectangle(width + wallThickness/2, height / 2, wallThickness, height * 2, wallOptions);
+            Composite.add(worldG2, [ground, ceiling, leftWall, rightWall]);
+
+            currentSentence = selectSentenceByAdaptiveWeight();
+            
+            document.getElementById('sentence-chapter').textContent = currentSentence.chapter;
+            document.getElementById('g2-target-english').textContent = 'Translate: "' + currentSentence.english + '"';
+
+            const dockContainer = document.getElementById('g2-dock-container');
+            dockContainer.innerHTML = '';
+            sentenceSlots = new Array(currentSentence.words.length).fill(null);
+
+            for (let i = 0; i < currentSentence.words.length; i++) {
+                const slot = document.createElement('div');
+                slot.className = 'dock-slot';
+                slot.textContent = 'Word ' + (i + 1);
+                slot.id = 'dock-slot-' + i;
+                dockContainer.appendChild(slot);
+            }
+
+            const cardDeck = [...currentSentence.words, ...currentSentence.distractors].sort(function() { return 0.5 - Math.random(); });
+
+            const containerG2 = document.getElementById('game-workspace');
+            cardDeck.forEach(function(word, index) {
+                createG2WordCard(word, index, cardDeck.length, containerG2);
+            });
+
+            const mouse = Mouse.create(containerG2);
+            const mouseConstraint = MouseConstraint.create(engineG2, {
+                mouse: mouse,
+                constraint: { stiffness: 0.15, render: { visible: false } }
+            });
+            Composite.add(worldG2, mouseConstraint);
+
+            mouseConstraint.mouse.element.removeEventListener("mousewheel", mouseConstraint.mouse.mousewheel);
+            mouseConstraint.mouse.element.removeEventListener("DOMMouseScroll", mouseConstraint.mouse.mousewheel);
+
+            Events.on(mouseConstraint, 'enddrag', function(event) {
+                const body = event.body;
+                if (body && body.g2Word) {
+                    attemptDockSnapping(body);
+                }
+            });
+
+            runnerG2 = Runner.create();
+            Runner.run(runnerG2, engineG2);
+
+            Events.on(engineG2, 'afterUpdate', function() {
+                g2Entities.forEach(function(item) {
+                    const position = item.body.position;
+                    const angle = item.body.angle;
+                    if (item.isDocked) return;
+                    item.el.style.transform = 'translate(' + (position.x - 60) + 'px, ' + (position.y - 35) + 'px) rotate(' + angle + 'rad)';
+                });
+            });
+        }
+
+        function createG2WordCard(word, index, total, container) {
+            const el = document.createElement('div');
+            el.className = 'g2-word-card';
+            el.innerHTML = '<div class="hanzi">' + word.hanzi + '</div><div class="trees">' + word.trees + '</div>';
+            container.appendChild(el);
+
+            const spaceX = width / (total + 1);
+            const x = spaceX * (index + 1) + (Math.random() - 0.5) * 15;
+            const y = 90 + (Math.random() - 0.5) * 35;
+
+            const body = Bodies.rectangle(x, y, 120, 70, {
+                restitution: 0.4,
+                friction: 0.1,
+                frictionAir: 0.015,
+                density: 0.001
+            });
+
+            body.g2Word = word;
+
+            Composite.add(worldG2, body);
+            g2Entities.push({ el: el, body: body, word: word, isDocked: false, slotIndex: -1 });
+        }
+
+        function attemptDockSnapping(body) {
+            const word = body.g2Word;
+            const cardEntity = g2Entities.find(function(e) { return e.body === body; });
+            if (!cardEntity || cardEntity.isDocked) return;
+
+            let nearestSlotIndex = -1;
+            let minDistance = 90;
+
+            for (let i = 0; i < currentSentence.words.length; i++) {
+                const slotEl = document.getElementById('dock-slot-' + i);
+                if (!slotEl) continue;
+
+                const rect = slotEl.getBoundingClientRect();
+                const containerRect = document.getElementById('game-workspace').getBoundingClientRect();
+                
+                const slotX = rect.left - containerRect.left + rect.width / 2;
+                const slotY = rect.top - containerRect.top + rect.height / 2;
+
+                const dist = Math.hypot(body.position.x - slotX, body.position.y - slotY);
+
+                if (dist < minDistance) {
+                    minDistance = dist;
+                    nearestSlotIndex = i;
+                }
+            }
+
+            if (nearestSlotIndex !== -1) {
+                if (sentenceSlots[nearestSlotIndex] === null) {
+                    const slotEl = document.getElementById('dock-slot-' + nearestSlotIndex);
+                    
+                    if (word.correctIndex === nearestSlotIndex) {
+                        snapToSlot(cardEntity, nearestSlotIndex, slotEl);
+                    } else {
+                        errorsThisTurn++;
+                        Body.applyForce(body, body.position, { x: (Math.random() - 0.5) * 0.06, y: -0.15 });
+                        
+                        cardEntity.el.style.borderColor = 'var(--red-tone)';
+                        setTimeout(function() {
+                            if (!cardEntity.isDocked) cardEntity.el.style.borderColor = 'var(--primary-green)';
+                        }, 800);
+                    }
+                }
+            }
+        }
+
+        function snapToSlot(entity, slotIndex, slotEl) {
+            entity.isDocked = true;
+            entity.slotIndex = slotIndex;
+            sentenceSlots[slotIndex] = entity;
+
+            Body.setStatic(entity.body, true);
+
+            slotEl.classList.add('filled');
+            slotEl.innerHTML = '';
+            slotEl.appendChild(entity.el);
+
+            entity.el.style.position = 'relative';
+            entity.el.style.left = '0px';
+            entity.el.style.top = '0px';
+            entity.el.style.transform = 'none';
+            entity.el.style.boxShadow = 'none';
+            entity.el.style.borderColor = 'var(--primary-green)';
+
+            speakChinese(entity.word.hanzi);
+            checkSentenceCompleteness();
+        }
+
+        function checkSentenceCompleteness() {
+            const allFilled = sentenceSlots.every(function(slot) { return slot !== null; });
+
+            if (allFilled && !hasSpokenWhole) {
+                hasSpokenWhole = true;
+                
+                triggerConfettiBurst(width / 2, height - 160);
+
+                const fullText = currentSentence.words.map(function(w) { return w.hanzi; }).join('');
+                setTimeout(function() { speakChinese(fullText); }, 400);
+
+                let starsEarned = 3 - errorsThisTurn;
+                if (starsEarned < 0) starsEarned = 0;
+
+                const existingStars = getSentenceStarRating(currentSentence.id);
+                if (starsEarned > existingStars) {
+                    setSentenceStarRating(currentSentence.id, starsEarned);
+                }
+
+                document.getElementById('star-rating').textContent = '⭐'.repeat(starsEarned) || '❌ Try for Stars!';
+                document.getElementById('reveal-sent-hanzi').textContent = fullText;
+                document.getElementById('reveal-sent-trees').textContent = currentSentence.words.map(function(w) { return w.trees; }).join(' ');
+                document.getElementById('reveal-sent-eng').textContent = '"' + currentSentence.english + '"';
+
+                setTimeout(function() {
+                    document.getElementById('sentence-success-overlay').style.display = 'flex';
+                }, 1000);
+            }
+        }
+
+        function repeatSentence() {
+            document.getElementById('sentence-success-overlay').style.display = 'none';
+            initGameSentence();
+        }
+
+        function loadNextSentence() {
+            document.getElementById('sentence-success-overlay').style.display = 'none';
+            initGameSentence();
+        }
+
+        window.addEventListener('resize', function() {
+            width = container.clientWidth;
+            height = container.clientHeight;
+        });
+
+        window.onload = function() {
+            populateVoiceList();
+            initGameSentence();
+        };
+    </script>
+</body>
+</html>
