@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trees Pinyin - Sentence Builder Sandbox</title>
+    <!-- Matter.js Physics Engine -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+    <style>
+        :root {
+            --primary-green: #2E7D32;
+            --dark-green: #1B5E20;
+            --accent-green: #E8F5E9;
+            --text-dark: #333333;
+            --muted-gray: #757575;
+            --white: #ffffff;
+            --blue-trees: #1565C0;
+            --orange-anchor: #E65100;
+            --red-tone: #C62828;
+            --amber-glow: #FFC107;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f1f3f1;
+            color: var(--text-dark);
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        #app-wrapper {
+            display: flex;
+            flex-direction: column;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        /* Top Navigation Header */
+        header {
+            background-color: var(--white);
+            padding: 12px 24px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .logo-area h1 {
+            margin: 0;
+            font-size: 20px;
+            color: var(--primary-green);
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo-area p {
+            margin: 2px 0 0 0;
+            font-size: 11px;
+            color: var(--muted-gray);
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .voice-control {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background-color: var(--accent-green);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            color: var(--dark-green);
+            font-weight: 700;
+            border: 1px solid rgba(46, 125, 50, 0.2);
+        }
+
+        .voice-dropdown {
+            border: none;
+            background: transparent;
+            color: var(--dark-green);
+            font-weight: 700;
+            outline: none;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .back-btn {
+            background-color: #f0f4f0;
+            border: 1.5px solid #d0ebd0;
+            color: var(--dark-green);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .back-btn:hover {
+            background-color: var(--accent-green);
+            transform: translateY(-1px);
+        }
+
+        /* Mode Selector Tab Bar */
+        .filter-bar {
+            background-color: #eaf0ea;
+            padding: 8px 24px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            z-index: 99;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.03);
+            border-bottom: 1px solid rgba(46, 125, 50, 0.1);
+        }
+
+        .filter-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--dark-green);
+            margin-right: 6px;
+        }
+
+        .filter-btn {
+            background-color: var(--white);
+            border: 1.5px solid #c0dbc0;
+            color: #555;
+            padding: 6px 14px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-btn:hover {
+            background-color: var(--accent-green);
+            border-color: var(--primary-green);
+        }
+
+        .filter-btn.active {
+            background-color: var(--primary-green);
+            color: var(--white);
+            border-color: var(--primary-green);
+            box-shadow: 0 2px 6px rgba(46, 125, 50, 0.2);
+        }
+
+        /* Main Workspace Container */
+        #game-workspace {
+            flex-grow: 1;
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: radial-gradient(circle, #fcfdfc 0%, #edf1ed 100%);
+        }
+
+        .g2-container {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+            padding: 15px 20px;
+        }
+
+        .g2-top-bar {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .target-sentence-eng {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--orange-anchor);
+            margin: 0;
+        }
+
+        .target-sentence-tip {
+            font-size: 12px;
+            color: var(--muted-gray);
+            margin: 4px 0 0 0;
+            font-weight: 500;
+        }
+
+        .context-badge {
+            display: inline-block;
+            background-color: #E3F2FD;
+            color: #0D47A1;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 10px;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+
+        /* Draggable Physics Cards */
+        .g2-word-card {
+            position: absolute;
+            width: 110px;
+            height: 65px;
+            background-color: var(--white);
+            border: 2px solid var(--primary-green);
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 4px 8px;
+            box-sizing: border-box;
+            cursor: grab;
+            text-align: center;
+            z-index: 5;
+        }
+
+        .g2-word-card:active {
+            cursor: grabbing;
+        }
+
+        .g2-word-card .hanzi {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--primary-green);
+        }
+
+        .g2-word-card .trees {
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--blue-trees);
+            font-style: italic;
+            margin-top: 1px;
+        }
+
+        /* Assembly Landing Zones */
+        .g2-assembly-dock {
+            margin-top: auto;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            z-index: 20;
+            flex-wrap: wrap;
+        }
+
+        .dock-slot {
+            width: 115px;
+            height: 70px;
+            border: 2px dashed #b0d0b0;
+            background-color: rgba(232, 245, 233, 0.4);
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 11px;
+            font-weight: 700;
+            color: #8da88d;
+            box-sizing: border-box;
+            transition: all 0.2s ease;
+        }
+
+        .dock-slot.highlight {
+            border-color: var(--primary-green);
+            background-color: rgba(232, 245, 233, 0.8);
+            box-shadow: 0 0 8px rgba(46, 125, 50, 0.2);
+        }
+
+        .dock-slot.filled {
+            border-style: solid;
+            border-color: var(--primary-green);
+            background-color: var(--white);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        /* Success Sentence Banner Overlay */
+        #sentence-success-overlay {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(4px);
+            justify-content: center;
+            align-items: center;
+            z-index: 600;
+        }
+
+        .sentence-reveal-card {
+            background-color: var(--white);
+            width: 440px;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            border: 3px solid var(--primary-green);
+            text-align: center;
+            animation: scaleIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .sentence-reveal-card .success-badge {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .sentence-reveal-card .stars-row {
+            font-size: 24px;
+            color: var(--amber-glow);
+            margin-bottom: 12px;
+        }
+
+        .sentence-reveal-card .full-hanzi-sentence {
+            font-size: 30px;
+            font-weight: 800;
+            color: var(--primary-green);
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        .sentence-reveal-card .full-trees-sentence {
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--blue-trees);
+            font-style: italic;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .sentence-reveal-card .full-eng-translation {
+            font-size: 13px;
+            color: var(--muted-gray);
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .sentence-reveal-card .btn-next {
+            background-color: var(--primary-green);
+            color: var(--white);
+            border: none;
+            padding: 12px 28px;
+            border-radius: 24px;
+            font-size: 14px;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(46, 125, 50, 0.25);
+            transition: all 0.2s ease;
+        }
+
+        .sentence-reveal-card .btn-next:hover {
+            transform: translateY(-2px);
+            background-color: var(--dark-green);
+        }
+
+        #confetti-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        /* Floating Score Display */
+        .score-display {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 6px 12px;
+            border-radius: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border: 1px solid rgba(46, 125, 50, 0.15);
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--dark-green);
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        @keyframes scaleIn {
+            0% { transform: scale(0.7); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="app-wrapper">
+        <!-- Top Header -->
+        <header>
+            <div class="logo-area">
+                <h1>🧩 Sentence Builder 2.0 💎</h1>
+                <p>Drag and snap Chinese words in the correct grammatical order</p>
+            </div>
+            <div class="header-controls">
+                <div class="voice-control">
+                    <span>🎤 Voice:</span>
+                    <select id="voice-select" class="voice-dropdown" onchange="changeVoice()"></select>
+                </div>
+                <a href="arcade.html" class="back-btn">◀ Back to Arcade</a>
+            </div>
+        </header>
+
+        <!-- Mode Selector Filter Bar -->
+        <div class="filter-bar">
+            <span class="filter-label">Difficulty:</span>
+            <button class="filter-btn active" id="btn-diff-all" onclick="setDifficulty('all')">All Sentences</button>
+            <button class="filter-btn" id="btn-diff-easy" onclick="setDifficulty('easy')">Easy 🟢</button>
+            <button class="filter-btn" id="btn-diff-med" onclick="setDifficulty('medium')">Medium 🟡</button>
+            <button class="filter-btn" id="btn-diff-hard" onclick="setDifficulty('hard')">Hard 🔴</button>
+            <button class="filter-btn" style="margin-left: auto; border-color: #dcdcdc; color: #777;" onclick="resetProgress()">🔄 Reset Mastery</button>
+        </div>
+
+        <!-- Main Workspace -->
+        <div id="game-workspace">
+            <canvas id="confetti-canvas"></canvas>
+
+            <div class="score-display" id="stars-total-display">⭐ Mastery: 0</div>
+
+            <div class="g2-container">
+                <div class="g2-top-bar">
+                    <span class="context-badge" id="g2-target-chapter">Chapter 2</span><br>
+                    <h2 class="target-sentence-eng" id="g2-target-english">Translate: "I come from the United States."</h2>
+                    <p class="target-sentence-tip">Drag and drop the cards into the correct order in the slots below!</p>
+                </div>
+
+                <!-- Sentence Success Overlay -->
+                <div id="sentence-success-overlay">
+                    <div class="sentence-reveal-card">
+                        <div class="success-badge">🎉 EXCELLENT!</div>
+                        <div class="stars-row" id="reveal-stars">⭐⭐⭐</div>
+                        <div class="full-hanzi-sentence" id="reveal-sent-hanzi">我來自美國。</div>
+                        <div class="full-trees-sentence" id="reveal-sent-trees">wer3 Lie2 ds4 may3 gooer2.</div>
+                        <div class="full-eng-translation" id="reveal-sent-eng">"I come from the United States."</div>
+                        <button class="btn-next" onclick="loadNextSentence()">Next Sentence ➡️</button>
+                    </div>
+                </div>
+
+                <!-- Bottom dock slots -->
+                <div class="g2-assembly-dock" id="g2-dock-container">
+                    <!-- Slots will be programmatically generated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Complete Adaptive 20 Sentences Database from Book 1 and Book 2 ---
+        const sentenceDatabase = [
+            // EASY (2-3 words)
+            {
+                id: "s1",
+                difficulty: "easy",
+                chapter: "Ch. 2: Everyday Conversation",
+                english: "Hello everyone!",
+                words: [
+                    { hanzi: "大家", trees: "dah4 jeeah", correctIndex: 0 },
+                    { hanzi: "好", trees: "haw3", correctIndex: 1 }
+                ],
+                distractors: [
+                    { hanzi: "一杯", trees: "ee4 bay" }
+                ]
+            },
+            {
+                id: "s2",
+                difficulty: "easy",
+                chapter: "Ch. 2: Everyday Conversation",
+                english: "Good morning.",
+                words: [
+                    { hanzi: "早上", trees: "dsaw3 (r)sang4", correctIndex: 0 },
+                    { hanzi: "好", trees: "haw3", correctIndex: 1 }
+                ],
+                distractors: [
+                    { hanzi: "你", trees: "nee3" }
+                ]
+            },
+            {
+                id: "s3",
+                difficulty: "easy",
+                chapter: "Ch. 2: Everyday Conversation",
+                english: "Don't get angry.",
+                words: [
+                    { hanzi: "别", trees: "beeer2", correctIndex: 0 },
+                    { hanzi: "生气", trees: "(r)ser ng tsee4", correctIndex: 1 }
+                ],
+                distractors: [
+                    { hanzi: "累", trees: "Lay4" }
+                ]
+            },
+            {
+                id: "s4",
+                difficulty: "easy",
+                chapter: "Ch. 4: Self-introduction",
+                english: "I am Leo.",
+                words: [
+                    { hanzi: "我", trees: "wer3", correctIndex: 0 },
+                    { hanzi: "是", trees: "(r)s4", correctIndex: 1 },
+                    { hanzi: "利奥", trees: "Leo", correctIndex: 2 }
+                ],
+                distractors: [
+                    { hanzi: "二", trees: "uh er4" }
+                ]
+            },
+            {
+                id: "s5",
+                difficulty: "easy",
+                chapter: "Ch. 4: Self-introduction",
+                english: "I like China.",
+                words: [
+                    { hanzi: "我", trees: "wer3", correctIndex: 0 },
+                    { hanzi: "喜欢", trees: "see3 hooan", correctIndex: 1 },
+                    { hanzi: "中国", trees: "(r)dser oong gooer2", correctIndex: 2 }
+                ],
+                distractors: [
+                    { hanzi: "微信", trees: "way seen4" }
+                ]
+            },
+            {
+                id: "s6",
+                difficulty: "easy",
+                chapter: "Ch. 5: Basic Patterns",
+                english: "I like singing.",
+                words: [
+                    { hanzi: "我", trees: "wer3", correctIndex: 0 },
+                    { hanzi: "喜欢", trees: "see3 hooan", correctIndex: 1 },
+                    { hanzi: "唱歌", trees: "(r)tsang4 ger", correctIndex: 2 }
+                ],
+                distractors: [
+                    { hanzi: "吉他", trees: "jee2 tah" }
+                ]
+            },
+            {
+                id: "s7",
+                difficulty: "easy",
+                chapter: "Ch. 8: See a doctor",
+                english: "I have a headache.",
+                words: [
+                    { hanzi: "我", trees: "wer3", correctIndex: 0 },
+                    { hanzi: "头疼", trees: "toh2_ter_ng2", correctIndex: 1 }
+                ],
+                distractors: [
+                    { hanzi: "坐", trees: "dsooer4" }
+                ]
+            },
+
+            // MEDIUM (4 words)
+            {
+                id: "s8",
+                difficulty: "medium",
+                chapter: "Ch. 3: Articles & Pronouns",
+                english: "This is mine.",
+                words: [
+                    { hanzi: "这", trees: "(r)dser4", correctIndex: 0 },
+                    { hanzi: "是", trees: "(r)s4", correctIndex: 1 },
+                    { hanzi: "我的", trees: "wer3 der", correctIndex: 2 }
+                ],
+                distractors: [
+                    { hanzi: "吉他", trees: "jee2 tah" },
+                    { hanzi: "朋友", trees: "per ng2 yoh" }
+                ]
+            },
+            {
+                id: "s9",
+                difficulty: "medium",
+                chapter: "Ch. 3: Articles & Pronouns",
+                english: "This is my guitar.",
+                words: [
+                    { hanzi: "这", trees: "(r)dser4", correctIndex: 0 },
+                    { hanzi: "是", trees: "(r)s4", correctIndex: 1 },
+                    { hanzi: "我的", trees: "wer3 der", correctIndex: 2 },
+                    { hanzi: "吉他", trees: "jee2 tah", correctIndex: 3 }
+                ],
+                distractors: [
+                    { hanzi: "二", trees: "uh er4" }
+                ]
+            },
+            {
+                id: "s10",
+                difficulty: "medium",
+                chapter: "Ch. 4: Self-introduction",
+                english: "We are Americans.",
+                words: [
+                    { hanzi: "我们", trees: "wer3 mer n", correctIndex: 0 },
+                    { hanzi: "是", trees: "(r)s4", correctIndex: 1 },
+                    { hanzi: "美国", trees: "may3 gooer2", correctIndex: 2 },
+                    { hanzi: "人", trees: "(r)ther n2", correctIndex: 3 }
+                ],
+                distractors: [
+                    { hanzi: "旅游", trees: "Lee(oo)3 yoh2" }
+                ]
+            },
+            {
+                id: "s11",
+                difficulty: "medium",
+                chapter: "Ch. 4: Self-introduction",
+                english: "I come from the United States.",
+                words: [
+                    { hanzi: "我", trees: "wer3", correctIndex: 0 },
+                    { hanzi: "来自", trees: "Lie2 ds4", correctIndex: 1 },
+                    { hanzi: "美国", trees: "may3 gooer2", correctIndex: 2 }
+                ],
+                distractors: [
+                    { hanzi: "二", trees: "uh er4" },
+                    { hanzi: "一杯", trees: "ee4 bay" }
+                ]
+            },
+            {
+                id: "s12",
+                difficulty: "medium",
+                chapter: "Ch. 5: Basic Patterns",
+                english: "Do you have WeChat?",
+                words: [
+                    { hanzi: "你", trees: "Nee3", correctIndex: 0 },
+                    { hanzi: "有", trees: "yoh3", correctIndex: 1 },
+                    { hanzi: "微信", trees: "way seen4", correctIndex: 2 },
+                    { hanzi: "吗", trees: "mah", correctIndex: 3 }
+                ],
+                distractors: [
+                    { hanzi: "累", trees: "Lay4" }
+                ]
+            },
+            {
+                id: "s13",
+                difficulty: "medium",
+                chapter: "Ch. 5: Basic Patterns",
+                english: "I cannot play guitar.",
+                words: [
+                    { hanzi: "我", trees: "wer3", correctIndex: 0 },
+                    { hanzi: "不会", trees: "boo2 hooay4", correctIndex: 1 },
+                    { hanzi: "弹", trees: "tan2", correctIndex: 2 },
+                    { hanzi: "吉他", trees: "jee2 tah", correctIndex: 3 }
+                ],
+                distractors: [
+                    { hanzi: "唱歌", trees: "(r)tsang4 ger" }
+                ]
+            },
+            {
+                id: "s14",
+                difficulty: "medium",
+                chapter: "Ch. 6: Wh-questions",
+                english: "Where are you from?",
+                words: [
+                    { hanzi: "你", trees: "nee3", correctIndex: 0 },
+                    { hanzi: "来自", trees: "lie2 ds4", correctIndex: 1 },
+                    { hanzi: "哪里", trees: "nah3 Lee3", correctIndex: 2 }
+                ],
+                distractors: [
+                    { hanzi: "美国", trees: "may3 gooer2" },
+                    { hanzi: "来自", trees: "Lie2 ds4" }
+                ]
+            },
+
+            // HARD (5+ words)
+            {
+                id: "s15",
+                difficulty: "hard",
+                chapter: "Ch. 3: Articles & Pronouns",
+                english: "He is my best friend.",
+                words: [
+                    { hanzi: "他", trees: "tah", correctIndex: 0 },
+                    { hanzi: "是", trees: "(r)s4", correctIndex: 1 },
+                    { hanzi: "我", trees: "wer3", correctIndex: 2 },
+                    { hanzi: "最", trees: "dsooay4", correctIndex: 3 },
+                    { hanzi: "好的", trees: "haw3 der", correctIndex: 4 },
+                    { hanzi: "朋友", trees: "per ng2 yoh", correctIndex: 5 }
+                ],
+                distractors: [
+                    { hanzi: "吉他", trees: "jee2 tah" }
+                ]
+            },
+            {
+                id: "s16",
+                difficulty: "hard",
+                chapter: "Ch. 4: Self-introduction",
+                english: "This is my younger brother Juan.",
+                words: [
+                    { hanzi: "这", trees: "(r)dser4", correctIndex: 0 },
+                    { hanzi: "是", trees: "(r)s4", correctIndex: 1 },
+                    { hanzi: "我的", trees: "wer3 der", correctIndex: 2 },
+                    { hanzi: "弟弟", trees: "dee4 dee", correctIndex: 3 },
+                    { hanzi: "胡安", trees: "hoo2 an", correctIndex: 4 }
+                ],
+                distractors: [
+                    { hanzi: "来自", trees: "Lie2 ds4" },
+                    { hanzi: "利奥", trees: "Leo" }
+                ]
+            },
+            {
+                id: "s17",
+                difficulty: "hard",
+                chapter: "Ch. 5: Basic Patterns",
+                english: "I'd like a cup of coffee.",
+                words: [
+                    { hanzi: "我", trees: "wer3", correctIndex: 0 },
+                    { hanzi: "要", trees: "yaw4", correctIndex: 1 },
+                    { hanzi: "一杯", trees: "ee4 bay", correctIndex: 2 },
+                    { hanzi: "咖啡", trees: "kah fay", correctIndex: 3 }
+                ],
+                distractors: [
+                    { hanzi: "歷史", trees: "Lee4 (r)s3" },
+                    { hanzi: "附近", trees: "foo4 jeen4" }
+                ]
+            },
+            {
+                id: "s18",
+                difficulty: "hard",
+                chapter: "Ch. 6: Wh-questions",
+                english: "How to go to the nearest supermarket?",
+                words: [
+                    { hanzi: "最近的", trees: "dsooay4 jeen4 der", correctIndex: 0 },
+                    { hanzi: "超市", trees: "(r)tsaw (r)s4", correctIndex: 1 },
+                    { hanzi: "怎么", trees: "dser n3 mer", correctIndex: 2 },
+                    { hanzi: "走", trees: "dsoh3", correctIndex: 3 }
+                ],
+                distractors: [
+                    { hanzi: "附近", trees: "foo4 jeen4" },
+                    { hanzi: "来自", trees: "lie2 ds4" }
+                ]
+            },
+            {
+                id: "s19",
+                difficulty: "hard",
+                chapter: "Ch. 7: Restaurant",
+                english: "What are your specialties?",
+                words: [
+                    { hanzi: "你们的", trees: "nee3 mer n der", correctIndex: 0 },
+                    { hanzi: "招牌菜", trees: "(r)dsaw pie2 tsie4", correctIndex: 1 },
+                    { hanzi: "是", trees: "(r)s4", correctIndex: 2 },
+                    { hanzi: "什么", trees: "(r)ser n2 mer", correctIndex: 3 }
+                ],
+                distractors: [
+                    { hanzi: "菜单", trees: "tsie4 dan" },
+                    { hanzi: "一杯", trees: "ee4 bay" }
+                ]
+            },
+            {
+                id: "s20",
+                difficulty: "hard",
+                chapter: "Ch. 7: Restaurant",
+                english: "What would you like to drink?",
+                words: [
+                    { hanzi: "你", trees: "nee3", correctIndex: 0 },
+                    { hanzi: "想要", trees: "seeang3 yaw4", correctIndex: 1 },
+                    { hanzi: "喝", trees: "her", correctIndex: 2 },
+                    { hanzi: "什么", trees: "(r)ser n2 mer", correctIndex: 3 }
+                ],
+                distractors: [
+                    { hanzi: "有", trees: "yoh3" },
+                    { hanzi: "微信", trees: "way seen4" }
+                ]
+            }
+        ];
+
+        // --- Core Application State & Adaptive Logic ---
+        let currentDifficulty = 'all';
+        let currentSentence = null;
+        let sentenceSlots = [];
+        let errorsInCurrentRound = 0;
+        
+        let engineG2 = null;
+        let worldG2 = null;
+        let runnerG2 = null;
+        let g2Entities = [];
+
+        // TTS Speech Synthesis Settings
+        let selectedVoice = null;
+        let voicesList = [];
+
+        const { Engine, Render, Runner, Bodies, Composite, Body, Events, Mouse, MouseConstraint } = Matter;
+
+        const container = document.getElementById('game-workspace');
+        let width = container.clientWidth || window.innerWidth;
+        let height = container.clientHeight || (window.innerHeight - 110);
+
+        // --- Adaptive Spaced-Repetition Star Storage ---
+        function getMusterStars(sentenceId) {
+            const stars = localStorage.getItem(`trees_star_${sentenceId}`);
+            return stars ? parseInt(stars, 10) : 0;
+        }
+
+        function setMusterStars(sentenceId, stars) {
+            localStorage.setItem(`trees_star_${sentenceId}`, Math.max(0, Math.min(3, stars)));
+            updateTotalMasteryDisplay();
+        }
+
+        function updateTotalMasteryDisplay() {
+            let total = 0;
+            sentenceDatabase.forEach(s => {
+                total += getMusterStars(s.id);
+            });
+            document.getElementById('stars-total-display').textContent = `⭐ Mastery: ${total} / ${sentenceDatabase.length * 3}`;
+        }
+
+        // Weighted Random Selector: Lower stars = higher appearance weight
+        function selectNextWeightedSentence() {
+            // Filter sentences by difficulty
+            const filteredList = sentenceDatabase.filter(s => {
+                if (currentDifficulty === 'all') return true;
+                return s.difficulty === currentDifficulty;
+            });
+
+            if (filteredList.length === 0) return sentenceDatabase[0];
+
+            // Assign weights: 0-star = 1.0, 1-star = 0.6, 2-star = 0.2, 3-star = 0.05
+            const weights = filteredList.map(s => {
+                const stars = getMusterStars(s.id);
+                if (stars === 0) return 1.0;
+                if (stars === 1) return 0.6;
+                if (stars === 2) return 0.2;
+                return 0.05; // 3-star mastered sentences appear very rarely
+            });
+
+            const totalWeight = weights.reduce((a, b) => a + b, 0);
+            let randomNum = Math.random() * totalWeight;
+            
+            for (let i = 0; i < filteredList.length; i++) {
+                randomNum -= weights[i];
+                if (randomNum <= 0) {
+                    return filteredList[i];
+                }
+            }
+            return filteredList[filteredList.length - 1];
+        }
+
+        // --- High-Quality Soft Chinese Female TTS Selection ---
+        function loadVoices() {
+            if (!('speechSynthesis' in window)) return;
+            
+            voicesList = window.speechSynthesis.getVoices();
+            const voiceSelect = document.getElementById('voice-select');
+            voiceSelect.innerHTML = '';
+
+            // Look for Mandarin voices (zh-CN, zh-HK, zh-TW)
+            const chineseVoices = voicesList.filter(v => 
+                v.lang.toLowerCase().includes('zh') || 
+                v.lang.toLowerCase().includes('chinese')
+            );
+
+            // Prioritize standard high-quality female engines (e.g. Xiaoxiao, Huihui, Tingting, Sinji)
+            const preferredKeywords = ['xiaoxiao', 'huihui', 'tingting', 'mei-jia', 'sin-ji', 'female', 'standard', 'google', 'apple'];
+            chineseVoices.sort((a, b) => {
+                const aName = a.name.toLowerCase();
+                const bName = b.name.toLowerCase();
+                let aScore = 0;
+                let bScore = 0;
+                preferredKeywords.forEach((kw, index) => {
+                    if (aName.includes(kw)) aScore += (preferredKeywords.length - index);
+                    if (bName.includes(kw)) bScore += (preferredKeywords.length - index);
+                });
+                return bScore - aScore;
+            });
+
+            chineseVoices.forEach(voice => {
+                const opt = document.createElement('option');
+                opt.value = voice.name;
+                opt.textContent = `${voice.name} (${voice.lang})`;
+                voiceSelect.appendChild(opt);
+            });
+
+            if (chineseVoices.length > 0) {
+                selectedVoice = chineseVoices[0];
+            } else if (voicesList.length > 0) {
+                // Fallback to first available
+                const opt = document.createElement('option');
+                opt.textContent = "Default System Voice";
+                voiceSelect.appendChild(opt);
+                selectedVoice = voicesList[0];
+            }
+        }
+
+        function changeVoice() {
+            const voiceSelect = document.getElementById('voice-select');
+            const found = voicesList.find(v => v.name === voiceSelect.value);
+            if (found) {
+                selectedVoice = found;
+                // Speak hello to verify voice
+                speakChinese("你好，我是您的树拼音女声伴学助手！");
+            }
+        }
+
+        function speakChinese(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel(); // Terminate ongoing speech
+                const utterance = new SpeechSynthesisUtterance(text);
+                if (selectedVoice) {
+                    utterance.voice = selectedVoice;
+                }
+                utterance.lang = 'zh-CN';
+                utterance.rate = 0.75; // Slower elegant speaking rate
+                utterance.pitch = 1.0;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        // --- Filter Control ---
+        function setDifficulty(diff) {
+            currentDifficulty = diff;
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                if (btn.id !== 'btn-diff-all' && btn.id !== `btn-diff-${diff}`) {
+                    btn.classList.remove('active');
+                }
+            });
+            document.getElementById('btn-diff-all').classList.toggle('active', diff === 'all');
+            const targetBtn = document.getElementById(`btn-diff-${diff}`);
+            if (targetBtn) targetBtn.classList.add('active');
+
+            initGameSentence();
+        }
+
+        function resetProgress() {
+            if (confirm("Reset all mastery stars to 0? Your learning progress will restart.")) {
+                sentenceDatabase.forEach(s => {
+                    localStorage.removeItem(`trees_star_${s.id}`);
+                });
+                updateTotalMasteryDisplay();
+                initGameSentence();
+            }
+        }
+
+        // --- GAME WORKSPACE INITIALIZATION (Matter.js) ---
+        function initGameSentence() {
+            // Stop and destroy previous game setups cleanly
+            if (engineG2) {
+                Matter.World.clear(worldG2);
+                Engine.clear(engineG2);
+                runnerG2 && Runner.stop(runnerG2);
+                g2Entities.forEach(e => e.el.remove());
+                g2Entities = [];
+            }
+
+            errorsInCurrentRound = 0;
+
+            engineG2 = Engine.create();
+            worldG2 = engineG2.world;
+            engineG2.gravity.y = 0.45; // Gentle drop gravity
+
+            // Boundaries
+            const wallThickness = 100;
+            const wallOptions = { isStatic: true, restitution: 0.3, friction: 0.1 };
+            // Raise ground level above the bottom docks
+            let ground = Bodies.rectangle(width / 2, height + wallThickness/2 - 120, width * 2, wallThickness, wallOptions);
+            let ceiling = Bodies.rectangle(width / 2, -wallThickness/2, width * 2, wallThickness, wallOptions);
+            let leftWall = Bodies.rectangle(-wallThickness/2, height / 2, wallThickness, height * 2, wallOptions);
+            let rightWall = Bodies.rectangle(width + wallThickness/2, height / 2, wallThickness, height * 2, wallOptions);
+            Composite.add(worldG2, [ground, ceiling, leftWall, rightWall]);
+
+            // Select sentence with weighted adaptive logic
+            currentSentence = selectNextWeightedSentence();
+
+            // Load header info
+            document.getElementById('g2-target-chapter').textContent = currentSentence.chapter;
+            document.getElementById('g2-target-english').textContent = `Translate: "${currentSentence.english}"`;
+
+            // Prepare bottom assembly slots
+            const dockContainer = document.getElementById('g2-dock-container');
+            dockContainer.innerHTML = '';
+            sentenceSlots = new Array(currentSentence.words.length).fill(null);
+
+            for (let i = 0; i < currentSentence.words.length; i++) {
+                const slot = document.createElement('div');
+                slot.className = 'dock-slot';
+                slot.textContent = `Word ${i + 1}`;
+                slot.id = `dock-slot-${i}`;
+                dockContainer.appendChild(slot);
+            }
+
+            // Shuffle card deck
+            const cardDeck = [...currentSentence.words, ...currentSentence.distractors].sort(() => 0.5 - Math.random());
+
+            // Build cards
+            cardDeck.forEach((word, index) => {
+                createG2WordCard(word, index, cardDeck.length, container);
+            });
+
+            // Matter Mouse Interactivity
+            const mouse = Mouse.create(container);
+            const mouseConstraint = MouseConstraint.create(engineG2, {
+                mouse: mouse,
+                constraint: { stiffness: 0.15, render: { visible: false } }
+            });
+            Composite.add(worldG2, mouseConstraint);
+
+            // Avoid touch scroll collisions
+            mouseConstraint.mouse.element.removeEventListener("mousewheel", mouseConstraint.mouse.mousewheel);
+            mouseConstraint.mouse.element.removeEventListener("DOMMouseScroll", mouseConstraint.mouse.mousewheel);
+
+            // Mouse Drag release trigger
+            Events.on(mouseConstraint, 'enddrag', (event) => {
+                const body = event.body;
+                if (body && body.g2Word) {
+                    attemptDockSnapping(body);
+                }
+            });
+
+            runnerG2 = Runner.create();
+            Runner.run(runnerG2, engineG2);
+
+            // DOM Syncer Frame Loop
+            Events.on(engineG2, 'afterUpdate', () => {
+                g2Entities.forEach(item => {
+                    const { position, angle } = item.body;
+                    if (item.isDocked) return;
+                    item.el.style.transform = `translate(${position.x - 55}px, ${position.y - 32}px) rotate(${angle}rad)`;
+                });
+            });
+        }
+
+        function createG2WordCard(word, index, total, parentContainer) {
+            const el = document.createElement('div');
+            el.className = 'g2-word-card';
+            el.innerHTML = `
+                <div class="hanzi">${word.hanzi}</div>
+                <div class="trees">${word.trees}</div>
+            `;
+            parentContainer.appendChild(el);
+
+            // Even columns distribution config
+            const spaceX = width / (total + 1);
+            const x = spaceX * (index + 1) + (Math.random() - 0.5) * 15;
+            const y = 85 + (Math.random() - 0.5) * 35;
+
+            const body = Bodies.rectangle(x, y, 110, 65, {
+                restitution: 0.4,
+                friction: 0.1,
+                frictionAir: 0.02,
+                density: 0.001
+            });
+
+            body.g2Word = word;
+
+            Composite.add(worldG2, body);
+            g2Entities.push({ el, body, word, isDocked: false, slotIndex: -1 });
+        }
+
+        function attemptDockSnapping(body) {
+            const word = body.g2Word;
+            const cardEntity = g2Entities.find(e => e.body === body);
+            if (!cardEntity || cardEntity.isDocked) return;
+
+            let nearestSlotIndex = -1;
+            let minDistance = 90; // Snap radius limit
+
+            for (let i = 0; i < currentSentence.words.length; i++) {
+                const slotEl = document.getElementById(`dock-slot-${i}`);
+                if (!slotEl) continue;
+
+                const rect = slotEl.getBoundingClientRect();
+                const containerRect = container.getBoundingClientRect();
+                
+                // Absolute center of the slot
+                const slotX = rect.left - containerRect.left + rect.width / 2;
+                const slotY = rect.top - containerRect.top + rect.height / 2;
+
+                const dist = Math.hypot(body.position.x - slotX, body.position.y - slotY);
+
+                if (dist < minDistance) {
+                    minDistance = dist;
+                    nearestSlotIndex = i;
+                }
+            }
+
+            if (nearestSlotIndex !== -1) {
+                if (sentenceSlots[nearestSlotIndex] === null) {
+                    const slotEl = document.getElementById(`dock-slot-${nearestSlotIndex}`);
+                    
+                    if (word.correctIndex === nearestSlotIndex) {
+                        // Success placement
+                        snapToSlot(cardEntity, nearestSlotIndex, slotEl);
+                    } else {
+                        // Wrong placement: bounce card up and record error
+                        errorsInCurrentRound++;
+                        Body.applyForce(body, body.position, { x: (Math.random() - 0.5) * 0.04, y: -0.12 });
+                    }
+                }
+            }
+        }
+
+        function snapToSlot(entity, slotIndex, slotEl) {
+            entity.isDocked = true;
+            entity.slotIndex = slotIndex;
+            sentenceSlots[slotIndex] = entity;
+
+            Body.setStatic(entity.body, true);
+
+            slotEl.classList.add('filled');
+            slotEl.innerHTML = '';
+            slotEl.appendChild(entity.el);
+
+            // Re-render in structural dock layout
+            entity.el.style.position = 'relative';
+            entity.el.style.left = '0px';
+            entity.el.style.top = '0px';
+            entity.el.style.transform = 'none';
+            entity.el.style.boxShadow = 'none';
+
+            speakChinese(entity.word.hanzi);
+            checkSentenceCompleteness();
+        }
+
+        function checkSentenceCompleteness() {
+            const allFilled = sentenceSlots.every(slot => slot !== null);
+
+            if (allFilled) {
+                // Calculate Star Mastery based on round errors
+                let currentStars = getMusterStars(currentSentence.id);
+                let starsAwarded = 0;
+
+                if (errorsInCurrentRound === 0) {
+                    starsAwarded = 3;
+                    setMusterStars(currentSentence.id, currentStars + 1); // Gain star
+                } else if (errorsInCurrentRound <= 1) {
+                    starsAwarded = 2; // Kept current stars
+                } else {
+                    starsAwarded = 1;
+                    setMusterStars(currentSentence.id, currentStars - 1); // Lose star
+                }
+
+                const updatedStars = getMusterStars(currentSentence.id);
+                
+                // Star display render
+                const starIcons = '⭐'.repeat(updatedStars) + '☆'.repeat(3 - updatedStars);
+                document.getElementById('reveal-stars').textContent = `${starIcons} (This round errors: ${errorsInCurrentRound})`;
+
+                triggerConfettiBurst(width / 2, height - 140);
+
+                // Speak whole sentence cleanly with female TTS voice
+                const fullText = currentSentence.words.map(w => w.hanzi).join('');
+                setTimeout(() => speakChinese(fullText), 400);
+
+                document.getElementById('reveal-sent-hanzi').textContent = fullText;
+                document.getElementById('reveal-sent-trees').textContent = currentSentence.words.map(w => w.trees).join(' ');
+                document.getElementById('reveal-sent-eng').textContent = `"${currentSentence.english}"`;
+
+                document.getElementById('sentence-success-overlay').style.display = 'flex';
+            }
+        }
+
+        function loadNextSentence() {
+            document.getElementById('sentence-success-overlay').style.display = 'none';
+            initGameSentence();
+        }
+
+        // --- Initialization and Event Bindings ---
+        window.addEventListener('resize', () => {
+            width = container.clientWidth;
+            height = container.clientHeight || (window.innerHeight - 110);
+        });
+
+        // Load voices dynamically and retry if necessary
+        window.onload = () => {
+            loadVoices();
+            if (speechSynthesis.onvoiceschanged !== undefined) {
+                speechSynthesis.onvoiceschanged = loadVoices;
+            }
+            updateTotalMasteryDisplay();
+            initGameSentence();
+        };
+
+    </script>
+</body>
+</html>
