@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trees Pinyin - Anti-Gravity Tone Sandbox</title>
+    <!-- Include Matter.js 2D Physics Engine -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+    <style>
+        :root {
+            --primary-green: #2E7D32;
+            --dark-green: #1B5E20;
+            --accent-green: #E8F5E9;
+            --text-dark: #333333;
+            --muted-gray: #757575;
+            --white: #ffffff;
+            --blue-trees: #1565C0;
+            --orange-anchor: #E65100;
+            --red-tone: #C62828;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f1f3f1;
+            color: var(--text-dark);
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        #app-wrapper {
+            display: flex;
+            flex-direction: column;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        /* Top Header Navigation */
+        header {
+            background-color: var(--white);
+            padding: 14px 24px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .logo-area h1 {
+            margin: 0;
+            font-size: 22px;
+            color: var(--primary-green);
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo-area p {
+            margin: 2px 0 0 0;
+            font-size: 12px;
+            color: var(--muted-gray);
+        }
+
+        /* Interactive Physics Control Panel */
+        .control-panel {
+            background-color: #eaf0ea;
+            padding: 10px 24px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+            z-index: 99;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.03);
+            border-bottom: 1px solid rgba(46, 125, 50, 0.1);
+        }
+
+        .panel-label {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--dark-green);
+            margin-right: 8px;
+        }
+
+        .btn {
+            background-color: var(--white);
+            border: 1.5px solid var(--primary-green);
+            color: var(--primary-green);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn:hover {
+            background-color: var(--accent-green);
+            transform: translateY(-1.5px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn.active {
+            background-color: var(--primary-green);
+            color: var(--white);
+            box-shadow: 0 4px 10px rgba(46, 125, 50, 0.3);
+        }
+
+        .btn-wind {
+            border-color: #0288D1;
+            color: #0288D1;
+        }
+        .btn-wind:hover {
+            background-color: #E1F5FE;
+        }
+        .btn-wind.active {
+            background-color: #0288D1;
+            color: white;
+            box-shadow: 0 4px 10px rgba(2, 136, 209, 0.3);
+        }
+
+        .btn-reset {
+            margin-left: auto;
+            border-color: #757575;
+            color: #757575;
+        }
+        .btn-reset:hover {
+            background-color: #f5f5f5;
+        }
+
+        /* Sandbox Playground Arena */
+        #sandbox {
+            flex-grow: 1;
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: radial-gradient(circle, #f9faf9 0%, #eef1ee 100%);
+        }
+
+        /* Interactive Physics Word Cards */
+        .word-card {
+            position: absolute;
+            width: 150px;
+            height: 100px;
+            background-color: var(--white);
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+            border: 2px solid var(--primary-green);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+            box-sizing: border-box;
+            cursor: grab;
+            transform-origin: center center;
+            will-change: transform;
+            transition: box-shadow 0.15s;
+            text-align: center;
+        }
+
+        .word-card:active {
+            cursor: grabbing;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.14) !important;
+        }
+
+        .word-card .hanzi {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--primary-green);
+            margin-bottom: 2px;
+            pointer-events: none;
+        }
+
+        .word-card .trees-pinyin {
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--blue-trees);
+            font-style: italic;
+            margin-bottom: 4px;
+            pointer-events: none;
+        }
+
+        .word-card .english {
+            font-size: 11px;
+            color: var(--muted-gray);
+            font-weight: 500;
+            line-height: 1.2;
+            pointer-events: none;
+        }
+
+        /* Tone-Specific Border Colors */
+        .word-card.tone-1 {
+            border-color: var(--primary-green);
+            box-shadow: 0 4px 10px rgba(46, 125, 50, 0.08);
+        }
+        .word-card.tone-2 {
+            border-color: var(--blue-trees);
+            box-shadow: 0 4px 10px rgba(21, 101, 192, 0.08);
+        }
+        .word-card.tone-3 {
+            border-color: var(--orange-anchor);
+            box-shadow: 0 4px 10px rgba(230, 81, 0, 0.08);
+        }
+        .word-card.tone-4 {
+            border-color: var(--red-tone);
+            box-shadow: 0 4px 10px rgba(198, 40, 40, 0.08);
+        }
+
+        /* Bottom Floating Guidance Overlay */
+        .instructions-overlay {
+            position: absolute;
+            bottom: 16px;
+            left: 24px;
+            right: 24px;
+            display: flex;
+            justify-content: space-between;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .instruction-tag {
+            background-color: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(4px);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--dark-green);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border: 1px solid rgba(46, 125, 50, 0.15);
+        }
+
+        /* Matter Debug Canvas (Hidden by default, used for physics boundary testing) */
+        #matter-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            opacity: 0.15;
+            z-index: 1;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="app-wrapper">
+        <!-- Top Navigation Header -->
+        <header>
+            <div class="logo-area">
+                <h1>🌴 Trees Pinyin: Anti-Gravity Sandbox</h1>
+                <p>The Multi-Sensory Physics Playground for Mandarin Tones</p>
+            </div>
+            <div class="instruction-tag" style="pointer-events: auto; cursor: help;" onclick="alert('💡 Quick Start Guide:\n1. Click different Tonal Gravity Modes to dynamically shift the physics engine!\n2. Click and hold with your mouse (or tap and drag on mobile) to throw the cards around.\n3. Tap any card to hear the high-quality native Mandarin pronunciation!\n4. Turn on \'Aspirated Blow\' to simulate standard speaker airflow and see its physical impact on aspirated vs. unaspirated sounds.')">
+                ❔ Quick Guide
+            </div>
+        </header>
+
+        <!-- Main Interactive Controls -->
+        <div class="control-panel">
+            <span class="panel-label">🌍 Tonal Gravity Modes:</span>
+            <button class="btn active" id="btn-earth" onclick="changeGravityMode('earth')">🏠 Normal Gravity (Earth)</button>
+            <button class="btn" id="btn-space" onclick="changeGravityMode('space')">🚀 Flat Zero-G (Tone 1: High-Flat)</button>
+            <button class="btn" id="btn-anti" onclick="changeGravityMode('anti')">🎈 Rising Float (Tone 2: Rising)</button>
+            <button class="btn" id="btn-bouncy" onclick="changeGravityMode('bouncy')">🦘 Dipping Bounce (Tone 3: Dip & Rise)</button>
+            <button class="btn" id="btn-heavy" onclick="changeGravityMode('heavy')">☄️ Punchy Downfall (Tone 4: Falling)</button>
+            
+            <button class="btn btn-wind" id="btn-wind" onclick="toggleWind()">💨 Aspirated Blow (Wind)</button>
+            
+            <button class="btn btn-reset" onclick="resetPositions()">🔄 Reset Sandbox</button>
+        </div>
+
+        <!-- Interactive Physics Playground Area -->
+        <div id="sandbox">
+            <!-- Hidden Canvas for Physics Debugging -->
+            <canvas id="matter-canvas"></canvas>
+            
+            <!-- Floating Overlay Prompts -->
+            <div class="instructions-overlay">
+                <div class="instruction-tag">👈 Click and drag any card to fling it! Tap once to play the high-quality audio.</div>
+                <div class="instruction-tag">Trees Pinyin © 2026 · Built with Matter.js</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. Initialize Matter.js Physics Engine ---
+        const { Engine, Render, Runner, Bodies, Composite, Body, Events, Mouse, MouseConstraint } = Matter;
+
+        const engine = Engine.create();
+        const world = engine.world;
+
+        // Set default gravity (standard earth gravity)
+        engine.gravity.y = 0.8;
+        engine.gravity.x = 0;
+
+        const container = document.getElementById('sandbox');
+        const width = container.clientWidth;
+        const height = container.clientHeight;
+
+        // Create Matter.js debug renderer
+        const canvas = document.getElementById('matter-canvas');
+        const render = Render.create({
+            canvas: canvas,
+            engine: engine,
+            options: {
+                width: width,
+                height: height,
+                wireframes: true,
+                background: 'transparent'
+            }
+        });
+        Render.run(render);
+
+        const runner = Runner.create();
+        Runner.run(runner, engine);
+
+        // --- 2. World Boundaries (Static Rigid Bodies) ---
+        const wallThickness = 100;
+        const wallOptions = { isStatic: true, restitution: 0.9, friction: 0.05 };
+
+        let ground = Bodies.rectangle(width / 2, height + wallThickness/2, width * 2, wallThickness, wallOptions);
+        let ceiling = Bodies.rectangle(width / 2, -wallThickness/2, width * 2, wallThickness, wallOptions);
+        let leftWall = Bodies.rectangle(-wallThickness/2, height / 2, wallThickness, height * 2, wallOptions);
+        let rightWall = Bodies.rectangle(width + wallThickness/2, height / 2, wallThickness, height * 2, wallOptions);
+
+        Composite.add(world, [ground, ceiling, leftWall, rightWall]);
+
+        // --- 3. Trees Pinyin Vocabulary and "Double-Lock" Data Store ---
+        const wordsData = [
+            { hanzi: "來自", trees: "Lie2 ds4", english: "From / Lies", tone: 4, aspirate: false },
+            { hanzi: "二", trees: "uh er4", english: "Two / Error", tone: 4, aspirate: false },
+            { hanzi: "累", trees: "Lay4", english: "Tired / Lay", tone: 4, aspirate: false },
+            { hanzi: "歷史", trees: "Lee4 (r)s3", english: "History / Lease", tone: 3, aspirate: false },
+            { hanzi: "微信", trees: "way seen4", english: "WeChat / Way Seen", tone: 4, aspirate: false },
+            { hanzi: "旅遊", trees: "Lee(oo)3 yoh2", english: "Traveling / You", tone: 2, aspirate: false },
+            { hanzi: "坐", trees: "dsooer4", english: "Sit / Zoomer", tone: 4, aspirate: false },
+            { hanzi: "一杯", trees: "ee4 bay", english: "A Cup of / eBay", tone: 1, aspirate: false },
+            { hanzi: "牛肉", trees: "neeoh2 (r)thoh4", english: "Beef / New Though", tone: 4, aspirate: false },
+            { hanzi: "附近", trees: "foo4 jeen4", english: "Nearby / Food Jean", tone: 4, aspirate: false },
+            // Aspirated phonemes (extremely light mass density, highly responsive to blow simulation)
+            { hanzi: "跑", trees: "pow3", english: "Run / Pow!", tone: 3, aspirate: true },
+            { hanzi: "聽", trees: "ting1", english: "Listen / Ting-a-ling", tone: 1, aspirate: true }
+        ];
+
+        const cardWidth = 150;
+        const cardHeight = 100;
+        const cardEntities = [];
+
+        // --- 4. Instantiate DOM Elements and Correlate with Physics Bodies ---
+        wordsData.forEach((word, index) => {
+            // Create DOM Card elements
+            const el = document.createElement('div');
+            el.className = `word-card tone-${word.tone}`;
+            el.innerHTML = `
+                <div class="hanzi">${word.hanzi}</div>
+                <div class="trees-pinyin">${word.trees}</div>
+                <div class="english">${word.english}</div>
+            `;
+            container.appendChild(el);
+
+            // Compute grid positions dynamically
+            const cols = 4;
+            const row = Math.floor(index / cols);
+            const col = index % cols;
+            const x = (width / cols) * (col + 0.5) + (Math.random() - 0.5) * 30;
+            const y = 100 + row * 120 + (Math.random() - 0.5) * 30;
+
+            // Physical parameters based on aspiration and tones
+            const bodyDensity = word.aspirate ? 0.0002 : 0.001; // Aspirated words are lighter (representing physical breath)
+            const bodyRestitution = word.tone === 3 ? 0.95 : 0.7; // Tone 3 (dipping) cards are incredibly springy
+
+            const body = Bodies.rectangle(x, y, cardWidth, cardHeight, {
+                restitution: bodyRestitution,
+                friction: 0.1,
+                frictionAir: 0.015,
+                density: bodyDensity
+            });
+
+            // Bind the source word data onto the physics rigid body
+            body.wordData = word;
+
+            Composite.add(world, body);
+            cardEntities.push({ el, body, data: word });
+
+            // --- 5. Speech Synthesis Audio Tap with Kinetic Micro-Force ---
+            el.addEventListener('click', () => {
+                // Call standard browser speech synthesis
+                const utterance = new SpeechSynthesisUtterance(word.hanzi);
+                utterance.lang = 'zh-CN';
+                utterance.rate = 0.8; // Slow down slightly for educational clarity
+                window.speechSynthesis.speak(utterance);
+
+                // Kinetics: Apply an upward kinetic pulse on clicked card
+                Body.applyForce(body, body.position, {
+                    x: (Math.random() - 0.5) * 0.05,
+                    y: -0.15
+                });
+            });
+        });
+
+        // --- 6. Physics Step Loop: Coordinate DOM Card Coordinates with Matter.js Output ---
+        Events.on(engine, 'afterUpdate', () => {
+            cardEntities.forEach(item => {
+                const { position, angle } = item.body;
+                
+                // Synchronize positions and rotation angles to DOM CSS absolute positioning
+                item.el.style.transform = `translate(${position.x - cardWidth / 2}px, ${position.y - cardHeight / 2}px) rotate(${angle}rad)`;
+            });
+
+            // 💨 Simulate "Aspirated Wind Blow" vector forces
+            if (isWindActive) {
+                cardEntities.forEach(item => {
+                    if (item.data.aspirate) {
+                        // Aspirated cards are highly sensitive and are easily blown away
+                        Body.applyForce(item.body, item.body.position, { x: 0.005, y: -0.001 });
+                    } else {
+                        // Unaspirated cards are heavy and stay relatively stable
+                        Body.applyForce(item.body, item.body.position, { x: 0.0005, y: 0 });
+                    }
+                });
+            }
+        });
+
+        // --- 7. Mouse Constraint & Touch Drag Setup ---
+        const mouse = Mouse.create(container);
+        const mouseConstraint = MouseConstraint.create(engine, {
+            mouse: mouse,
+            constraint: {
+                stiffness: 0.15,
+                render: { visible: false }
+            }
+        });
+
+        Composite.add(world, mouseConstraint);
+
+        // Prevent mobile gesture scrolling conflicts when interacting with the sandbox physics playground
+        mouseConstraint.mouse.element.removeEventListener("mousewheel", mouseConstraint.mouse.mousewheel);
+        mouseConstraint.mouse.element.removeEventListener("DOMMouseScroll", mouseConstraint.mouse.mousewheel);
+
+        // --- 8. Dynamic Gravity Manipulation Schemes (Tonal Gravity Modes) ---
+        let currentMode = 'earth';
+        function changeGravityMode(mode) {
+            currentMode = mode;
+            
+            // Clear current active styling state on controls
+            document.querySelectorAll('.control-panel .btn').forEach(btn => {
+                if (btn.id !== 'btn-wind') btn.classList.remove('active');
+            });
+            
+            // Activate selected option button
+            document.getElementById(`btn-${mode}`).classList.add('active');
+
+            if (mode === 'earth') {
+                // Earth normal gravity
+                engine.gravity.y = 0.8;
+                engine.gravity.x = 0;
+                cardEntities.forEach(item => {
+                    item.body.restitution = item.data.tone === 3 ? 0.95 : 0.7;
+                    item.body.frictionAir = 0.015;
+                });
+            } else if (mode === 'space') {
+                // Space Flat Zero-G: Mimics Tone 1 (high, flat, and weightless flow)
+                engine.gravity.y = 0;
+                engine.gravity.x = 0.02; // Soft rightwards drifting breeze
+                cardEntities.forEach(item => {
+                    item.body.frictionAir = 0.005; // Low friction for elegant floating movement
+                    // Apply brief random initialization push vectors
+                    Body.applyForce(item.body, item.body.position, {
+                        x: (Math.random() - 0.5) * 0.05,
+                        y: (Math.random() - 0.5) * 0.05
+                    });
+                });
+            } else if (mode === 'anti') {
+                // Balloon rising anti-gravity: Mimics Tone 2 (surprised, rising tone track)
+                engine.gravity.y = -0.25; // Floating upwards smoothly
+                engine.gravity.x = 0;
+                cardEntities.forEach(item => {
+                    item.body.frictionAir = 0.03; // Increased drag to create a smooth, gentle rise
+                });
+            } else if (mode === 'bouncy') {
+                // Trampoline bounce mode: Mimics Tone 3 (dipping and rising tone trajectory)
+                engine.gravity.y = 1.2; // Accelerated heavy downward force
+                engine.gravity.x = 0;
+                cardEntities.forEach(item => {
+                    // Turn up elastic coefficient past unity to generate a powerful rebounding rise!
+                    item.body.restitution = 1.05; 
+                    item.body.frictionAir = 0.01;
+                });
+                alert("🦘 Dipping Bounce Mode Enabled!\nDipping third-tone cards (like '历史' and '跑') now have ultra-high elasticity. Watch them dip and rise as they bounce off surfaces!");
+            } else if (mode === 'heavy') {
+                // Meteor downfall mode: Mimics Tone 4 (short, punchy, downward falling tone)
+                engine.gravity.y = 2.8; // Extremely heavy gravitational field
+                engine.gravity.x = 0;
+                cardEntities.forEach(item => {
+                    item.body.restitution = 0.15; // Low elasticity to simulate a heavy thud landing
+                    item.body.frictionAir = 0.05;
+                });
+            }
+        }
+
+        // --- 9. Toggle Force-Field: 💨 Aspirated Blow Control ---
+        let isWindActive = false;
+        function toggleWind() {
+            isWindActive = !isWindActive;
+            const windBtn = document.getElementById('btn-wind');
+            if (isWindActive) {
+                windBtn.classList.add('active');
+                windBtn.innerHTML = "💨 Wind Blowing... (ON)";
+            } else {
+                windBtn.classList.remove('active');
+                windBtn.innerHTML = "💨 Aspirated Blow (Wind)";
+            }
+        }
+
+        // --- 10. Utility function: 🔄 Reset Sandbox Items ---
+        function resetPositions() {
+            cardEntities.forEach((item, index) => {
+                const cols = 4;
+                const row = Math.floor(index / cols);
+                const col = index % cols;
+                const x = (width / cols) * (col + 0.5) + (Math.random() - 0.5) * 20;
+                const y = 100 + row * 110;
+
+                // Reset rigid body translational position, angles, velocities, and angular speeds
+                Body.setPosition(item.body, { x: x, y: y });
+                Body.setAngle(item.body, 0);
+                Body.setVelocity(item.body, { x: 0, y: 0 });
+                Body.setAngularVelocity(item.body, 0);
+            });
+            
+            // Revert back to standard Earth gravity
+            changeGravityMode('earth');
+        }
+
+        // --- 11. Adapt Boundaries dynamically to Window Resizes ---
+        window.addEventListener('resize', () => {
+            const newWidth = container.clientWidth;
+            const newHeight = container.clientHeight;
+            
+            // Scale and redraw debug graphics bounds
+            render.bounds.max.x = newWidth;
+            render.bounds.max.y = newHeight;
+            render.options.width = newWidth;
+            render.options.height = newHeight;
+            canvas.width = newWidth;
+            canvas.height = newHeight;
+
+            // Reposition spatial boundary lines (rigid bodies)
+            Body.setPosition(ground, { x: newWidth / 2, y: newHeight + wallThickness/2 });
+            Body.setPosition(ceiling, { x: newWidth / 2, y: -wallThickness/2 });
+            Body.setPosition(leftWall, { x: -wallThickness/2, y: newHeight / 2 });
+            Body.setPosition(rightWall, { x: newWidth + wallThickness/2, y: newHeight / 2 });
+        });
+
+    </script>
+</body>
+</html>
