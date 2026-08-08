@@ -176,6 +176,23 @@
             flex-wrap: wrap;
             gap: 15px;
         }
+        .top-action-banner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            background-color: var(--accent-green);
+            padding: 16px 20px;
+            border-radius: 8px;
+            border: 2px solid rgba(46, 125, 50, 0.15);
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .top-action-banner span {
+            font-size: 14px;
+            font-weight: bold;
+            color: var(--dark-green);
+        }
         .anki-btn {
             background-color: var(--primary-green);
             color: var(--white);
@@ -229,6 +246,11 @@
             </div>
         </div>
         
+        <div class="top-action-banner">
+            <span>🎁 Recommended: Download our official Book 1 Anki Deck to practice offline on your phone/tablet with pure audio!</span>
+            <a href="https://www.treespinyin.com/vol1/Easy_Mandarin_Speaking_Trees_Pinyin_Book_1.apkg" class="anki-btn">📩 Download Book 1 Anki Deck</a>
+        </div>
+        
         <div class="search-area">
             <input type="text" id="search" class="search-input" placeholder="Search by English, Hanzi, or Pinyin...">
             <select id="chapter-filter" class="chapter-select">
@@ -265,8 +287,8 @@
         </table>
 
         <div class="footer-action">
-            <span>🎁 Double-click an apk download, or download our premium pre-built deck here:</span>
-            <a href="https://www.treespinyin.com/vol1/Easy_Mandarin_Speaking_Trees_Pinyin_Book_1.apkg" class="anki-btn">📩 Download Book 1 Anki Deck</a>
+            <span>💡 Need memory anchors? Click on "Memory Tips" on any vocabulary item to check its logical story.</span>
+            <a href="about.html" class="anki-btn" style="background-color: var(--muted-gray);">🏠 Back to Homepage</a>
         </div>
     </div>
 
@@ -2252,4 +2274,5 @@
     </script>
 </body>
 </html>
+
 
