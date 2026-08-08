@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trees Pinyin - Interactive Multi-Sensory Games</title>
+    <!-- Matter.js Physics Engine -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+    <style>
+        :root {
+            --primary-green: #2E7D32;
+            --dark-green: #1B5E20;
+            --accent-green: #E8F5E9;
+            --text-dark: #333333;
+            --muted-gray: #757575;
+            --white: #ffffff;
+            --blue-trees: #1565C0;
+            --orange-anchor: #E65100;
+            --red-tone: #C62828;
+            --amber-glow: #FFC107;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f1f3f1;
+            color: var(--text-dark);
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        #app-wrapper {
+            display: flex;
+            flex-direction: column;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        /* Top Navigation Header */
+        header {
+            background-color: var(--white);
+            padding: 12px 24px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .logo-area h1 {
+            margin: 0;
+            font-size: 20px;
+            color: var(--primary-green);
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo-area p {
+            margin: 2px 0 0 0;
+            font-size: 11px;
+            color: var(--muted-gray);
+        }
+
+        /* Tab / Game Switcher */
+        .tab-bar {
+            display: flex;
+            gap: 10px;
+        }
+
+        .tab-btn {
+            background-color: #f0f4f0;
+            border: 1.5px solid #d0ebd0;
+            color: var(--dark-green);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .tab-btn:hover {
+            background-color: var(--accent-green);
+            transform: translateY(-1px);
+        }
+
+        .tab-btn.active {
+            background-color: var(--primary-green);
+            color: var(--white);
+            border-color: var(--primary-green);
+            box-shadow: 0 4px 10px rgba(46, 125, 50, 0.25);
+        }
+
+        /* Main Workspace Container */
+        #game-workspace {
+            flex-grow: 1;
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        /* Game Screen Wrapper */
+        .game-screen {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, #fcfdfc 0%, #edf1ed 100%);
+        }
+
+        .game-screen.active {
+            display: block;
+        }
+
+        /* Game 1 UI Layout */
+        #game-connector-instructions {
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.9);
+            padding: 8px 16px;
+            border-radius: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border: 1px solid rgba(46, 125, 50, 0.15);
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--dark-green);
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        /* Draggable Physics Cards for Game 1 */
+        .g1-card {
+            position: absolute;
+            width: 140px;
+            height: 80px;
+            background-color: var(--white);
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border: 2px solid var(--primary-green);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 8px;
+            box-sizing: border-box;
+            cursor: grab;
+            transform-origin: center center;
+            will-change: transform;
+            text-align: center;
+            z-index: 5;
+        }
+
+        .g1-card:active {
+            cursor: grabbing;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12) !important;
+        }
+
+        .g1-card.english-card {
+            border-color: var(--orange-anchor);
+            background-color: #FFFDF9;
+        }
+
+        .g1-card.pinyin-card {
+            border-color: var(--blue-trees);
+            background-color: #F9FBFF;
+        }
+
+        .g1-card .title-text {
+            font-size: 14px;
+            font-weight: 800;
+            line-height: 1.2;
+        }
+
+        .g1-card.english-card .title-text {
+            color: var(--orange-anchor);
+        }
+
+        .g1-card.pinyin-card .title-text {
+            color: var(--blue-trees);
+            font-style: italic;
+            font-size: 15px;
+        }
+
+        .g1-card .sub-text {
+            font-size: 11px;
+            color: var(--muted-gray);
+            margin-top: 4px;
+            font-weight: 500;
+        }
+
+        /* Complete Reveal Anki Card Modal Overlay */
+        #anki-modal {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(4px);
+            justify-content: center;
+            align-items: center;
+            z-index: 500;
+        }
+
+        .anki-card {
+            background-color: var(--white);
+            width: 320px;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.18);
+            border: 3px solid var(--primary-green);
+            text-align: center;
+            transform: scale(0.7);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+        }
+
+        .anki-card.show {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        .anki-card .success-check {
+            font-size: 36px;
+            color: var(--primary-green);
+            margin-bottom: 10px;
+            animation: popCheck 0.4s ease-out;
+        }
+
+        .anki-card .hanzi {
+            font-size: 42px;
+            font-weight: 800;
+            color: var(--primary-green);
+            margin-bottom: 12px;
+            letter-spacing: 2px;
+        }
+
+        .anki-card .pinyin-row {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--blue-trees);
+            font-style: italic;
+            margin-bottom: 6px;
+        }
+
+        .anki-card .std-pinyin {
+            font-size: 13px;
+            color: var(--muted-gray);
+            margin-bottom: 16px;
+        }
+
+        .anki-card .divider {
+            border-top: 1.5px solid #eee;
+            margin: 15px 0;
+        }
+
+        .anki-card .meaning {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--orange-anchor);
+            margin-bottom: 8px;
+        }
+
+        .anki-card .mnemonic {
+            font-size: 13px;
+            color: #555;
+            font-style: italic;
+            line-height: 1.4;
+            padding: 0 10px;
+        }
+
+        .anki-card .btn-close {
+            background-color: var(--primary-green);
+            color: var(--white);
+            border: none;
+            padding: 10px 24px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            margin-top: 20px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(46, 125, 50, 0.2);
+            transition: transform 0.15s;
+        }
+
+        .anki-card .btn-close:hover {
+            transform: translateY(-1px);
+        }
+
+        .anki-card .audio-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 20px;
+            color: var(--primary-green);
+            margin-left: 6px;
+            vertical-align: middle;
+            transition: transform 0.15s;
+        }
+
+        .anki-card .audio-btn:hover {
+            transform: scale(1.15);
+        }
+
+        /* Game 2: Sentence Builder UI Layout */
+        .g2-container {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+            padding: 20px;
+        }
+
+        .g2-top-bar {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .target-sentence-eng {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--orange-anchor);
+            margin: 0;
+        }
+
+        .target-sentence-tip {
+            font-size: 12px;
+            color: var(--muted-gray);
+            margin: 4px 0 0 0;
+            font-weight: 500;
+        }
+
+        /* Draggable Physics Cards for Game 2 */
+        .g2-word-card {
+            position: absolute;
+            width: 120px;
+            height: 70px;
+            background-color: var(--white);
+            border: 2px solid var(--primary-green);
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 6px;
+            box-sizing: border-box;
+            cursor: grab;
+            text-align: center;
+            z-index: 5;
+        }
+
+        .g2-word-card:active {
+            cursor: grabbing;
+        }
+
+        .g2-word-card .hanzi {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--primary-green);
+        }
+
+        .g2-word-card .trees {
+            font-size: 12px;
+            font-weight: 800;
+            color: var(--blue-trees);
+            font-style: italic;
+            margin-top: 2px;
+        }
+
+        /* Assembly Landing Zones */
+        .g2-assembly-dock {
+            margin-top: auto;
+            margin-bottom: 40px;
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            z-index: 20;
+        }
+
+        .dock-slot {
+            width: 125px;
+            height: 75px;
+            border: 2px dashed #b0d0b0;
+            background-color: rgba(232, 245, 233, 0.4);
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 12px;
+            font-weight: 700;
+            color: #8da88d;
+            box-sizing: border-box;
+            transition: all 0.2s ease;
+        }
+
+        .dock-slot.highlight {
+            border-color: var(--primary-green);
+            background-color: rgba(232, 245, 233, 0.8);
+            box-shadow: 0 0 8px rgba(46, 125, 50, 0.2);
+        }
+
+        .dock-slot.filled {
+            border-style: solid;
+            border-color: var(--primary-green);
+            background-color: var(--white);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        /* Success Sentence Banner Overlay */
+        #sentence-success-overlay {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(4px);
+            justify-content: center;
+            align-items: center;
+            z-index: 600;
+        }
+
+        .sentence-reveal-card {
+            background-color: var(--white);
+            width: 420px;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            border: 3px solid var(--primary-green);
+            text-align: center;
+            animation: scaleIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .sentence-reveal-card .success-badge {
+            font-size: 42px;
+            margin-bottom: 12px;
+        }
+
+        .sentence-reveal-card .full-hanzi-sentence {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--primary-green);
+            margin-bottom: 14px;
+            letter-spacing: 1px;
+        }
+
+        .sentence-reveal-card .full-trees-sentence {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--blue-trees);
+            font-style: italic;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .sentence-reveal-card .full-eng-translation {
+            font-size: 14px;
+            color: var(--muted-gray);
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .sentence-reveal-card .btn-next {
+            background-color: var(--primary-green);
+            color: var(--white);
+            border: none;
+            padding: 12px 28px;
+            border-radius: 24px;
+            font-size: 14px;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(46, 125, 50, 0.25);
+            transition: all 0.2s ease;
+        }
+
+        .sentence-reveal-card .btn-next:hover {
+            transform: translateY(-2px);
+            background-color: var(--dark-green);
+        }
+
+        /* Confetti Particle Canvas overlay */
+        #confetti-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        /* Debug canvas wrapper */
+        #matter-debug-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            opacity: 0.15;
+            display: none;
+            z-index: 1;
+        }
+
+        /* Keyframes */
+        @keyframes popCheck {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes scaleIn {
+            0% { transform: scale(0.7); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="app-wrapper">
+        <!-- Top Navigation Column -->
+        <header>
+            <div class="logo-area">
+                <h1>🌴 Trees Pinyin: Funny Games 💎</h1>
+                <p>Learn Mandarin Speaking and Sentence Building through Native English Intuition</p>
+            </div>
+            
+            <!-- Game Switcher Tabs -->
+            <div class="tab-bar">
+                <button class="tab-btn active" id="tab-connector" onclick="switchGame('connector')">🎮 Sound-Meaning Connector</button>
+                <button class="tab-btn" id="tab-sentence" onclick="switchGame('sentence')">🧩 Sentence Builder</button>
+            </div>
+        </header>
+
+        <!-- Main Interactive Workspace -->
+        <div id="game-workspace">
+            
+            <!-- Canvas for Confetti celebrations -->
+            <canvas id="confetti-canvas"></canvas>
+            <canvas id="matter-debug-canvas"></canvas>
+
+            <!-- GAME 1: SOUND-MEANING CONNECTOR -->
+            <div class="game-screen active" id="screen-connector">
+                <div id="game-connector-instructions">👉 Drag and collide the corresponding English meaning card onto its Trees Pinyin card!</div>
+                
+                <!-- Anki Card Popup modal -->
+                <div id="anki-modal">
+                    <div class="anki-card" id="anki-card-entity">
+                        <div class="success-check">🌟 MATCHED!</div>
+                        <div class="hanzi" id="reveal-hanzi">來自</div>
+                        <div class="pinyin-row">
+                            <span id="reveal-trees">Lie2 ds4</span>
+                            <button class="audio-btn" onclick="playCurrentAnkiAudio()" title="Play Audio">🔊</button>
+                        </div>
+                        <div class="std-pinyin" id="reveal-std">Standard Pinyin: lái zì</div>
+                        <div class="divider"></div>
+                        <div class="meaning" id="reveal-meaning">From / Lies</div>
+                        <div class="mnemonic" id="reveal-mnemonic">“The truth LIES in where you come FROM.”</div>
+                        <button class="btn-close" onclick="closeAnkiModal()">Continue Play ➡️</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- GAME 2: SENTENCE BUILDER -->
+            <div class="game-screen" id="screen-sentence">
+                <div class="g2-container">
+                    <!-- Top instructions / Target sentence in English -->
+                    <div class="g2-top-bar">
+                        <h2 class="target-sentence-eng" id="g2-target-english">Translate: "I come from the United States."</h2>
+                        <p class="target-sentence-tip">Drag and drop the word cards into the correct order in the docks below!</p>
+                    </div>
+
+                    <!-- Sentence Success overlay banner -->
+                    <div id="sentence-success-overlay">
+                        <div class="sentence-reveal-card">
+                            <div class="success-badge">🎉 EXCELLENT!</div>
+                            <div class="full-hanzi-sentence" id="reveal-sent-hanzi">我來自美國。</div>
+                            <div class="full-trees-sentence" id="reveal-sent-trees">wer3 Lie2 ds4 may3 gooer2.</div>
+                            <div class="full-eng-translation" id="reveal-sent-eng">"I come from the United States."</div>
+                            <button class="btn-next" onclick="loadNextSentence()">Next Sentence ➡️</button>
+                        </div>
+                    </div>
+
+                    <!-- Bottom dock slots -->
+                    <div class="g2-assembly-dock" id="g2-dock-container">
+                        <!-- Slots will be programmatically generated here -->
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // --- Shared Datasets ---
+        const vocabularyList = [
+            { hanzi: "來自", trees: "Lie2 ds4", pinyin: "lái zì", english: "From / Lies", mnemonic: "The truth LIES in where you come FROM." },
+            { hanzi: "二", trees: "uh er4", pinyin: "èr", english: "Two / Error", mnemonic: "An 'error' often occurs at a fork (二) in the road." },
+            { hanzi: "累", trees: "Lay4", pinyin: "lèi", english: "Tired / Lay", mnemonic: "Lay down if you feel tired." },
+            { hanzi: "歷史", trees: "Lee4 (r)s3", pinyin: "lì shǐ", english: "History / Lease", mnemonic: "Life is a Lease on History." },
+            { hanzi: "微信", trees: "way seen4", pinyin: "wèi xìn", english: "WeChat / Way Seen", mnemonic: "I hate the way I was seen but ignored on WeChat." },
+            { hanzi: "坐", trees: "dsooer4", pinyin: "zuò", english: "Sit / Zoomer", mnemonic: "My friend from London is a zoomer, who sits for tea." },
+            { hanzi: "一杯", trees: "ee4 bay", pinyin: "yī bēi", english: "A Cup of / eBay", mnemonic: "Imagine your coffee cup came from eBay!" },
+            { hanzi: "附近", trees: "foo4 jeen4", pinyin: "fù jìn", english: "Nearby / Food Jean", mnemonic: "The food Jean found nearby is surprisingly cheap." }
+        ];
+
+        const sentenceDatabase = [
+            {
+                english: "I come from the United States.",
+                words: [
+                    { hanzi: "我", trees: "wer3", correctIndex: 0 },
+                    { hanzi: "來自", trees: "Lie2 ds4", correctIndex: 1 },
+                    { hanzi: "美國", trees: "may3 gooer2", correctIndex: 2 }
+                ],
+                distractors: [
+                    { hanzi: "二", trees: "uh er4" },
+                    { hanzi: "一杯", trees: "ee4 bay" }
+                ]
+            },
+            {
+                english: "Do you have WeChat?",
+                words: [
+                    { hanzi: "你", trees: "Nee3", correctIndex: 0 },
+                    { hanzi: "有", trees: "yoh3", correctIndex: 1 },
+                    { hanzi: "微信", trees: "way seen4", correctIndex: 2 },
+                    { hanzi: "嗎", trees: "mah", correctIndex: 3 }
+                ],
+                distractors: [
+                    { hanzi: "坐", trees: "dsooer4" },
+                    { hanzi: "累", trees: "Lay4" }
+                ]
+            },
+            {
+                english: "I'd like a cup of coffee.",
+                words: [
+                    { hanzi: "我", trees: "wer3", correctIndex: 0 },
+                    { hanzi: "要", trees: "yaw4", correctIndex: 1 },
+                    { hanzi: "一杯", trees: "ee4 bay", correctIndex: 2 },
+                    { hanzi: "咖啡", trees: "kah fay", correctIndex: 3 }
+                ],
+                distractors: [
+                    { hanzi: "歷史", trees: "Lee4 (r)s3" },
+                    { hanzi: "附近", trees: "foo4 jeen4" }
+                ]
+            }
+        ];
+
+        // --- Global State ---
+        let currentTab = 'connector';
+        let currentAnkiWord = null;
+        let currentSentenceIndex = 0;
+        let sentenceSlots = []; // Track dock assignments
+
+        // --- Matter.js Engine Instances ---
+        let engineG1 = null;
+        let worldG1 = null;
+        let runnerG1 = null;
+        let g1Entities = [];
+
+        let engineG2 = null;
+        let worldG2 = null;
+        let runnerG2 = null;
+        let g2Entities = [];
+
+        // Matter.js Destructuring
+        const { Engine, Render, Runner, Bodies, Composite, Body, Events, Mouse, MouseConstraint } = Matter;
+
+        // Container dimensions
+        const container = document.getElementById('game-workspace');
+        let width = container.clientWidth || window.innerWidth;
+        let height = container.clientHeight || (window.innerHeight - 60);
+
+        // --- Speech Engine Helper ---
+        function speakChinese(text) {
+            if ('speechSynthesis' in window) {
+                // Cancel any ongoing speaking first
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'zh-CN';
+                utterance.rate = 0.8; // Standard comfortable speed
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        // --- Confetti particle engine ---
+        const confettiCanvas = document.getElementById('confetti-canvas');
+        const ctxConfetti = confettiCanvas.getContext('2d');
+        let confettiParticles = [];
+        let confettiAnimationId = null;
+
+        function resizeConfettiCanvas() {
+            confettiCanvas.width = container.clientWidth || window.innerWidth;
+            confettiCanvas.height = container.clientHeight || (window.innerHeight - 60);
+        }
+        window.addEventListener('resize', resizeConfettiCanvas);
+        resizeConfettiCanvas();
+
+        class ConfettiParticle {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.size = Math.random() * 8 + 5;
+                this.color = ['#2E7D32', '#1565C0', '#E65100', '#C62828', '#FFC107', '#E8F5E9'][Math.floor(Math.random() * 6)];
+                this.vx = Math.random() * 10 - 5;
+                this.vy = Math.random() * -12 - 5;
+                this.rotation = Math.random() * 360;
+                this.rotationSpeed = Math.random() * 10 - 5;
+                this.gravity = 0.3;
+                this.opacity = 1;
+            }
+
+            update() {
+                this.vy += this.gravity;
+                this.x += this.vx;
+                this.y += this.vy;
+                this.rotation += this.rotationSpeed;
+                if (this.y > confettiCanvas.height) {
+                    this.opacity -= 0.02;
+                }
+            }
+
+            draw() {
+                ctxConfetti.save();
+                ctxConfetti.translate(this.x, this.y);
+                ctxConfetti.rotate((this.rotation * Math.PI) / 180);
+                ctxConfetti.globalAlpha = this.opacity;
+                ctxConfetti.fillStyle = this.color;
+                ctxConfetti.fillRect(-this.size / 2, -this.size / 2, this.size, this.size);
+                ctxConfetti.restore();
+            }
+        }
+
+        function triggerConfettiBurst(x, y) {
+            for (let i = 0; i < 80; i++) {
+                confettiParticles.push(new ConfettiParticle(x, y));
+            }
+            if (!confettiAnimationId) {
+                animateConfetti();
+            }
+        }
+
+        function animateConfetti() {
+            ctxConfetti.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+            for (let i = confettiParticles.length - 1; i >= 0; i--) {
+                const p = confettiParticles[i];
+                p.update();
+                p.draw();
+                if (p.opacity <= 0) {
+                    confettiParticles.splice(i, 1);
+                }
+            }
+            if (confettiParticles.length > 0) {
+                confettiAnimationId = requestAnimationFrame(animateConfetti);
+            } else {
+                confettiAnimationId = null;
+                ctxConfetti.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+            }
+        }
+
+        // --- Screen Switching Tabs ---
+        function switchGame(tabName) {
+            currentTab = tabName;
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.game-screen').forEach(screen => screen.classList.remove('active'));
+
+            if (tabName === 'connector') {
+                document.getElementById('tab-connector').classList.add('active');
+                document.getElementById('screen-connector').classList.add('active');
+                initGameConnector();
+            } else if (tabName === 'sentence') {
+                document.getElementById('tab-sentence').classList.add('active');
+                document.getElementById('screen-sentence').classList.add('active');
+                initGameSentence();
+            }
+        }
+
+        // --- GAME 1: SOUND-MEANING CONNECTOR (Matter.js) ---
+        function initGameConnector() {
+            // Cleanup existing running instances of Game 1
+            if (engineG1) {
+                Matter.World.clear(worldG1);
+                Engine.clear(engineG1);
+                runnerG1 && Runner.stop(runnerG1);
+                g1Entities.forEach(e => e.el.remove());
+                g1Entities = [];
+            }
+
+            // Also stop Game 2 running loop
+            if (runnerG2) Runner.stop(runnerG2);
+
+            engineG1 = Engine.create();
+            worldG1 = engineG1.world;
+            engineG1.gravity.y = 0; // Floating Zero-G sandbox!
+
+            // Create boundaries (Ground, ceiling, left, right walls)
+            const wallThickness = 100;
+            const wallOptions = { isStatic: true, restitution: 0.9, friction: 0.1 };
+            let ground = Bodies.rectangle(width / 2, height + wallThickness/2, width * 2, wallThickness, wallOptions);
+            let ceiling = Bodies.rectangle(width / 2, -wallThickness/2, width * 2, wallThickness, wallOptions);
+            let leftWall = Bodies.rectangle(-wallThickness/2, height / 2, wallThickness, height * 2, wallOptions);
+            let rightWall = Bodies.rectangle(width + wallThickness/2, height / 2, wallThickness, height * 2, wallOptions);
+            Composite.add(worldG1, [ground, ceiling, leftWall, rightWall]);
+
+            const containerG1 = document.getElementById('screen-connector');
+
+            // Select 4 random vocab entries for matching to prevent overcrowded layout
+            const shuffledVocab = [...vocabularyList].sort(() => 0.5 - Math.random()).slice(0, 4);
+
+            shuffledVocab.forEach((item, index) => {
+                // Left Columns: English Cards
+                createG1Card(item, 'english', index, shuffledVocab.length, containerG1);
+                // Right Columns: Pinyin Cards
+                createG1Card(item, 'pinyin', index, shuffledVocab.length, containerG1);
+            });
+
+            // Set up dragging Constraint
+            const mouse = Mouse.create(containerG1);
+            const mouseConstraint = MouseConstraint.create(engineG1, {
+                mouse: mouse,
+                constraint: { stiffness: 0.1, render: { visible: false } }
+            });
+            Composite.add(worldG1, mouseConstraint);
+
+            // Avoid scrolling interference on mobile touch devices
+            mouseConstraint.mouse.element.removeEventListener("mousewheel", mouseConstraint.mouse.mousewheel);
+            mouseConstraint.mouse.element.removeEventListener("DOMMouseScroll", mouseConstraint.mouse.mousewheel);
+
+            // Matter collision monitoring
+            Events.on(engineG1, 'collisionStart', (event) => {
+                event.pairs.forEach(pair => {
+                    const bodyA = pair.bodyA;
+                    const bodyB = pair.bodyB;
+
+                    if (bodyA.g1Data && bodyB.g1Data) {
+                        // Check if they are matched pair
+                        if (bodyA.g1Data.hanzi === bodyB.g1Data.hanzi && bodyA.cardType !== bodyB.cardType) {
+                            // Sound meaning connection match success!
+                            triggerMatchSuccess(bodyA.g1Data, bodyA.position.x, (bodyA.position.y + bodyB.position.y)/2);
+                        }
+                    }
+                });
+            });
+
+            // Run G1 loop
+            runnerG1 = Runner.create();
+            Runner.run(runnerG1, engineG1);
+
+            // Sync HTML cards position & rotation
+            Events.on(engineG1, 'afterUpdate', () => {
+                g1Entities.forEach(item => {
+                    const { position, angle } = item.body;
+                    item.el.style.transform = `translate(${position.x - 70}px, ${position.y - 40}px) rotate(${angle}rad)`;
+                });
+            });
+        }
+
+        function createG1Card(item, type, index, total, container) {
+            const el = document.createElement('div');
+            el.className = `g1-card ${type}-card`;
+            
+            if (type === 'english') {
+                el.innerHTML = `
+                    <div class="title-text">${item.english}</div>
+                    <div class="sub-text">Semantic Homophone</div>
+                `;
+            } else {
+                el.innerHTML = `
+                    <div class="title-text">${item.trees}</div>
+                    <div class="sub-text">Trees Pinyin Pronunciation</div>
+                `;
+            }
+            container.appendChild(el);
+
+            // Space out positions
+            const columnX = type === 'english' ? width * 0.25 : width * 0.75;
+            const spaceY = (height - 100) / total;
+            const startY = 80 + index * spaceY + (Math.random() - 0.5) * 20;
+
+            const body = Bodies.rectangle(columnX, startY, 140, 80, {
+                restitution: 0.8,
+                friction: 0.1,
+                frictionAir: 0.05,
+                density: 0.001
+            });
+
+            body.g1Data = item;
+            body.cardType = type;
+
+            // Push tiny float random initial push
+            Body.applyForce(body, body.position, {
+                x: (Math.random() - 0.5) * 0.02,
+                y: (Math.random() - 0.5) * 0.02
+            });
+
+            Composite.add(worldG1, body);
+            g1Entities.push({ el, body, type, data: item });
+        }
+
+        function triggerMatchSuccess(word, x, y) {
+            triggerConfettiBurst(x, y);
+            currentAnkiWord = word;
+
+            // Display reveal modal
+            const modal = document.getElementById('anki-modal');
+            const card = document.getElementById('anki-card-entity');
+            
+            document.getElementById('reveal-hanzi').textContent = word.hanzi;
+            document.getElementById('reveal-trees').textContent = word.trees;
+            document.getElementById('reveal-std').textContent = `Standard Pinyin: ${word.pinyin}`;
+            document.getElementById('reveal-meaning').textContent = word.english;
+            document.getElementById('reveal-mnemonic').textContent = `“${word.mnemonic}”`;
+
+            modal.style.display = 'flex';
+            setTimeout(() => card.classList.add('show'), 50);
+
+            // Play voice automatically
+            speakChinese(word.hanzi);
+        }
+
+        function playCurrentAnkiAudio() {
+            if (currentAnkiWord) {
+                speakChinese(currentAnkiWord.hanzi);
+            }
+        }
+
+        function closeAnkiModal() {
+            const modal = document.getElementById('anki-modal');
+            const card = document.getElementById('anki-card-entity');
+            card.classList.remove('show');
+            setTimeout(() => {
+                modal.style.display = 'none';
+                // Reset/refresh current Connector screen to clear matched elements or start over
+                initGameConnector();
+            }, 300);
+        }
+
+        // --- GAME 2: SENTENCE BUILDER (Matter.js Dock Snapping) ---
+        function initGameSentence() {
+            // Cleanup existing G2 Running environment
+            if (engineG2) {
+                Matter.World.clear(worldG2);
+                Engine.clear(engineG2);
+                runnerG2 && Runner.stop(runnerG2);
+                g2Entities.forEach(e => e.el.remove());
+                g2Entities = [];
+            }
+
+            // Stop G1 Loop
+            if (runnerG1) Runner.stop(runnerG1);
+
+            engineG2 = Engine.create();
+            worldG2 = engineG2.world;
+            engineG2.gravity.y = 0.5; // Moderate gravity for downward sliding card play
+
+            const containerG2 = document.getElementById('screen-sentence');
+
+            // Build G2 physical walls
+            const wallThickness = 100;
+            const wallOptions = { isStatic: true, restitution: 0.4, friction: 0.1 };
+            let ground = Bodies.rectangle(width / 2, height + wallThickness/2 - 120, width * 2, wallThickness, wallOptions); // Ground is higher than dock bar
+            let ceiling = Bodies.rectangle(width / 2, -wallThickness/2, width * 2, wallThickness, wallOptions);
+            let leftWall = Bodies.rectangle(-wallThickness/2, height / 2, wallThickness, height * 2, wallOptions);
+            let rightWall = Bodies.rectangle(width + wallThickness/2, height / 2, wallThickness, height * 2, wallOptions);
+            Composite.add(worldG2, [ground, ceiling, leftWall, rightWall]);
+
+            // Load active sentence data
+            const sentence = sentenceDatabase[currentSentenceIndex];
+            document.getElementById('g2-target-english').textContent = `Translate: "${sentence.english}"`;
+
+            // Setup dock elements
+            const dockContainer = document.getElementById('g2-dock-container');
+            dockContainer.innerHTML = '';
+            sentenceSlots = new Array(sentence.words.length).fill(null);
+
+            for (let i = 0; i < sentence.words.length; i++) {
+                const slot = document.createElement('div');
+                slot.className = 'dock-slot';
+                slot.textContent = `Word ${i + 1}`;
+                slot.id = `dock-slot-${i}`;
+                dockContainer.appendChild(slot);
+            }
+
+            // Spawn words + distractors mixed randomly
+            const cardDeck = [...sentence.words, ...sentence.distractors].sort(() => 0.5 - Math.random());
+
+            cardDeck.forEach((word, index) => {
+                createG2WordCard(word, index, cardDeck.length, containerG2);
+            });
+
+            // Setup G2 Drag support
+            const mouse = Mouse.create(containerG2);
+            const mouseConstraint = MouseConstraint.create(engineG2, {
+                mouse: mouse,
+                constraint: { stiffness: 0.15, render: { visible: false } }
+            });
+            Composite.add(worldG2, mouseConstraint);
+
+            // Touch support override
+            mouseConstraint.mouse.element.removeEventListener("mousewheel", mouseConstraint.mouse.mousewheel);
+            mouseConstraint.mouse.element.removeEventListener("DOMMouseScroll", mouseConstraint.mouse.mousewheel);
+
+            // Listen for card drag end to attempt slot snapping
+            Events.on(mouseConstraint, 'enddrag', (event) => {
+                const body = event.body;
+                if (body && body.g2Word) {
+                    attemptDockSnapping(body);
+                }
+            });
+
+            runnerG2 = Runner.create();
+            Runner.run(runnerG2, engineG2);
+
+            // G2 Synchronizer
+            Events.on(engineG2, 'afterUpdate', () => {
+                g2Entities.forEach(item => {
+                    const { position, angle } = item.body;
+                    
+                    // Skip positioning updates for locked/docked cards
+                    if (item.isDocked) return;
+
+                    item.el.style.transform = `translate(${position.x - 60}px, ${position.y - 35}px) rotate(${angle}rad)`;
+                });
+            });
+        }
+
+        function createG2WordCard(word, index, total, container) {
+            const el = document.createElement('div');
+            el.className = 'g2-word-card';
+            el.innerHTML = `
+                <div class="hanzi">${word.hanzi}</div>
+                <div class="trees">${word.trees}</div>
+            `;
+            container.appendChild(el);
+
+            // Spread out starting positions in a sky rain configuration
+            const spaceX = width / (total + 1);
+            const x = spaceX * (index + 1);
+            const y = 80 + (Math.random() - 0.5) * 40;
+
+            const body = Bodies.rectangle(x, y, 120, 70, {
+                restitution: 0.5,
+                friction: 0.1,
+                frictionAir: 0.02,
+                density: 0.001
+            });
+
+            body.g2Word = word;
+
+            Composite.add(worldG2, body);
+            g2Entities.push({ el, body, word, isDocked: false, slotIndex: -1 });
+        }
+
+        function attemptDockSnapping(body) {
+            const word = body.g2Word;
+            const cardEntity = g2Entities.find(e => e.body === body);
+            if (!cardEntity || cardEntity.isDocked) return;
+
+            // Find nearest slot
+            let nearestSlotIndex = -1;
+            let minDistance = 100; // Snap threshold radius
+
+            const sentence = sentenceDatabase[currentSentenceIndex];
+
+            for (let i = 0; i < sentence.words.length; i++) {
+                const slotEl = document.getElementById(`dock-slot-${i}`);
+                if (!slotEl) continue;
+
+                const rect = slotEl.getBoundingClientRect();
+                const containerRect = document.getElementById('game-workspace').getBoundingClientRect();
+                
+                // Calculate Slot Center within sandbox workspace
+                const slotX = rect.left - containerRect.left + rect.width / 2;
+                const slotY = rect.top - containerRect.top + rect.height / 2;
+
+                const dist = Math.hypot(body.position.x - slotX, body.position.y - slotY);
+
+                if (dist < minDistance) {
+                    minDistance = dist;
+                    nearestSlotIndex = i;
+                }
+            }
+
+            if (nearestSlotIndex !== -1) {
+                // Check if slot is empty or matched index
+                if (sentenceSlots[nearestSlotIndex] === null) {
+                    // Try to place card in slot
+                    const slotEl = document.getElementById(`dock-slot-${nearestSlotIndex}`);
+                    
+                    // Trigger match verification
+                    if (word.correctIndex === nearestSlotIndex) {
+                        // Correct card placement! Snap completely
+                        snapToSlot(cardEntity, nearestSlotIndex, slotEl);
+                    } else {
+                        // Fail - Push card away upwards to give negative physical feedback
+                        Body.applyForce(body, body.position, { x: (Math.random() - 0.5) * 0.05, y: -0.12 });
+                    }
+                }
+            }
+        }
+
+        function snapToSlot(entity, slotIndex, slotEl) {
+            entity.isDocked = true;
+            entity.slotIndex = slotIndex;
+            sentenceSlots[slotIndex] = entity;
+
+            // Make physics rigid body static to prevent moving
+            Body.setStatic(entity.body, true);
+
+            // Update UI Styling
+            slotEl.classList.add('filled');
+            slotEl.innerHTML = '';
+            slotEl.appendChild(entity.el);
+
+            // Reset transform inside dock container
+            entity.el.style.position = 'relative';
+            entity.el.style.left = '0px';
+            entity.el.style.top = '0px';
+            entity.el.style.transform = 'none';
+            entity.el.style.boxShadow = 'none';
+
+            // Play pronunciation feedback
+            speakChinese(entity.word.hanzi);
+
+            // Check if full sentence is successfully resolved
+            checkSentenceCompleteness();
+        }
+
+        function checkSentenceCompleteness() {
+            const sentence = sentenceDatabase[currentSentenceIndex];
+            const allFilled = sentenceSlots.every(slot => slot !== null);
+
+            if (allFilled) {
+                // Create massive celebration burst
+                const containerRect = document.getElementById('game-workspace').getBoundingClientRect();
+                triggerConfettiBurst(width / 2, height - 150);
+
+                // Speak whole sentence
+                const fullText = sentence.words.map(w => w.hanzi).join('');
+                setTimeout(() => speakChinese(fullText), 400);
+
+                // Set up reveal card elements
+                document.getElementById('reveal-sent-hanzi').textContent = fullText;
+                document.getElementById('reveal-sent-trees').textContent = sentence.words.map(w => w.trees).join(' ');
+                document.getElementById('reveal-sent-eng').textContent = `"${sentence.english}"`;
+
+                // Display celebration overlay banner
+                document.getElementById('sentence-success-overlay').style.display = 'flex';
+            }
+        }
+
+        function loadNextSentence() {
+            document.getElementById('sentence-success-overlay').style.display = 'none';
+            currentSentenceIndex = (currentSentenceIndex + 1) % sentenceDatabase.length;
+            initGameSentence();
+        }
+
+        // Window resize adapter
+        window.addEventListener('resize', () => {
+            const activeWidth = container.clientWidth;
+            const activeHeight = container.clientHeight;
+            width = activeWidth;
+            height = activeHeight;
+        });
+
+        // Initialize Game 1 Connector as entry default
+        window.onload = () => {
+            initGameConnector();
+        };
+
+    </script>
+</body>
+</html>
