@@ -1,0 +1,2169 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌲 Trees Pinyin - I Want to Bless You</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f1f8e9',
+                            100: '#dcedc8',
+                            600: '#2e7d32',
+                            700: '#1b5e20',
+                            800: '#003300',
+                            navy: '#1a237e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Pinyin-pro CDN for on-the-fly Chinese to Pinyin conversion -->
+    <script src="https://unpkg.com/pinyin-pro"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700;800&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap');
+        
+        body {
+            font-family: 'Lexend', 'Noto Sans TC', sans-serif;
+            background-color: #fcfdfa;
+        }
+        .trees-pinyin {
+            font-family: 'Playfair Display', serif;
+            color: #1a237e; /* Premium Deep Navy */
+            font-style: italic;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between">
+
+    <!-- Top Navigation Header -->
+    <header class="bg-gradient-to-r from-brand-700 via-brand-600 to-emerald-800 text-white shadow-md">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <span class="text-3xl">🌳</span>
+                <div>
+                    <h1 class="text-xl font-black tracking-tight">Trees Pinyin</h1>
+                    <p class="text-[10px] text-brand-100 font-medium tracking-widest uppercase">The Intuitive Guide to Mandarin Pronunciation</p>
+                </div>
+            </div>
+            <!-- Links Back to Homepage and Amazon -->
+            <div class="flex flex-wrap gap-3">
+                <a href="https://www.treespinyin.com/" target="_blank" class="bg-white/10 hover:bg-white/20 px-4 py-2 rounded-xl text-xs font-bold transition-all border border-white/10">
+                    <i class="fa-solid fa-house mr-1.5"></i>Back to Homepage
+                </a>
+                <a href="https://www.amazon.com/dp/B0HCXLCK3K" target="_blank" class="bg-yellow-500 hover:bg-yellow-600 text-slate-900 px-4 py-2 rounded-xl text-xs font-black transition-all shadow-sm">
+                    <i class="fa-solid fa-shopping-cart mr-1.5"></i>Get Book on Amazon
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-grow max-w-4xl mx-auto w-full px-4 py-8 md:py-12">
+        <div class="text-center mb-8">
+            <span class="bg-brand-50 text-brand-700 text-xs font-extrabold px-3.5 py-1.5 rounded-full uppercase tracking-wider border border-brand-200/50">
+                🎉 FREE SENSORY MULTI-MEDIA TOOL
+            </span>
+            <h2 class="text-2xl md:text-3.5xl font-black text-slate-800 mt-4 tracking-tight">
+                ✉️ “I Want to Bless You” - Greeting Generator
+            </h2>
+            <p class="text-slate-500 text-sm mt-2 max-w-xl mx-auto">
+                Type any English phrase below. Our smart engine will instantly translate it, parse the standard tones, and map it into <b>斜體加粗</b> Trees Pinyin!
+            </p>
+        </div>
+
+        <!-- Prominent Search/Input Area -->
+        <div class="bg-white rounded-3xl p-6 md:p-8 border border-slate-100 shadow-xl mb-8">
+            <div class="space-y-4">
+                <label class="block text-xs font-black text-brand-700 uppercase tracking-widest">
+                    <i class="fa-solid fa-keyboard mr-1.5"></i>Please enter what you want to say in English:
+                </label>
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <div class="relative flex-grow">
+                        <i class="fa-solid fa-wand-magic-sparkles absolute left-4 top-1/2 -translate-y-1/2 text-brand-600 text-lg"></i>
+                        <input type="text" id="english-input" onkeydown="handleEnter(event)" placeholder="Type any English (e.g. Happy New Year, Happy Birthday, I love you...)" class="w-full pl-12 pr-4 py-4 rounded-2xl border-2 border-brand-100 focus:outline-none focus:border-brand-600 focus:ring-4 focus:ring-brand-500/10 transition-all text-base md:text-lg font-medium shadow-inner">
+                    </div>
+                    <button onclick="triggerTranslation()" class="bg-brand-600 hover:bg-brand-700 text-white font-bold px-8 py-4 rounded-2xl transition-all shadow-md active:scale-95 flex items-center justify-center gap-2">
+                        <span>Generate Card</span>
+                        <i class="fa-solid fa-circle-arrow-right"></i>
+                    </button>
+                </div>
+
+                <!-- Quick Presets -->
+                <div class="flex flex-wrap items-center gap-2 pt-2">
+                    <span class="text-xs font-bold text-slate-400 uppercase mr-1">Quick Greetings:</span>
+                    <button onclick="setPreset('Happy New Year')" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-50 hover:bg-brand-50 hover:text-brand-700 border border-slate-200 transition-all text-slate-600">🎉 Happy New Year</button>
+                    <button onclick="setPreset('Happy Birthday')" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-50 hover:bg-brand-50 hover:text-brand-700 border border-slate-200 transition-all text-slate-600">🎂 Happy Birthday</button>
+                    <button onclick="setPreset('Wish you to be rich')" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-50 hover:bg-brand-50 hover:text-brand-700 border border-slate-200 transition-all text-slate-600">💰 Wish you rich (恭喜發財)</button>
+                    <button onclick="setPreset('Everything goes smoothly')" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-50 hover:bg-brand-50 hover:text-brand-700 border border-slate-200 transition-all text-slate-600">⛵ Smoothly (事事順利)</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dynamic Results Area -->
+        <div id="results-area" class="hidden space-y-6">
+            <!-- Full Sentence Speaker Panel -->
+            <div class="bg-brand-50 border border-brand-200/50 rounded-2xl p-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div class="flex items-center gap-3">
+                    <span class="text-2xl">📢</span>
+                    <div>
+                        <h4 id="sentence-meaning" class="text-sm font-bold text-slate-700">English: ...</h4>
+                        <p id="sentence-chinese" class="text-xs text-slate-500 font-medium">Chinese: ...</p>
+                    </div>
+                </div>
+                <button onclick="speakFullSentence()" class="w-full sm:w-auto bg-brand-600 hover:bg-brand-700 text-white font-bold py-2.5 px-5 rounded-xl text-xs transition-all shadow-sm flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-volume-high"></i>
+                    <span>🔊 Play Full Sentence (流利整句慢速)</span>
+                </button>
+            </div>
+
+            <!-- Card Grid -->
+            <div id="cards-container" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                <!-- Word cards injected here -->
+            </div>
+
+            <!-- Memory Story Drawer -->
+            <div id="story-box" class="bg-amber-50/50 border border-amber-200/60 rounded-3xl p-6 md:p-8">
+                <!-- Story details or Lock message injected here -->
+            </div>
+        </div>
+
+        <!-- Loading spinner -->
+        <div id="loading-spinner" class="hidden text-center py-16">
+            <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-brand-600 border-t-transparent mb-3"></div>
+            <p class="text-slate-400 text-sm font-medium">Translating your blessing into Trees Pinyin...</p>
+        </div>
+
+        <!-- Welcome Banner -->
+        <div id="empty-banner" class="text-center py-16 bg-white rounded-3xl border-2 border-dashed border-slate-100 p-8 shadow-inner">
+            <span class="text-5xl block mb-4">✨</span>
+            <h3 class="text-lg font-extrabold text-slate-700">Type above to begin</h3>
+            <p class="text-slate-400 text-sm mt-1 max-w-sm mx-auto">
+                Try typing simple words like "Hello", "Thank you", or any creative blessing phrase!
+            </p>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-500 py-8 border-t border-slate-800 text-center text-xs">
+        <div class="max-w-6xl mx-auto px-4 space-y-3">
+            <p class="text-slate-400 font-bold">
+                &copy; 2026 <a href="https://www.treespinyin.com/" class="underline hover:text-white">Trees Pinyin</a>. All Rights Reserved.
+            </p>
+            <p>Designed for the Book Launch of "Easy Mandarin Speaking" and "Easy Mandarin Tones"</p>
+            <div class="flex justify-center gap-4 text-[11px] text-slate-400">
+                <a href="https://www.treespinyin.com/" target="_blank" class="hover:text-white underline">Homepage</a>
+                <a href="https://www.amazon.com/dp/B0HCXLCK3K" target="_blank" class="hover:text-white underline">Buy on Amazon</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ==================== JS TRANSLATION ENGINE & DATA ==================== -->
+    <script>
+        // High frequency greetings with predefined custom stories
+        const PREMIUM_GREETINGS = {
+            "happy new year": {
+                zh: "新年快樂",
+                hp: "xīn nián kuài lè",
+                tp: "Seen neean2 kooie4 Ler4",
+                story: "You have never <b>seen</b> a <b>neon</b> sign so <b>qui(te) lo(vely)</b>."
+            },
+            "happy birthday": {
+                zh: "生日快樂",
+                hp: "shēng rì kuài lè",
+                tp: " (r)s er ng (r)th4 kooie4 Ler4",
+                story: "At birth (<b>sung</b>), the <b>day</b> (<b>r-then</b>) begins happily. Happy kids are <b>qui(te) lo(vely)</b>."
+            },
+            "wish you to be rich": {
+                zh: "恭喜發財",
+                hp: "gōng xǐ fā cái",
+                tp: "Ger oong see3 fah tsie2",
+                story: "At the palace, my elder brother (<b>ger</b>) <b>won't</b> <b>see</b> anyone; it's I who made a <b>far try</b> to make a fortune."
+            },
+            "everything goes smoothly": {
+                zh: "事事順利",
+                hp: "shì shì shùn lì",
+                tp: " (r)s4 (r)s4 soon4 Lee4",
+                story: "Yes, yes, everything is in the room soonly!"
+            }
+        };
+
+        // Full Vocabulary Database loaded from Book 1 Excel
+        const VOCAB_DATABASE = [
+  {
+    "en": "Two / 2",
+    "zh": "二",
+    "hp": "èr",
+    "tp": "uh er4",
+    "anchor": "4 (Falling)",
+    "chap": "Ch. 1: Numbers and Tones"
+  },
+  {
+    "en": "Four / 4",
+    "zh": "四",
+    "hp": "sì",
+    "tp": "s4",
+    "anchor": "4 (Falling)",
+    "chap": "Ch. 1: Numbers and Tones"
+  },
+  {
+    "en": "Five / 5",
+    "zh": "五",
+    "hp": "wǔ",
+    "tp": "woo3",
+    "anchor": "3 (Dipping)",
+    "chap": "Ch. 1: Numbers and Tones"
+  },
+  {
+    "en": "Six / 6",
+    "zh": "六",
+    "hp": "liù",
+    "tp": "Leeoo4",
+    "anchor": "4 (Falling)",
+    "chap": "Ch. 1: Numbers and Tones"
+  },
+  {
+    "en": "Nine / 9",
+    "zh": "九",
+    "hp": "jiǔ",
+    "tp": "jeeoo3",
+    "anchor": "3 (Dipping)",
+    "chap": "Ch. 1: Numbers and Tones"
+  },
+  {
+    "en": "Ten / 10",
+    "zh": "十",
+    "hp": "shí",
+    "tp": "(r)s2",
+    "anchor": "2 (Rising)",
+    "chap": "Ch. 1: Numbers and Tones"
+  },
+  {
+    "en": "Nine, Ten (9,10)",
+    "zh": "九十",
+    "hp": "jiǔ shí",
+    "tp": "jeeoo3 (r)s2",
+    "anchor": "5,10 / 9,10",
+    "chap": "Ch. 1: Numbers and Tones"
+  },
+  {
+    "en": "The United States",
+    "zh": "美國",
+    "hp": "měi guó",
+    "tp": "may3 gooer2",
+    "anchor": "5,10 / 9,10",
+    "chap": "Ch. 1: Numbers and Tones"
+  },
+  {
+    "en": "Traveling",
+    "zh": "旅遊",
+    "hp": "lǚ yóu",
+    "tp": "Lee(oo)3 yoh2",
+    "anchor": "9,10",
+    "chap": "Ch. 1: Numbers and Tones"
+  },
+  {
+    "en": "Tour Guide",
+    "zh": "导游",
+    "hp": "dǎo yóu",
+    "tp": "daw3 yoh2",
+    "anchor": "9,10",
+    "chap": "Ch. 1: Numbers and Tones"
+  },
+  {
+    "en": "Girl",
+    "zh": "女孩",
+    "hp": "nǚ hái",
+    "tp": "nee(oo)3 hie2",
+    "anchor": "9,10",
+    "chap": "Ch. 1: Numbers and Tones"
+  },
+  {
+    "en": "Woman",
+    "zh": "女人",
+    "hp": "nǚ rén",
+    "tp": "nee(oo)3 (r)ther n2",
+    "anchor": "9,10",
+    "chap": "Ch. 1: Numbers and Tones"
+  },
+  {
+    "en": "Human / Man / People",
+    "zh": "人",
+    "hp": "rén",
+    "tp": "(r)ther n2",
+    "anchor": "10",
+    "chap": "Ch. 1: Numbers and Tones"
+  },
+  {
+    "en": "Daughter",
+    "zh": "女兒",
+    "hp": "nǚ ér",
+    "tp": "nee(oo)3 (uh)er2",
+    "anchor": "9,10",
+    "chap": "Ch. 1: Numbers and Tones"
+  },
+  {
+    "en": "Son",
+    "zh": "兒子",
+    "hp": "ér zi",
+    "tp": "(uh)er2 ds",
+    "anchor": "10, *",
+    "chap": "Ch. 1: Numbers and Tones"
+  },
+  {
+    "en": "Beautiful",
+    "zh": "美",
+    "hp": "měi",
+    "tp": "may3",
+    "anchor": "5 / 9",
+    "chap": "Ch. 1: Numbers and Tones"
+  },
+  {
+    "en": "Elder sister",
+    "zh": "姐姐",
+    "hp": "jiě jie",
+    "tp": "jeeer3 jeeer",
+    "anchor": "5, *",
+    "chap": "Ch. 1: Numbers and Tones"
+  },
+  {
+    "en": "Younger sister",
+    "zh": "妹妹",
+    "hp": "mèi mei",
+    "tp": "may4 may",
+    "anchor": "4, * / 6, *",
+    "chap": "Ch. 1: Numbers and Tones"
+  },
+  {
+    "en": "Sisters (Elder & Younger)",
+    "zh": "姐妹",
+    "hp": "jiě mèi",
+    "tp": "jeeer3 may4",
+    "anchor": "5, 6",
+    "chap": "Ch. 1: Numbers and Tones"
+  },
+  {
+    "en": "I / Me",
+    "zh": "我",
+    "hp": "wǒ",
+    "tp": "wer3",
+    "anchor": "5",
+    "chap": "Ch. 1: Numbers and Tones"
+  },
+  {
+    "en": "Where",
+    "zh": "哪裡",
+    "hp": "nǎ lǐ",
+    "tp": "nah3 Lee3",
+    "anchor": "5, 9",
+    "chap": "Ch. 1: Numbers and Tones"
+  },
+  {
+    "en": "Could / Can / May",
+    "zh": "可以",
+    "hp": "kě yǐ",
+    "tp": "ker3 ee3",
+    "anchor": "5, 9",
+    "chap": "Ch. 1: Numbers and Tones"
+  },
+  {
+    "en": "Get / Buy",
+    "zh": "買",
+    "hp": "mǎi",
+    "tp": "Mie3",
+    "anchor": "5",
+    "chap": "Ch. 1: Numbers and Tones"
+  },
+  {
+    "en": "Fruit",
+    "zh": "水果",
+    "hp": "shuǐ guǒ",
+    "tp": "(r)sooay3 gooer3",
+    "anchor": "5, 9",
+    "chap": "Ch. 1: Numbers and Tones"
+  },
+  {
+    "en": "Hello",
+    "zh": "你好",
+    "hp": "Nǐ hǎo",
+    "tp": "Nee3 haw3",
+    "anchor": "5, 9",
+    "chap": "Ch. 1: Numbers and Tones"
+  },
+  {
+    "en": "You",
+    "zh": "你",
+    "hp": "nǐ",
+    "tp": "nee3",
+    "anchor": "9",
+    "chap": "Ch. 1: Numbers and Tones"
+  },
+  {
+    "en": "Good",
+    "zh": "好",
+    "hp": "hǎo",
+    "tp": "haw3",
+    "anchor": "5",
+    "chap": "Ch. 1: Numbers and Tones"
+  },
+  {
+    "en": "Bad",
+    "zh": "坏",
+    "hp": "huài",
+    "tp": "hooie4",
+    "anchor": "6",
+    "chap": "Ch. 1: Numbers and Tones"
+  },
+  {
+    "en": "Would like / Want",
+    "zh": "想要",
+    "hp": "xiǎng yào",
+    "tp": "seeang3 yaw4",
+    "anchor": "5, 6",
+    "chap": "Ch. 1: Numbers and Tones"
+  },
+  {
+    "en": "BBQ / Barbecue",
+    "zh": "烤肉",
+    "hp": "kǎo ròu",
+    "tp": "kaw3 (r)thoh4",
+    "anchor": "5, 6",
+    "chap": "Ch. 1: Numbers and Tones"
+  },
+  {
+    "en": "Excuse me / May I ask",
+    "zh": "請問",
+    "hp": "qǐng wèn",
+    "tp": "Tsing3 wer n4",
+    "anchor": "5, 6",
+    "chap": "Ch. 1: Numbers and Tones"
+  },
+  {
+    "en": "Twelve / 12",
+    "zh": "十二",
+    "hp": "shí èr",
+    "tp": "(r)s2 uh er4",
+    "anchor": "12",
+    "chap": "Ch. 1: Numbers and Tones"
+  },
+  {
+    "en": "From",
+    "zh": "來自",
+    "hp": "lái zì",
+    "tp": "Lie2 ds4",
+    "anchor": "12",
+    "chap": "Ch. 1: Numbers and Tones"
+  },
+  {
+    "en": "Kobe",
+    "zh": "神戶",
+    "hp": "shén hù",
+    "tp": "(r)ser n2 hoo4",
+    "anchor": "12",
+    "chap": "Ch. 1: Numbers and Tones"
+  },
+  {
+    "en": "Colleague",
+    "zh": "同事",
+    "hp": "tóng shì",
+    "tp": "ter oong2 (r)s4",
+    "anchor": "12",
+    "chap": "Ch. 1: Numbers and Tones"
+  },
+  {
+    "en": "Unique",
+    "zh": "獨特",
+    "hp": "dú tè",
+    "tp": "doo2 ter4",
+    "anchor": "12",
+    "chap": "Ch. 1: Numbers and Tones"
+  },
+  {
+    "en": "Habit",
+    "zh": "習慣",
+    "hp": "xí guàn",
+    "tp": "see2 gooan4",
+    "anchor": "12",
+    "chap": "Ch. 1: Numbers and Tones"
+  },
+  {
+    "en": "Beef",
+    "zh": "牛肉",
+    "hp": "niú ròu",
+    "tp": "neeoh2 (r)thoh4",
+    "anchor": "12",
+    "chap": "Ch. 1: Numbers and Tones"
+  },
+  {
+    "en": "Holidays",
+    "zh": "節日",
+    "hp": "jié rì",
+    "tp": "jeeer2 (r)th4",
+    "anchor": "12",
+    "chap": "Ch. 1: Numbers and Tones"
+  },
+  {
+    "en": "Fifteen / 15",
+    "zh": "十五",
+    "hp": "shí wǔ",
+    "tp": "(r)s2 woo3",
+    "anchor": "15",
+    "chap": "Ch. 1: Numbers and Tones"
+  },
+  {
+    "en": "Friend",
+    "zh": "朋友",
+    "hp": "péng yǒu",
+    "tp": "per ng2 yoh3",
+    "anchor": "15",
+    "chap": "Ch. 1: Numbers and Tones"
+  },
+  {
+    "en": "Accompany Me",
+    "zh": "陪我",
+    "hp": "péi wǒ",
+    "tp": "pay2 wer3",
+    "anchor": "15",
+    "chap": "Ch. 1: Numbers and Tones"
+  },
+  {
+    "en": "Explore / Sightseeing",
+    "zh": "遊覽",
+    "hp": "yóu lǎn",
+    "tp": "yoh2 lan3",
+    "anchor": "15",
+    "chap": "Ch. 1: Numbers and Tones"
+  },
+  {
+    "en": "Magnificent",
+    "zh": "宏偉",
+    "hp": "hóng wěi",
+    "tp": "her oong2 way3",
+    "anchor": "15",
+    "chap": "Ch. 1: Numbers and Tones"
+  },
+  {
+    "en": "Bamboo Sea",
+    "zh": "竹海",
+    "hp": "zhú hǎi",
+    "tp": "(r)dsoo2 hie3",
+    "anchor": "15",
+    "chap": "Ch. 1: Numbers and Tones"
+  },
+  {
+    "en": "Elder brother",
+    "zh": "哥哥",
+    "hp": "gē ge",
+    "tp": "ger ger",
+    "anchor": "*, * (Natural)",
+    "chap": "Ch. 1: Reading Guide Summary"
+  },
+  {
+    "en": "A / An / One piece",
+    "zh": "一個",
+    "hp": "yí gè",
+    "tp": "ee2 ger4",
+    "anchor": "12",
+    "chap": "Ch. 2: Word Order & Practical Examples"
+  },
+  {
+    "en": "Measure word (general)",
+    "zh": "個",
+    "hp": "gè",
+    "tp": "ger4",
+    "anchor": "4",
+    "chap": "Ch. 2: Word Order & Practical Examples"
+  },
+  {
+    "en": "A cup of",
+    "zh": "一杯",
+    "hp": "yì bēi",
+    "tp": "ee4 bay",
+    "anchor": "4, *",
+    "chap": "Ch. 2: Word Order & Practical Examples"
+  },
+  {
+    "en": "Was / Is / Am / Are",
+    "zh": "是",
+    "hp": "shì",
+    "tp": "(r)s4",
+    "anchor": "4",
+    "chap": "Ch. 2: Word Order & Practical Examples"
+  },
+  {
+    "en": "Yes",
+    "zh": "是",
+    "hp": "shì",
+    "tp": "(r)s4",
+    "anchor": "4",
+    "chap": "Ch. 2: Word Order & Practical Examples"
+  },
+  {
+    "en": "This",
+    "zh": "這",
+    "hp": "zhè",
+    "tp": "(r)dser4",
+    "anchor": "4",
+    "chap": "Ch. 2: Word Order & Practical Examples"
+  },
+  {
+    "en": "Bag",
+    "zh": "包",
+    "hp": "bāo",
+    "tp": "baw",
+    "anchor": "1",
+    "chap": "Ch. 2: Word Order & Practical Examples"
+  },
+  {
+    "en": "Your / Yours",
+    "zh": "你的",
+    "hp": "nǐ de",
+    "tp": "nee3 der",
+    "anchor": "9, *",
+    "chap": "Ch. 2: Word Order & Practical Examples"
+  },
+  {
+    "en": "No / Not",
+    "zh": "不",
+    "hp": "bù",
+    "tp": "boo4",
+    "anchor": "6 / 4",
+    "chap": "Ch. 2: Word Order & Practical Examples"
+  },
+  {
+    "en": "Question particle",
+    "zh": "嗎",
+    "hp": "ma",
+    "tp": "mah",
+    "anchor": "*",
+    "chap": "Ch. 2: Word Order & Practical Examples"
+  },
+  {
+    "en": "Be Not",
+    "zh": "不是",
+    "hp": "bú shì",
+    "tp": "boo2 (r)s4",
+    "anchor": "12 / 10,4",
+    "chap": "Ch. 2: Word Order & Practical Examples"
+  },
+  {
+    "en": "My / Mine",
+    "zh": "我的",
+    "hp": "wǒ de",
+    "tp": "wer3 der",
+    "anchor": "5, *",
+    "chap": "Ch. 2: Word Order & Practical Examples"
+  },
+  {
+    "en": "Have / Has / There be",
+    "zh": "有",
+    "hp": "yǒu",
+    "tp": "yoh3",
+    "anchor": "5, 9",
+    "chap": "Ch. 2: Word Order & Practical Examples"
+  },
+  {
+    "en": "Near / Nearby",
+    "zh": "附近",
+    "hp": "fù jìn",
+    "tp": "foo4 jeen4",
+    "anchor": "4, 4",
+    "chap": "Ch. 2: Word Order & Practical Examples"
+  },
+  {
+    "en": "Restroom",
+    "zh": "洗手間",
+    "hp": "xǐ shǒu jiān",
+    "tp": "see3 (r)soh3 jeean",
+    "anchor": "5, 5, *",
+    "chap": "Ch. 2: Word Order & Practical Examples"
+  },
+  {
+    "en": "Wash",
+    "zh": "洗",
+    "hp": "xǐ",
+    "tp": "see3",
+    "anchor": "5",
+    "chap": "Ch. 2: Word Order & Practical Examples"
+  },
+  {
+    "en": "Hand",
+    "zh": "手",
+    "hp": "shǒu",
+    "tp": "(r)soh3",
+    "anchor": "5",
+    "chap": "Ch. 2: Word Order & Practical Examples"
+  },
+  {
+    "en": "Room",
+    "zh": "房間",
+    "hp": "fáng jiān",
+    "tp": "fang2 jeean",
+    "anchor": "10, *",
+    "chap": "Ch. 2: Word Order & Practical Examples"
+  },
+  {
+    "en": "Room (suffix)",
+    "zh": "室",
+    "hp": "shì",
+    "tp": "(r)s4",
+    "anchor": "4",
+    "chap": "Ch. 2: Word Order & Practical Examples"
+  },
+  {
+    "en": "Bedroom",
+    "zh": "臥室",
+    "hp": "wò shì",
+    "tp": "wer4 (r)s4",
+    "anchor": "4, 4",
+    "chap": "Ch. 2: Word Order & Practical Examples"
+  },
+  {
+    "en": "Classroom",
+    "zh": "教室",
+    "hp": "jiào shì",
+    "tp": "jeeaw4 (r)s4",
+    "anchor": "4, 4",
+    "chap": "Ch. 2: Word Order & Practical Examples"
+  },
+  {
+    "en": "WeChat",
+    "zh": "微信",
+    "hp": "wēi xìn",
+    "tp": "way seen4",
+    "anchor": "*, 4",
+    "chap": "Ch. 2: Word Order & Practical Examples"
+  },
+  {
+    "en": "What",
+    "zh": "什麼",
+    "hp": "shén me",
+    "tp": "(r)ser n2 mer",
+    "anchor": "10, *",
+    "chap": "Ch. 2: Word Order & Practical Examples"
+  },
+  {
+    "en": "To Drink",
+    "zh": "喝",
+    "hp": "hē",
+    "tp": "her",
+    "anchor": "*",
+    "chap": "Ch. 2: Word Order & Practical Examples"
+  },
+  {
+    "en": "Coffee",
+    "zh": "咖啡",
+    "hp": "kā fēi",
+    "tp": "kah fay",
+    "anchor": "*, *",
+    "chap": "Ch. 2: Word Order & Practical Examples"
+  },
+  {
+    "en": "Like / Love",
+    "zh": "喜歡",
+    "hp": "xǐ huān",
+    "tp": "see3 hooan",
+    "anchor": "5, *",
+    "chap": "Ch. 2: Word Order & Practical Examples"
+  },
+  {
+    "en": "Very / Very Much",
+    "zh": "很",
+    "hp": "hěn",
+    "tp": "hern3",
+    "anchor": "5",
+    "chap": "Ch. 2: Word Order & Practical Examples"
+  },
+  {
+    "en": "Very Good",
+    "zh": "很好",
+    "hp": "hěn hǎo",
+    "tp": "hern3 haw3",
+    "anchor": "5, 9",
+    "chap": "Ch. 2: Word Order & Practical Examples"
+  },
+  {
+    "en": "Watch / Read / Look at",
+    "zh": "看",
+    "hp": "kàn",
+    "tp": "kan4",
+    "anchor": "4",
+    "chap": "Ch. 3: Train to Beijing"
+  },
+  {
+    "en": "Be + -ing (continuous)",
+    "zh": "在",
+    "hp": "zài",
+    "tp": "dsie4",
+    "anchor": "4",
+    "chap": "Ch. 3: Train to Beijing"
+  },
+  {
+    "en": "Modal particle (wh-questions)",
+    "zh": "呢",
+    "hp": "ne",
+    "tp": "ner",
+    "anchor": "*",
+    "chap": "Ch. 3: Train to Beijing"
+  },
+  {
+    "en": "Beijing",
+    "zh": "北京",
+    "hp": "běi jīng",
+    "tp": "bay3 jing",
+    "anchor": "5, * / 9, *",
+    "chap": "Ch. 3: Train to Beijing"
+  },
+  {
+    "en": "Video",
+    "zh": "視頻",
+    "hp": "shì pín",
+    "tp": "(r)s4 pin2",
+    "anchor": "4, 10",
+    "chap": "Ch. 3: Train to Beijing"
+  },
+  {
+    "en": "Go / To go to",
+    "zh": "去",
+    "hp": "qù",
+    "tp": "tsee(oo)4",
+    "anchor": "4",
+    "chap": "Ch. 3: Train to Beijing"
+  },
+  {
+    "en": "Have been to",
+    "zh": "去過",
+    "hp": "qù guo",
+    "tp": "tsee(oo)4 gooer",
+    "anchor": "4, *",
+    "chap": "Ch. 3: Train to Beijing"
+  },
+  {
+    "en": "Past experience particle",
+    "zh": "過",
+    "hp": "guo",
+    "tp": "gooer",
+    "anchor": "*",
+    "chap": "Ch. 3: Train to Beijing"
+  },
+  {
+    "en": "Completed action particle",
+    "zh": "了",
+    "hp": "le",
+    "tp": "Ler",
+    "anchor": "*",
+    "chap": "Ch. 3: Train to Beijing"
+  },
+  {
+    "en": "Time",
+    "zh": "時候",
+    "hp": "shí hou",
+    "tp": "(r)s2 hoh",
+    "anchor": "10, *",
+    "chap": "Ch. 3: Train to Beijing"
+  },
+  {
+    "en": "Yesterday",
+    "zh": "昨天",
+    "hp": "zuó tiān",
+    "tp": "Dsooer2 teean",
+    "anchor": "10, *",
+    "chap": "Ch. 3: Train to Beijing"
+  },
+  {
+    "en": "Will / Want / Be going to",
+    "zh": "要",
+    "hp": "yào",
+    "tp": "yaw4",
+    "anchor": "4",
+    "chap": "Ch. 3: Train to Beijing"
+  },
+  {
+    "en": "Should’ve",
+    "zh": "本應",
+    "hp": "běn yīng",
+    "tp": "ber n3 ying",
+    "anchor": "5, *",
+    "chap": "Ch. 3: Train to Beijing"
+  },
+  {
+    "en": "(Be) in / at",
+    "zh": "在",
+    "hp": "zài",
+    "tp": "dsie4",
+    "anchor": "4",
+    "chap": "Ch. 3: Train to Beijing"
+  },
+  {
+    "en": "Sit",
+    "zh": "坐",
+    "hp": "zuò",
+    "tp": "dsooer4",
+    "anchor": "4",
+    "chap": "Ch. 4: Cute Girl (Small Talk)"
+  },
+  {
+    "en": "Here",
+    "zh": "這兒",
+    "hp": "zhè'er",
+    "tp": "(r)dser4 (uh)er",
+    "anchor": "4, *",
+    "chap": "Ch. 4: Cute Girl (Small Talk)"
+  },
+  {
+    "en": "Spoken suffix",
+    "zh": "兒",
+    "hp": "er",
+    "tp": "(uh)er",
+    "anchor": "10",
+    "chap": "Ch. 4: Cute Girl (Small Talk)"
+  },
+  {
+    "en": "So / Too / Very",
+    "zh": "真",
+    "hp": "zhēn",
+    "tp": "(r)dser n",
+    "anchor": "*",
+    "chap": "Ch. 4: Cute Girl (Small Talk)"
+  },
+  {
+    "en": "Cute",
+    "zh": "可愛",
+    "hp": "kě ài",
+    "tp": "ker3 ie4",
+    "anchor": "5, 6",
+    "chap": "Ch. 4: Cute Girl (Small Talk)"
+  },
+  {
+    "en": "How (degree)",
+    "zh": "多",
+    "hp": "duō",
+    "tp": "dooer",
+    "anchor": "*",
+    "chap": "Ch. 4: Cute Girl (Small Talk)"
+  },
+  {
+    "en": "Old / Big (age)",
+    "zh": "大",
+    "hp": "dà",
+    "tp": "dah4",
+    "anchor": "4 / 6",
+    "chap": "Ch. 4: Cute Girl (Small Talk)"
+  },
+  {
+    "en": "Old (elderly)",
+    "zh": "老",
+    "hp": "lǎo",
+    "tp": "Law3",
+    "anchor": "9, 5",
+    "chap": "Ch. 4: Cute Girl (Small Talk)"
+  },
+  {
+    "en": "Used / Old",
+    "zh": "舊",
+    "hp": "jiù",
+    "tp": "jeeoo4",
+    "anchor": "4",
+    "chap": "Ch. 4: Cute Girl (Small Talk)"
+  },
+  {
+    "en": "Year (of age)",
+    "zh": "歲",
+    "hp": "suì",
+    "tp": "sooay4",
+    "anchor": "4",
+    "chap": "Ch. 4: Cute Girl (Small Talk)"
+  },
+  {
+    "en": "Year (calendar)",
+    "zh": "年",
+    "hp": "nián",
+    "tp": "neean2",
+    "anchor": "10",
+    "chap": "Ch. 4: Cute Girl (Small Talk)"
+  },
+  {
+    "en": "Happy",
+    "zh": "快樂",
+    "hp": "kuài lè",
+    "tp": "kooie4 Ler4",
+    "anchor": "4, 4",
+    "chap": "Ch. 4: Cute Girl (Small Talk)"
+  },
+  {
+    "en": "New",
+    "zh": "新",
+    "hp": "xīn",
+    "tp": "seen",
+    "anchor": "*",
+    "chap": "Ch. 4: Cute Girl (Small Talk)"
+  },
+  {
+    "en": "Happy New Year!",
+    "zh": "新年快樂",
+    "hp": "xīn nián kuài lè",
+    "tp": "seen neean2 kooie4 Ler4",
+    "anchor": "*, 10, 4, 4",
+    "chap": "Ch. 4: Cute Girl (Small Talk)"
+  },
+  {
+    "en": "Cake",
+    "zh": "蛋糕",
+    "hp": "dàn gāo",
+    "tp": "dan4 gaw",
+    "anchor": "4, *",
+    "chap": "Ch. 4: Cute Girl (Small Talk)"
+  },
+  {
+    "en": "Yummy",
+    "zh": "好吃",
+    "hp": "hǎo chī",
+    "tp": "haw3 (r)ts",
+    "anchor": "5, *",
+    "chap": "Ch. 4: Cute Girl (Small Talk)"
+  },
+  {
+    "en": "Eat / To eat",
+    "zh": "吃",
+    "hp": "chī",
+    "tp": "(r)ts",
+    "anchor": "*",
+    "chap": "Ch. 4: Cute Girl (Small Talk)"
+  },
+  {
+    "en": "Where (alternative)",
+    "zh": "哪兒",
+    "hp": "nǎ'er",
+    "tp": "nah3 (uh)er",
+    "anchor": "5, *",
+    "chap": "Ch. 4: Cute Girl (Small Talk)"
+  },
+  {
+    "en": "The Forbidden City",
+    "zh": "故宮",
+    "hp": "gù gōng",
+    "tp": "goo4 ger oong",
+    "anchor": "4, *",
+    "chap": "Ch. 4: Cute Girl (Small Talk)"
+  },
+  {
+    "en": "How",
+    "zh": "怎麼",
+    "hp": "zěn me",
+    "tp": "dser n3 mer",
+    "anchor": "5, *",
+    "chap": "Ch. 4: Cute Girl (Small Talk)"
+  },
+  {
+    "en": "There",
+    "zh": "那裡",
+    "hp": "nà lǐ",
+    "tp": "nah4 Lee3",
+    "anchor": "4, 5",
+    "chap": "Ch. 4: Cute Girl (Small Talk)"
+  },
+  {
+    "en": "There (alternative)",
+    "zh": "那兒",
+    "hp": "nà'er",
+    "tp": "nah4 (uh)er",
+    "anchor": "4, *",
+    "chap": "Ch. 4: Cute Girl (Small Talk)"
+  },
+  {
+    "en": "Place (suffix)",
+    "zh": "裡",
+    "hp": "lǐ",
+    "tp": "Lee3",
+    "anchor": "5",
+    "chap": "Ch. 4: Cute Girl (Small Talk)"
+  },
+  {
+    "en": "Bruce Lee",
+    "zh": "李小龍",
+    "hp": "Lǐ Xiǎolóng",
+    "tp": "Lee3 seeaw3 Ler oong2",
+    "anchor": "9, 9, 10",
+    "chap": "Ch. 4: Cute Girl (Small Talk)"
+  },
+  {
+    "en": "Little / Small",
+    "zh": "小",
+    "hp": "xiǎo",
+    "tp": "seeaw3",
+    "anchor": "5 / 9",
+    "chap": "Ch. 4: Cute Girl (Small Talk)"
+  },
+  {
+    "en": "A little / A few / Less",
+    "zh": "少",
+    "hp": "shǎo",
+    "tp": "(r)saw3",
+    "anchor": "5",
+    "chap": "Ch. 4: Cute Girl (Small Talk)"
+  },
+  {
+    "en": "Loong / Dragon",
+    "zh": "龍",
+    "hp": "lóng",
+    "tp": "Ler oong2",
+    "anchor": "10",
+    "chap": "Ch. 4: Cute Girl (Small Talk)"
+  },
+  {
+    "en": "How much / How many",
+    "zh": "多少",
+    "hp": "duō shǎo",
+    "tp": "dooer (r)saw3",
+    "anchor": "*, 5",
+    "chap": "Ch. 5: Forbidden City"
+  },
+  {
+    "en": "Money",
+    "zh": "錢",
+    "hp": "qián",
+    "tp": "tseean2",
+    "anchor": "10",
+    "chap": "Ch. 5: Forbidden City"
+  },
+  {
+    "en": "Ticket",
+    "zh": "門票",
+    "hp": "mén piào",
+    "tp": "mer n2 peeaw4",
+    "anchor": "12",
+    "chap": "Ch. 5: Forbidden City"
+  },
+  {
+    "en": "Gate / Door",
+    "zh": "門",
+    "hp": "mén",
+    "tp": "mer n2",
+    "anchor": "10",
+    "chap": "Ch. 5: Forbidden City"
+  },
+  {
+    "en": "Plural suffix for people",
+    "zh": "們",
+    "hp": "men",
+    "tp": "mer n",
+    "anchor": "*",
+    "chap": "Ch. 5: Forbidden City"
+  },
+  {
+    "en": "Grab / Snatch / Scramble",
+    "zh": "搶",
+    "hp": "qiǎng",
+    "tp": "tseeang3",
+    "anchor": "5",
+    "chap": "Ch. 5: Forbidden City"
+  },
+  {
+    "en": "Ahead / In advance",
+    "zh": "提前",
+    "hp": "tí qián",
+    "tp": "tee2 tseean2",
+    "anchor": "10, 10",
+    "chap": "Ch. 5: Forbidden City"
+  },
+  {
+    "en": "In the morning",
+    "zh": "早上",
+    "hp": "zǎo shang",
+    "tp": "dsaw3 (r)sang4",
+    "anchor": "5, 6",
+    "chap": "Ch. 5: Forbidden City"
+  },
+  {
+    "en": "Mini-program",
+    "zh": "小程序",
+    "hp": "xiǎo chéng xù",
+    "tp": "seeaw3 (r)tser ng2 see(oo)4",
+    "anchor": "5, 12",
+    "chap": "Ch. 5: Forbidden City"
+  },
+  {
+    "en": "Program / Procedure / Process",
+    "zh": "程序",
+    "hp": "chéng xù",
+    "tp": "(r)tser ng2 see(oo)4",
+    "anchor": "12",
+    "chap": "Ch. 5: Forbidden City"
+  },
+  {
+    "en": "Tourist",
+    "zh": "遊客",
+    "hp": "yóu kè",
+    "tp": "yoh2 ker4",
+    "anchor": "12",
+    "chap": "Ch. 5: Forbidden City"
+  },
+  {
+    "en": "Exclamation particle",
+    "zh": "啊",
+    "hp": "a",
+    "tp": "Ah",
+    "anchor": "*",
+    "chap": "Ch. 5: Forbidden City"
+  },
+  {
+    "en": "Hot",
+    "zh": "熱",
+    "hp": "rè",
+    "tp": "(r)ther4",
+    "anchor": "4",
+    "chap": "Ch. 5: Forbidden City"
+  },
+  {
+    "en": "Line up",
+    "zh": "排隊",
+    "hp": "pái duì",
+    "tp": "pie2 dooay4",
+    "anchor": "12",
+    "chap": "Ch. 5: Forbidden City"
+  },
+  {
+    "en": "Very / Very much (adj)",
+    "zh": "非常",
+    "hp": "fēi cháng",
+    "tp": "fay tsang2",
+    "anchor": "8, 10",
+    "chap": "Ch. 5: Forbidden City"
+  },
+  {
+    "en": "Ming Dynasty",
+    "zh": "明代",
+    "hp": "míng dài",
+    "tp": "ming2 die4",
+    "anchor": "12",
+    "chap": "Ch. 5: Forbidden City"
+  },
+  {
+    "en": "And",
+    "zh": "和",
+    "hp": "hé",
+    "tp": "her2",
+    "anchor": "10",
+    "chap": "Ch. 5: Forbidden City"
+  },
+  {
+    "en": "Qing Dynasty",
+    "zh": "清代",
+    "hp": "qīng dài",
+    "tp": "tsing die4",
+    "anchor": "*, 4",
+    "chap": "Ch. 5: Forbidden City"
+  },
+  {
+    "en": "of",
+    "zh": "的",
+    "hp": "de",
+    "tp": "der",
+    "anchor": "*",
+    "chap": "Ch. 5: Forbidden City"
+  },
+  {
+    "en": "Polite measure word for people",
+    "zh": "位",
+    "hp": "wèi",
+    "tp": "way4",
+    "anchor": "4",
+    "chap": "Ch. 5: Forbidden City"
+  },
+  {
+    "en": "How many (people)",
+    "zh": "幾位",
+    "hp": "jǐ wèi",
+    "tp": "jee3 way4",
+    "anchor": "5, 4",
+    "chap": "Ch. 5: Forbidden City"
+  },
+  {
+    "en": "Emperor",
+    "zh": "皇帝",
+    "hp": "huáng dì",
+    "tp": "hooang2 dee4",
+    "anchor": "12",
+    "chap": "Ch. 5: Forbidden City"
+  },
+  {
+    "en": "Power",
+    "zh": "權利",
+    "hp": "quán lì",
+    "tp": "tsee(oo)an2 Lee4",
+    "anchor": "12",
+    "chap": "Ch. 5: Forbidden City"
+  },
+  {
+    "en": "Center",
+    "zh": "中心",
+    "hp": "zhōng xīn",
+    "tp": "(r)dser oong seen",
+    "anchor": "*, *",
+    "chap": "Ch. 5: Forbidden City"
+  },
+  {
+    "en": "The Hall of Supreme Harmony",
+    "zh": "太和殿",
+    "hp": "tài hé diàn",
+    "tp": "tie4 her2 deean4",
+    "anchor": "4, 10, 4",
+    "chap": "Ch. 5: Forbidden City"
+  },
+  {
+    "en": "The Throne of the Emperor",
+    "zh": "龍椅",
+    "hp": "lóng yǐ",
+    "tp": "Ler oong2 ee3",
+    "anchor": "10, 5",
+    "chap": "Ch. 5: Forbidden City"
+  },
+  {
+    "en": "Chair",
+    "zh": "椅子",
+    "hp": "yǐ zi",
+    "tp": "ee3 ds",
+    "anchor": "5, *",
+    "chap": "Ch. 5: Forbidden City"
+  },
+  {
+    "en": "The Imperial Dragon Robe",
+    "zh": "龍袍",
+    "hp": "lóng páo",
+    "tp": "Ler oong2 paw2",
+    "anchor": "10, 10",
+    "chap": "Ch. 5: Forbidden City"
+  },
+  {
+    "en": "The Meridian Gate",
+    "zh": "午門",
+    "hp": "wǔ mén",
+    "tp": "woo3 mer n2",
+    "anchor": "9, 10",
+    "chap": "Ch. 5: Forbidden City"
+  },
+  {
+    "en": "Help",
+    "zh": "幫",
+    "hp": "bāng",
+    "tp": "bang",
+    "anchor": "*",
+    "chap": "Ch. 5: Forbidden City"
+  },
+  {
+    "en": "Take a Picture",
+    "zh": "拍照",
+    "hp": "pāi zhào",
+    "tp": "pie (r)dsaw4",
+    "anchor": "*, 4 / *, 2",
+    "chap": "Ch. 5: Forbidden City"
+  },
+  {
+    "en": "Chopsticks",
+    "zh": "筷子",
+    "hp": "kuài zi",
+    "tp": "kooie4 ds",
+    "anchor": "4, *",
+    "chap": "Ch. 5: Forbidden City"
+  },
+  {
+    "en": "Fan",
+    "zh": "扇子",
+    "hp": "shàn zi",
+    "tp": "(r)san4 ds",
+    "anchor": "4, *",
+    "chap": "Ch. 5: Forbidden City"
+  },
+  {
+    "en": "Electric Fan",
+    "zh": "電扇",
+    "hp": "diàn shàn",
+    "tp": "deean4 (r)san4",
+    "anchor": "4, 4",
+    "chap": "Ch. 5: Forbidden City"
+  },
+  {
+    "en": "Qianmen",
+    "zh": "前門",
+    "hp": "qián mén",
+    "tp": "tseean2 mer n2",
+    "anchor": "10, 10",
+    "chap": "Ch. 6: Qianmen Cuisine"
+  },
+  {
+    "en": "Cuisine",
+    "zh": "美食",
+    "hp": "měi shí",
+    "tp": "may3 (r)s2",
+    "anchor": "9, 10",
+    "chap": "Ch. 6: Qianmen Cuisine"
+  },
+  {
+    "en": "Quanjude Roast Duck Restaurant",
+    "zh": "全聚德烤鴨店",
+    "hp": "quán jù dé kǎo yā diàn",
+    "tp": "tsee(oo)an2 jee(oo)4 der2 kaw3 yah deean4",
+    "anchor": "10, 2, 10, 5, *, 4",
+    "chap": "Ch. 6: Qianmen Cuisine"
+  },
+  {
+    "en": "Whole",
+    "zh": "全",
+    "hp": "quán",
+    "tp": "tsee(oo)an2",
+    "anchor": "10",
+    "chap": "Ch. 6: Qianmen Cuisine"
+  },
+  {
+    "en": "Gathering",
+    "zh": "聚",
+    "hp": "jù",
+    "tp": "jee(oo)4",
+    "anchor": "4 / 2",
+    "chap": "Ch. 6: Qianmen Cuisine"
+  },
+  {
+    "en": "Ethics / Morality",
+    "zh": "德",
+    "hp": "dé",
+    "tp": "der2",
+    "anchor": "10",
+    "chap": "Ch. 6: Qianmen Cuisine"
+  },
+  {
+    "en": "Family",
+    "zh": "家",
+    "hp": "jiā",
+    "tp": "jeeah",
+    "anchor": "*",
+    "chap": "Ch. 6: Qianmen Cuisine"
+  },
+  {
+    "en": "Happiness",
+    "zh": "幸福",
+    "hp": "xìng fú",
+    "tp": "sing4 foo2",
+    "anchor": "4, 10",
+    "chap": "Ch. 6: Qianmen Cuisine"
+  },
+  {
+    "en": "Roast Duck",
+    "zh": "烤鴨",
+    "hp": "kǎo yā",
+    "tp": "kaw3 yah",
+    "anchor": "5, *",
+    "chap": "Ch. 6: Qianmen Cuisine"
+  },
+  {
+    "en": "Restaurant",
+    "zh": "飯店",
+    "hp": "fàn diàn",
+    "tp": "fan4 deean4",
+    "anchor": "4, 4",
+    "chap": "Ch. 6: Qianmen Cuisine"
+  },
+  {
+    "en": "Shop / Store",
+    "zh": "店",
+    "hp": "diàn",
+    "tp": "deean4",
+    "anchor": "4",
+    "chap": "Ch. 6: Qianmen Cuisine"
+  },
+  {
+    "en": "Humble Restaurant / Hall",
+    "zh": "馆",
+    "hp": "guǎn",
+    "tp": "gooan3",
+    "anchor": "5",
+    "chap": "Ch. 6: Qianmen Cuisine"
+  },
+  {
+    "en": "Donglaishun Mutton Restaurant",
+    "zh": "东来顺羊肉馆",
+    "hp": "dōng lái shùn yáng ròu guǎn",
+    "tp": "der oong Lie2 soon4 yang2 (r)thoh4 gooan3",
+    "anchor": "*, 10, 2, 12, 5",
+    "chap": "Ch. 6: Qianmen Cuisine"
+  },
+  {
+    "en": "Mutton",
+    "zh": "羊肉",
+    "hp": "yáng ròu",
+    "tp": "yang2 (r)thoh4",
+    "anchor": "12",
+    "chap": "Ch. 6: Qianmen Cuisine"
+  },
+  {
+    "en": "East",
+    "zh": "东",
+    "hp": "dōng",
+    "tp": "der oong",
+    "anchor": "*",
+    "chap": "Ch. 6: Qianmen Cuisine"
+  },
+  {
+    "en": "Come",
+    "zh": "来",
+    "hp": "lái",
+    "tp": "Lie2",
+    "anchor": "10",
+    "chap": "Ch. 6: Qianmen Cuisine"
+  },
+  {
+    "en": "Smoothly",
+    "zh": "順利",
+    "hp": "shùn lì",
+    "tp": "soon4 Lee4",
+    "anchor": "4, 4",
+    "chap": "Ch. 6: Qianmen Cuisine"
+  },
+  {
+    "en": "Everything",
+    "zh": "事事",
+    "hp": "shì shì",
+    "tp": "(r)s4 (r)s4",
+    "anchor": "4, 4",
+    "chap": "Ch. 6: Qianmen Cuisine"
+  },
+  {
+    "en": "Long",
+    "zh": "長",
+    "hp": "cháng",
+    "tp": "(r)tsang2",
+    "anchor": "10",
+    "chap": "Ch. 7: The Great Wall"
+  },
+  {
+    "en": "Wall",
+    "zh": "城牆",
+    "hp": "chéng qiáng",
+    "tp": "(r)tser ng2 tseeang2",
+    "anchor": "10, 10",
+    "chap": "Ch. 7: The Great Wall"
+  },
+  {
+    "en": "Badaling Great Wall",
+    "zh": "八達嶺長城",
+    "hp": "bā dá lǐng cháng chéng",
+    "tp": "bah dah2 Ling3 (r)tsang2 (r)tser ng2",
+    "anchor": "*, 15, 10, 10",
+    "chap": "Ch. 7: The Great Wall"
+  },
+  {
+    "en": "History",
+    "zh": "歷史",
+    "hp": "lì shǐ",
+    "tp": "Lee4 (r)s3",
+    "anchor": "4, 5",
+    "chap": "Ch. 7: The Great Wall"
+  },
+  {
+    "en": "Autumn / Fall",
+    "zh": "秋天",
+    "hp": "qiū tiān",
+    "tp": "tseeoh (teean)",
+    "anchor": "*, *",
+    "chap": "Ch. 7: The Great Wall"
+  },
+  {
+    "en": "High / Tall",
+    "zh": "高",
+    "hp": "gāo",
+    "tp": "gaw",
+    "anchor": "*",
+    "chap": "Ch. 7: The Great Wall"
+  },
+  {
+    "en": "Air",
+    "zh": "空氣",
+    "hp": "kōng qì",
+    "tp": "(ker oong) tsee4",
+    "anchor": "*, 4",
+    "chap": "Ch. 7: The Great Wall"
+  },
+  {
+    "en": "Crisp (weather)",
+    "zh": "爽",
+    "hp": "shuǎng",
+    "tp": "(r)sooang3",
+    "anchor": "5",
+    "chap": "Ch. 7: The Great Wall"
+  },
+  {
+    "en": "Crisp (texture)",
+    "zh": "脆",
+    "hp": "cuì",
+    "tp": "tsooay4",
+    "anchor": "*",
+    "chap": "Ch. 7: The Great Wall"
+  },
+  {
+    "en": "Full / Satisfied",
+    "zh": "滿",
+    "hp": "mǎn",
+    "tp": "man3",
+    "anchor": "5",
+    "chap": "Ch. 7: The Great Wall"
+  },
+  {
+    "en": "Full (of food)",
+    "zh": "飽",
+    "hp": "bǎo",
+    "tp": "baw3",
+    "anchor": "5",
+    "chap": "Ch. 7: The Great Wall"
+  },
+  {
+    "en": "Mountain",
+    "zh": "山",
+    "hp": "shān",
+    "tp": "(r)san",
+    "anchor": "*",
+    "chap": "Ch. 7: The Great Wall"
+  },
+  {
+    "en": "Red",
+    "zh": "紅色",
+    "hp": "hóng sè",
+    "tp": "her oong2 (ser4)",
+    "anchor": "12",
+    "chap": "Ch. 7: The Great Wall"
+  },
+  {
+    "en": "Leaf",
+    "zh": "樹葉",
+    "hp": "shù yè",
+    "tp": "(r)soo4 yeeer4",
+    "anchor": "4, 4",
+    "chap": "Ch. 7: The Great Wall"
+  },
+  {
+    "en": "Be Like",
+    "zh": "像",
+    "hp": "xiàng",
+    "tp": "seeang4",
+    "anchor": "4",
+    "chap": "Ch. 7: The Great Wall"
+  },
+  {
+    "en": "Imagine",
+    "zh": "想像",
+    "hp": "xiǎng xiàng",
+    "tp": "seeang3 seeang4",
+    "anchor": "5, 6",
+    "chap": "Ch. 7: The Great Wall"
+  },
+  {
+    "en": "Giant",
+    "zh": "巨大",
+    "hp": "jù dà",
+    "tp": "jee(oo)4 (dah4)",
+    "anchor": "4 / 6",
+    "chap": "Ch. 7: The Great Wall"
+  },
+  {
+    "en": "Winding",
+    "zh": "蜿蜒",
+    "hp": "wān yán",
+    "tp": "wan yan2",
+    "anchor": "*, 10",
+    "chap": "Ch. 7: The Great Wall"
+  },
+  {
+    "en": "Away",
+    "zh": "遠去",
+    "hp": "yuǎn qù",
+    "tp": "yee(oo)an3 tsee(oo)4",
+    "anchor": "5, 6",
+    "chap": "Ch. 7: The Great Wall"
+  },
+  {
+    "en": "Everyone",
+    "zh": "人人",
+    "hp": "rén rén",
+    "tp": "(r)ther n2 (r)ther n2",
+    "anchor": "10, 10",
+    "chap": "Ch. 7: The Great Wall"
+  },
+  {
+    "en": "Everyone / All of us",
+    "zh": "大家",
+    "hp": "dà jiā",
+    "tp": "dah4 jeeah",
+    "anchor": "4, *",
+    "chap": "Ch. 7: The Great Wall"
+  },
+  {
+    "en": "All / Both",
+    "zh": "都",
+    "hp": "dōu",
+    "tp": "doh",
+    "anchor": "*",
+    "chap": "Ch. 7: The Great Wall"
+  },
+  {
+    "en": "A piece of / A sheet",
+    "zh": "一張",
+    "hp": "yì zhāng",
+    "tp": "ee4 (r)dsang",
+    "anchor": "4, *",
+    "chap": "Ch. 7: The Great Wall"
+  },
+  {
+    "en": "Smiling Face",
+    "zh": "笑臉",
+    "hp": "xiào liǎn",
+    "tp": "seeaw4 Leean3",
+    "anchor": "4, 5",
+    "chap": "Ch. 7: The Great Wall"
+  },
+  {
+    "en": "Tired",
+    "zh": "累",
+    "hp": "lèi",
+    "tp": "Lay4",
+    "anchor": "4",
+    "chap": "Ch. 7: The Great Wall"
+  },
+  {
+    "en": "Corridor",
+    "zh": "長廊",
+    "hp": "cháng láng",
+    "tp": "(r)tsang2 Lang2",
+    "anchor": "10, 10",
+    "chap": "Ch. 8: Summer Palace"
+  },
+  {
+    "en": "Carved Beams",
+    "zh": "雕梁",
+    "hp": "diāo liáng",
+    "tp": "deeaw Leeang2",
+    "anchor": "*, 10",
+    "chap": "Ch. 8: Summer Palace"
+  },
+  {
+    "en": "Painted Rafters",
+    "zh": "畫棟",
+    "hp": "huà dòng",
+    "tp": "hooah4 der oong4",
+    "anchor": "4, 4",
+    "chap": "Ch. 8: Summer Palace"
+  },
+  {
+    "en": "Make / Cause",
+    "zh": "令",
+    "hp": "lìng",
+    "tp": "Ling4",
+    "anchor": "4",
+    "chap": "Ch. 8: Summer Palace"
+  },
+  {
+    "en": "Marvel / Exclaim",
+    "zh": "讚嘆",
+    "hp": "zàn tàn",
+    "tp": "dsan4 tan4",
+    "anchor": "4, 4",
+    "chap": "Ch. 8: Summer Palace"
+  },
+  {
+    "en": "The Rippling Waters",
+    "zh": "碧波蕩漾",
+    "hp": "bì bō dàng yàng",
+    "tp": "bee4 ber dang4 yang4",
+    "anchor": "4, *, 4, 4",
+    "chap": "Ch. 8: Summer Palace"
+  },
+  {
+    "en": "Wear / Put Up",
+    "zh": "穿",
+    "hp": "chuān",
+    "tp": "(r)tsooan",
+    "anchor": "*",
+    "chap": "Ch. 8: Summer Palace"
+  },
+  {
+    "en": "Boat / Ship",
+    "zh": "船",
+    "hp": "chuán",
+    "tp": "(r)tsooan2",
+    "anchor": "10",
+    "chap": "Ch. 8: Summer Palace"
+  },
+  {
+    "en": "Cruise Boats",
+    "zh": "游船",
+    "hp": "yóu chuán",
+    "tp": "yoh2 (r)tsooan2",
+    "anchor": "10, 10",
+    "chap": "Ch. 8: Summer Palace"
+  },
+  {
+    "en": "Shuttle back and forth",
+    "zh": "穿梭",
+    "hp": "chuān suō",
+    "tp": "(r)tsooan sooer",
+    "anchor": "*, *",
+    "chap": "Ch. 8: Summer Palace"
+  },
+  {
+    "en": "Feel Like / As if",
+    "zh": "宛如",
+    "hp": "wǎn rú",
+    "tp": "wan3 roo2",
+    "anchor": "9, 10",
+    "chap": "Ch. 8: Summer Palace"
+  },
+  {
+    "en": "Painting",
+    "zh": "畫",
+    "hp": "huà",
+    "tp": "hooah4",
+    "anchor": "4",
+    "chap": "Ch. 8: Summer Palace"
+  },
+  {
+    "en": "(Be) in / Inside",
+    "zh": "在...中",
+    "hp": "zài...zhōng",
+    "tp": "dsie4 ... (r)dser oong",
+    "anchor": "4, *",
+    "chap": "Ch. 8: Summer Palace"
+  }
+];
+
+        // Formula databases from Trees Pinyin Map
+        const INITIALS = {
+            "b": { trees: "b" }, "p": { trees: "p" }, "m": { trees: "m" }, "f": { trees: "f" },
+            "d": { trees: "d" }, "t": { trees: "t" }, "n": { trees: "n" }, "l": { trees: "L" },
+            "g": { trees: "g" }, "k": { trees: "k" }, "h": { trees: "h" }, "j": { trees: "j" },
+            "q": { trees: "tsee" }, "x": { trees: "see" },
+            "zh": { trees: "(r)ds" }, "ch": { trees: "(r)ts" }, "sh": { trees: "(r)s" }, "r": { trees: "(r)th" },
+            "z": { trees: "ds" }, "c": { trees: "ts" }, "s": { trees: "s" }, "y": { trees: "y" }, "w": { trees: "w" }
+        };
+
+        const FINALS = {
+            "a": { trees: "ah" }, "o": { trees: "ooer" }, "e": { trees: "er" }, "i": { trees: "ee" }, "u": { trees: "oo" }, "ü": { trees: "ee(oo)" }, "v": { trees: "ee(oo)" },
+            "ai": { trees: "ie" }, "ei": { trees: "ay" }, "ui": { trees: "ooay" }, "ao": { trees: "aw" }, "ou": { trees: "oh" }, "iu": { trees: "eeoh" },
+            "ie": { trees: "eeer" }, "üe": { trees: "ee(oo)er" }, "ve": { trees: "ee(oo)er" }, "er": { trees: "uh er" },
+            "an": { trees: "an" }, "en": { trees: "er n" }, "in": { trees: "een" }, "un": { trees: "oon" }, "ün": { trees: "ee(oo)n" }, "vn": { trees: "ee(oo)n" },
+            "ang": { trees: "ang" }, "eng": { trees: "er ng" }, "ing": { trees: "ing" }, "ong": { trees: "er oong" }
+        };
+
+        const OVERALLS = {
+            "zhi": "(r)ds", "chi": "(r)ts", "shi": "(r)s", "ri": "(r)th",
+            "zi": "ds", "ci": "ts", "si": "s",
+            "yi": "ee", "wu": "woo", "yu": "yee(oo)",
+            "ye": "yeeer", "yue": "yee(oo)er", "yuan": "yee(oo)an",
+            "yin": "yeen", "yun": "yee(oo)n", "ying": "ying"
+        };
+
+        let currentSentenceChinese = "";
+
+        function handleEnter(event) {
+            if (event.key === 'Enter') {
+                triggerTranslation();
+            }
+        }
+
+        function setPreset(text) {
+            document.getElementById('english-input').value = text;
+            triggerTranslation();
+        }
+
+        function normalizeTones(pinyinWord) {
+            const toneMap = {
+                'ā': ['a', '1'], 'á': ['a', '2'], 'ǎ': ['a', '3'], 'à': ['a', '4'],
+                'ō': ['o', '1'], 'ó': ['o', '2'], 'ǒ': ['o', '3'], 'ò': ['o', '4'],
+                'ē': ['e', '1'], 'é': ['e', '2'], 'ě': ['e', '3'], 'è': ['e', '4'],
+                'ī': ['i', '1'], 'í': ['i', '2'], 'ǐ': ['i', '3'], 'ì': ['i', '4'],
+                'ū': ['u', '1'], 'ú': ['u', '2'], 'ǔ': ['u', '3'], 'ù': ['u', '4'],
+                'ǖ': ['v', '1'], 'ǘ': ['v', '2'], 'ǚ': ['v', '3'], 'ǜ': ['v', '4'],
+                'ü': ['v', '1']
+            };
+            let tone = '';
+            let normalized = '';
+            for (let char of pinyinWord) {
+                if (toneMap[char]) {
+                    normalized += toneMap[char][0];
+                    tone = toneMap[char][1];
+                } else {
+                    normalized += char;
+                }
+            }
+            if (/\d$/.test(normalized)) {
+                return normalized;
+            } else if (tone) {
+                return normalized + tone;
+            }
+            return normalized;
+        }
+
+        // Formula-based Hanyu Pinyin to Trees Pinyin dynamic conversion
+        function translatePinyinToTrees(pinyinRaw) {
+            if (!pinyinRaw || pinyinRaw.trim() === '') return "";
+            
+            let text = pinyinRaw.toLowerCase();
+            let words = text.split(/\s+/);
+            let finalTreesArray = [];
+
+            words.forEach(word => {
+                let normalized = normalizeTones(word);
+                let match = normalized.match(/^(zh|ch|sh|b|p|m|f|d|t|n|l|g|k|h|j|q|x|r|z|c|s|y|w)?([a-z|ü|v]+)([1-5]?)$/i);
+                if (match) {
+                    let initial = match[1] || "";
+                    let final = match[2];
+                    let tone = match[3] || "1";
+                    
+                    let syllable = initial + final;
+                    let mappedTrees = "";
+
+                    if (OVERALLS[syllable]) {
+                        mappedTrees = OVERALLS[syllable];
+                    } else {
+                        let mappedInitial = initial !== "" ? (INITIALS[initial] ? INITIALS[initial].trees : initial) : "";
+                        let mappedFinal = FINALS[final] ? FINALS[final].trees : final;
+                        
+                        // Special override for 'h' + 'en' -> 'hern'
+                        if (initial === 'h' && final === 'en') {
+                            mappedTrees = 'hern';
+                        } else {
+                            mappedTrees = mappedInitial + mappedFinal;
+                        }
+                    }
+
+                    let toneStr = "";
+                    if (tone === "2") toneStr = "2";
+                    else if (tone === "3") toneStr = "3";
+                    else if (tone === "4") toneStr = "4";
+
+                    finalTreesArray.push(mappedTrees + toneStr);
+                } else {
+                    finalTreesArray.push(word);
+                }
+            });
+
+            return finalTreesArray.join(" ");
+        }
+
+        // Formatting casing rules
+        function formatFinalTreesPinyin(treesPinyinStr) {
+            if (!treesPinyinStr) return "";
+            
+            // Split into words, enforce lowercase for all characters except 'L'
+            let words = treesPinyinStr.split(/\s+/).map(word => {
+                let chars = word.split('');
+                let formattedChars = chars.map(char => {
+                    if (char === 'L') return 'L';
+                    return char.toLowerCase();
+                });
+                return formattedChars.join('');
+            });
+            
+            // Enforce capitalization on the very first letter of the entire sentence
+            if (words.length > 0 && words[0].length > 0) {
+                for (let i = 0; i < words[0].length; i++) {
+                    let c = words[0].charAt(i);
+                    if (/[a-zA-Z]/.test(c)) {
+                        words[0] = words[0].slice(0, i) + c.toUpperCase() + words[0].slice(i + 1);
+                        break;
+                    }
+                }
+            }
+            return words.join(" ");
+        }
+
+        // Play text using browser Speech Synthesis API
+        function playSpeech(text, rateValue) {
+            if ('speechSynthesis' in window) {
+                // Cancel active speeches
+                window.speechSynthesis.cancel();
+                
+                let utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'zh-CN';
+                utterance.rate = rateValue || 0.7; // default slow
+                
+                // Seek standard local voices
+                let voices = window.speechSynthesis.getVoices();
+                let selectedVoice = voices.find(v => v.lang.includes('zh') && v.name.toLowerCase().includes('ting'));
+                if (selectedVoice) utterance.voice = selectedVoice;
+                
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        function speakFullSentence() {
+            if (currentSentenceChinese) {
+                playSpeech(currentSentenceChinese, 0.7); // standard slow flow
+            }
+        }
+
+        function speakCardWord(char) {
+            playSpeech(char, 0.55); // extra slow individual char
+        }
+
+        // On-the-fly execution
+        async function triggerTranslation() {
+            let input = document.getElementById('english-input').value.trim();
+            if (input === '') return;
+
+            document.getElementById('empty-banner').classList.add('hidden');
+            document.getElementById('results-area').classList.add('hidden');
+            document.getElementById('loading-spinner').classList.remove('hidden');
+
+            let normalizedInput = input.toLowerCase();
+            
+            // Check if it's a predefined Premium Greeting (Happy New Year, etc.)
+            if (PREMIUM_GREETINGS[normalizedInput]) {
+                let data = PREMIUM_GREETINGS[normalizedInput];
+                renderCards(input, data.zh, data.hp, data.tp, data.story, false);
+                return;
+            }
+
+            // Check if it's in the Book 1 Vocabulary list
+            let matchedItem = VOCAB_DATABASE.find(item => item.en.toLowerCase() === normalizedInput);
+            if (matchedItem) {
+                let formattedTP = formatFinalTreesPinyin(matchedItem.tp);
+                renderCards(input, matchedItem.zh, matchedItem.hp, formattedTP, matchedItem.story || "", false);
+                return;
+            }
+
+            // Fallback: fetch dynamic translation via Google Translate API
+            try {
+                let url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=zh-CN&dt=t&q=${encodeURIComponent(input)}`;
+                let response = await fetch(url);
+                let resData = await response.json();
+                
+                if (resData && resData[0]) {
+                    let translatedZh = resData[0].map(item => item[0]).join('');
+                    
+                    // Convert Chinese to Standard Pinyin using pinyin-pro
+                    // Use toneType: 'num' to get standard tones to map easily
+                    let pinyinWithTones = pinyinPro.pinyin(translatedZh, { toneType: 'num' });
+                    let pinyinStandard = pinyinPro.pinyin(translatedZh, { toneType: 'symbol' });
+                    
+                    // Map Standard Pinyin to Trees Pinyin
+                    let rawTrees = translatePinyinToTrees(pinyinWithTones);
+                    let formattedTrees = formatFinalTreesPinyin(rawTrees);
+
+                    renderCards(input, translatedZh, pinyinStandard, formattedTrees, "", true);
+                } else {
+                    throw new Error("Translation data format mismatch");
+                }
+            } catch (err) {
+                console.error("Translation API failure:", err);
+                
+                // Fallback: render dummy standard card if API fails
+                document.getElementById('loading-spinner').classList.add('hidden');
+                document.getElementById('empty-banner').classList.remove('hidden');
+                alert("Translation engine temporarily busy. Please try again or type a simpler word!");
+            }
+        }
+
+        // Card rendering function
+        function renderCards(enInput, zhText, hpText, tpText, story, isLocked) {
+            currentSentenceChinese = zhText;
+            
+            document.getElementById('sentence-meaning').innerHTML = `<b>English:</b> "${enInput}"`;
+            document.getElementById('sentence-chinese').innerHTML = `<b>Chinese Characters:</b> 「${zhText}」 | <b>Pinyin:</b> ${hpText}`;
+
+            // Parse each Chinese character & standard Pinyin syllable
+            let chars = zhText.replace(/\s+/g, '').split('');
+            let tpWords = tpText.split(/\s+/);
+
+            let cardsHtml = "";
+            chars.forEach((char, idx) => {
+                let wordTp = tpWords[idx] || "";
+                
+                cardsHtml += `
+                    <div onclick="speakCardWord('${char}')" class="bg-white rounded-2xl p-5 border border-slate-100 shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-200 cursor-pointer text-center relative overflow-hidden group">
+                        <div class="absolute top-0 left-0 w-full h-1.5 bg-brand-600"></div>
+                        <div class="space-y-3">
+                            <span class="text-4xl font-extrabold text-slate-800 tracking-wider block">${char}</span>
+                            <div class="bg-brand-50 p-3 rounded-xl border border-brand-100/50">
+                                <span class="text-lg font-black text-brand-navy tracking-tight italic block">***${wordTp}***</span>
+                            </div>
+                        </div>
+                        <!-- Play hover decorator -->
+                        <div class="absolute bottom-2 right-2 text-slate-300 group-hover:text-brand-600 transition-colors">
+                            <i class="fa-solid fa-volume-high text-xs"></i>
+                        </div>
+                    </div>
+                `;
+            });
+            document.getElementById('cards-container').innerHTML = cardsHtml;
+
+            // Render Story Box
+            let storyBox = document.getElementById('story-box');
+            if (story && story.trim() !== '') {
+                storyBox.className = "bg-amber-50/50 border border-amber-200/60 rounded-3xl p-6 md:p-8";
+                storyBox.innerHTML = `
+                    <div class="flex items-start gap-3">
+                        <span class="text-2xl mt-0.5">💡</span>
+                        <div class="space-y-2">
+                            <h5 class="text-xs font-black text-amber-800 uppercase tracking-widest">Trees Pinyin Memory Hack Story Box:</h5>
+                            <p class="text-sm text-slate-700 leading-relaxed font-serif-serif">${story}</p>
+                        </div>
+                    </div>
+                `;
+            } else if (isLocked) {
+                // Gold lock for custom translations (Sales Funnel)
+                storyBox.className = "bg-amber-50/30 border border-yellow-200 rounded-3xl p-6 md:p-8 text-center space-y-4";
+                storyBox.innerHTML = `
+                    <div class="max-w-md mx-auto space-y-3">
+                        <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-yellow-100 text-yellow-600 text-xl mb-1">
+                            <i class="fa-solid fa-lock"></i>
+                        </div>
+                        <h5 class="text-sm font-black text-yellow-800 uppercase tracking-widest">Memory Hack Story Locked! 🔒</h5>
+                        <h5 class="text-xs font-bold text-amber-800 mt-1">解鎖更多記憶技巧請購買我的書！</h5>
+                        <p class="text-xs text-slate-500 leading-relaxed">
+                            Want to unlock 500+ powerful logical stories and visual memory hacks for this and other words? Check out the full <b>"Easy Mandarin"</b> series on Amazon!
+                        </p>
+                        <div class="flex flex-wrap justify-center gap-3 pt-2">
+                            <a href="https://www.amazon.com/dp/B0HCXLCK3K" target="_blank" class="bg-yellow-500 hover:bg-yellow-600 text-slate-900 px-5 py-2 rounded-xl text-xs font-black transition-all shadow-sm">
+                                <i class="fa-solid fa-shopping-cart mr-1"></i>Get Book on Amazon
+                            </a>
+                            <a href="https://www.treespinyin.com/" target="_blank" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-5 py-2 rounded-xl text-xs font-bold transition-all">
+                                🏠 Visit Homepage
+                            </a>
+                        </div>
+                    </div>
+                `;
+            } else {
+                storyBox.className = "bg-amber-50/10 border border-slate-100 rounded-3xl p-6 md:p-8 text-center";
+                storyBox.innerHTML = `
+                    <p class="text-xs text-slate-400">
+                        This vocabulary uses intuitive phonetic spelling. Simply follow the bold-italicized guides to pronounce it like a native speaker!
+                    </p>
+                `;
+            }
+
+            document.getElementById('loading-spinner').classList.add('hidden');
+            document.getElementById('results-area').classList.remove('hidden');
+
+            // Automatically slow-play full sentence on reveal
+            setTimeout(() => {
+                speakFullSentence();
+            }, 300);
+        }
+
+        // Initialize Speak engine voice loading
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.getVoices();
+            window.speechSynthesis.onvoiceschanged = function() {
+                window.speechSynthesis.getVoices();
+            };
+        }
+    </script>
+</body>
+</html>
