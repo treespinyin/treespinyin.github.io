@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌲 Trees Pinyin: Chinese Card Maker ✉️</title>
+    <!-- Tailwind CSS for modern responsive premium layout -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f1f8e9',
+                            100: '#dcedc8',
+                            600: '#2e7d32',
+                            700: '#1b5e20',
+                            800: '#003300',
+                            navy: '#1a237e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome for beautiful clean icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Pinyin-pro CDN for on-the-fly Chinese to Pinyin conversion -->
+    <script src="https://unpkg.com/pinyin-pro"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700;800&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap');
+        
+        body {
+            font-family: 'Lexend', 'Noto Sans TC', sans-serif;
+            background-color: #fcfdfc;
+        }
+        .font-serif-serif {
+            font-family: 'Playfair Display', serif;
+        }
+        /* Strict Formatting Rule: Bold-Italicized without overly fancy fonts */
+        .trees-pinyin-style {
+            font-family: 'Playfair Display', 'Georgia', serif;
+            font-style: italic;
+            font-weight: bold;
+            color: #1a237e; /* Premium Deep Navy */
+        }
+        .card-shadow {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.04), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between">
+
+    <!-- Top Premium Navigation Header -->
+    <header class="bg-gradient-to-r from-brand-700 via-brand-600 to-emerald-800 text-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex flex-row justify-between items-center">
+            <div class="flex items-center gap-3">
+                <a href="https://www.treespinyin.com/" class="bg-white p-2 rounded-xl shadow-inner flex items-center justify-center hover:scale-105 transition-transform">
+                    <span class="text-brand-700 text-2xl font-extrabold">🌲</span>
+                </a>
+                <div>
+                    <h1 class="text-xl md:text-2xl font-black tracking-tight flex items-center gap-2">
+                        <span>Chinese Card Maker</span>
+                        <span class="text-xs bg-brand-800/40 text-brand-100 px-2 py-0.5 rounded-full border border-brand-500/30">✉️ Tool</span>
+                    </h1>
+                    <p class="text-[10px] text-brand-100 font-medium tracking-widest uppercase hidden md:block">Sensory Greeting Card Maker & Interactive Translator</p>
+                </div>
+            </div>
+            
+            <!-- Quick Back Button -->
+            <div class="flex items-center gap-3">
+                <a href="https://www.treespinyin.com/" class="text-xs md:text-sm font-bold bg-brand-800/40 hover:bg-brand-800/80 text-white px-4 py-2 rounded-xl transition-all border border-brand-500/20 flex items-center gap-1.5">
+                    <i class="fa-solid fa-house"></i>
+                    <span>Back to Homepage</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-grow max-w-5xl mx-auto w-full px-6 py-10 space-y-10">
+        
+        <!-- Big Prominent Search & Input Area -->
+        <div class="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm card-shadow text-center space-y-6">
+            <div class="max-w-2xl mx-auto space-y-2">
+                <span class="bg-brand-50 text-brand-700 text-xs font-black px-3 py-1 rounded-full uppercase tracking-wider">
+                    ✨ Sensory Language Sandbox
+                </span>
+                <h2 class="text-2xl md:text-3xl font-black text-slate-800">
+                    Type in English to Generate Chinese Sensory Cards!
+                </h2>
+                <p class="text-slate-500 text-sm leading-relaxed">
+                    Enter any English word, phrase, or full sentence below. The system will automatically translate it, parse standard Hanyu Pinyin, and dynamically render perfect <b>Trees Pinyin Cards</b> with slow standard pronunciation!
+                </p>
+            </div>
+
+            <!-- Big Input Form -->
+            <div class="max-w-2xl mx-auto">
+                <div class="relative flex flex-col md:flex-row gap-3">
+                    <div class="relative flex-grow">
+                        <i class="fa-solid fa-wand-magic-sparkles absolute left-5 top-1/2 -translate-y-1/2 text-brand-600 text-lg"></i>
+                        <input type="text" id="english-input" onkeypress="handleEnter(event)" placeholder="Type anything... e.g. Happy New Year / I love Mapo Tofu / How are you?" class="w-full pl-14 pr-4 py-4 rounded-2xl border-2 border-slate-200 focus:outline-none focus:ring-4 focus:ring-brand-100 focus:border-brand-600 transition-all text-lg font-medium shadow-inner">
+                    </div>
+                    <button onclick="triggerTranslation()" class="bg-gradient-to-r from-brand-700 to-emerald-600 hover:from-brand-600 hover:to-emerald-500 text-white px-8 py-4 rounded-2xl font-extrabold text-base tracking-wide shadow-md hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2">
+                        <span>Generate Card</span>
+                        <i class="fa-solid fa-bolt"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quick Preset Greeting Tags -->
+            <div class="max-w-2xl mx-auto pt-2">
+                <span class="block text-xs font-bold text-slate-400 uppercase mb-3">Popular Chinese Blessings (🎉 點擊一鍵製作祝福卡片)：</span>
+                <div class="flex flex-wrap justify-center gap-2">
+                    <button onclick="setPreset('Happy New Year')" class="px-4 py-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-xs font-extrabold text-slate-700 border border-slate-200/80 transition-all flex items-center gap-1.5">
+                        <span>🎉 Happy New Year</span>
+                    </button>
+                    <button onclick="setPreset('Congratulations and be prosperous')" class="px-4 py-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-xs font-extrabold text-slate-700 border border-slate-200/80 transition-all flex items-center gap-1.5">
+                        <span>💰 Congratulations & Be Rich</span>
+                    </button>
+                    <button onclick="setPreset('Happy Birthday')" class="px-4 py-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-xs font-extrabold text-slate-700 border border-slate-200/80 transition-all flex items-center gap-1.5">
+                        <span>🎂 Happy Birthday</span>
+                    </button>
+                    <button onclick="setPreset('Everything goes smoothly')" class="px-4 py-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-xs font-extrabold text-slate-700 border border-slate-200/80 transition-all flex items-center gap-1.5">
+                        <span>⛵ Everything Smoothly</span>
+                    </button>
+                    <button onclick="setPreset('May everything go as you wish')" class="px-4 py-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-xs font-extrabold text-slate-700 border border-slate-200/80 transition-all flex items-center gap-1.5">
+                        <span>🌟 May all go as you wish</span>
+                    </button>
+                    <button onclick="setPreset('Good Health')" class="px-4 py-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-xs font-extrabold text-slate-700 border border-slate-200/80 transition-all flex items-center gap-1.5">
+                        <span>❤️ Good Health</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== LIVE GENERATED CARD BOARD ==================== -->
+        <section id="translation-result" class="space-y-8">
+            <!-- Loading Spinner (Hidden by default) -->
+            <div id="loading-spinner" class="hidden text-center py-12">
+                <div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-brand-600 border-t-transparent"></div>
+                <p class="text-slate-400 text-sm mt-3 font-semibold">Generating your custom cards...</p>
+            </div>
+
+            <!-- Empty State Banner -->
+            <div id="empty-banner" class="text-center py-16 bg-white rounded-3xl border border-dashed border-slate-200 p-8">
+                <span class="text-5xl block mb-4">🔮</span>
+                <h3 class="text-lg font-bold text-slate-700">Your card board is empty</h3>
+                <p class="text-slate-400 text-sm mt-1 max-w-md mx-auto">Type any English sentence or phrase above and watch the magic of Trees Pinyin unfold!</p>
+            </div>
+
+            <!-- Output Container (Hidden initially) -->
+            <div id="output-area" class="hidden space-y-6">
+                
+                <!-- Main Header Controls -->
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-brand-50 p-6 rounded-3xl border border-brand-100 shadow-sm">
+                    <div>
+                        <p id="sentence-meaning" class="text-slate-500 text-xs font-black uppercase tracking-wider">...</p>
+                        <h3 id="sentence-chinese" class="text-lg font-black text-brand-700 mt-1">...</h3>
+                    </div>
+                    <button onclick="speakFullSentence()" class="w-full md:w-auto bg-brand-600 hover:bg-brand-700 text-white px-6 py-3 rounded-2xl font-black text-sm tracking-wide shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-volume-high text-base"></i>
+                        <span>🔊 Play Full Sentence (流利整句慢速)</span>
+                    </button>
+                </div>
+
+                <!-- Custom Cards Grid -->
+                <div id="cards-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-5">
+                    <!-- Custom generated Cards will go here -->
+                </div>
+
+                <!-- Single Story Box (Anchor & Mnemonic) -->
+                <div id="story-box">
+                    <!-- Dynamically populated or showing lock -->
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 py-10 border-t border-slate-800 text-center text-xs space-y-4">
+        <div class="max-w-7xl mx-auto px-6 space-y-4">
+            <!-- Buttons & Action Calls -->
+            <div class="flex flex-wrap justify-center gap-4">
+                <a href="https://www.treespinyin.com/" class="bg-slate-800 hover:bg-slate-700 text-white px-6 py-3 rounded-xl font-black transition-all flex items-center gap-1.5">
+                    <i class="fa-solid fa-house"></i>
+                    <span>Visit Trees Pinyin Homepage</span>
+                </a>
+                <a href="https://www.amazon.com/dp/B0HCXLCK3K" target="_blank" class="bg-yellow-500 hover:bg-yellow-600 text-slate-900 px-6 py-3 rounded-xl font-black transition-all shadow-md flex items-center gap-1.5">
+                    <i class="fa-solid fa-shopping-cart"></i>
+                    <span>Get Easy Mandarin on Amazon</span>
+                </a>
+            </div>
+            
+            <p class="text-slate-500 font-semibold">&copy; 2026 Trees Pinyin. All Rights Reserved. Manufactured in Google Workspace.</p>
+            <p class="text-slate-600">Designed for the Book Launch of "Easy Mandarin Speaking" and "Easy Mandarin Tones"</p>
+        </div>
+    </footer>
+
+    <!-- ==================== JS DATABASE & MAPPING ENGINE ==================== -->
+    <script>
+        // Preset Blessings Stories from the Book
+        const PREMIUM_GREETINGS = {
+            "happy new year": {
+                zh: "新年快樂",
+                hp: "xīn nián kuài lè",
+                tp: "Seen neean2 kooie4 Ler4",
+                story: "You have never <b>seen</b> a <b>neon</b> sign so <b>qui(te) lo(vely)</b> in the New Year!"
+            },
+            "congratulations and be prosperous": {
+                zh: "恭喜發財",
+                hp: "gōng xǐ fā cái",
+                tp: "Ger oong see3 fah tsie2",
+                story: "At the palace, my elder brother (<b>ger</b>) <b>won't</b> <b>see</b> anyone; it's I who made a <b>far try</b> (bold attempt) to make a fortune."
+            },
+            "happy birthday": {
+                zh: "生日快樂",
+                hp: "shēng rì kuài lè",
+                tp: "(r)s er ng (r)th4 kooie4 Ler4",
+                story: "Imagine it's your <b>birthday (sung)</b>, and (r)<b>th</b>en... the <b>day</b> begins! Happy kids are <b>qui(te) lo(vely)</b>."
+            },
+            "everything goes smoothly": {
+                zh: "事事順利",
+                hp: "shì shì shùn lì",
+                tp: "(r)s4 (r)s4 soon4 Lee4",
+                story: "Yes, yes, everything is in the room soonly!"
+            },
+            "may everything go as you wish": {
+                zh: "萬事如意",
+                hp: "wàn  shì rú yì",
+                tp: "wan4 (r)s4 roo2 ee4",
+                story: "He <b>won</b> a fortune, <b>yes</b>, and now <b>rules</b> the <b>ea</b>st!"
+            },
+            "good health": {
+                zh: "身體健康",
+                hp: "shēn tǐ jiàn kāng",
+                tp: "ser n tee3 jeean4 kang",
+                story: "A healthy body is like a strong <b>sun</b> on a <b>tea</b> terrace, built for a <b>g</b>i<b>an</b>t <b>con</b>queror!"
+            }
+        };
+
+        // Standard 63 Formula Mapping Database from Trees Pinyin Appendix Map
+        const INITIALS = {
+            "b": { trees: "b" }, "p": { trees: "p" }, "m": { trees: "m" }, "f": { trees: "f" },
+            "d": { trees: "d" }, "t": { trees: "t" }, "n": { trees: "n" }, "l": { trees: "L" },
+            "g": { trees: "g" }, "k": { trees: "k" }, "h": { trees: "h" }, "j": { trees: "j" },
+            "q": { trees: "tsee" }, "x": { trees: "see" },
+            "zh": { trees: "(r)ds" }, "ch": { trees: "(r)ts" }, "sh": { trees: "(r)s" }, "r": { trees: "(r)th" },
+            "z": { trees: "ds" }, "c": { trees: "ts" }, "s": { trees: "s" }, "y": { trees: "y" }, "w": { trees: "w" }
+        };
+
+        const FINALS = {
+            "a": { trees: "ah" }, "o": { trees: "ooer" }, "e": { trees: "er" }, "i": { trees: "ee" }, "u": { trees: "oo" }, "ü": { trees: "ee(oo)" }, "v": { trees: "ee(oo)" },
+            "ai": { trees: "ie" }, "ei": { trees: "ay" }, "ui": { trees: "ooay" }, "ao": { trees: "aw" }, "ou": { trees: "oh" }, "iu": { trees: "eeoh" },
+            "ie": { trees: "eeer" }, "üe": { trees: "ee(oo)er" }, "ve": { trees: "ee(oo)er" }, "er": { trees: "uh er" },
+            "an": { trees: "an" }, "en": { trees: "er n" }, "in": { trees: "een" }, "un": { trees: "oon" }, "ün": { trees: "ee(oo)n" }, "vn": { trees: "ee(oo)n" },
+            "ang": { trees: "ang" }, "eng": { trees: "er ng" }, "ing": { trees: "ing" }, "ong": { trees: "er oong" }
+        };
+
+        const OVERALLS = {
+            "zhi": "(r)ds", "chi": "(r)ts", "shi": "(r)s", "ri": "(r)th",
+            "zi": "ds", "ci": "ts", "si": "s",
+            "yi": "ee", "wu": "woo", "yu": "yee(oo)",
+            "ye": "yeeer", "yue": "yee(oo)er", "yuan": "yee(oo)an",
+            "yin": "yeen", "yun": "yee(oo)n", "ying": "ying"
+        };
+
+        // Full embedded Volume 1 Database (205 items) compiled for offline instant lookup
+        const VOCAB_DATABASE = [];
+
+        let currentSentenceChinese = "";
+
+        function handleEnter(event) {
+            if (event.key === 'Enter') {
+                triggerTranslation();
+            }
+        }
+
+        function setPreset(text) {
+            document.getElementById('english-input').value = text;
+            triggerTranslation();
+        }
+
+        // Standardize tone inputs from standard numerical formats (like hui4, hen3, etc.)
+        function normalizeTones(pinyinWord) {
+            return pinyinWord.toLowerCase()
+                .replace(/ā/g, 'a1').replace(/á/g, 'a2').replace(/ǎ/g, 'a3').replace(/à/g, 'a4')
+                .replace(/ō/g, 'o1').replace(/ó/g, 'o2').replace(/ǒ/g, 'o3').replace(/ò/g, 'o4')
+                .replace(/ē/g, 'e1').replace(/é/g, 'e2').replace(/ě/g, 'e3').replace(/è/g, 'e4')
+                .replace(/ī/g, 'i1').replace(/í/g, 'i2').replace(/ǐ/g, 'i3').replace(/ì/g, 'i4')
+                .replace(/ū/g, 'u1').replace(/ú/g, 'u2').replace(/ǔ/g, 'u3').replace(/ù/g, 'u4')
+                .replace(/ǖ/g, 'v1').replace(/ǘ/g, 'v2').replace(/ǚ/g, 'v3').replace(/ǜ/g, 'v4')
+                .replace(/ü/g, 'v');
+        }
+
+        // Hanyu Pinyin to Trees Pinyin dynamic conversion algorithm
+        function translatePinyinToTrees(pinyinRaw) {
+            if (!pinyinRaw || pinyinRaw.trim() === '') return "";
+            
+            let text = normalizeTones(pinyinRaw);
+            let words = text.split(/\s+/);
+            let finalTreesArray = [];
+
+            words.forEach(word => {
+                // Precise regex to extract Pinyin Initials, Finals, and Tones
+                let match = word.match(/^(zh|ch|sh|b|p|m|f|d|t|n|l|g|k|h|j|q|x|r|z|c|s|y|w)?([a-z|ü|v]+)([1-5|0]?)$/i);
+                if (match) {
+                    let initial = match[1] || "";
+                    let final = match[2];
+                    let tone = match[3] || "1"; // Default to first tone
+                    
+                    let syllable = initial + final;
+                    let mappedTrees = "";
+
+                    // 1. Overall mapping check
+                    if (OVERALLS[syllable]) {
+                        mappedTrees = OVERALLS[syllable];
+                    } else {
+                        // 2. Initial mapping
+                        let mappedInitial = initial !== "" ? (INITIALS[initial] ? INITIALS[initial].trees : initial) : "";
+                        // 3. Final mapping
+                        let mappedFinal = FINALS[final] ? FINALS[final].trees : final;
+                        
+                        mappedTrees = mappedInitial + mappedFinal;
+                        
+                        // Custom phonetic adjustments for natural english speaking blends
+                        if (mappedTrees === "her n") mappedTrees = "hern";
+                    }
+
+                    // 4. Tone markers (First tone 1 and neutral tone 5/0 are completely omitted!)
+                    let toneStr = "";
+                    if (tone === "2") toneStr = "2";
+                    else if (tone === "3") toneStr = "3";
+                    else if (tone === "4") toneStr = "4";
+
+                    finalTreesArray.push(mappedTrees + toneStr);
+                } else {
+                    finalTreesArray.push(word);
+                }
+            });
+
+            return finalTreesArray.join(" ");
+        }
+
+        // Strict casing rules formatting
+        function formatFinalTreesPinyin(treesPinyinStr) {
+            if (!treesPinyinStr) return "";
+            
+            // Enforce lowercase except for letter 'L'
+            let words = treesPinyinStr.split(/\s+/).map(word => {
+                let chars = word.split('');
+                let formattedChars = chars.map(char => {
+                    if (char === 'l' || char === 'L') return 'L';
+                    return char.toLowerCase();
+                });
+                return formattedChars.join('');
+            });
+            
+            // Capitalize the first letter of the entire custom sentence
+            let joined = words.join(" ");
+            for (let i = 0; i < joined.length; i++) {
+                let c = joined.charAt(i);
+                if (/[a-zA-Z]/.test(c)) {
+                    joined = joined.slice(0, i) + c.toUpperCase() + joined.slice(i + 1);
+                    break;
+                }
+            }
+            return joined;
+        }
+
+        // Play standard voice on the browser using Synthesis Speech API
+        function playSpeech(text, rateValue) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                
+                let utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'zh-CN';
+                utterance.rate = rateValue || 0.7; // default slow
+                
+                let voices = window.speechSynthesis.getVoices();
+                let selectedVoice = voices.find(v => v.lang.includes('zh') && v.name.toLowerCase().includes('ting'));
+                if (selectedVoice) utterance.voice = selectedVoice;
+                
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        function speakFullSentence() {
+            if (currentSentenceChinese) {
+                playSpeech(currentSentenceChinese, 0.7); // standard slow
+            }
+        }
+
+        function speakCardWord(char) {
+            playSpeech(char, 0.55); // extra slow individual char for tracing
+        }
+
+        // Execution block
+        async function triggerTranslation() {
+            let input = document.getElementById('english-input').value.trim();
+            if (input === '') return;
+
+            document.getElementById('empty-banner').classList.add('hidden');
+            document.getElementById('output-area').classList.add('hidden');
+            document.getElementById('loading-spinner').classList.remove('hidden');
+
+            let inputLower = input.toLowerCase();
+
+            // 1. Direct Premium Blessings Match
+            if (PREMIUM_GREETINGS[inputLower]) {
+                let matched = PREMIUM_GREETINGS[inputLower];
+                setTimeout(() => {
+                    document.getElementById('loading-spinner').classList.add('hidden');
+                    document.getElementById('output-area').classList.remove('hidden');
+                    renderCards(input, matched.zh, matched.hp, matched.tp, matched.story, false);
+                }, 400);
+                return;
+            }
+
+            // 2. Direct embedded vocabulary lookup (205 words)
+            let localMatch = VOCAB_DATABASE.find(item => item.en.toLowerCase() === inputLower || item.en.toLowerCase().includes(inputLower));
+            if (localMatch) {
+                let formattedTP = formatFinalTreesPinyin(localMatch.tp);
+                setTimeout(() => {
+                    document.getElementById('loading-spinner').classList.add('hidden');
+                    document.getElementById('output-area').classList.remove('hidden');
+                    renderCards(input, localMatch.zh, localMatch.hp, formattedTP, "", false);
+                }, 400);
+                return;
+            }
+
+            // 3. Fallback: Hot-pluggable cloud translation
+            try {
+                let url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=zh-CN&dt=t&q=${encodeURIComponent(input)}`;
+                let response = await fetch(url);
+                let resData = await response.json();
+                
+                if (resData && resData[0]) {
+                    let translatedZh = resData[0].map(item => item[0]).join('');
+                    
+                    // Call pinyin-pro library to fetch standard pinyin
+                    let pinyinWithTones = pinyinPro.pinyin(translatedZh, { toneType: 'num' });
+                    let pinyinStandard = pinyinPro.pinyin(translatedZh, { toneType: 'symbol' });
+                    
+                    let rawTrees = translatePinyinToTrees(pinyinWithTones);
+                    let formattedTrees = formatFinalTreesPinyin(rawTrees);
+
+                    document.getElementById('loading-spinner').classList.add('hidden');
+                    document.getElementById('output-area').classList.remove('hidden');
+                    
+                    renderCards(input, translatedZh, pinyinStandard, formattedTrees, "", true);
+                } else {
+                    throw new Error("Translation structure mismatch");
+                }
+            } catch (err) {
+                console.error("API Fetch Error:", err);
+                document.getElementById('loading-spinner').classList.add('hidden');
+                document.getElementById('empty-banner').classList.remove('hidden');
+                alert("Translation service busy. Please check your internet connection or try again with simpler words!");
+            }
+        }
+
+        // Live Card Rendering Engine
+        function renderCards(enInput, zhText, hpText, tpText, story, isLocked) {
+            currentSentenceChinese = zhText;
+            
+            document.getElementById('sentence-meaning').innerHTML = `<b>English Input:</b> "${enInput}"`;
+            document.getElementById('sentence-chinese').innerHTML = `<b>Chinese characters:</b> 「${zhText}」 | <b>Hanyu Pinyin:</b> ${hpText}`;
+
+            let chars = zhText.replace(/\s+/g, '').split('');
+            let tpWords = tpText.split(/\s+/);
+
+            let cardsHtml = "";
+            chars.forEach((char, idx) => {
+                let wordTp = tpWords[idx] || "";
+                
+                cardsHtml += `
+                    <div onclick="speakCardWord('${char}')" class="bg-white rounded-2xl p-5 border border-slate-100 shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-200 cursor-pointer text-center relative overflow-hidden group">
+                        <div class="absolute top-0 left-0 w-full h-1.5 bg-brand-600"></div>
+                        
+                        <span class="text-xs font-mono font-bold text-slate-400 block mb-3 group-hover:text-brand-600 transition-colors">Character ${idx + 1}</span>
+                        <h4 class="text-4xl font-extrabold text-slate-800 mb-4 tracking-tight">${char}</h4>
+                        
+                        <div class="bg-brand-50/50 p-3 rounded-xl border border-brand-100/50">
+                            <span class="block text-[8px] text-brand-600 font-extrabold uppercase tracking-widest mb-0.5">Trees Pinyin:</span>
+                            <span class="text-base text-brand-navy font-serif-serif italic font-extrabold block">***${wordTp}***</span>
+                        </div>
+                        
+                        <span class="text-[9px] text-slate-400 block mt-3"><i class="fa-solid fa-volume-high mr-1"></i>Tap to speak</span>
+                    </div>
+                `;
+            });
+            document.getElementById('cards-grid').innerHTML = cardsHtml;
+
+            // Render Story & Promotion Box (The Sales Funnel)
+            let storyBox = document.getElementById('story-box');
+            if (story && story.trim() !== '') {
+                storyBox.className = "bg-amber-50/50 border border-amber-200/60 rounded-3xl p-6 md:p-8";
+                storyBox.innerHTML = `
+                    <div class="flex items-start gap-3">
+                        <span class="text-2xl mt-0.5">💡</span>
+                        <div class="space-y-2">
+                            <h5 class="text-xs font-black text-amber-800 uppercase tracking-widest">Trees Pinyin Memory Hack Story Box:</h5>
+                            <p class="text-sm text-slate-700 leading-relaxed font-serif-serif">${story}</p>
+                        </div>
+                    </div>
+                `;
+            } else if (isLocked) {
+                storyBox.className = "bg-amber-50/30 border border-yellow-200 rounded-3xl p-6 md:p-8 text-center space-y-4";
+                storyBox.innerHTML = `
+                    <div class="max-w-md mx-auto space-y-3">
+                        <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-yellow-100 text-yellow-600 text-xl mb-1">
+                            <i class="fa-solid fa-lock"></i>
+                        </div>
+                        <h5 class="text-sm font-black text-yellow-800 uppercase tracking-widest">Memory Hack Story Locked! 🔒 解鎖更多記憶技巧請購買我的書</h5>
+                        <p class="text-xs text-slate-500 leading-relaxed">
+                            Want to unlock 500+ powerful logical stories and visual memory hacks for this and other words? Check out the full <b>"Easy Mandarin"</b> series on Amazon!
+                        </p>
+                        <div class="flex flex-wrap justify-center gap-3 pt-2">
+                            <a href="https://www.amazon.com/dp/B0HCXLCK3K" target="_blank" class="bg-yellow-500 hover:bg-yellow-600 text-slate-900 px-5 py-2.5 rounded-xl text-xs font-black transition-all shadow-sm">
+                                <i class="fa-solid fa-shopping-cart mr-1"></i>Get Book on Amazon
+                            </a>
+                            <a href="https://www.treespinyin.com/" target="_blank" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-5 py-2.5 rounded-xl text-xs font-bold transition-all">
+                                🏠 Visit Homepage
+                            </a>
+                        </div>
+                    </div>
+                `;
+            } else {
+                storyBox.className = "bg-amber-50/10 border border-slate-100 rounded-3xl p-6 md:p-8 text-center";
+                storyBox.innerHTML = `
+                    <p class="text-xs text-slate-400">
+                        This vocabulary uses intuitive phonetic spelling. Simply follow the bold-italicized guides to pronounce it like a native speaker!
+                    </p>
+                `;
+            }
+
+            // Trigger slow full sentence speech automatically on load (rate=0.7)
+            setTimeout(() => {
+                speakFullSentence();
+            }, 300);
+        }
+    </script>
+</body>
+</html>
