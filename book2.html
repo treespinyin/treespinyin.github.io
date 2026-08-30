@@ -1,0 +1,2257 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book 2 point-and-read player</title>
+    <style>
+        :root {
+            --primary-green: #2E7D32;
+            --dark-green: #1B5E20;
+            --accent-green: #E8F5E9;
+            --text-dark: #333333;
+            --muted-gray: #757575;
+            --white: #ffffff;
+            --blue-trees: #1565C0;
+            --orange-anchor: #E65100;
+        }
+        body {
+            background-color: #f4f6f4;
+            color: var(--text-dark);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            padding: 24px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: var(--white);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        h1 {
+            color: var(--primary-green);
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0;
+        }
+        .voice-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background-color: var(--accent-green);
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            color: var(--dark-green);
+            font-weight: 600;
+        }
+        .voice-dropdown {
+            padding: 6px 10px;
+            border-radius: 6px;
+            border: 1px solid var(--primary-green);
+            outline: none;
+            font-size: 13px;
+            background-color: var(--white);
+            cursor: pointer;
+            color: var(--text-dark);
+        }
+        .search-area {
+            display: flex;
+            gap: 12px;
+            width: 100%;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .search-input {
+            flex-grow: 2;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 2px solid var(--accent-green);
+            font-size: 15px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .search-input:focus {
+            border-color: var(--primary-green);
+        }
+        .chapter-select {
+            flex-grow: 1;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 2px solid var(--accent-green);
+            font-size: 15px;
+            outline: none;
+            background-color: var(--white);
+            cursor: pointer;
+        }
+        .chapter-select:focus {
+            border-color: var(--primary-green);
+        }
+        /* Table Layout */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            text-align: left;
+            padding: 14px 16px;
+            border-bottom: 1px solid #eeeeee;
+        }
+        th {
+            background-color: var(--accent-green);
+            color: var(--dark-green);
+            font-weight: 700;
+        }
+        tr:hover {
+            background-color: #fafafa;
+        }
+        .hanzi-btn {
+            background: none;
+            border: none;
+            font-size: 22px;
+            font-weight: bold;
+            color: var(--primary-green);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: transform 0.15s;
+        }
+        .hanzi-btn:hover {
+            transform: scale(1.08);
+        }
+        .hanzi-btn span {
+            font-size: 14px;
+        }
+        .trees-pinyin {
+            font-size: 17px;
+            font-weight: bold;
+            color: var(--blue-trees);
+            font-style: italic;
+        }
+        .std-pinyin {
+            font-size: 13px;
+            color: var(--muted-gray);
+        }
+        .anchor-badge {
+            font-size: 13px;
+            color: var(--orange-anchor);
+            background-color: #FFF3E0;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: 500;
+            display: inline-block;
+        }
+        .chapter-cell {
+            font-size: 13px;
+            color: var(--muted-gray);
+        }
+        .tips-link {
+            color: var(--blue-trees);
+            font-weight: bold;
+            text-decoration: underline;
+            font-size: 13px;
+        }
+        .footer-action {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 30px;
+            background-color: #fafafa;
+            padding: 16px 20px;
+            border-radius: 8px;
+            border: 1px solid #eee;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .top-action-banner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            background-color: var(--accent-green);
+            padding: 16px 20px;
+            border-radius: 8px;
+            border: 2px solid rgba(46, 125, 50, 0.15);
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .top-action-banner span {
+            font-size: 14px;
+            font-weight: bold;
+            color: var(--dark-green);
+        }
+        .anki-btn {
+            background-color: var(--primary-green);
+            color: var(--white);
+            padding: 10px 18px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 14px;
+            transition: background-color 0.2s;
+        }
+        .anki-btn:hover {
+            background-color: var(--dark-green);
+        }
+        @media (max-width: 768px) {
+            table, thead, tbody, th, td, tr {
+                display: block;
+            }
+            thead {
+                display: none;
+            }
+            tr {
+                border-bottom: 2px solid var(--accent-green);
+                padding: 15px 0;
+            }
+            td {
+                border: none;
+                padding: 6px 12px;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+            td::before {
+                content: attr(data-label);
+                font-weight: bold;
+                color: var(--dark-green);
+                min-width: 100px;
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📗 Book 2 Searchable Point-and-Read Audio Player</h1>
+            <div class="voice-control">
+                <span>🔊 Voice (發音人):</span>
+                <select id="voice-select" class="voice-dropdown" onchange="changeVoice()">
+                    <!-- Voices populated dynamically by JavaScript -->
+                </select>
+            </div>
+        </div>
+        
+        <div class="top-action-banner">
+            <span>🎁 Recommended: Download our official Book 2 Anki Deck to practice offline on your phone/tablet with pure audio!</span>
+            <a href="https://www.treespinyin.com/vol2/Easy_Mandarin_Speaking_Trees_Pinyin_Book_2.apkg" class="anki-btn">📩 Download Book 2 Anki Deck</a>
+        </div>
+        
+        <div class="search-area">
+            <input type="text" id="search" class="search-input" placeholder="Search by English, Hanzi, or Pinyin...">
+            <select id="chapter-filter" class="chapter-select">
+                <option value="">All Chapters (全部章節)</option>
+                
+                <option value="Ch. 1">Ch 1: Numbers & Tones</option>
+                <option value="Ch. 2">Ch 2: Word Order</option>
+                <option value="Ch. 3">Ch 3: Train to Beijing</option>
+                <option value="Ch. 4">Ch 4: Cute Girl (Small Talk)</option>
+                <option value="Ch. 5">Ch 5: Forbidden City</option>
+                <option value="Ch. 6">Ch 6: Qianmen Cuisine</option>
+                <option value="Ch. 7">Ch 7: The Great Wall</option>
+                <option value="Ch. 8">Ch 8: Summer Palace</option>
+        
+            </select>
+        </div>
+
+        <table id="vocab-table">
+            <thead>
+                <tr>
+                    <th>English Meaning</th>
+                    <th>Hanzi (点读 🔊)</th>
+                    <th>Trees Pinyin (特色)</th>
+                    <th>Standard Pinyin</th>
+                    <th>Tone Anchor</th>
+                    <th>Chapter</th>
+                    <th>Mnemonic Link</th>
+                </tr>
+            </thead>
+            <tbody id="table-body">
+                <!-- Javascript will insert vocabulary here -->
+            </tbody>
+        </table>
+
+        <div class="footer-action">
+            <span>💡 Need memory anchors? Click on "Memory Tips" on any vocabulary item to check its logical story.</span>
+            <a href="about.html" class="anki-btn" style="background-color: var(--muted-gray);">🏠 Back to Homepage</a>
+        </div>
+    </div>
+
+    <script>
+        const vocabulary = [
+    {
+        "id": 1,
+        "english": "Two / 2",
+        "hanzi": "二",
+        "pinyin": "èr",
+        "trees": "uh-er4",
+        "anchor": "4 (Falling)",
+        "chapter": "Ch. 1: Numbers and Tones"
+    },
+    {
+        "id": 2,
+        "english": "Four / 4",
+        "hanzi": "四",
+        "pinyin": "sì",
+        "trees": "s4",
+        "anchor": "4 (Falling)",
+        "chapter": "Ch. 1: Numbers and Tones"
+    },
+    {
+        "id": 3,
+        "english": "Five / 5",
+        "hanzi": "五",
+        "pinyin": "wǔ",
+        "trees": "woo3",
+        "anchor": "3 (Dipping)",
+        "chapter": "Ch. 1: Numbers and Tones"
+    },
+    {
+        "id": 4,
+        "english": "Six / 6",
+        "hanzi": "六",
+        "pinyin": "liù",
+        "trees": "Leeoo4",
+        "anchor": "4 (Falling)",
+        "chapter": "Ch. 1: Numbers and Tones"
+    },
+    {
+        "id": 5,
+        "english": "Nine / 9",
+        "hanzi": "九",
+        "pinyin": "jiǔ",
+        "trees": "jeeoo3",
+        "anchor": "3 (Dipping)",
+        "chapter": "Ch. 1: Numbers and Tones"
+    },
+    {
+        "id": 6,
+        "english": "Ten / 10",
+        "hanzi": "十",
+        "pinyin": "shí",
+        "trees": "(r)s2",
+        "anchor": "2 (Rising)",
+        "chapter": "Ch. 1: Numbers and Tones"
+    },
+    {
+        "id": 7,
+        "english": "Nine, Ten (9,10)",
+        "hanzi": "九十",
+        "pinyin": "jiǔ shí",
+        "trees": "jeeoo3 (r)s2",
+        "anchor": "5,10 / 9,10",
+        "chapter": "Ch. 1: Numbers and Tones"
+    },
+    {
+        "id": 8,
+        "english": "The United States",
+        "hanzi": "美國",
+        "pinyin": "měi guó",
+        "trees": "may3 gooer2",
+        "anchor": "5,10 / 9,10",
+        "chapter": "Ch. 1: Numbers and Tones"
+    },
+    {
+        "id": 9,
+        "english": "Traveling",
+        "hanzi": "旅遊",
+        "pinyin": "lǚ yóu",
+        "trees": "Lee(oo)3 yoh2",
+        "anchor": "9,10",
+        "chapter": "Ch. 1: Numbers and Tones"
+    },
+    {
+        "id": 10,
+        "english": "Tour Guide",
+        "hanzi": "导游",
+        "pinyin": "dǎo yóu",
+        "trees": "daw3 yoh2",
+        "anchor": "9,10",
+        "chapter": "Ch. 1: Numbers and Tones"
+    },
+    {
+        "id": 11,
+        "english": "Girl",
+        "hanzi": "女孩",
+        "pinyin": "nǚ hái",
+        "trees": "nee(oo)3 hie2",
+        "anchor": "9,10",
+        "chapter": "Ch. 1: Numbers and Tones"
+    },
+    {
+        "id": 12,
+        "english": "Woman",
+        "hanzi": "女人",
+        "pinyin": "nǚ rén",
+        "trees": "nee(oo)3 (r)ther-n2",
+        "anchor": "9,10",
+        "chapter": "Ch. 1: Numbers and Tones"
+    },
+    {
+        "id": 13,
+        "english": "Human / Man / People",
+        "hanzi": "人",
+        "pinyin": "rén",
+        "trees": "(r)ther-n2",
+        "anchor": "10",
+        "chapter": "Ch. 1: Numbers and Tones"
+    },
+    {
+        "id": 14,
+        "english": "Daughter",
+        "hanzi": "女兒",
+        "pinyin": "nǚ ér",
+        "trees": "nee(oo)3 (uh)-er2",
+        "anchor": "9,10",
+        "chapter": "Ch. 1: Numbers and Tones"
+    },
+    {
+        "id": 15,
+        "english": "Son",
+        "hanzi": "兒子",
+        "pinyin": "ér zi",
+        "trees": "(uh)-er2 ds",
+        "anchor": "10, *",
+        "chapter": "Ch. 1: Numbers and Tones"
+    },
+    {
+        "id": 16,
+        "english": "Beautiful",
+        "hanzi": "美",
+        "pinyin": "měi",
+        "trees": "may3",
+        "anchor": "5 / 9",
+        "chapter": "Ch. 1: Numbers and Tones"
+    },
+    {
+        "id": 17,
+        "english": "Elder sister",
+        "hanzi": "姐姐",
+        "pinyin": "jiě jie",
+        "trees": "jeeer3 jeeer",
+        "anchor": "5, *",
+        "chapter": "Ch. 1: Numbers and Tones"
+    },
+    {
+        "id": 18,
+        "english": "Younger sister",
+        "hanzi": "妹妹",
+        "pinyin": "mèi mei",
+        "trees": "may4 may",
+        "anchor": "4, * / 6, *",
+        "chapter": "Ch. 1: Numbers and Tones"
+    },
+    {
+        "id": 19,
+        "english": "Sisters (Elder & Younger)",
+        "hanzi": "姐妹",
+        "pinyin": "jiě mèi",
+        "trees": "jeeer3 may4",
+        "anchor": "5, 6",
+        "chapter": "Ch. 1: Numbers and Tones"
+    },
+    {
+        "id": 20,
+        "english": "I / Me",
+        "hanzi": "我",
+        "pinyin": "wǒ",
+        "trees": "wer3",
+        "anchor": "5",
+        "chapter": "Ch. 1: Numbers and Tones"
+    },
+    {
+        "id": 21,
+        "english": "Where",
+        "hanzi": "哪裡",
+        "pinyin": "nǎ lǐ",
+        "trees": "nah3 Lee3",
+        "anchor": "5, 9",
+        "chapter": "Ch. 1: Numbers and Tones"
+    },
+    {
+        "id": 22,
+        "english": "Could / Can / May",
+        "hanzi": "可以",
+        "pinyin": "kě yǐ",
+        "trees": "ker3 ee3",
+        "anchor": "5, 9",
+        "chapter": "Ch. 1: Numbers and Tones"
+    },
+    {
+        "id": 23,
+        "english": "Get / Buy",
+        "hanzi": "買",
+        "pinyin": "mǎi",
+        "trees": "Mie3",
+        "anchor": "5",
+        "chapter": "Ch. 1: Numbers and Tones"
+    },
+    {
+        "id": 24,
+        "english": "Fruit",
+        "hanzi": "水果",
+        "pinyin": "shuǐ guǒ",
+        "trees": "(r)sooay3 gooer3",
+        "anchor": "5, 9",
+        "chapter": "Ch. 1: Numbers and Tones"
+    },
+    {
+        "id": 25,
+        "english": "Hello",
+        "hanzi": "你好",
+        "pinyin": "Nǐ hǎo",
+        "trees": "Nee3 haw3",
+        "anchor": "5, 9",
+        "chapter": "Ch. 1: Numbers and Tones"
+    },
+    {
+        "id": 26,
+        "english": "You",
+        "hanzi": "你",
+        "pinyin": "nǐ",
+        "trees": "nee3",
+        "anchor": "9",
+        "chapter": "Ch. 1: Numbers and Tones"
+    },
+    {
+        "id": 27,
+        "english": "Good",
+        "hanzi": "好",
+        "pinyin": "hǎo",
+        "trees": "haw3",
+        "anchor": "5",
+        "chapter": "Ch. 1: Numbers and Tones"
+    },
+    {
+        "id": 28,
+        "english": "Bad",
+        "hanzi": "坏",
+        "pinyin": "huài",
+        "trees": "hooie4",
+        "anchor": "6",
+        "chapter": "Ch. 1: Numbers and Tones"
+    },
+    {
+        "id": 29,
+        "english": "Would like / Want",
+        "hanzi": "想要",
+        "pinyin": "xiǎng yào",
+        "trees": "seeang3 yaw4",
+        "anchor": "5, 6",
+        "chapter": "Ch. 1: Numbers and Tones"
+    },
+    {
+        "id": 30,
+        "english": "BBQ / Barbecue",
+        "hanzi": "烤肉",
+        "pinyin": "kǎo ròu",
+        "trees": "kaw3 (r)thoh4",
+        "anchor": "5, 6",
+        "chapter": "Ch. 1: Numbers and Tones"
+    },
+    {
+        "id": 31,
+        "english": "Excuse me / May I ask",
+        "hanzi": "請問",
+        "pinyin": "qǐng wèn",
+        "trees": "Tsing3 wer-n4",
+        "anchor": "5, 6",
+        "chapter": "Ch. 1: Numbers and Tones"
+    },
+    {
+        "id": 32,
+        "english": "Twelve / 12",
+        "hanzi": "十二",
+        "pinyin": "shí èr",
+        "trees": "(r)s2 uh-er4",
+        "anchor": "12",
+        "chapter": "Ch. 1: Numbers and Tones"
+    },
+    {
+        "id": 33,
+        "english": "From",
+        "hanzi": "來自",
+        "pinyin": "lái zì",
+        "trees": "Lie2 ds4",
+        "anchor": "12",
+        "chapter": "Ch. 1: Numbers and Tones"
+    },
+    {
+        "id": 34,
+        "english": "Kobe",
+        "hanzi": "神戶",
+        "pinyin": "shén hù",
+        "trees": "(r)ser-n2 hoo4",
+        "anchor": "12",
+        "chapter": "Ch. 1: Numbers and Tones"
+    },
+    {
+        "id": 35,
+        "english": "Colleague",
+        "hanzi": "同事",
+        "pinyin": "tóng shì",
+        "trees": "ter-oong2 (r)s4",
+        "anchor": "12",
+        "chapter": "Ch. 1: Numbers and Tones"
+    },
+    {
+        "id": 36,
+        "english": "Unique",
+        "hanzi": "獨特",
+        "pinyin": "dú tè",
+        "trees": "doo2 ter4",
+        "anchor": "12",
+        "chapter": "Ch. 1: Numbers and Tones"
+    },
+    {
+        "id": 37,
+        "english": "Habit",
+        "hanzi": "習慣",
+        "pinyin": "xí guàn",
+        "trees": "see2 gooan4",
+        "anchor": "12",
+        "chapter": "Ch. 1: Numbers and Tones"
+    },
+    {
+        "id": 38,
+        "english": "Beef",
+        "hanzi": "牛肉",
+        "pinyin": "niú ròu",
+        "trees": "neeoh2 (r)thoh4",
+        "anchor": "12",
+        "chapter": "Ch. 1: Numbers and Tones"
+    },
+    {
+        "id": 39,
+        "english": "Holidays",
+        "hanzi": "節日",
+        "pinyin": "jié rì",
+        "trees": "jeeer2 (r)th4",
+        "anchor": "12",
+        "chapter": "Ch. 1: Numbers and Tones"
+    },
+    {
+        "id": 40,
+        "english": "Fifteen / 15",
+        "hanzi": "十五",
+        "pinyin": "shí wǔ",
+        "trees": "(r)s2 woo3",
+        "anchor": "15",
+        "chapter": "Ch. 1: Numbers and Tones"
+    },
+    {
+        "id": 41,
+        "english": "Friend",
+        "hanzi": "朋友",
+        "pinyin": "péng yǒu",
+        "trees": "per-ng2 yoh3",
+        "anchor": "15",
+        "chapter": "Ch. 1: Numbers and Tones"
+    },
+    {
+        "id": 42,
+        "english": "Accompany Me",
+        "hanzi": "陪我",
+        "pinyin": "péi wǒ",
+        "trees": "pay2 wer3",
+        "anchor": "15",
+        "chapter": "Ch. 1: Numbers and Tones"
+    },
+    {
+        "id": 43,
+        "english": "Explore / Sightseeing",
+        "hanzi": "遊覽",
+        "pinyin": "yóu lǎn",
+        "trees": "yoh2 lan3",
+        "anchor": "15",
+        "chapter": "Ch. 1: Numbers and Tones"
+    },
+    {
+        "id": 44,
+        "english": "Magnificent",
+        "hanzi": "宏偉",
+        "pinyin": "hóng wěi",
+        "trees": "her-oong2 way3",
+        "anchor": "15",
+        "chapter": "Ch. 1: Numbers and Tones"
+    },
+    {
+        "id": 45,
+        "english": "Bamboo Sea",
+        "hanzi": "竹海",
+        "pinyin": "zhú hǎi",
+        "trees": "(r)dsoo2 hie3",
+        "anchor": "15",
+        "chapter": "Ch. 1: Numbers and Tones"
+    },
+    {
+        "id": 46,
+        "english": "Elder brother",
+        "hanzi": "哥哥",
+        "pinyin": "gē ge",
+        "trees": "ger ger",
+        "anchor": "*, * (Natural)",
+        "chapter": "Ch. 1: Reading Guide Summary"
+    },
+    {
+        "id": 47,
+        "english": "A / An / One piece",
+        "hanzi": "一個",
+        "pinyin": "yí gè",
+        "trees": "ee2 ger4",
+        "anchor": "12",
+        "chapter": "Ch. 2: Word Order & Practical Examples"
+    },
+    {
+        "id": 48,
+        "english": "Measure word (general)",
+        "hanzi": "個",
+        "pinyin": "gè",
+        "trees": "ger4",
+        "anchor": "4",
+        "chapter": "Ch. 2: Word Order & Practical Examples"
+    },
+    {
+        "id": 49,
+        "english": "A cup of",
+        "hanzi": "一杯",
+        "pinyin": "yì bēi",
+        "trees": "ee4 bay",
+        "anchor": "4, *",
+        "chapter": "Ch. 2: Word Order & Practical Examples"
+    },
+    {
+        "id": 50,
+        "english": "Was / Is / Am / Are",
+        "hanzi": "是",
+        "pinyin": "shì",
+        "trees": "(r)s4",
+        "anchor": "4",
+        "chapter": "Ch. 2: Word Order & Practical Examples"
+    },
+    {
+        "id": 51,
+        "english": "Yes",
+        "hanzi": "是",
+        "pinyin": "shì",
+        "trees": "(r)s4",
+        "anchor": "4",
+        "chapter": "Ch. 2: Word Order & Practical Examples"
+    },
+    {
+        "id": 52,
+        "english": "This",
+        "hanzi": "這",
+        "pinyin": "zhè",
+        "trees": "(r)dser4",
+        "anchor": "4",
+        "chapter": "Ch. 2: Word Order & Practical Examples"
+    },
+    {
+        "id": 53,
+        "english": "Bag",
+        "hanzi": "包",
+        "pinyin": "bāo",
+        "trees": "baw",
+        "anchor": "1",
+        "chapter": "Ch. 2: Word Order & Practical Examples"
+    },
+    {
+        "id": 54,
+        "english": "Your / Yours",
+        "hanzi": "你的",
+        "pinyin": "nǐ de",
+        "trees": "nee3 der",
+        "anchor": "9, *",
+        "chapter": "Ch. 2: Word Order & Practical Examples"
+    },
+    {
+        "id": 55,
+        "english": "No / Not",
+        "hanzi": "不",
+        "pinyin": "bù",
+        "trees": "boo4",
+        "anchor": "6 / 4",
+        "chapter": "Ch. 2: Word Order & Practical Examples"
+    },
+    {
+        "id": 56,
+        "english": "Question particle",
+        "hanzi": "嗎",
+        "pinyin": "ma",
+        "trees": "mah",
+        "anchor": "*",
+        "chapter": "Ch. 2: Word Order & Practical Examples"
+    },
+    {
+        "id": 57,
+        "english": "Be Not",
+        "hanzi": "不是",
+        "pinyin": "bú shì",
+        "trees": "boo2 (r)s4",
+        "anchor": "12 / 10,4",
+        "chapter": "Ch. 2: Word Order & Practical Examples"
+    },
+    {
+        "id": 58,
+        "english": "My / Mine",
+        "hanzi": "我的",
+        "pinyin": "wǒ de",
+        "trees": "wer3 der",
+        "anchor": "5, *",
+        "chapter": "Ch. 2: Word Order & Practical Examples"
+    },
+    {
+        "id": 59,
+        "english": "Have / Has / There be",
+        "hanzi": "有",
+        "pinyin": "yǒu",
+        "trees": "yoh3",
+        "anchor": "5, 9",
+        "chapter": "Ch. 2: Word Order & Practical Examples"
+    },
+    {
+        "id": 60,
+        "english": "Near / Nearby",
+        "hanzi": "附近",
+        "pinyin": "fù jìn",
+        "trees": "foo4 jeen4",
+        "anchor": "4, 4",
+        "chapter": "Ch. 2: Word Order & Practical Examples"
+    },
+    {
+        "id": 61,
+        "english": "Restroom",
+        "hanzi": "洗手間",
+        "pinyin": "xǐ shǒu jiān",
+        "trees": "see3 (r)soh3 jeean",
+        "anchor": "5, 5, *",
+        "chapter": "Ch. 2: Word Order & Practical Examples"
+    },
+    {
+        "id": 62,
+        "english": "Wash",
+        "hanzi": "洗",
+        "pinyin": "xǐ",
+        "trees": "see3",
+        "anchor": "5",
+        "chapter": "Ch. 2: Word Order & Practical Examples"
+    },
+    {
+        "id": 63,
+        "english": "Hand",
+        "hanzi": "手",
+        "pinyin": "shǒu",
+        "trees": "(r)soh3",
+        "anchor": "5",
+        "chapter": "Ch. 2: Word Order & Practical Examples"
+    },
+    {
+        "id": 64,
+        "english": "Room",
+        "hanzi": "房間",
+        "pinyin": "fáng jiān",
+        "trees": "fang2 jeean",
+        "anchor": "10, *",
+        "chapter": "Ch. 2: Word Order & Practical Examples"
+    },
+    {
+        "id": 65,
+        "english": "Room (suffix)",
+        "hanzi": "室",
+        "pinyin": "shì",
+        "trees": "(r)s4",
+        "anchor": "4",
+        "chapter": "Ch. 2: Word Order & Practical Examples"
+    },
+    {
+        "id": 66,
+        "english": "Bedroom",
+        "hanzi": "臥室",
+        "pinyin": "wò shì",
+        "trees": "wer4 (r)s4",
+        "anchor": "4, 4",
+        "chapter": "Ch. 2: Word Order & Practical Examples"
+    },
+    {
+        "id": 67,
+        "english": "Classroom",
+        "hanzi": "教室",
+        "pinyin": "jiào shì",
+        "trees": "jeeaw4 (r)s4",
+        "anchor": "4, 4",
+        "chapter": "Ch. 2: Word Order & Practical Examples"
+    },
+    {
+        "id": 68,
+        "english": "WeChat",
+        "hanzi": "微信",
+        "pinyin": "wēi xìn",
+        "trees": "way seen4",
+        "anchor": "*, 4",
+        "chapter": "Ch. 2: Word Order & Practical Examples"
+    },
+    {
+        "id": 69,
+        "english": "What",
+        "hanzi": "什麼",
+        "pinyin": "shén me",
+        "trees": "(r)ser-n2 mer",
+        "anchor": "10, *",
+        "chapter": "Ch. 2: Word Order & Practical Examples"
+    },
+    {
+        "id": 70,
+        "english": "To Drink",
+        "hanzi": "喝",
+        "pinyin": "hē",
+        "trees": "her",
+        "anchor": "*",
+        "chapter": "Ch. 2: Word Order & Practical Examples"
+    },
+    {
+        "id": 71,
+        "english": "Coffee",
+        "hanzi": "咖啡",
+        "pinyin": "kā fēi",
+        "trees": "kah fay",
+        "anchor": "*, *",
+        "chapter": "Ch. 2: Word Order & Practical Examples"
+    },
+    {
+        "id": 72,
+        "english": "Like / Love",
+        "hanzi": "喜歡",
+        "pinyin": "xǐ huān",
+        "trees": "see3 hooan",
+        "anchor": "5, *",
+        "chapter": "Ch. 2: Word Order & Practical Examples"
+    },
+    {
+        "id": 73,
+        "english": "Very / Very Much",
+        "hanzi": "很",
+        "pinyin": "hěn",
+        "trees": "hen3",
+        "anchor": "5",
+        "chapter": "Ch. 2: Word Order & Practical Examples"
+    },
+    {
+        "id": 74,
+        "english": "Very Good",
+        "hanzi": "很好",
+        "pinyin": "hěn hǎo",
+        "trees": "hen3 haw3",
+        "anchor": "5, 9",
+        "chapter": "Ch. 2: Word Order & Practical Examples"
+    },
+    {
+        "id": 75,
+        "english": "Watch / Read / Look at",
+        "hanzi": "看",
+        "pinyin": "kàn",
+        "trees": "kan4",
+        "anchor": "4",
+        "chapter": "Ch. 3: Train to Beijing"
+    },
+    {
+        "id": 76,
+        "english": "Be + -ing (continuous)",
+        "hanzi": "在",
+        "pinyin": "zài",
+        "trees": "dsie4",
+        "anchor": "4",
+        "chapter": "Ch. 3: Train to Beijing"
+    },
+    {
+        "id": 77,
+        "english": "Modal particle (wh-questions)",
+        "hanzi": "呢",
+        "pinyin": "ne",
+        "trees": "ner",
+        "anchor": "*",
+        "chapter": "Ch. 3: Train to Beijing"
+    },
+    {
+        "id": 78,
+        "english": "Beijing",
+        "hanzi": "北京",
+        "pinyin": "běi jīng",
+        "trees": "bay3 jing",
+        "anchor": "5, * / 9, *",
+        "chapter": "Ch. 3: Train to Beijing"
+    },
+    {
+        "id": 79,
+        "english": "Video",
+        "hanzi": "視頻",
+        "pinyin": "shì pín",
+        "trees": "(r)s4 pin2",
+        "anchor": "4, 10",
+        "chapter": "Ch. 3: Train to Beijing"
+    },
+    {
+        "id": 80,
+        "english": "Go / To go to",
+        "hanzi": "去",
+        "pinyin": "qù",
+        "trees": "tsee(oo)4",
+        "anchor": "4",
+        "chapter": "Ch. 3: Train to Beijing"
+    },
+    {
+        "id": 81,
+        "english": "Have been to",
+        "hanzi": "去過",
+        "pinyin": "qù guo",
+        "trees": "tsee(oo)4 gooer",
+        "anchor": "4, *",
+        "chapter": "Ch. 3: Train to Beijing"
+    },
+    {
+        "id": 82,
+        "english": "Past experience particle",
+        "hanzi": "過",
+        "pinyin": "guo",
+        "trees": "gooer",
+        "anchor": "*",
+        "chapter": "Ch. 3: Train to Beijing"
+    },
+    {
+        "id": 83,
+        "english": "Completed action particle",
+        "hanzi": "了",
+        "pinyin": "le",
+        "trees": "Ler",
+        "anchor": "*",
+        "chapter": "Ch. 3: Train to Beijing"
+    },
+    {
+        "id": 84,
+        "english": "Time",
+        "hanzi": "時候",
+        "pinyin": "shí hou",
+        "trees": "(r)s2 hoh",
+        "anchor": "10, *",
+        "chapter": "Ch. 3: Train to Beijing"
+    },
+    {
+        "id": 85,
+        "english": "Yesterday",
+        "hanzi": "昨天",
+        "pinyin": "zuó tiān",
+        "trees": "Dsooer2 teean",
+        "anchor": "10, *",
+        "chapter": "Ch. 3: Train to Beijing"
+    },
+    {
+        "id": 86,
+        "english": "Will / Want / Be going to",
+        "hanzi": "要",
+        "pinyin": "yào",
+        "trees": "yaw4",
+        "anchor": "4",
+        "chapter": "Ch. 3: Train to Beijing"
+    },
+    {
+        "id": 87,
+        "english": "Should’ve",
+        "hanzi": "本應",
+        "pinyin": "běn yīng",
+        "trees": "ber-n3 ying",
+        "anchor": "5, *",
+        "chapter": "Ch. 3: Train to Beijing"
+    },
+    {
+        "id": 88,
+        "english": "(Be) in / at",
+        "hanzi": "在",
+        "pinyin": "zài",
+        "trees": "dsie4",
+        "anchor": "4",
+        "chapter": "Ch. 3: Train to Beijing"
+    },
+    {
+        "id": 89,
+        "english": "Sit",
+        "hanzi": "坐",
+        "pinyin": "zuò",
+        "trees": "dsooer4",
+        "anchor": "4",
+        "chapter": "Ch. 4: Cute Girl (Small Talk)"
+    },
+    {
+        "id": 90,
+        "english": "Here",
+        "hanzi": "這兒",
+        "pinyin": "zhè'er",
+        "trees": "(r)dser4 (uh)-er",
+        "anchor": "4, *",
+        "chapter": "Ch. 4: Cute Girl (Small Talk)"
+    },
+    {
+        "id": 91,
+        "english": "Spoken suffix",
+        "hanzi": "兒",
+        "pinyin": "er",
+        "trees": "(uh)-er",
+        "anchor": "10",
+        "chapter": "Ch. 4: Cute Girl (Small Talk)"
+    },
+    {
+        "id": 92,
+        "english": "So / Too / Very",
+        "hanzi": "真",
+        "pinyin": "zhēn",
+        "trees": "(r)dser-n",
+        "anchor": "*",
+        "chapter": "Ch. 4: Cute Girl (Small Talk)"
+    },
+    {
+        "id": 93,
+        "english": "Cute",
+        "hanzi": "可愛",
+        "pinyin": "kě ài",
+        "trees": "ker3 ie4",
+        "anchor": "5, 6",
+        "chapter": "Ch. 4: Cute Girl (Small Talk)"
+    },
+    {
+        "id": 94,
+        "english": "How (degree)",
+        "hanzi": "多",
+        "pinyin": "duō",
+        "trees": "dooer",
+        "anchor": "*",
+        "chapter": "Ch. 4: Cute Girl (Small Talk)"
+    },
+    {
+        "id": 95,
+        "english": "Old / Big (age)",
+        "hanzi": "大",
+        "pinyin": "dà",
+        "trees": "dah4",
+        "anchor": "4 / 6",
+        "chapter": "Ch. 4: Cute Girl (Small Talk)"
+    },
+    {
+        "id": 96,
+        "english": "Old (elderly)",
+        "hanzi": "老",
+        "pinyin": "lǎo",
+        "trees": "Law3",
+        "anchor": "9, 5",
+        "chapter": "Ch. 4: Cute Girl (Small Talk)"
+    },
+    {
+        "id": 97,
+        "english": "Used / Old",
+        "hanzi": "舊",
+        "pinyin": "jiù",
+        "trees": "jeeoo4",
+        "anchor": "4",
+        "chapter": "Ch. 4: Cute Girl (Small Talk)"
+    },
+    {
+        "id": 98,
+        "english": "Year (of age)",
+        "hanzi": "歲",
+        "pinyin": "suì",
+        "trees": "sooay4",
+        "anchor": "4",
+        "chapter": "Ch. 4: Cute Girl (Small Talk)"
+    },
+    {
+        "id": 99,
+        "english": "Year (calendar)",
+        "hanzi": "年",
+        "pinyin": "nián",
+        "trees": "neean2",
+        "anchor": "10",
+        "chapter": "Ch. 4: Cute Girl (Small Talk)"
+    },
+    {
+        "id": 100,
+        "english": "Happy",
+        "hanzi": "快樂",
+        "pinyin": "kuài lè",
+        "trees": "kooie4 Ler4",
+        "anchor": "4, 4",
+        "chapter": "Ch. 4: Cute Girl (Small Talk)"
+    },
+    {
+        "id": 101,
+        "english": "New",
+        "hanzi": "新",
+        "pinyin": "xīn",
+        "trees": "seen",
+        "anchor": "*",
+        "chapter": "Ch. 4: Cute Girl (Small Talk)"
+    },
+    {
+        "id": 102,
+        "english": "Happy New Year!",
+        "hanzi": "新年快樂",
+        "pinyin": "xīn nián kuài lè",
+        "trees": "seen neean2 kooie4 Ler4",
+        "anchor": "*, 10, 4, 4",
+        "chapter": "Ch. 4: Cute Girl (Small Talk)"
+    },
+    {
+        "id": 103,
+        "english": "Cake",
+        "hanzi": "蛋糕",
+        "pinyin": "dàn gāo",
+        "trees": "dan4 gaw",
+        "anchor": "4, *",
+        "chapter": "Ch. 4: Cute Girl (Small Talk)"
+    },
+    {
+        "id": 104,
+        "english": "Yummy",
+        "hanzi": "好吃",
+        "pinyin": "hǎo chī",
+        "trees": "haw3 (r)ts",
+        "anchor": "5, *",
+        "chapter": "Ch. 4: Cute Girl (Small Talk)"
+    },
+    {
+        "id": 105,
+        "english": "Eat / To eat",
+        "hanzi": "吃",
+        "pinyin": "chī",
+        "trees": "(r)ts",
+        "anchor": "*",
+        "chapter": "Ch. 4: Cute Girl (Small Talk)"
+    },
+    {
+        "id": 106,
+        "english": "Where (alternative)",
+        "hanzi": "哪兒",
+        "pinyin": "nǎ'er",
+        "trees": "nah3 (uh)-er",
+        "anchor": "5, *",
+        "chapter": "Ch. 4: Cute Girl (Small Talk)"
+    },
+    {
+        "id": 107,
+        "english": "The Forbidden City",
+        "hanzi": "故宮",
+        "pinyin": "gù gōng",
+        "trees": "goo4 ger-oong",
+        "anchor": "4, *",
+        "chapter": "Ch. 4: Cute Girl (Small Talk)"
+    },
+    {
+        "id": 108,
+        "english": "How",
+        "hanzi": "怎麼",
+        "pinyin": "zěn me",
+        "trees": "dser-n3 mer",
+        "anchor": "5, *",
+        "chapter": "Ch. 4: Cute Girl (Small Talk)"
+    },
+    {
+        "id": 109,
+        "english": "There",
+        "hanzi": "那裡",
+        "pinyin": "nà lǐ",
+        "trees": "nah4 Lee3",
+        "anchor": "4, 5",
+        "chapter": "Ch. 4: Cute Girl (Small Talk)"
+    },
+    {
+        "id": 110,
+        "english": "There (alternative)",
+        "hanzi": "那兒",
+        "pinyin": "nà'er",
+        "trees": "nah4 (uh)-er",
+        "anchor": "4, *",
+        "chapter": "Ch. 4: Cute Girl (Small Talk)"
+    },
+    {
+        "id": 111,
+        "english": "Place (suffix)",
+        "hanzi": "裡",
+        "pinyin": "lǐ",
+        "trees": "Lee3",
+        "anchor": "5",
+        "chapter": "Ch. 4: Cute Girl (Small Talk)"
+    },
+    {
+        "id": 112,
+        "english": "Bruce Lee",
+        "hanzi": "李小龍",
+        "pinyin": "Lǐ Xiǎolóng",
+        "trees": "Lee3 seeaw3 Ler-oong2",
+        "anchor": "9, 9, 10",
+        "chapter": "Ch. 4: Cute Girl (Small Talk)"
+    },
+    {
+        "id": 113,
+        "english": "Little / Small",
+        "hanzi": "小",
+        "pinyin": "xiǎo",
+        "trees": "seeaw3",
+        "anchor": "5 / 9",
+        "chapter": "Ch. 4: Cute Girl (Small Talk)"
+    },
+    {
+        "id": 114,
+        "english": "A little / A few / Less",
+        "hanzi": "少",
+        "pinyin": "shǎo",
+        "trees": "(r)saw3",
+        "anchor": "5",
+        "chapter": "Ch. 4: Cute Girl (Small Talk)"
+    },
+    {
+        "id": 115,
+        "english": "Loong / Dragon",
+        "hanzi": "龍",
+        "pinyin": "lóng",
+        "trees": "Ler-oong2",
+        "anchor": "10",
+        "chapter": "Ch. 4: Cute Girl (Small Talk)"
+    },
+    {
+        "id": 116,
+        "english": "How much / How many",
+        "hanzi": "多少",
+        "pinyin": "duō shǎo",
+        "trees": "dooer (r)saw3",
+        "anchor": "*, 5",
+        "chapter": "Ch. 5: Forbidden City"
+    },
+    {
+        "id": 117,
+        "english": "Money",
+        "hanzi": "錢",
+        "pinyin": "qián",
+        "trees": "tseean2",
+        "anchor": "10",
+        "chapter": "Ch. 5: Forbidden City"
+    },
+    {
+        "id": 118,
+        "english": "Ticket",
+        "hanzi": "門票",
+        "pinyin": "mén piào",
+        "trees": "mer-n2 peeaw4",
+        "anchor": "12",
+        "chapter": "Ch. 5: Forbidden City"
+    },
+    {
+        "id": 119,
+        "english": "Gate / Door",
+        "hanzi": "門",
+        "pinyin": "mén",
+        "trees": "mer-n2",
+        "anchor": "10",
+        "chapter": "Ch. 5: Forbidden City"
+    },
+    {
+        "id": 120,
+        "english": "Plural suffix for people",
+        "hanzi": "們",
+        "pinyin": "men",
+        "trees": "mer-n",
+        "anchor": "*",
+        "chapter": "Ch. 5: Forbidden City"
+    },
+    {
+        "id": 121,
+        "english": "Grab / Snatch / Scramble",
+        "hanzi": "搶",
+        "pinyin": "qiǎng",
+        "trees": "tseeang3",
+        "anchor": "5",
+        "chapter": "Ch. 5: Forbidden City"
+    },
+    {
+        "id": 122,
+        "english": "Ahead / In advance",
+        "hanzi": "提前",
+        "pinyin": "tí qián",
+        "trees": "tee2 tseean2",
+        "anchor": "10, 10",
+        "chapter": "Ch. 5: Forbidden City"
+    },
+    {
+        "id": 123,
+        "english": "In the morning",
+        "hanzi": "早上",
+        "pinyin": "zǎo shang",
+        "trees": "dsaw3 (r)sang4",
+        "anchor": "5, 6",
+        "chapter": "Ch. 5: Forbidden City"
+    },
+    {
+        "id": 124,
+        "english": "Mini-program",
+        "hanzi": "小程序",
+        "pinyin": "xiǎo chéng xù",
+        "trees": "seeaw3 (r)tser-ng2 see(oo)4",
+        "anchor": "5, 12",
+        "chapter": "Ch. 5: Forbidden City"
+    },
+    {
+        "id": 125,
+        "english": "Program / Procedure / Process",
+        "hanzi": "程序",
+        "pinyin": "chéng xù",
+        "trees": "(r)tser-ng2 see(oo)4",
+        "anchor": "12",
+        "chapter": "Ch. 5: Forbidden City"
+    },
+    {
+        "id": 126,
+        "english": "Tourist",
+        "hanzi": "遊客",
+        "pinyin": "yóu kè",
+        "trees": "yoh2 ker4",
+        "anchor": "12",
+        "chapter": "Ch. 5: Forbidden City"
+    },
+    {
+        "id": 127,
+        "english": "Exclamation particle",
+        "hanzi": "啊",
+        "pinyin": "a",
+        "trees": "Ah",
+        "anchor": "*",
+        "chapter": "Ch. 5: Forbidden City"
+    },
+    {
+        "id": 128,
+        "english": "Hot",
+        "hanzi": "熱",
+        "pinyin": "rè",
+        "trees": "(r)ther4",
+        "anchor": "4",
+        "chapter": "Ch. 5: Forbidden City"
+    },
+    {
+        "id": 129,
+        "english": "Line up",
+        "hanzi": "排隊",
+        "pinyin": "pái duì",
+        "trees": "pie2 dooay4",
+        "anchor": "12",
+        "chapter": "Ch. 5: Forbidden City"
+    },
+    {
+        "id": 130,
+        "english": "Very / Very much (adj)",
+        "hanzi": "非常",
+        "pinyin": "fēi cháng",
+        "trees": "fay tsang2",
+        "anchor": "8, 10",
+        "chapter": "Ch. 5: Forbidden City"
+    },
+    {
+        "id": 131,
+        "english": "Ming Dynasty",
+        "hanzi": "明代",
+        "pinyin": "míng dài",
+        "trees": "ming2 die4",
+        "anchor": "12",
+        "chapter": "Ch. 5: Forbidden City"
+    },
+    {
+        "id": 132,
+        "english": "And",
+        "hanzi": "和",
+        "pinyin": "hé",
+        "trees": "her2",
+        "anchor": "10",
+        "chapter": "Ch. 5: Forbidden City"
+    },
+    {
+        "id": 133,
+        "english": "Qing Dynasty",
+        "hanzi": "清代",
+        "pinyin": "qīng dài",
+        "trees": "tsing die4",
+        "anchor": "*, 4",
+        "chapter": "Ch. 5: Forbidden City"
+    },
+    {
+        "id": 134,
+        "english": "of",
+        "hanzi": "的",
+        "pinyin": "de",
+        "trees": "der",
+        "anchor": "*",
+        "chapter": "Ch. 5: Forbidden City"
+    },
+    {
+        "id": 135,
+        "english": "Polite measure word for people",
+        "hanzi": "位",
+        "pinyin": "wèi",
+        "trees": "way4",
+        "anchor": "4",
+        "chapter": "Ch. 5: Forbidden City"
+    },
+    {
+        "id": 136,
+        "english": "How many (people)",
+        "hanzi": "幾位",
+        "pinyin": "jǐ wèi",
+        "trees": "jee3 way4",
+        "anchor": "5, 4",
+        "chapter": "Ch. 5: Forbidden City"
+    },
+    {
+        "id": 137,
+        "english": "Emperor",
+        "hanzi": "皇帝",
+        "pinyin": "huáng dì",
+        "trees": "hooang2 dee4",
+        "anchor": "12",
+        "chapter": "Ch. 5: Forbidden City"
+    },
+    {
+        "id": 138,
+        "english": "Power",
+        "hanzi": "權利",
+        "pinyin": "quán lì",
+        "trees": "tsee(oo)an2 Lee4",
+        "anchor": "12",
+        "chapter": "Ch. 5: Forbidden City"
+    },
+    {
+        "id": 139,
+        "english": "Center",
+        "hanzi": "中心",
+        "pinyin": "zhōng xīn",
+        "trees": "(r)dser-oong seen",
+        "anchor": "*, *",
+        "chapter": "Ch. 5: Forbidden City"
+    },
+    {
+        "id": 140,
+        "english": "The Hall of Supreme Harmony",
+        "hanzi": "太和殿",
+        "pinyin": "tài hé diàn",
+        "trees": "tie4 her2 deean4",
+        "anchor": "4, 10, 4",
+        "chapter": "Ch. 5: Forbidden City"
+    },
+    {
+        "id": 141,
+        "english": "The Throne of the Emperor",
+        "hanzi": "龍椅",
+        "pinyin": "lóng yǐ",
+        "trees": "Ler-oong2 ee3",
+        "anchor": "10, 5",
+        "chapter": "Ch. 5: Forbidden City"
+    },
+    {
+        "id": 142,
+        "english": "Chair",
+        "hanzi": "椅子",
+        "pinyin": "yǐ zi",
+        "trees": "ee3 ds",
+        "anchor": "5, *",
+        "chapter": "Ch. 5: Forbidden City"
+    },
+    {
+        "id": 143,
+        "english": "The Imperial Dragon Robe",
+        "hanzi": "龍袍",
+        "pinyin": "lóng páo",
+        "trees": "Ler-oong2 paw2",
+        "anchor": "10, 10",
+        "chapter": "Ch. 5: Forbidden City"
+    },
+    {
+        "id": 144,
+        "english": "The Meridian Gate",
+        "hanzi": "午門",
+        "pinyin": "wǔ mén",
+        "trees": "woo3 mer-n2",
+        "anchor": "9, 10",
+        "chapter": "Ch. 5: Forbidden City"
+    },
+    {
+        "id": 145,
+        "english": "Help",
+        "hanzi": "幫",
+        "pinyin": "bāng",
+        "trees": "bang",
+        "anchor": "*",
+        "chapter": "Ch. 5: Forbidden City"
+    },
+    {
+        "id": 146,
+        "english": "Take a Picture",
+        "hanzi": "拍照",
+        "pinyin": "pāi zhào",
+        "trees": "pie (r)dsaw4",
+        "anchor": "*, 4 / *, 2",
+        "chapter": "Ch. 5: Forbidden City"
+    },
+    {
+        "id": 147,
+        "english": "Chopsticks",
+        "hanzi": "筷子",
+        "pinyin": "kuài zi",
+        "trees": "kooie4 ds",
+        "anchor": "4, *",
+        "chapter": "Ch. 5: Forbidden City"
+    },
+    {
+        "id": 148,
+        "english": "Fan",
+        "hanzi": "扇子",
+        "pinyin": "shàn zi",
+        "trees": "(r)san4 ds",
+        "anchor": "4, *",
+        "chapter": "Ch. 5: Forbidden City"
+    },
+    {
+        "id": 149,
+        "english": "Electric Fan",
+        "hanzi": "電扇",
+        "pinyin": "diàn shàn",
+        "trees": "deean4 (r)san4",
+        "anchor": "4, 4",
+        "chapter": "Ch. 5: Forbidden City"
+    },
+    {
+        "id": 150,
+        "english": "Qianmen",
+        "hanzi": "前門",
+        "pinyin": "qián mén",
+        "trees": "tseean2 mer-n2",
+        "anchor": "10, 10",
+        "chapter": "Ch. 6: Qianmen Cuisine"
+    },
+    {
+        "id": 151,
+        "english": "Cuisine",
+        "hanzi": "美食",
+        "pinyin": "měi shí",
+        "trees": "may3 (r)s2",
+        "anchor": "9, 10",
+        "chapter": "Ch. 6: Qianmen Cuisine"
+    },
+    {
+        "id": 152,
+        "english": "Quanjude Roast Duck Restaurant",
+        "hanzi": "全聚德烤鴨店",
+        "pinyin": "quán jù dé kǎo yā diàn",
+        "trees": "tsee(oo)an2 jee(oo)4 der2 kaw3 yah deean4",
+        "anchor": "10, 2, 10, 5, *, 4",
+        "chapter": "Ch. 6: Qianmen Cuisine"
+    },
+    {
+        "id": 153,
+        "english": "Whole",
+        "hanzi": "全",
+        "pinyin": "quán",
+        "trees": "tsee(oo)an2",
+        "anchor": "10",
+        "chapter": "Ch. 6: Qianmen Cuisine"
+    },
+    {
+        "id": 154,
+        "english": "Gathering",
+        "hanzi": "聚",
+        "pinyin": "jù",
+        "trees": "jee(oo)4",
+        "anchor": "4 / 2",
+        "chapter": "Ch. 6: Qianmen Cuisine"
+    },
+    {
+        "id": 155,
+        "english": "Ethics / Morality",
+        "hanzi": "德",
+        "pinyin": "dé",
+        "trees": "der2",
+        "anchor": "10",
+        "chapter": "Ch. 6: Qianmen Cuisine"
+    },
+    {
+        "id": 156,
+        "english": "Family",
+        "hanzi": "家",
+        "pinyin": "jiā",
+        "trees": "jeeah",
+        "anchor": "*",
+        "chapter": "Ch. 6: Qianmen Cuisine"
+    },
+    {
+        "id": 157,
+        "english": "Happiness",
+        "hanzi": "幸福",
+        "pinyin": "xìng fú",
+        "trees": "sing4 foo2",
+        "anchor": "4, 10",
+        "chapter": "Ch. 6: Qianmen Cuisine"
+    },
+    {
+        "id": 158,
+        "english": "Roast Duck",
+        "hanzi": "烤鴨",
+        "pinyin": "kǎo yā",
+        "trees": "kaw3 yah",
+        "anchor": "5, *",
+        "chapter": "Ch. 6: Qianmen Cuisine"
+    },
+    {
+        "id": 159,
+        "english": "Restaurant",
+        "hanzi": "飯店",
+        "pinyin": "fàn diàn",
+        "trees": "fan4 deean4",
+        "anchor": "4, 4",
+        "chapter": "Ch. 6: Qianmen Cuisine"
+    },
+    {
+        "id": 160,
+        "english": "Shop / Store",
+        "hanzi": "店",
+        "pinyin": "diàn",
+        "trees": "deean4",
+        "anchor": "4",
+        "chapter": "Ch. 6: Qianmen Cuisine"
+    },
+    {
+        "id": 161,
+        "english": "Humble Restaurant / Hall",
+        "hanzi": "馆",
+        "pinyin": "guǎn",
+        "trees": "gooan3",
+        "anchor": "5",
+        "chapter": "Ch. 6: Qianmen Cuisine"
+    },
+    {
+        "id": 162,
+        "english": "Donglaishun Mutton Restaurant",
+        "hanzi": "东来顺羊肉馆",
+        "pinyin": "dōng lái shùn yáng ròu guǎn",
+        "trees": "der-oong Lie2 soon4 yang2 (r)thoh4 gooan3",
+        "anchor": "*, 10, 2, 12, 5",
+        "chapter": "Ch. 6: Qianmen Cuisine"
+    },
+    {
+        "id": 163,
+        "english": "Mutton",
+        "hanzi": "羊肉",
+        "pinyin": "yáng ròu",
+        "trees": "yang2 (r)thoh4",
+        "anchor": "12",
+        "chapter": "Ch. 6: Qianmen Cuisine"
+    },
+    {
+        "id": 164,
+        "english": "East",
+        "hanzi": "东",
+        "pinyin": "dōng",
+        "trees": "der-oong",
+        "anchor": "*",
+        "chapter": "Ch. 6: Qianmen Cuisine"
+    },
+    {
+        "id": 165,
+        "english": "Come",
+        "hanzi": "来",
+        "pinyin": "lái",
+        "trees": "Lie2",
+        "anchor": "10",
+        "chapter": "Ch. 6: Qianmen Cuisine"
+    },
+    {
+        "id": 166,
+        "english": "Smoothly",
+        "hanzi": "順利",
+        "pinyin": "shùn lì",
+        "trees": "soon4 Lee4",
+        "anchor": "4, 4",
+        "chapter": "Ch. 6: Qianmen Cuisine"
+    },
+    {
+        "id": 167,
+        "english": "Everything",
+        "hanzi": "事事",
+        "pinyin": "shì shì",
+        "trees": "(r)s4 (r)s4",
+        "anchor": "4, 4",
+        "chapter": "Ch. 6: Qianmen Cuisine"
+    },
+    {
+        "id": 168,
+        "english": "Long",
+        "hanzi": "長",
+        "pinyin": "cháng",
+        "trees": "(r)tsang2",
+        "anchor": "10",
+        "chapter": "Ch. 7: The Great Wall"
+    },
+    {
+        "id": 169,
+        "english": "Wall",
+        "hanzi": "城牆",
+        "pinyin": "chéng qiáng",
+        "trees": "(r)tser-ng2 tseeang2",
+        "anchor": "10, 10",
+        "chapter": "Ch. 7: The Great Wall"
+    },
+    {
+        "id": 170,
+        "english": "Badaling Great Wall",
+        "hanzi": "八達嶺長城",
+        "pinyin": "bā dá lǐng cháng chéng",
+        "trees": "bah dah2 Ling3 (r)tsang2 (r)tser-ng2",
+        "anchor": "*, 15, 10, 10",
+        "chapter": "Ch. 7: The Great Wall"
+    },
+    {
+        "id": 171,
+        "english": "History",
+        "hanzi": "歷史",
+        "pinyin": "lì shǐ",
+        "trees": "Lee4 (r)s3",
+        "anchor": "4, 5",
+        "chapter": "Ch. 7: The Great Wall"
+    },
+    {
+        "id": 172,
+        "english": "Autumn / Fall",
+        "hanzi": "秋天",
+        "pinyin": "qiū tiān",
+        "trees": "tseeoh (teean)",
+        "anchor": "*, *",
+        "chapter": "Ch. 7: The Great Wall"
+    },
+    {
+        "id": 173,
+        "english": "High / Tall",
+        "hanzi": "高",
+        "pinyin": "gāo",
+        "trees": "gaw",
+        "anchor": "*",
+        "chapter": "Ch. 7: The Great Wall"
+    },
+    {
+        "id": 174,
+        "english": "Air",
+        "hanzi": "空氣",
+        "pinyin": "kōng qì",
+        "trees": "(ker-oong) tsee4",
+        "anchor": "*, 4",
+        "chapter": "Ch. 7: The Great Wall"
+    },
+    {
+        "id": 175,
+        "english": "Crisp (weather)",
+        "hanzi": "爽",
+        "pinyin": "shuǎng",
+        "trees": "(r)sooang3",
+        "anchor": "5",
+        "chapter": "Ch. 7: The Great Wall"
+    },
+    {
+        "id": 176,
+        "english": "Crisp (texture)",
+        "hanzi": "脆",
+        "pinyin": "cuì",
+        "trees": "tsooay4",
+        "anchor": "*",
+        "chapter": "Ch. 7: The Great Wall"
+    },
+    {
+        "id": 177,
+        "english": "Full / Satisfied",
+        "hanzi": "滿",
+        "pinyin": "mǎn",
+        "trees": "man3",
+        "anchor": "5",
+        "chapter": "Ch. 7: The Great Wall"
+    },
+    {
+        "id": 178,
+        "english": "Full (of food)",
+        "hanzi": "飽",
+        "pinyin": "bǎo",
+        "trees": "baw3",
+        "anchor": "5",
+        "chapter": "Ch. 7: The Great Wall"
+    },
+    {
+        "id": 179,
+        "english": "Mountain",
+        "hanzi": "山",
+        "pinyin": "shān",
+        "trees": "(r)san",
+        "anchor": "*",
+        "chapter": "Ch. 7: The Great Wall"
+    },
+    {
+        "id": 180,
+        "english": "Red",
+        "hanzi": "紅色",
+        "pinyin": "hóng sè",
+        "trees": "her-oong2 (ser4)",
+        "anchor": "12",
+        "chapter": "Ch. 7: The Great Wall"
+    },
+    {
+        "id": 181,
+        "english": "Leaf",
+        "hanzi": "樹葉",
+        "pinyin": "shù yè",
+        "trees": "(r)soo4 yeeer4",
+        "anchor": "4, 4",
+        "chapter": "Ch. 7: The Great Wall"
+    },
+    {
+        "id": 182,
+        "english": "Be Like",
+        "hanzi": "像",
+        "pinyin": "xiàng",
+        "trees": "seeang4",
+        "anchor": "4",
+        "chapter": "Ch. 7: The Great Wall"
+    },
+    {
+        "id": 183,
+        "english": "Imagine",
+        "hanzi": "想像",
+        "pinyin": "xiǎng xiàng",
+        "trees": "seeang3 seeang4",
+        "anchor": "5, 6",
+        "chapter": "Ch. 7: The Great Wall"
+    },
+    {
+        "id": 184,
+        "english": "Giant",
+        "hanzi": "巨大",
+        "pinyin": "jù dà",
+        "trees": "jee(oo)4 (dah4)",
+        "anchor": "4 / 6",
+        "chapter": "Ch. 7: The Great Wall"
+    },
+    {
+        "id": 185,
+        "english": "Winding",
+        "hanzi": "蜿蜒",
+        "pinyin": "wān yán",
+        "trees": "wan yan2",
+        "anchor": "*, 10",
+        "chapter": "Ch. 7: The Great Wall"
+    },
+    {
+        "id": 186,
+        "english": "Away",
+        "hanzi": "遠去",
+        "pinyin": "yuǎn qù",
+        "trees": "yee(oo)an3 tsee(oo)4",
+        "anchor": "5, 6",
+        "chapter": "Ch. 7: The Great Wall"
+    },
+    {
+        "id": 187,
+        "english": "Everyone",
+        "hanzi": "人人",
+        "pinyin": "rén rén",
+        "trees": "(r)ther-n2 (r)ther-n2",
+        "anchor": "10, 10",
+        "chapter": "Ch. 7: The Great Wall"
+    },
+    {
+        "id": 188,
+        "english": "Everyone / All of us",
+        "hanzi": "大家",
+        "pinyin": "dà jiā",
+        "trees": "dah4 jeeah",
+        "anchor": "4, *",
+        "chapter": "Ch. 7: The Great Wall"
+    },
+    {
+        "id": 189,
+        "english": "All / Both",
+        "hanzi": "都",
+        "pinyin": "dōu",
+        "trees": "doh",
+        "anchor": "*",
+        "chapter": "Ch. 7: The Great Wall"
+    },
+    {
+        "id": 190,
+        "english": "A piece of / A sheet",
+        "hanzi": "一張",
+        "pinyin": "yì zhāng",
+        "trees": "ee4 (r)dsang",
+        "anchor": "4, *",
+        "chapter": "Ch. 7: The Great Wall"
+    },
+    {
+        "id": 191,
+        "english": "Smiling Face",
+        "hanzi": "笑臉",
+        "pinyin": "xiào liǎn",
+        "trees": "seeaw4 Leean3",
+        "anchor": "4, 5",
+        "chapter": "Ch. 7: The Great Wall"
+    },
+    {
+        "id": 192,
+        "english": "Tired",
+        "hanzi": "累",
+        "pinyin": "lèi",
+        "trees": "Lay4",
+        "anchor": "4",
+        "chapter": "Ch. 7: The Great Wall"
+    },
+    {
+        "id": 193,
+        "english": "Corridor",
+        "hanzi": "長廊",
+        "pinyin": "cháng láng",
+        "trees": "(r)tsang2 Lang2",
+        "anchor": "10, 10",
+        "chapter": "Ch. 8: Summer Palace"
+    },
+    {
+        "id": 194,
+        "english": "Carved Beams",
+        "hanzi": "雕梁",
+        "pinyin": "diāo liáng",
+        "trees": "deeaw Leeang2",
+        "anchor": "*, 10",
+        "chapter": "Ch. 8: Summer Palace"
+    },
+    {
+        "id": 195,
+        "english": "Painted Rafters",
+        "hanzi": "畫棟",
+        "pinyin": "huà dòng",
+        "trees": "hooah4 der-oong4",
+        "anchor": "4, 4",
+        "chapter": "Ch. 8: Summer Palace"
+    },
+    {
+        "id": 196,
+        "english": "Make / Cause",
+        "hanzi": "令",
+        "pinyin": "lìng",
+        "trees": "Ling4",
+        "anchor": "4",
+        "chapter": "Ch. 8: Summer Palace"
+    },
+    {
+        "id": 197,
+        "english": "Marvel / Exclaim",
+        "hanzi": "讚嘆",
+        "pinyin": "zàn tàn",
+        "trees": "dsan4 tan4",
+        "anchor": "4, 4",
+        "chapter": "Ch. 8: Summer Palace"
+    },
+    {
+        "id": 198,
+        "english": "The Rippling Waters",
+        "hanzi": "碧波蕩漾",
+        "pinyin": "bì bō dàng yàng",
+        "trees": "bee4 ber dang4 yang4",
+        "anchor": "4, *, 4, 4",
+        "chapter": "Ch. 8: Summer Palace"
+    },
+    {
+        "id": 199,
+        "english": "Wear / Put Up",
+        "hanzi": "穿",
+        "pinyin": "chuān",
+        "trees": "(r)tsooan",
+        "anchor": "*",
+        "chapter": "Ch. 8: Summer Palace"
+    },
+    {
+        "id": 200,
+        "english": "Boat / Ship",
+        "hanzi": "船",
+        "pinyin": "chuán",
+        "trees": "(r)tsooan2",
+        "anchor": "10",
+        "chapter": "Ch. 8: Summer Palace"
+    },
+    {
+        "id": 201,
+        "english": "Cruise Boats",
+        "hanzi": "游船",
+        "pinyin": "yóu chuán",
+        "trees": "yoh2 (r)tsooan2",
+        "anchor": "10, 10",
+        "chapter": "Ch. 8: Summer Palace"
+    },
+    {
+        "id": 202,
+        "english": "Shuttle back and forth",
+        "hanzi": "穿梭",
+        "pinyin": "chuān suō",
+        "trees": "(r)tsooan sooer",
+        "anchor": "*, *",
+        "chapter": "Ch. 8: Summer Palace"
+    },
+    {
+        "id": 203,
+        "english": "Feel Like / As if",
+        "hanzi": "宛如",
+        "pinyin": "wǎn rú",
+        "trees": "wan3 roo2",
+        "anchor": "9, 10",
+        "chapter": "Ch. 8: Summer Palace"
+    },
+    {
+        "id": 204,
+        "english": "Painting",
+        "hanzi": "畫",
+        "pinyin": "huà",
+        "trees": "hooah4",
+        "anchor": "4",
+        "chapter": "Ch. 8: Summer Palace"
+    },
+    {
+        "id": 205,
+        "english": "(Be) in / Inside",
+        "hanzi": "在...中",
+        "pinyin": "zài...zhōng",
+        "trees": "dsie4 ... (r)dser-oong",
+        "anchor": "4, *",
+        "chapter": "Ch. 8: Summer Palace"
+    }
+];
+
+        const tableBody = document.getElementById('table-body');
+        const searchInput = document.getElementById('search');
+        const chapterFilter = document.getElementById('chapter-filter');
+        const voiceSelect = document.getElementById('voice-select');
+
+        let voices = [];
+
+        function populateVoices() {
+            if (typeof speechSynthesis === 'undefined') return;
+            voices = window.speechSynthesis.getVoices();
+            voiceSelect.innerHTML = '';
+            
+            // Filter out Chinese voices
+            let zhVoices = voices.filter(v => v.lang.includes('zh') || v.lang.includes('ZH'));
+            
+            if (zhVoices.length === 0) {
+                zhVoices = voices; // Fallback
+            }
+            
+            // Prioritize high-quality voices like Microsoft Yaoyao, Huihui, Apple Tingting, Premium, Google
+            zhVoices.sort((a, b) => {
+                const nameA = a.name.toLowerCase();
+                const nameB = b.name.toLowerCase();
+                const score = (name) => {
+                    if (name.includes('tingting')) return 10;
+                    if (name.includes('huihui')) return 9;
+                    if (name.includes('yaoyao')) return 8;
+                    if (name.includes('premium')) return 7;
+                    if (name.includes('google')) return 6;
+                    if (name.includes('microsoft')) return 5;
+                    if (name.includes('female') || name.includes('woman') || name.includes('girl')) return 4;
+                    if (name.includes('zh')) return 3;
+                    return 0;
+                };
+                return score(nameB) - score(nameA);
+            });
+            
+            zhVoices.forEach((voice, index) => {
+                let option = document.createElement('option');
+                option.textContent = voice.name + ' (' + voice.lang + ')';
+                option.value = voice.name;
+                if (index === 0) option.selected = true;
+                voiceSelect.appendChild(option);
+            });
+        }
+
+        populateVoices();
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = populateVoices;
+        }
+
+        function renderTable(data) {
+            tableBody.innerHTML = '';
+            data.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td data-label="English">${item.english}</td>
+                    <td data-label="Hanzi">
+                        <button class="hanzi-btn" onclick="speak('${item.hanzi}')">
+                            ${item.hanzi} <span>🔊</span>
+                        </button>
+                    </td>
+                    <td data-label="Trees Pinyin" class="trees-pinyin">${item.trees}</td>
+                    <td data-label="Standard Pinyin" class="std-pinyin">${item.pinyin}</td>
+                    <td data-label="Tone Anchor"><span class="anchor-badge">${item.anchor}</span></td>
+                    <td data-label="Chapter" class="chapter-cell">${item.chapter}</td>
+                    <td data-label="Link">
+                        <a href="https://a.co/d/0aGVdcPJ" target="_blank" class="tips-link">Memory Tips</a>
+                    </td>
+                `;
+                tableBody.appendChild(tr);
+            });
+        }
+
+        function filterData() {
+            const query = searchInput.value.toLowerCase();
+            const selectedChapter = chapterFilter.value;
+
+            const filtered = vocabulary.filter(item => {
+                const matchesSearch = item.english.toLowerCase().includes(query) || 
+                                      item.hanzi.includes(query) || 
+                                      item.pinyin.toLowerCase().includes(query) || 
+                                      item.trees.toLowerCase().includes(query);
+                const matchesChapter = selectedChapter === "" || item.chapter.startsWith(selectedChapter);
+                return matchesSearch && matchesChapter;
+            });
+            renderTable(filtered);
+        }
+
+        function speak(word) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(word);
+                utterance.lang = 'zh-CN';
+                utterance.rate = 0.85; // Learn natural speed
+                
+                const selectedVoiceName = voiceSelect.value;
+                const selectedVoice = voices.find(v => v.name === selectedVoiceName);
+                if (selectedVoice) {
+                    utterance.voice = selectedVoice;
+                }
+                window.speechSynthesis.speak(utterance);
+            } else {
+                alert('Audio point-and-read is not supported in this browser. Please try Chrome, Safari, or Edge.');
+            }
+        }
+
+        searchInput.addEventListener('input', filterData);
+        chapterFilter.addEventListener('change', filterData);
+
+        // Initial render
+        renderTable(vocabulary);
+    </script>
+</body>
+</html>
