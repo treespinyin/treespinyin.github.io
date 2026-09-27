@@ -35,6 +35,12 @@
             align-items: center;
             gap: 12px;
         }
+        /* 新增的 Logo 图片样式，使其高与文字对齐并保持比例 */
+        .title-logo {
+            height: 38px;
+            width: auto;
+            object-fit: contain;
+        }
         .subtitle {
             font-size: 18px;
             color: var(--muted-gray);
@@ -106,7 +112,8 @@
 </head>
 <body>
     <div class="container">
-        <h1>🌴 Trees Pinyin: Multi-Sensory Hub</h1>
+        <!-- 此处已将原本的 🌴 替换为绝对路径下的 /logo.png 图片 -->
+        <h1><img src="/logo.png" alt="Logo" class="title-logo"> Trees Pinyin: Multi-Sensory Hub</h1>
         <p class="subtitle">Easier languages, a friendlier world.</p>
         <div class="divider"></div>
         
