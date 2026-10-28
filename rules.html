@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trees Pinyin™ Technical Specification & Mapping Rules</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-green: #2E7D32;
+            --dark-green: #1B5E20;
+            --accent-green: #E8F5E9;
+            --text-dark: #2c3e50;
+            --muted-gray: #666666;
+            --white: #ffffff;
+            --navy-tp: #1a237e;
+            --border-color: #e2e8f0;
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background-color: #f4f6f4;
+            color: var(--text-dark);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.65;
+            padding: 30px 15px;
+        }
+        .container {
+            max-width: 1040px;
+            margin: 0 auto;
+            background: var(--white);
+            padding: 45px 50px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        }
+        /* Header */
+        .doc-header {
+            border-bottom: 2px solid var(--accent-green);
+            padding-bottom: 25px;
+            margin-bottom: 30px;
+        }
+        .doc-badge {
+            display: inline-block;
+            background-color: var(--accent-green);
+            color: var(--dark-green);
+            font-size: 11px;
+            font-weight: 800;
+            padding: 4px 12px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 12px;
+        }
+        h1 {
+            color: var(--primary-green);
+            font-size: 28px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            line-height: 1.3;
+        }
+        .title-logo {
+            height: 40px;
+            width: auto;
+            object-fit: contain;
+        }
+        .subtitle {
+            font-size: 15px;
+            color: var(--muted-gray);
+            margin-top: 8px;
+        }
+        /* Sections */
+        h2 {
+            color: var(--dark-green);
+            font-size: 21px;
+            margin: 36px 0 16px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid var(--accent-green);
+            padding-bottom: 8px;
+        }
+        h3 {
+            color: var(--primary-green);
+            font-size: 16px;
+            margin: 20px 0 10px 0;
+        }
+        p, li {
+            font-size: 14.5px;
+            color: #444;
+            margin-bottom: 12px;
+        }
+        ul, ol {
+            padding-left: 22px;
+            margin-bottom: 16px;
+        }
+        li {
+            margin-bottom: 8px;
+        }
+        /* Cards & Highlights */
+        .grid-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin: 20px 0;
+        }
+        .info-card {
+            background-color: #fafbfa;
+            border-top: 3px solid var(--primary-green);
+            border-radius: 8px;
+            padding: 16px;
+            font-size: 13.5px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+        .info-card strong {
+            display: block;
+            color: var(--primary-green);
+            margin-bottom: 6px;
+            font-size: 14.5px;
+        }
+        .highlight-box {
+            background-color: var(--accent-green);
+            border-left: 4px solid var(--primary-green);
+            border-radius: 0 8px 8px 0;
+            padding: 16px 20px;
+            margin: 20px 0;
+            font-size: 14px;
+        }
+        /* Tables */
+        .table-responsive {
+            overflow-x: auto;
+            margin: 18px 0 28px 0;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13.5px;
+            text-align: left;
+        }
+        th, td {
+            padding: 12px 14px;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: top;
+        }
+        th {
+            background-color: #f8fafc;
+            color: var(--dark-green);
+            font-weight: 700;
+            white-space: nowrap;
+        }
+        tr:last-child td {
+            border-bottom: none;
+        }
+        tr:hover {
+            background-color: #fbfdfa;
+        }
+        /* Trees Pinyin Typography */
+        .tp {
+            color: var(--navy-tp);
+            font-weight: 800;
+            font-style: italic;
+            font-family: 'Lexend', Arial, sans-serif;
+            font-size: 14.5px;
+        }
+        .mono-pill {
+            background-color: #f1f5f9;
+            color: #334155;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12.5px;
+        }
+        .footer-note {
+            text-align: center;
+            color: var(--muted-gray);
+            font-size: 13px;
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 1px solid #edf2f7;
+        }
+        @media (max-width: 768px) {
+            .container { padding: 25px 20px; }
+            h1 { font-size: 22px; }
+            .grid-cards { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        
+        <!-- Header Section -->
+        <header class="doc-header">
+            <span class="doc-badge"><i class="fa-solid fa-stamp"></i> US Copyright & Trademark Specification</span>
+            <h1>
+                <img src="/logo.png" alt="Trees Pinyin" class="title-logo">
+                Trees Pinyin™ Intuitive Phonics System
+            </h1>
+            <p class="subtitle">Complete Technical Specification, Articulatory Mechanisms & Pedagogical Mapping Guide</p>
+        </header>
+
+        <!-- Part I -->
+        <section>
+            <h2><i class="fa-solid fa-compass"></i> Part I: Overview & Core Pillars</h2>
+            <p>
+                <strong>Trees Pinyin™</strong> is an original English-based phonetic transliteration system invented for native English speakers to master Spoken Mandarin Chinese through natural reading intuition—bypassing IPA and Romanization obstacles.
+            </p>
+
+            <div class="grid-cards">
+                <div class="info-card">
+                    <strong>1. Intuitive Phonics</strong>
+                    Constructed exclusively from natural English letter combinations and connected speech habits.
+                </div>
+                <div class="info-card">
+                    <strong>2. Silent Guides ( )</strong>
+                    Audibly silent letters instruct oral muscles to pre-lock tongue retroflexion or lip rounding.
+                </div>
+                <div class="info-card">
+                    <strong>3. Monosyllabic One-Beat</strong>
+                    Every Chinese character is uttered in exactly one unified beat using fluent word blending.
+                </div>
+                <div class="info-card">
+                    <strong>4. Contextual Tones</strong>
+                    Number anchors and the conversational "Do" melody unlock effortless pitch accuracy.
+                </div>
+            </div>
+
+            <div class="highlight-box">
+                <strong>Mandatory Visual Conventions:</strong>
+                <ul style="margin: 8px 0 0 0; padding-left: 18px;">
+                    <li><strong>Bold-Italic Notation:</strong> All Trees Pinyin symbols must appear in <span class="tp">bold-italics</span> (e.g., <span class="tp">booer</span>, <span class="tp">(r)s2 hoh4</span>).</li>
+                    <li><strong>Uppercase L:</strong> Initial <em>l</em> is permanently capitalized as <span class="tp">L</span> (e.g., <span class="tp">Lah</span>, <span class="tp">Leeoh4</span>) to prevent confusion with uppercase <em>I</em> or digit <em>1</em>.</li>
+                    <li><strong>Hyphenated Finals:</strong> Finals <em>en, eng, ong</em> use hyphens (<span class="tp">er-n</span>, <span class="tp">er-ng</span>, <span class="tp">er-oong</span>) to prevent italic <em>rn</em> from merging into <em>m</em>.</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Part II -->
+        <section>
+            <h2><i class="fa-solid fa-head-side-cough"></i> Part II: Articulatory Muscle Mechanisms</h2>
+            
+            <h3>1. The Silent Retroflex Prefix <span class="tp">*(r)*</span> (Mandarin zh, ch, sh, r)</h3>
+            <p>Pre-curl the tongue tip backward into the English <em>r</em> posture without vocalizing an <em>r</em>-glide, then immediately release the consonant cluster:</p>
+            <ul>
+                <li><span class="tp">(r)ds</span> (zh): Hold <em>r</em> tongue curl + unaspirated <em>ds</em> (as in <em>birds</em>).</li>
+                <li><span class="tp">(r)ts</span> (ch): Hold <em>r</em> tongue curl + strongly aspirated <em>ts</em> (as in <em>cats</em>).</li>
+                <li><span class="tp">(r)s</span> (sh): Hold <em>r</em> tongue curl + release <em>s</em> friction.</li>
+                <li><span class="tp">(r)th</span> (r): Hold <em>r</em> tongue curl + voiced friction <em>th</em> (/ð/, as in <em>this</em>).</li>
+            </ul>
+
+            <h3>2. Silent Labial-Rounding Guide <span class="tp">*ee(oo)*</span> (Mandarin ü)</h3>
+            <p>Vocalize the long front vowel <span class="tp">ee</span> (/iː/) while keeping lips firmly rounded into an <span class="tp">(oo)</span> posture—effortlessly synthesizing authentic Mandarin <em>ü</em>.</p>
+
+            <h3>3. Non-Rhotic British Vowel Standard <span class="tp">*er*</span> & <span class="tp">*ar*</span></h3>
+            <p>Except for the standalone word "Two" (<span class="tp">uh-er4</span> / 二), all <span class="tp">er</span> symbols follow <strong>British Non-Rhotic</strong> rules—the final <em>r</em> is completely flat and silent (as in British <em>her</em> or <em>term</em>).</p>
+        </section>
+
+        <!-- Part III: Tables -->
+        <section>
+            <h2><i class="fa-solid fa-table-list"></i> Part III: Complete Mapping Tables</h2>
+
+            <h3>3.1 Table of 23 Initials (聲母對應表)</h3>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Hanyu Pinyin</th>
+                            <th>Trees Pinyin</th>
+                            <th>Articulatory Mechanism & English Intuition</th>
+                            <th>Character Examples</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><strong>b, p, m, f</strong></td><td class="tp">b, p, m, f</td><td>Identical to English initial stops and fricatives</td><td>八 <span class="tp">bah</span>, 怕 <span class="tp">pah4</span>, 媽 <span class="tp">mah</span>, 發 <span class="tp">fah</span></td></tr>
+                        <tr><td><strong>d, t, n, l</strong></td><td class="tp">d, t, n, L</td><td>Standard alveolar stops; <span class="tp">L</span> is uppercase for clear recognition</td><td>大 <span class="tp">dah4</span>, 他 <span class="tp">tah</span>, 拿 <span class="tp">nah2</span>, 拉 <span class="tp">Lah</span></td></tr>
+                        <tr><td><strong>g, k, h</strong></td><td class="tp">g, k, h</td><td>Unaspirated/aspirated velar stops & friction</td><td>哥 <span class="tp">ger</span>, 卡 <span class="tp">kah3</span>, 哈 <span class="tp">hah</span></td></tr>
+                        <tr><td><strong>j</strong></td><td class="tp">jee / j</td><td>Tongue blade against hard palate; inherent <em>ee</em> glide</td><td>機 <span class="tp">jee</span>, 家 <span class="tp">jeeah</span></td></tr>
+                        <tr><td><strong>q</strong></td><td class="tp">tsee</td><td>Aspirated alveolar affricate blended with high-front <em>ee</em></td><td>七 <span class="tp">tsee</span>, 千 <span class="tp">tseean</span></td></tr>
+                        <tr><td><strong>x</strong></td><td class="tp">see</td><td>Alveolo-palatal friction anchored behind lower teeth</td><td>西 <span class="tp">see</span>, 下 <span class="tp">seeah4</span></td></tr>
+                        <tr><td><strong>zh</strong></td><td class="tp">(r)ds</td><td>Silent retroflex tongue curl + unaspirated plural <em>ds</em></td><td>知 <span class="tp">(r)ds</span>, 中 <span class="tp">(r)dser-oong</span></td></tr>
+                        <tr><td><strong>ch</strong></td><td class="tp">(r)ts</td><td>Silent retroflex tongue curl + aspirated plural <em>ts</em></td><td>吃 <span class="tp">(r)ts</span>, 出 <span class="tp">(r)tsoo</span></td></tr>
+                        <tr><td><strong>sh</strong></td><td class="tp">(r)s</td><td>Silent retroflex tongue curl + friction <em>s</em></td><td>十 <span class="tp">(r)s2</span>, 書 <span class="tp">(r)soo</span></td></tr>
+                        <tr><td><strong>r</strong></td><td class="tp">(r)th</td><td>Silent retroflex tongue curl + voiced <em>th</em> (/ð/)</td><td>日 <span class="tp">(r)th4</span>, 熱 <span class="tp">(r)ther4</span></td></tr>
+                        <tr><td><strong>z, c, s</strong></td><td class="tp">ds, ts, s</td><td>Flat tongue dental affricates & sibilant; vocalized when alone</td><td>字 <span class="tp">ds4</span>, 次 <span class="tp">ts4</span>, 四 <span class="tp">s4</span></td></tr>
+                        <tr><td><strong>y, w</strong></td><td class="tp">y, w</td><td>Semivowels matching English <em>yes</em> and <em>we</em></td><td>呀 <span class="tp">yah</span>, 我 <span class="tp">wer3</span></td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>3.2 Table of 24 Finals & Dual Mappings (韻母對應表)</h3>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Hanyu Pinyin</th>
+                            <th>Trees Pinyin</th>
+                            <th>Articulatory Mechanism & English Intuition</th>
+                            <th>Character Examples</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><strong>a</strong></td><td class="tp">ah</td><td>Open exclamation /ɑː/ (as in <em>father</em>)</td><td>媽 <span class="tp">mah</span>, 巴 <span class="tp">bah</span></td></tr>
+                        <tr><td><strong>o (standalone)</strong></td><td class="tp">oh</td><td>Independent exclamation diphthong (as in <em>go</em>)</td><td>哦 <span class="tp">oh2</span></td></tr>
+                        <tr><td><strong>o (with b, p, m, f)</strong></td><td class="tp">ooer</td><td>Captures the natural labiovelar w-glide (/u̯ɔ/)</td><td>波 <span class="tp">booer</span>, 婆 <span class="tp">pooer2</span></td></tr>
+                        <tr><td><strong>e</strong></td><td class="tp">er</td><td>British Non-Rhotic neutral vowel (silent <em>r</em>)</td><td>哥 <span class="tp">ger</span>, 車 <span class="tp">(r)tser</span></td></tr>
+                        <tr><td><strong>i</strong></td><td class="tp">ee</td><td>Long high front vowel (as in <em>see</em>)</td><td>低 <span class="tp">dee</span>, 米 <span class="tp">mee3</span></td></tr>
+                        <tr><td><strong>u</strong></td><td class="tp">oo</td><td>High back rounded vowel (as in <em>moon</em>)</td><td>都 <span class="tp">doo</span>, 書 <span class="tp">(r)soo</span></td></tr>
+                        <tr><td><strong>ü / v</strong></td><td class="tp">ee(oo)</td><td>Say <em>ee</em> while maintaining <em>(oo)</em> lip rounding</td><td>女 <span class="tp">nee(oo)3</span>, 綠 <span class="tp">Lee(oo)4</span></td></tr>
+                        <tr><td><strong>ai, ei, ao, ou</strong></td><td class="tp">ie, ay, aw, oh</td><td>Natural English diphthongs (<em>pie, day, saw, go</em>)</td><td>愛 <span class="tp">ie4</span>, 美 <span class="tp">may3</span>, 好 <span class="tp">haw3</span>, 走 <span class="tp">dsoh3</span></td></tr>
+                        <tr><td><strong>ui, iu, ie</strong></td><td class="tp">ooay, eeoh, eer</td><td>Compound glides blended into one beat</td><td>水 <span class="tp">(r)sooay3</span>, 六 <span class="tp">Leeoh4</span>, 謝 <span class="tp">seer4</span></td></tr>
+                        <tr><td><strong>üe</strong></td><td class="tp">ee(oo)er</td><td>Rounded <em>ü</em> sliding into British non-rhotic <em>er</em></td><td>學 <span class="tp">see(oo)er2</span></td></tr>
+                        <tr><td><strong>an, in, un</strong></td><td class="tp">an, een, oon</td><td>Alveolar nasal closures (<em>can, seen, soon</em>)</td><td>安 <span class="tp">an</span>, 心 <span class="tp">seen</span>, 春 <span class="tp">(r)tsoon</span></td></tr>
+                        <tr><td><strong>en, eng, ong</strong></td><td class="tp">er-n, er-ng, er-oong</td><td>Hyphenated non-rhotic schwa nasal sequences</td><td>門 <span class="tp">mer-n2</span>, 風 <span class="tp">fer-ng</span>, 東 <span class="tp">der-oong</span></td></tr>
+                        <tr><td><strong>ün</strong></td><td class="tp">ee(oo)n</td><td>Hold <em>ü</em> rounded mouth shape and close onto <em>-n</em></td><td>軍 <span class="tp">jee(oo)n</span>, 群 <span class="tp">tsee(oo)n2</span></td></tr>
+                        <tr><td><strong>ia, ian, iao</strong></td><td class="tp">eeah, eean, eeaw</td><td>Medial <em>ee</em> compound glides</td><td>家 <span class="tp">jeeah</span>, 千 <span class="tp">tseean</span>, 小 <span class="tp">seeaw3</span></td></tr>
+                        <tr><td><strong>ua, uai, uan</strong></td><td class="tp">ooah, ooie, ooan</td><td>Medial labial <em>oo</em> compound glides</td><td>花 <span class="tp">hooah</span>, 快 <span class="tp">kooie4</span>, 關 <span class="tp">gooan</span></td></tr>
+                        <tr><td><strong>er</strong></td><td class="tp">(uh)-er / uh-er4</td><td>Only American rhotic exception; locked as <span class="tp">uh-er4</span> for "Two" (二)</td><td>兒 <span class="tp">(uh)-er2</span>, 二 <span class="tp">uh-er4</span></td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>3.3 Table of 16 Overall Syllables (整體認讀音節對應表)</h3>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Pinyin</th><th>Trees Pinyin</th><th>Pinyin</th><th>Trees Pinyin</th><th>Pinyin</th><th>Trees Pinyin</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><strong>zhi</strong></td><td class="tp">(r)ds</td><td><strong>chi</strong></td><td class="tp">(r)ts</td><td><strong>shi</strong></td><td class="tp">(r)s</td></tr>
+                        <tr><td><strong>ri</strong></td><td class="tp">(r)th</td><td><strong>zi</strong></td><td class="tp{">ds</td><td><strong>ci</strong></td><td class="tp">ts</td></tr>
+                        <tr><td><strong>si</strong></td><td class="tp">s</td><td><strong>yi</strong></td><td class="tp">yee</td><td><strong>wu</strong></td><td class="tp">woo</td></tr>
+                        <tr><td><strong>yu</strong></td><td class="tp">yee(oo)</td><td><strong>ye</strong></td><td class="tp">yer</td><td><strong>yue</strong></td><td class="tp">yee(oo)er</td></tr>
+                        <tr><td><strong>yuan</strong></td><td class="tp">yee(oo)an</td><td><strong>yin</strong></td><td class="tp">yeen</td><td><strong>yun</strong></td><td class="tp">yee(oo)n</td></tr>
+                        <tr><td><strong>ying</strong></td><td class="tp">ying</td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Part IV & V -->
+        <section>
+            <h2><i class="fa-solid fa-gears"></i> Part IV: Vowel Omission & Deduplication</h2>
+            <p>When initials <span class="tp">tsee</span> (q), <span class="tp">see</span> (x), or <span class="tp">jee</span> (j) combine with finals starting with <em>ee/i</em>, the redundant <em>ee</em> is omitted automatically:</p>
+            <ul>
+                <li><span class="mono-pill">q + ian</span> → <span class="tp">tsee</span> + <span class="tp">eean</span> → <span class="tp">tseean</span> (千, NOT <em>tseeean</em>)</li>
+                <li><span class="mono-pill">x + ing</span> → <span class="tp">see</span> + <span class="tp">ing</span> → <span class="tp">sing</span> (星, NOT <em>seeng</em>)</li>
+                <li><span class="mono-pill">j + ie</span> → <span class="tp">jee</span> + <span class="tp">eer</span> → <span class="tp">jeer</span> (節, NOT <em>jeeeer</em>)</li>
+            </ul>
+
+            <h2><i class="fa-solid fa-music"></i> Part V: Tone System & Anchors</h2>
+            <div class="grid-cards">
+                <div class="info-card">
+                    <strong>Tone 1 (—) & Neutral</strong>
+                    <em>Omitted.</em> Unmarked syllables naturally speak high & level (<span class="tp">doo</span> 都) or soft unstressed.
+                </div>
+                <div class="info-card">
+                    <strong>Tone 2 ( / ) & 3 ( v )</strong>
+                    Rising pitch tagged with <strong>2</strong> (<span class="tp">doo2</span> 讀); dipping pitch tagged with <strong>3</strong> (<span class="tp">doo3</span> 堵).
+                </div>
+                <div class="info-card">
+                    <strong>Tone 4 ( \ )</strong>
+                    Emphatic falling tone tagged with <strong>4</strong> (<span class="tp">doo4</span> 度, <span class="tp">s4</span> 四).
+                </div>
+            </div>
+
+            <div class="highlight-box">
+                <strong>Number-Tone Anchor Mnemonic (e.g. Anchor 12):</strong>
+                Mandarin "Twelve" (<span class="tp">(r)s2 uh-er4</span> / 十二 / 12) carries a <strong>Tone 2 + Tone 4</strong> contour. "Holiday" (<span class="tp">jeer2 (r)th4</span> / 節日) carries the exact same melody. Learners instantly lock in the pronunciation of <em>Holiday</em> by remembering Twelve Days of Christmas!
+            </div>
+        </section>
+
+        <div class="footer-note">
+            © 2026 Trees Pinyin. All Rights Reserved. Hosted at <a href="https://www.treespinyin.com" target="_blank" style="color: var(--primary-green); text-decoration: none; font-weight: 600;">treespinyin.com</a>.
+        </div>
+    </div>
+</body>
+</html>
