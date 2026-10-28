@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trees Pinyin™ Intuitive Mandarin Phonics System | Official Guide & Specification</title>
+    <style>
+        :root {
+            --forest-dark: #1b4332;
+            --forest-mid: #2d6a4f;
+            --forest-light: #40916c;
+            --leaf-bg: #f3f9f5;
+            --leaf-border: #b7e4c7;
+            --gold-accent: #f4a261;
+            --gold-bright: #e9c46a;
+            --trunk-brown: #6c462f;
+            --text-dark: #1f2937;
+            --text-muted: #4b5563;
+            --card-bg: #ffffff;
+            --shadow: 0 4px 16px rgba(27, 67, 50, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.7;
+            color: var(--text-dark);
+            background-color: var(--leaf-bg);
+            scroll-behavior: smooth;
+        }
+
+        /* Bold-Italic Trees Pinyin Symbol Styling */
+        .tp {
+            font-weight: 700;
+            font-style: italic;
+            color: var(--forest-dark);
+            background-color: #e6f4ea;
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-family: "Liberation Sans", "Arial", sans-serif;
+            letter-spacing: 0.01em;
+        }
+
+        .underline-blend {
+            font-weight: 700;
+            text-decoration: underline;
+            text-decoration-thickness: 2px;
+            text-underline-offset: 3px;
+            color: var(--trunk-brown);
+        }
+
+        /* Header / Hero Banner */
+        header.hero {
+            background: linear-gradient(135deg, var(--forest-dark) 0%, var(--forest-mid) 60%, var(--forest-light) 100%);
+            color: #ffffff;
+            padding: 3.5rem 1.5rem 3rem;
+            text-align: center;
+            border-bottom: 6px solid var(--gold-bright);
+        }
+
+        .brand-badge {
+            display: inline-block;
+            background-color: var(--gold-bright);
+            color: var(--forest-dark);
+            font-weight: 900;
+            font-size: 2rem;
+            padding: 0.4rem 1.4rem;
+            border-radius: 14px;
+            border: 3px solid #ffffff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            letter-spacing: 0.05em;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+        }
+
+        header.hero h1 {
+            font-size: 2.2rem;
+            max-width: 900px;
+            margin: 0 auto 0.8rem;
+            line-height: 1.3;
+        }
+
+        header.hero p.subtitle {
+            font-size: 1.15rem;
+            max-width: 780px;
+            margin: 0 auto 1.2rem;
+            opacity: 0.95;
+        }
+
+        .domain-pill {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+            padding: 0.35rem 1rem;
+            border-radius: 999px;
+            font-size: 0.95rem;
+            text-decoration: none;
+            border: 1px solid rgba(255, 255, 255, 0.35);
+        }
+
+        /* Sticky Navigation */
+        nav.sticky-nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background-color: #ffffff;
+            border-bottom: 1px solid var(--leaf-border);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            padding: 0.65rem 1rem;
+            overflow-x: auto;
+            white-space: nowrap;
+            text-align: center;
+        }
+
+        nav.sticky-nav a {
+            display: inline-block;
+            color: var(--forest-dark);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.92rem;
+            padding: 0.4rem 0.9rem;
+            margin: 0 0.2rem;
+            border-radius: 6px;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        nav.sticky-nav a:hover {
+            background-color: var(--forest-mid);
+            color: #ffffff;
+        }
+
+        /* Main Container */
+        main.container {
+            max-width: 1120px;
+            margin: 2.5rem auto;
+            padding: 0 1.25rem;
+        }
+
+        section.card-section {
+            background: var(--card-bg);
+            border-radius: 14px;
+            padding: 2.25rem;
+            margin-bottom: 2.25rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--leaf-border);
+        }
+
+        h2.section-title {
+            color: var(--forest-dark);
+            font-size: 1.65rem;
+            border-left: 6px solid var(--forest-mid);
+            padding-left: 0.85rem;
+            margin-bottom: 1.4rem;
+            line-height: 1.3;
+        }
+
+        h3.subsection-title {
+            color: var(--forest-mid);
+            font-size: 1.28rem;
+            margin: 1.6rem 0 0.85rem;
+            padding-bottom: 0.35rem;
+            border-bottom: 2px solid var(--leaf-bg);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        ul, ol {
+            margin: 0.6rem 0 1.2rem 1.5rem;
+        }
+
+        li {
+            margin-bottom: 0.55rem;
+        }
+
+        /* Pillar Grid */
+        .pillars-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.2rem;
+            margin-top: 1rem;
+        }
+
+        .pillar-box {
+            background: var(--leaf-bg);
+            border: 1px solid var(--leaf-border);
+            border-radius: 10px;
+            padding: 1.25rem;
+        }
+
+        .pillar-box h4 {
+            color: var(--forest-dark);
+            margin-bottom: 0.5rem;
+            font-size: 1.05rem;
+        }
+
+        /* Highlight Callouts */
+        .callout {
+            background-color: #fefae0;
+            border-left: 5px solid var(--gold-accent);
+            padding: 1.1rem 1.35rem;
+            border-radius: 8px;
+            margin: 1.2rem 0;
+        }
+
+        /* Directory Cards for Initials, Finals, and Overall Syllables */
+        .search-bar-wrap {
+            margin: 1rem 0 1.5rem;
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 240px;
+            padding: 0.7rem 1rem;
+            border: 2px solid var(--leaf-border);
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .search-input:focus {
+            border-color: var(--forest-mid);
+        }
+
+        .mapping-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+            gap: 1rem;
+            margin-top: 0.8rem;
+        }
+
+        .map-item {
+            background: #ffffff;
+            border: 1px solid #d8f3dc;
+            border-top: 4px solid var(--forest-mid);
+            border-radius: 10px;
+            padding: 1.1rem;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .map-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(27, 67, 50, 0.1);
+        }
+
+        .map-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.6rem;
+            padding-bottom: 0.45rem;
+            border-bottom: 1px dashed #d8f3dc;
+        }
+
+        .hp-symbol {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--trunk-brown);
+        }
+
+        .arrow {
+            color: var(--text-muted);
+            margin: 0 0.4rem;
+            font-weight: normal;
+        }
+
+        .tp-large {
+            font-size: 1.25rem;
+            font-weight: 700;
+            font-style: italic;
+            color: var(--forest-dark);
+            background: #d8f3dc;
+            padding: 2px 10px;
+            border-radius: 6px;
+        }
+
+        .badge-tag {
+            font-size: 0.75rem;
+            font-weight: 600;
+            background: var(--leaf-bg);
+            color: var(--forest-mid);
+            padding: 2px 8px;
+            border-radius: 99px;
+            border: 1px solid var(--leaf-border);
+        }
+
+        .map-desc {
+            font-size: 0.94rem;
+            color: var(--text-dark);
+            margin-bottom: 0.55rem;
+        }
+
+        .map-ex {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            background: #f9fbf9;
+            padding: 0.4rem 0.65rem;
+            border-radius: 6px;
+        }
+
+        /* Deduplication Paradigm Box */
+        .paradigm-columns {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+            gap: 1.25rem;
+            margin-top: 1rem;
+        }
+
+        .paradigm-card {
+            background: var(--leaf-bg);
+            border: 1px solid var(--leaf-border);
+            border-radius: 10px;
+            padding: 1.2rem;
+        }
+
+        .paradigm-card h4 {
+            color: var(--forest-dark);
+            margin-bottom: 0.65rem;
+            border-bottom: 2px solid var(--leaf-border);
+            padding-bottom: 0.35rem;
+        }
+
+        .paradigm-card ul {
+            list-style: none;
+            margin-left: 0;
+        }
+
+        .paradigm-card li {
+            font-size: 0.93rem;
+            margin-bottom: 0.35rem;
+            padding: 0.2rem 0;
+            border-bottom: 1px dotted rgba(0,0,0,0.08);
+        }
+
+        /* Tone Cards */
+        .tone-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .tone-card {
+            background: #ffffff;
+            border: 2px solid var(--leaf-border);
+            border-radius: 10px;
+            padding: 1.15rem;
+            text-align: center;
+        }
+
+        .tone-card .tone-num {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: var(--forest-mid);
+            margin-bottom: 0.3rem;
+        }
+
+        .tone-card .do-sentence {
+            font-size: 1.05rem;
+            margin: 0.5rem 0;
+            color: var(--text-dark);
+        }
+
+        footer {
+            text-align: center;
+            padding: 2.5rem 1.25rem;
+            background: var(--forest-dark);
+            color: #ffffff;
+            margin-top: 3rem;
+            font-size: 0.92rem;
+        }
+
+        footer a {
+            color: var(--gold-bright);
+            text-decoration: none;
+        }
+
+        @media (max-width: 640px) {
+            header.hero h1 {
+                font-size: 1.65rem;
+            }
+            section.card-section {
+                padding: 1.4rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="hero">
+        <div class="brand-badge">TREES PINYIN™</div>
+        <h1>Intuitive Mandarin Phonics System</h1>
+        <p class="subtitle">Complete Phonetic Mapping Rules, Articulatory Mechanisms &amp; Pronunciation Guide for Native English Speakers</p>
+        <a class="domain-pill" href="https://www.treespinyin.com" target="_blank" rel="noopener">Official Website: www.treespinyin.com</a>
+    </header>
+
+    <nav class="sticky-nav">
+        <a href="#part1">Part I: Overview &amp; Brand</a>
+        <a href="#part2">Part II: Articulatory Mechanisms</a>
+        <a href="#initials">23 Initials</a>
+        <a href="#finals">24 Finals &amp; Glides</a>
+        <a href="#overall">16 Overall Syllables</a>
+        <a href="#part4">Part IV: 6 Core Rules</a>
+        <a href="#part5">Part V: Tones &amp; Anchors</a>
+    </nav>
+
+    <main class="container">
+
+        <!-- PART I -->
+        <section id="part1" class="card-section">
+            <h2 class="section-title">PART I: SYSTEM OVERVIEW, BRAND IDENTITY &amp; CORE PRINCIPLES</h2>
+
+            <h3 class="subsection-title">1.1 Background, Purpose of the Invention, and Brand Identity</h3>
+            <p><strong>Trees Pinyin™</strong> is an original, proprietary English-based phonetic annotation and transliteration system invented specifically for native English speakers (and learners educated in English phonics) to master Spoken Mandarin Chinese with immediate, intuitive accuracy.</p>
+            <ul>
+                <li><strong>Visual Trademark &amp; Brand Identity (TREES PINYIN™):</strong> The Trees Pinyin system is officially represented by its graphic trademark featuring a lush, layered green tree canopy over a sturdy brown trunk, emblazoned with the capitalized words <strong>"TREES PINYIN"</strong> in warm golden-yellow rounded typography outlined in dark green. Just as a flourishing tree branches out into thousands of leaves from a single solid trunk, the Trees Pinyin system enables learners to branch out into thousands of Mandarin characters and everyday phrases from the solid, familiar trunk of English phonics intuition. Official audio resources, web applications, browser extensions, and published learning series are hosted under the official brand domain <strong><a href="https://www.treespinyin.com" target="_blank" rel="noopener">www.treespinyin.com</a></strong>.</li>
+                <li><strong>Technical Problem Solved:</strong> Standard Hanyu Pinyin (the official Romanization system for Mandarin) utilizes numerous Roman letters in ways that directly contradict English phonics conventions—such as <code>q</code>, <code>x</code>, <code>zh</code>, <code>c</code>, <code>ü</code>, <code>i</code>, <code>e</code>, <code>ou</code>, <code>ui</code>, and <code>ian</code>. When native English speakers read Hanyu Pinyin using their native reading instincts, severe pronunciation distortions and cognitive friction occur.</li>
+                <li><strong>Technical Solution:</strong> Trees Pinyin systematically deconstructs Mandarin phonology and maps every initial, final, and overall syllable onto <strong>intuitive English letter combinations</strong> and <strong>connected speech patterns</strong>. By integrating proprietary <strong>"Silent Articulatory Guides <code>( )</code>"</strong>, a <strong>"Non-Rhotic British Vowel Standard"</strong>, and <strong>"Inherent Vocal Resonance Rules"</strong>, learners can bypass the International Phonetic Alphabet (IPA) and complex linguistic training—relying purely on their native English reading intuition and oral muscle coordination to produce authentic Mandarin sounds within a single beat.</li>
+            </ul>
+
+            <h3 class="subsection-title">1.2 Four Core Pedagogical &amp; Design Pillars</h3>
+            <div class="pillars-grid">
+                <div class="pillar-box">
+                    <h4>1. Intuitive Phonics &amp; Connected Speech</h4>
+                    <p>All phonetic symbols are constructed from familiar English letter combinations or natural English connected speech blends. Learners simply sound them out based on native intuition.</p>
+                </div>
+                <div class="pillar-box">
+                    <h4>2. Silent Articulatory Guides <code>( )</code></h4>
+                    <p>Letters enclosed in bold-italic parentheses—such as <span class="tp">(r)th</span>, <span class="tp">(r)ds</span>, or <span class="tp">ee(oo)</span>—are <strong>audibly silent</strong>, but instruct the speaker to <strong>pre-position or maintain the exact mouth shape or tongue posture</strong> while vocalizing the adjacent sound.</p>
+                </div>
+                <div class="pillar-box">
+                    <h4>3. Monosyllabic Blending (One Beat)</h4>
+                    <p>Every Chinese character is strictly monosyllabic (one single beat). In mnemonic sentences, <span class="underline-blend">bolded and underlined</span> English word parts blend continuously into a single syllable (e.g., <em>Le<span class="underline-blend">t's see an</span></em> &rarr; <span class="tp">tseean</span> for 千 / <em>qiān</em>, "Thousand").</p>
+                </div>
+                <div class="pillar-box">
+                    <h4>4. Contextual Tones &amp; Number Anchors</h4>
+                    <p>Speak out loud using a relaxed, fluid <strong>"hybrid" (Pidgin-style) intonation</strong> while mastering tones through the <strong>"Do" Contextual Tone Method</strong> and <strong>Number-Tone Anchor Groups</strong> (e.g., anchor <code>12</code> linking "Twelve" and "Holiday").</p>
+                </div>
+            </div>
+
+            <h3 class="subsection-title">1.3 Mandatory Visual &amp; Typographical Conventions</h3>
+            <ul>
+                <li><strong>Bold-Italic Notation:</strong> Every Trees Pinyin transcription is formatted in <span class="tp">bold-italics</span> (e.g., <span class="tp">booer</span>, <span class="tp">(r)s2 hoh4</span>) to visually distinguish phonetic symbols from standard English text and Hanyu Pinyin reference text.</li>
+                <li><strong>Anti-Confusion Capitalization (<code>L</code>):</strong> The Mandarin initial <code>l</code> is permanently mapped to an uppercase bold-italic <span class="tp">L</span> (e.g., <span class="tp">Lah</span>, <span class="tp">Leeoh4</span>) to prevent visual confusion with an uppercase <code>I</code> or the digit <code>1</code> in sans-serif italic fonts.</li>
+                <li><strong>Anti-Confusion Hyphenation (<code>er-n</code>):</strong> The Mandarin final <code>en</code> is permanently written with a hyphen as <span class="tp">er-n</span> (e.g., <span class="tp">mer-n</span>, <span class="tp">her-n3</span>) to ensure that adjacent italic letters <code>r</code> and <code>n</code> (<code>rn</code>) are never visually mistaken for the letter <code>m</code>.</li>
+            </ul>
+        </section>
+
+        <!-- PART II -->
+        <section id="part2" class="card-section">
+            <h2 class="section-title">PART II: ARTICULATORY MECHANISMS &amp; SPECIAL SYMBOL COMBINATIONS</h2>
+            <p>The core innovation of Trees Pinyin lies in how it guides the vocal tract muscles of an English speaker to synthesize authentic Mandarin sounds through five specialized articulatory mechanisms:</p>
+
+            <h3 class="subsection-title">2.1 Silent Guides <code>( )</code>: Mouth Shape &amp; Tongue Posture Coordination</h3>
+            <p>Whenever bold-italic letters appear inside parentheses <code>( )</code>, the learner must <strong>not pronounce them as independent sounds</strong>, but must <strong>lock in their physical articulatory posture (mouth shape or tongue position)</strong>:</p>
+            <ol>
+                <li>
+                    <strong>The Silent Retroflex Prefix <span class="tp">(r)</span> (Mapping Mandarin <code>zh</code>, <code>ch</code>, <code>sh</code>, <code>r</code>):</strong>
+                    <ul>
+                        <li><strong>Physiological Mechanism:</strong> When native English speakers prepare to pronounce an initial <code>r</code> (as in <em>red</em> or <em>run</em>), the tip of the tongue naturally curls upward and backward toward the hard palate (retroflexion). By placing a silent <span class="tp">(r)</span> before <code>ds</code>, <code>ts</code>, <code>s</code>, and <code>th</code>, Trees Pinyin instructs the speaker to <strong>first curl the tip of the tongue into the English <code>r</code> position (without producing the vocalic English r-glide)</strong>, and while holding that curled tongue posture, immediately release the following consonant airstream:</li>
+                        <li><span class="tp">(r)ds</span> (<code>zh</code>): Hold the <code>r</code> curled-tongue posture + articulate the unaspirated <code>ds</code> cluster (as at the end of <em>bi<span class="underline-blend">rds</span></em> or <em>ha<span class="underline-blend">nds</span></em>). This physically synthesizes the Mandarin retroflex unaspirated affricate <code>zh</code>.</li>
+                        <li><span class="tp">(r)ts</span> (<code>ch</code>): Hold the <code>r</code> curled-tongue posture + articulate a strongly aspirated <code>ts</code> cluster (as at the end of <em>ca<span class="underline-blend">ts</span></em>). This synthesizes the Mandarin retroflex aspirated affricate <code>ch</code>.</li>
+                        <li><span class="tp">(r)s</span> (<code>sh</code>): Hold the <code>r</code> curled-tongue posture + release the <code>s</code> fricative airstream (similar to English <em>fi<span class="underline-blend">sh</span></em>, but with the tongue tip curled further back). This synthesizes the Mandarin retroflex fricative <code>sh</code>.</li>
+                        <li><span class="tp">(r)th</span> (<code>r</code>): Hold the <code>r</code> curled-tongue posture + vibrate the vocal cords as if pronouncing the voiced English <code>th</code> (/&eth;/, as in <em><span class="underline-blend">th</span>is</em> or <em><span class="underline-blend">th</span>at</em>). By combining the <code>r</code> tongue curl with voiced <code>th</code> friction, the speaker avoids the excessive lip-rounding of American English <code>r</code> and accurately produces the authentic Mandarin voiced retroflex <code>r</code> (e.g., 日 / <em>rì</em> &rarr; <span class="tp">(r)th4</span>).</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>The Silent Labial-Rounding Guide <span class="tp">ee(oo)</span> (Mapping Mandarin <code>ü / v</code>):</strong>
+                    <ul>
+                        <li><strong>Physiological Mechanism:</strong> The Mandarin close front rounded vowel <code>ü</code> (IPA: /y/) does not exist in modern English. Phonetically, it is the simultaneous combination of the <strong>tongue position of the high front vowel <span class="tp">ee</span> (/i&#720;/)</strong> and the <strong>lip-rounding posture of the high back vowel <span class="tp">oo</span> (/u&#720;/)</strong>.</li>
+                        <li><strong>Synthesized Phoneme:</strong> In <span class="tp">ee(oo)</span>, the learner <strong>audibly vocalizes the long vowel <span class="tp">ee</span> (as in <em>b<span class="underline-blend">ee</span></em> or <em>s<span class="underline-blend">ee</span></em>, keeping the tongue high and forward against the lower teeth)</strong>, while simultaneously <strong>rounding and protruding the lips into the exact shape required to say <span class="tp">oo</span> (as in <em>m<span class="underline-blend">oo</span>n</em>)—without actually gliding into the <code>oo</code> sound</strong>. By vocalizing <code>ee</code> through an <code>(oo)</code> mouth shape, English speakers effortlessly produce a native-level Mandarin <code>ü</code>.</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>The Central Vowel Transition Guide <span class="tp">(uh)-er</span> (Mapping Mandarin <code>er</code>):</strong>
+                    <ul>
+                        <li><strong>Physiological Mechanism:</strong> For the Mandarin rhotacized final <code>er</code> (as in 兒/而/耳), the parenthetical <span class="tp">(uh)</span> instructs the speaker to start with a relaxed, neutral mid-central vowel posture (schwa /&#601;/) and immediately curl the tongue into an American r-colored <span class="tp">er</span> glide. For the fourth-tone number "Two" (二 / <em>èr</em>), both parts are fully vocalized and emphasized as <span class="tp">uh-er4</span>.</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>Word Parentheses in English Phonetic Aids:</strong>
+                    <ul>
+                        <li>In English reference words (outside the bold-italic Trees Pinyin symbols), normal letters placed inside parentheses indicate silent segments of the English word that must be omitted when sounding out the mnemonic comparison—for example: <strong>wor</strong>(l)<strong>d</strong> (omit the <code>l</code> sound) or (fi)<strong>sh</strong> (omit the <code>fi</code> and only use the <code>sh</code> sound).</li>
+                    </ul>
+                </li>
+            </ol>
+
+            <h3 class="subsection-title">2.2 The Non-Rhotic British Pronunciation Standard (<code>er</code> and <code>ar</code>)</h3>
+            <ul>
+                <li><strong>Core Rule:</strong> Throughout the Trees Pinyin system, vowel symbols containing the letter <code>r</code>—specifically <span class="tp">er</span> (mapping Mandarin <code>e</code>) and <span class="tp">ar</span>—follow <strong>British English (Non-Rhotic / Received Pronunciation)</strong> rules, where the final letter <strong><code>r</code> is completely silent and uncurled</strong>.</li>
+                <li><strong>Articulatory Effect (<span class="tp">er</span>):</strong> Pronounced like British English <em>h<span class="underline-blend">er</span></em>, <em>t<span class="underline-blend">er</span>m</em>, or <em>sist<span class="underline-blend">er</span></em> (/&#604;&#720;/ or /&#601;/ gliding toward unrounded back /&#612;/), with a flat tongue. This prevents native English speakers from misreading the single Hanyu Pinyin letter <code>e</code> as English /i&#720;/ (<em>me</em>) or /e/ (<em>bed</em>), while avoiding unwanted American <code>r</code>-curling on syllables like 哥 (<span class="tp">ger</span> / <em>gē</em>) or 德 (<span class="tp">der2</span> / <em>dé</em>).</li>
+                <li><strong>Sole American Rhotic Exception:</strong> Only the standalone retroflex syllable <code>er</code>—written as <span class="tp">(uh)-er</span> (for 兒/而/耳) or <span class="tp">uh-er4</span> (for 二 / "Two")—uses the <strong>American English r-colored (rhotic) <code>r</code> sound</strong>.</li>
+            </ul>
+
+            <h3 class="subsection-title">2.3 Vocal Resonance &amp; Inherent Voicing of Standalone Consonants</h3>
+            <ul>
+                <li><strong>Core Principle:</strong> Every Chinese character is inherently voiced because every Mandarin syllable contains a vowel nucleus. Unlike English, where word-final sibilants and affricates (such as <code>-s</code> in <em>bus</em>, <code>-ce</code> in <em>force</em>, or <code>-ts</code> in <em>cats</em>) end in unvoiced, breathy airflow, Mandarin standalone syllables must end in a <strong>full, resonant voiced vowel</strong>.</li>
+                <li><strong>Visual Omission of Apical <code>-i</code>:</strong> In Hanyu Pinyin, the syllables <code>zi, ci, si, zhi, chi, shi, ri</code> use the letter <code>i</code> to represent apical (tongue-tip) vowels, which English speakers invariably mispronounce as /i&#720;/ (<em>see</em>) or /&#618;/ (<em>sit</em>). Trees Pinyin eliminates this confusion by omitting the letter <code>i</code> entirely, writing them as standalone symbols: <span class="tp">ds</span>, <span class="tp">ts</span>, <span class="tp">s</span>, <span class="tp">(r)ds</span>, <span class="tp">(r)ts</span>, <span class="tp">(r)s</span>, <span class="tp">(r)th</span>.</li>
+                <li><strong>Burst-to-Resonance Transition:</strong> When pronouncing any of these standalone symbols, start with a sharp burst of air or friction (e.g., for Four / 四 / <em>sì</em> &rarr; <span class="tp">s4</span>, start like the <code>-ce</code> at the end of <em>for<span class="underline-blend">ce</span></em> or <code>-s</code> in <em>bu<span class="underline-blend">s</span></em>; for <span class="tp">ts</span>, start like <code>-ts</code> in <em>ca<span class="underline-blend">ts</span></em>), <strong>but immediately engage the vocal cords while holding the exact same tongue position, transitioning into a strong, continuous, resonant voiced vowel</strong> until the end of the beat.</li>
+            </ul>
+        </section>
+
+        <!-- PART III -->
+        <section id="part3" class="card-section">
+            <h2 class="section-title">PART III: COMPLETE MAPPING DIRECTORY (HANYU PINYIN TO TREES PINYIN)</h2>
+
+            <div class="search-bar-wrap">
+                <input type="text" id="symbolSearch" class="search-input" placeholder="Quick filter by Hanyu Pinyin, Trees Pinyin, or Chinese character (e.g., q, tsee, ü, zh, 花)...">
+            </div>
+
+            <!-- 3.1 23 Initials -->
+            <h3 id="initials" class="subsection-title">3.1 Directory of 23 Initials (聲母對應與發音解析)</h3>
+            <div class="mapping-grid">
+                <div class="map-item">
+                    <div class="map-header"><span><span class="hp-symbol">1. b</span><span class="arrow">&rarr;</span><span class="tp-large">b</span></span><span class="badge-tag">Direct Match</span></div>
+                    <p class="map-desc">Identical to English initial <code>b</code> (as in <em><span class="underline-blend">b</span>oy</em>); unaspirated bilabial stop.</p>
+                    <div class="map-ex"><strong>Examples:</strong> 八 <span class="tp">bah</span> (<em>bā</em>), 波 <span class="tp">booer</span> (<em>bō</em>)</div>
+                </div>
+                <div class="map-item">
+                    <div class="map-header"><span><span class="hp-symbol">2. p</span><span class="arrow">&rarr;</span><span class="tp-large">p</span></span><span class="badge-tag">Direct Match</span></div>
+                    <p class="map-desc">Identical to English initial <code>p</code> (as in <em><span class="underline-blend">p</span>en</em>); strongly aspirated bilabial stop.</p>
+                    <div class="map-ex"><strong>Examples:</strong> 怕 <span class="tp">pah4</span> (<em>pà</em>), 婆 <span class="tp">pooer2</span> (<em>pó</em>)</div>
+                </div>
+                <div class="map-item">
+                    <div class="map-header"><span><span class="hp-symbol">3. m</span><span class="arrow">&rarr;</span><span class="tp-large">m</span></span><span class="badge-tag">Direct Match</span></div>
+                    <p class="map-desc">Identical to English <code>m</code> (as in <em><span class="underline-blend">m</span>an</em>); bilabial nasal.</p>
+                    <div class="map-ex"><strong>Examples:</strong> 媽 <span class="tp">mah</span> (<em>mā</em>), 摸 <span class="tp">mooer</span> (<em>mō</em>)</div>
+                </div>
+                <div class="map-item">
+                    <div class="map-header"><span><span class="hp-symbol">4. f</span><span class="arrow">&rarr;</span><span class="tp-large">f</span></span><span class="badge-tag">Direct Match</span></div>
+                    <p class="map-desc">Identical to English <code>f</code> (as in <em><span class="underline-blend">f</span>un</em>); labiodental fricative.</p>
+                    <div class="map-ex"><strong>Examples:</strong> 發 <span class="tp">fah</span> (<em>fā</em>), 佛 <span class="tp">fooer2</span> (<em>fó</em>)</div>
+                </div>
+                <div class="map-item">
+                    <div class="map-header"><span><span class="hp-symbol">5. d</span><span class="arrow">&rarr;</span><span class="tp-large">d</span></span><span class="badge-tag">Direct Match</span></div>
+                    <p class="map-desc">Identical to English initial <code>d</code> (as in <em><span class="underline-blend">d</span>og</em>); unaspirated alveolar stop.</p>
+                    <div class="map-ex"><strong>Examples:</strong> 大 <span class="tp">dah4</span> (<em>dà</em>), 得 <span class="tp">der2</span> (<em>dé</em>)</div>
+                </div>
+                <div class="map-item">
+                    <div class="map-header"><span><span class="hp-symbol">6. t</span><span class="arrow">&rarr;</span><span class="tp-large">t</span></span><span class="badge-tag">Direct Match</span></div>
+                    <p class="map-desc">Identical to English initial <code>t</code> (as in <em><span class="underline-blend">t</span>op</em>); strongly aspirated alveolar stop.</p>
+                    <div class="map-ex"><strong>Examples:</strong> 他 <span class="tp">tah</span> (<em>tā</em>), 特 <span class="tp">ter4</span> (<em>tè</em>)</div>
+                </div>
+                <div class="map-item">
+                    <div class="map-header"><span><span class="hp-symbol">7. n</span><span class="arrow">&rarr;</span><span class="tp-large">n</span></span><span class="badge-tag">Direct Match</span></div>
+                    <p class="map-desc">Identical to English <code>n</code> (as in <em><span class="underline-blend">n</span>o</em>); alveolar nasal.</p>
+                    <div class="map-ex"><strong>Examples:</strong> 拿 <span class="tp">nah2</span> (<em>ná</em>), 呢 <span class="tp">ner</span> (<em>ne</em>)</div>
+                </div>
+                <div class="map-item">
+                    <div class="map-header"><span><span class="hp-symbol">8. l</span><span class="arrow">&rarr;</span><span class="tp-large">L</span></span><span class="badge-tag">Visual Anti-Confusion</span></div>
+                    <p class="map-desc">Identical in sound to English <code>l</code> (as in <em><span class="underline-blend">l</span>ove</em>). <strong>Fixed as uppercase <code>L</code></strong> so it is never confused with uppercase <code>I</code> or digit <code>1</code> in italic type.</p>
+                    <div class="map-ex"><strong>Examples:</strong> 拉 <span class="tp">Lah</span> (<em>lā</em>), 樂 <span class="tp">Ler4</span> (<em>lè</em>)</div>
+                </div>
+                <div class="map-item">
+                    <div class="map-header"><span><span class="hp-symbol">9. g</span><span class="arrow">&rarr;</span><span class="tp-large">g</span></span><span class="badge-tag">Direct Match</span></div>
+                    <p class="map-desc">Identical to English hard <code>g</code> (as in <em><span class="underline-blend">g</span>o</em>); unaspirated velar stop.</p>
+                    <div class="map-ex"><strong>Examples:</strong> 哥 <span class="tp">ger</span> (<em>gē</em>), 高 <span class="tp">gaw</span> (<em>gāo</em>)</div>
+                </div>
+                <div class="map-item">
+                    <div class="map-header"><span><span class="hp-symbol">10. k</span><span class="arrow">&rarr;</span><span class="tp-large">k</span></span><span class="badge-tag">Direct Match</span></div>
+                    <p class="map-desc">Identical to English <code>k</code> (as in <em><span class="underline-blend">k</span>ey</em>); strongly aspirated velar stop.</p>
+                    <div class="map-ex"><strong>Examples:</strong> 卡 <span class="tp">kah3</span> (<em>kǎ</em>), 科 <span class="tp">ker</span> (<em>kē</em>)</div>
+                </div>
+                <div class="map-item">
+                    <div class="map-header"><span><span class="hp-symbol">11. h</span><span class="arrow">&rarr;</span><span class="tp-large">h</span></span><span class="badge-tag">Direct Match</span></div>
+                    <p class="map-desc">Similar to English <code>h</code> (as in <em><span class="underline-blend">h</span>at</em>) with slightly stronger velar friction.</p>
+                    <div class="map-ex"><strong>Examples:</strong> 哈 <span class="tp">hah</span> (<em>hā</em>), 喝 <span class="tp">her</span> (<em>hē</em>)</div>
+                </div>
+                <div class="map-item">
+                    <div class="map-header"><span><span class="hp-symbol">12. j</span><span class="arrow">&rarr;</span><span class="tp-large">j</span></span><span class="badge-tag">Alveolo-Palatal</span></div>
+                    <p class="map-desc">Uses English <code>j</code> intuition (as in <em><span class="underline-blend">j</span>eep</em>), pronounced with tongue blade flat against hard palate and unrounded lips. Carries an inherent <code>ee</code> glide property.</p>
+                    <div class="map-ex"><strong>Examples:</strong> 機 <span class="tp">jee</span> (<em>jī</em>), 家 <span class="tp">jeeah</span> (<em>jiā</em>), 節 <span class="tp">jeer2</span> (<em>jié</em>)</div>
+                </div>
+                <div class="map-item">
+                    <div class="map-header"><span><span class="hp-symbol">13. q</span><span class="arrow">&rarr;</span><span class="tp-large">tsee</span></span><span class="badge-tag">Special Cluster</span></div>
+                    <p class="map-desc">Mandarin <code>q</code> is an aspirated alveolo-palatal affricate. Combining aspirated English <code>ts</code> (<em>ca<span class="underline-blend">ts</span></em>) with high front <code>ee</code> (<em>s<span class="underline-blend">ee</span></em>) flattens the tongue blade while releasing a strong burst of air (e.g., <em>Le<span class="underline-blend">t's see an</span></em> &rarr; <span class="tp">tseean</span>).</p>
+                    <div class="map-ex"><strong>Examples:</strong> 七 <span class="tp">tsee</span> (<em>qī</em>), 千 <span class="tp">tseean</span> (<em>qiān</em>), 請 <span class="tp">tsing3</span> (<em>qǐng</em>)</div>
+                </div>
+                <div class="map-item">
+                    <div class="map-header"><span><span class="hp-symbol">14. x</span><span class="arrow">&rarr;</span><span class="tp-large">see</span></span><span class="badge-tag">Special Cluster</span></div>
+                    <p class="map-desc">Mandarin <code>x</code> is an alveolo-palatal fricative. Using English <code>see</code> (<em><span class="underline-blend">see</span></em>) anchors the tongue tip behind the lower teeth while raising the tongue blade toward the hard palate.</p>
+                    <div class="map-ex"><strong>Examples:</strong> 西 <span class="tp">see</span> (<em>xī</em>), 下 <span class="tp">seeah4</span> (<em>xià</em>), 心 <span class="tp">seen</span> (<em>xīn</em>)</div>
+                </div>
+                <div class="map-item">
+                    <div class="map-header"><span><span class="hp-symbol">15. zh</span><span class="arrow">&rarr;</span><span class="tp-large">(r)ds</span></span><span class="badge-tag">Silent Retroflex</span></div>
+                    <p class="map-desc">Silent <span class="tp">(r)</span> pre-curls the tongue tip into the <code>r</code> position while pronouncing the unaspirated English <code>ds</code> cluster (as in <em>bi<span class="underline-blend">rds</span></em> or <em>ha<span class="underline-blend">nds</span></em>).</p>
+                    <div class="map-ex"><strong>Examples:</strong> 知 <span class="tp">(r)ds</span> (<em>zhī</em>), 中 <span class="tp">(r)dser-oong</span> (<em>zhōng</em>)</div>
+                </div>
+                <div class="map-item">
+                    <div class="map-header"><span><span class="hp-symbol">16. ch</span><span class="arrow">&rarr;</span><span class="tp-large">(r)ts</span></span><span class="badge-tag">Silent Retroflex</span></div>
+                    <p class="map-desc">Silent <span class="tp">(r)</span> pre-curls the tongue tip into the <code>r</code> position while pronouncing the strongly aspirated English <code>ts</code> cluster (as in <em>ca<span class="underline-blend">ts</span></em>).</p>
+                    <div class="map-ex"><strong>Examples:</strong> 吃 <span class="tp">(r)ts</span> (<em>chī</em>), 出 <span class="tp">(r)tsoo</span> (<em>chū</em>)</div>
+                </div>
+                <div class="map-item">
+                    <div class="map-header"><span><span class="hp-symbol">17. sh</span><span class="arrow">&rarr;</span><span class="tp-large">(r)s</span></span><span class="badge-tag">Silent Retroflex</span></div>
+                    <p class="map-desc">Silent <span class="tp">(r)</span> pre-curls the tongue tip into the <code>r</code> position while releasing the <code>s</code> fricative airstream, producing a true retroflex <code>sh</code>.</p>
+                    <div class="map-ex"><strong>Examples:</strong> 十 <span class="tp">(r)s2</span> (<em>shí</em>), 書 <span class="tp">(r)soo</span> (<em>shū</em>)</div>
+                </div>
+                <div class="map-item">
+                    <div class="map-header"><span><span class="hp-symbol">18. r</span><span class="arrow">&rarr;</span><span class="tp-large">(r)th</span></span><span class="badge-tag">Silent Retroflex</span></div>
+                    <p class="map-desc">Silent <span class="tp">(r)</span> pre-curls the tongue tip into the <code>r</code> position while vibrating the vocal cords with voiced English <code>th</code> (/&eth;/, as in <em><span class="underline-blend">th</span>is</em>).</p>
+                    <div class="map-ex"><strong>Examples:</strong> 日 <span class="tp">(r)th4</span> (<em>rì</em>), 熱 <span class="tp">(r)ther4</span> (<em>rè</em>)</div>
+                </div>
+                <div class="map-item">
+                    <div class="map-header"><span><span class="hp-symbol">19. z</span><span class="arrow">&rarr;</span><span class="tp-large">ds</span></span><span class="badge-tag">Alveolar Affricate</span></div>
+                    <p class="map-desc">Matches the English unaspirated plural ending <code>ds</code> (as in <em>ca<span class="underline-blend">rds</span></em> or <em>be<span class="underline-blend">ds</span></em>), pronounced with a flat tongue tip at the upper teeth ridge.</p>
+                    <div class="map-ex"><strong>Examples:</strong> 字 <span class="tp">ds4</span> (<em>zì</em>), 早 <span class="tp">dsaw3</span> (<em>zǎo</em>)</div>
+                </div>
+                <div class="map-item">
+                    <div class="map-header"><span><span class="hp-symbol">20. c</span><span class="arrow">&rarr;</span><span class="tp-large">ts</span></span><span class="badge-tag">Alveolar Affricate</span></div>
+                    <p class="map-desc">Matches the English strongly aspirated plural ending <code>ts</code> (as in <em>ca<span class="underline-blend">ts</span></em> or <em>ha<span class="underline-blend">ts</span></em>), pronounced with a flat tongue tip.</p>
+                    <div class="map-ex"><strong>Examples:</strong> 次 <span class="tp">ts4</span> (<em>cì</em>), 草 <span class="tp">tsaw3</span> (<em>cǎo</em>)</div>
+                </div>
+                <div class="map-item">
+                    <div class="map-header"><span><span class="hp-symbol">21. s</span><span class="arrow">&rarr;</span><span class="tp-large">s</span></span><span class="badge-tag">Direct Match</span></div>
+                    <p class="map-desc">Matches sharp English <code>s</code> (as in <em><span class="underline-blend">s</span>un</em> or <em>bu<span class="underline-blend">s</span></em>). Transitions into a full voiced vowel when standing alone.</p>
+                    <div class="map-ex"><strong>Examples:</strong> 四 <span class="tp">s4</span> (<em>sì</em>), 三 <span class="tp">san</span> (<em>sān</em>)</div>
+                </div>
+                <div class="map-item">
+                    <div class="map-header"><span><span class="hp-symbol">22. y</span><span class="arrow">&rarr;</span><span class="tp-large">y</span></span><span class="badge-tag">Direct Match</span></div>
+                    <p class="map-desc">Identical to English semivowel <code>y</code> (as in <em><span class="underline-blend">y</span>es</em>).</p>
+                    <div class="map-ex"><strong>Examples:</strong> 呀 <span class="tp">yah</span> (<em>yā</em>), 也 <span class="tp">yer3</span> (<em>yě</em>)</div>
+                </div>
+                <div class="map-item">
+                    <div class="map-header"><span><span class="hp-symbol">23. w</span><span class="arrow">&rarr;</span><span class="tp-large">w</span></span><span class="badge-tag">Direct Match</span></div>
+                    <p class="map-desc">Identical to English semivowel <code>w</code> (as in <em><span class="underline-blend">w</span>e</em>).</p>
+                    <div class="map-ex"><strong>Examples:</strong> 蛙 <span class="tp">wah</span> (<em>wā</em>), 我 <span class="tp">wer3</span> (<em>wǒ</em>)</div>
+                </div>
+            </div>
+
+            <!-- 3.2 24 Finals & Dual Mappings -->
+            <h3 id="finals" class="subsection-title">3.2 Directory of 24 Finals, Dual Mappings &amp; Compound Glides (韻母與複合韻母解析)</h3>
+            <div class="mapping-grid">
+                <div class="map-item">
+                    <div class="map-header"><span><span class="hp-symbol">1. a</span><span class="arrow">&rarr;</span><span class="tp-large">ah</span></span><span class="badge-tag">Open Vowel</span></div>
+                    <p class="map-desc">Matches open English exclamation <code>ah</code> (<em>f<span class="underline-blend">a</span>ther</em> /&#593;&#720;/), preventing short /&#230;/ (<em>cat</em>) or /e&#618;/ (<em>cake</em>).</p>
+                    <div class="map-ex"><strong>Examples:</strong> 媽 <span class="tp">mah</span> (<em>mā</em>), 巴 <span class="tp">bah</span> (<em>bā</em>)</div>
+                </div>
+                <div class="map-item">
+                    <div class="map-header"><span><span class="hp-symbol">2a. o (standalone)</span><span class="arrow">&rarr;</span><span class="tp-large">oh</span></span><span class="badge-tag">Dual Mapping 1</span></div>
+                    <p class="map-desc">When <code>o</code> stands alone as an interjection or single syllable, it maps to English <code>oh</code> (<em><span class="underline-blend">oh</span></em>, <em>g<span class="underline-blend">o</span></em>).</p>
+                    <div class="map-ex"><strong>Example:</strong> 哦 <span class="tp">oh2</span> (<em>ó</em>)</div>
+                </div>
+                <div class="map-item">
+                    <div class="map-header"><span><span class="hp-symbol">2b. o (b/p/m/f)</span><span class="arrow">&rarr;</span><span class="tp-large">ooer</span></span><span class="badge-tag">Dual Mapping 2</span></div>
+                    <p class="map-desc">With labial initials (<code>b, p, m, f</code>), Mandarin inserts a natural rounded w-glide (/u&#815;&#596;/), gliding from <code>oo</code> into British non-rhotic <code>er</code> in one beat.</p>
+                    <div class="map-ex"><strong>Examples:</strong> 波 <span class="tp">booer</span>, 坡 <span class="tp">pooer</span>, 摸 <span class="tp">mooer</span>, 佛 <span class="tp">fooer2</span></div>
+                </div>
+                <div class="map-item">
+                    <div class="map-header"><span><span class="hp-symbol">3. e</span><span class="arrow">&rarr;</span><span class="tp-large">er</span></span><span class="badge-tag">British Non-Rhotic</span></div>
+                    <p class="map-desc">Uses <strong>British non-rhotic <code>er</code></strong> (<em>h<span class="underline-blend">er</span></em>, <em>t<span class="underline-blend">er</span>m</em>, silent <code>r</code>), preventing misreading <code>e</code> as /i&#720;/ (<em>me</em>) or /e/ (<em>bed</em>).</p>
+                    <div class="map-ex"><strong>Examples:</strong> 哥 <span class="tp">ger</span> (<em>gē</em>), 車 <span class="tp">(r)tser</span> (<em>chē</em>)</div>
+                </div>
+                <div class="map-item">
+                    <div class="map-header"><span><span class="hp-symbol">4. i</span><span class="arrow">&rarr;</span><span class="tp-large">ee</span></span><span class="badge-tag">High Front Vowel</span></div>
+                    <p class="map-desc">Matches English <code>ee</code> (<em>b<span class="underline-blend">ee</span></em>, <em>s<span class="underline-blend">ee</span></em> /i&#720;/), avoiding /a&#618;/ (<em>bike</em>) or short /&#618;/ (<em>sit</em>).</p>
+                    <div class="map-ex"><strong>Examples:</strong> 低 <span class="tp">dee</span> (<em>dī</em>), 米 <span class="tp">mee3</span> (<em>mǐ</em>)</div>
+                </div>
+                <div class="map-item">
+                    <div class="map-header"><span><span class="hp-symbol">5. u</span><span class="arrow">&rarr;</span><span class="tp-large">oo</span></span><span class="badge-tag">Rounded Vowel</span></div>
+                    <p class="map-desc">Matches English long <code>oo</code> (<em>m<span class="underline-blend">oo</span>n</em>, <em>f<span class="underline-blend">oo</span>d</em> /u&#720;/), avoiding /&#652;/ (<em>cup</em>) or /ju&#720;/ (<em>use</em>).</p>
+                    <div class="map-ex"><strong>Examples:</strong> 都 <span class="tp">doo</span> (<em>dū</em>), 書 <span class="tp">(r)soo</span> (<em>shū</em>)</div>
+                </div>
+                <div class="map-item">
+                    <div class="map-header"><span><span class="hp-symbol">6. ü / v</span><span class="arrow">&rarr;</span><span class="tp-large">ee(oo)</span></span><span class="badge-tag">Silent Lip Guide</span></div>
+                    <p class="map-desc"><strong>Core Invention:</strong> Vocalize <span class="tp">ee</span> (/i&#720;/) while holding the rounded lip posture of <span class="tp">(oo)</span> (/u&#720;/). The <code>(oo)</code> is silent; only its lip shape is maintained.</p>
+                    <div class="map-ex"><strong>Examples:</strong> 女 <span class="tp">nee(oo)3</span> (<em>nǚ</em>), 綠 <span class="tp">Lee(oo)4</span> (<em>lǜ</em>)</div>
+                </div>
+                <div class="map-item">
+                    <div class="map-header"><span><span class="hp-symbol">7. er</span><span class="arrow">&rarr;</span><span class="tp-large">(uh)-er / uh-er</span></span><span class="badge-tag">Rhotic Exception</span></div>
+                    <p class="map-desc">The <strong>only symbol using American rhotic <code>er</code></strong>. Written <span class="tp">(uh)-er</span> for Tone 2/3 words, and locked as <span class="tp">uh-er4</span> for "Two" (二).</p>
+                    <div class="map-ex"><strong>Examples:</strong> 兒 <span class="tp">(uh)-er2</span>, 耳 <span class="tp">(uh)-er3</span>, 二 <span class="tp">uh-er4</span></div>
+                </div>
+                <div class="map-item">
+                    <div class="map-header"><span><span class="hp-symbol">8. ai</span><span class="arrow">&rarr;</span><span class="tp-large">ie</span></span><span class="badge-tag">Diphthong</span></div>
+                    <p class="map-desc">Matches English <code>ie</code> (<em>p<span class="underline-blend">ie</span></em>, <em>t<span class="underline-blend">ie</span></em>, <em>l<span class="underline-blend">ie</span></em> /a&#618;/).</p>
+                    <div class="map-ex"><strong>Examples:</strong> 愛 <span class="tp">ie4</span> (<em>ài</em>), 買 <span class="tp">mie3</span> (<em>mǎi</em>)</div>
+                </div>
+                <div class="map-item">
+                    <div class="map-header"><span><span class="hp-symbol">9. ei</span><span class="arrow">&rarr;</span><span class="tp-large">ay</span></span><span class="badge-tag">Diphthong</span></div>
+                    <p class="map-desc">Matches English <code>ay</code> (<em>d<span class="underline-blend">ay</span></em>, <em>s<span class="underline-blend">ay</span></em>, <em>m<span class="underline-blend">ay</span></em> /e&#618;/).</p>
+                    <div class="map-ex"><strong>Examples:</strong> 杯 <span class="tp">bay</span> (<em>bēi</em>), 美 <span class="tp">may3</span> (<em>měi</em>)</div>
+                </div>
+                <div class="map-item">
+                    <div class="map-header"><span><span class="hp-symbol">10. ui</span><span class="arrow">&rarr;</span><span class="tp-large">ooay</span></span><span class="badge-tag">Compound Glide</span></div>
+                    <p class="map-desc">Contraction of <code>u + ei</code> (/u&#815;e&#618;/). Blending <code>oo</code> + <code>ay</code> in one beat prevents misreading <code>ui</code> as in <em>fruit</em> or <em>build</em>.</p>
+                    <div class="map-ex"><strong>Examples:</strong> 水 <span class="tp">(r)sooay3</span> (<em>shuǐ</em>), 對 <span class="tp">dooay4</span> (<em>duì</em>)</div>
+                </div>
+                <div class="map-item">
+                    <div class="map-header"><span><span class="hp-symbol">11. ao</span><span class="arrow">&rarr;</span><span class="tp-large">aw</span></span><span class="badge-tag">Back Diphthong</span></div>
+                    <p class="map-desc">Uses English <code>aw</code> / <code>ow</code> back-gliding contour for the deep open-to-rounded back diphthong <code>ao</code>.</p>
+                    <div class="map-ex"><strong>Examples:</strong> 好 <span class="tp">haw3</span> (<em>hǎo</em>), 高 <span class="tp">gaw</span> (<em>gāo</em>)</div>
+                </div>
+                <div class="map-item">
+                    <div class="map-header"><span><span class="hp-symbol">12. ou</span><span class="arrow">&rarr;</span><span class="tp-large">oh</span></span><span class="badge-tag">Diphthong</span></div>
+                    <p class="map-desc">Matches English <code>oh</code> (<em>g<span class="underline-blend">o</span></em>, <em>n<span class="underline-blend">o</span></em>, <em>s<span class="underline-blend">o</span></em> /o&#650;/), preventing misreading <code>ou</code> as in <em>out</em> or <em>you</em>.</p>
+                    <div class="map-ex"><strong>Examples:</strong> 走 <span class="tp">dsoh3</span> (<em>zǒu</em>), 頭 <span class="tp">toh2</span> (<em>tóu</em>), 候 <span class="tp">hoh4</span> (<em>hòu</em>)</div>
+                </div>
+                <div class="map-item">
+                    <div class="map-header"><span><span class="hp-symbol">13. iu</span><span class="arrow">&rarr;</span><span class="tp-large">eeoh</span></span><span class="badge-tag">Compound Glide</span></div>
+                    <p class="map-desc">Contraction of <code>i + ou</code> (/i&#815;o&#650;/). Blending <span class="tp">ee</span> and <span class="tp">oh</span> in one beat restores the hidden mid-vowel transition.</p>
+                    <div class="map-ex"><strong>Examples:</strong> 六 <span class="tp">Leeoh4</span> (<em>liù</em>), 牛 <span class="tp">neeoh2</span> (<em>niú</em>)</div>
+                </div>
+                <div class="map-item">
+                    <div class="map-header"><span><span class="hp-symbol">14. ie</span><span class="arrow">&rarr;</span><span class="tp-large">eer</span></span><span class="badge-tag">Compound Glide</span></div>
+                    <p class="map-desc">Uses British non-rhotic <code>eer</code> (<em>d<span class="underline-blend">eer</span></em>, <em>p<span class="underline-blend">eer</span></em>), smoothly blending <code>ee</code> into non-rhotic <code>er</code> in one beat (/i&#815;&#603;/).</p>
+                    <div class="map-ex"><strong>Examples:</strong> 謝 <span class="tp">seer4</span> (<em>xiè</em>), 姐 <span class="tp">jeer3</span> (<em>jiě</em>), 節 <span class="tp">jeer2</span> (<em>jié</em>)</div>
+                </div>
+                <div class="map-item">
+                    <div class="map-header"><span><span class="hp-symbol">15. üe / ve</span><span class="arrow">&rarr;</span><span class="tp-large">ee(oo)er</span></span><span class="badge-tag">Rounded Glide</span></div>
+                    <p class="map-desc">Starts with rounded front vowel <span class="tp">ee(oo)</span> (<code>ü</code>) and glides seamlessly into non-rhotic British <span class="tp">er</span> within one beat.</p>
+                    <div class="map-ex"><strong>Examples:</strong> 學 <span class="tp">see(oo)er2</span> (<em>xué</em>), 略 <span class="tp">Lee(oo)er4</span> (<em>lüè</em>)</div>
+                </div>
+                <div class="map-item">
+                    <div class="map-header"><span><span class="hp-symbol">16. an</span><span class="arrow">&rarr;</span><span class="tp-large">an</span></span><span class="badge-tag">Alveolar Nasal</span></div>
+                    <p class="map-desc">Matches natural English <code>an</code> (<em>c<span class="underline-blend">an</span></em>, <em>m<span class="underline-blend">an</span></em>), ending with tongue tip at alveolar ridge <code>-n</code>.</p>
+                    <div class="map-ex"><strong>Examples:</strong> 安 <span class="tp">an</span> (<em>ān</em>), 三 <span class="tp">san</span> (<em>sān</em>)</div>
+                </div>
+                <div class="map-item">
+                    <div class="map-header"><span><span class="hp-symbol">17. en</span><span class="arrow">&rarr;</span><span class="tp-large">er-n</span></span><span class="badge-tag">Hyphen Anti-Confusion</span></div>
+                    <p class="map-desc">Combines non-rhotic schwa <span class="tp">er</span> (/&#601;/) with <code>-n</code> (<em>tak<span class="underline-blend">en</span></em>). <strong>Hyphen <code>-</code> is mandatory</strong> so italic <code>rn</code> is never misread as <code>m</code>.</p>
+                    <div class="map-ex"><strong>Examples:</strong> 門 <span class="tp">mer-n2</span> (<em>mén</em>), 很 <span class="tp">her-n3</span> (<em>hěn</em>), 問 <span class="tp">wer-n4</span> (<em>wèn</em>)</div>
+                </div>
+                <div class="map-item">
+                    <div class="map-header"><span><span class="hp-symbol">18. in</span><span class="arrow">&rarr;</span><span class="tp-large">een</span></span><span class="badge-tag">Front Nasal</span></div>
+                    <p class="map-desc">Combines long vowel <span class="tp">ee</span> with <code>-n</code> (<em>s<span class="underline-blend">een</span></em>, <em>gr<span class="underline-blend">een</span></em>), avoiding lax short /&#618;n/ (<em>pin</em>).</p>
+                    <div class="map-ex"><strong>Examples:</strong> 心 <span class="tp">seen</span> (<em>xīn</em>), 金 <span class="tp">jeen</span> (<em>jīn</em>)</div>
+                </div>
+                <div class="map-item">
+                    <div class="map-header"><span><span class="hp-symbol">19. un</span><span class="arrow">&rarr;</span><span class="tp-large">oon</span></span><span class="badge-tag">Rounded Nasal</span></div>
+                    <p class="map-desc">Combines rounded <span class="tp">oo</span> with <code>-n</code> (<em>m<span class="underline-blend">oon</span></em>, <em>s<span class="underline-blend">oon</span></em>), preventing reading <code>un</code> as /&#652;n/ (<em>sun</em>).</p>
+                    <div class="map-ex"><strong>Examples:</strong> 村 <span class="tp">tsoon</span> (<em>cūn</em>), 春 <span class="tp">(r)tsoon</span> (<em>chūn</em>)</div>
+                </div>
+                <div class="map-item">
+                    <div class="map-header"><span><span class="hp-symbol">20. ün / vn</span><span class="arrow">&rarr;</span><span class="tp-large">ee(oo)n</span></span><span class="badge-tag">Rounded Nasal</span></div>
+                    <p class="map-desc">Maintains the <span class="tp">ee(oo)</span> (<code>ü</code>) tongue-and-lip posture and closes directly onto alveolar nasal <code>-n</code>.</p>
+                    <div class="map-ex"><strong>Examples:</strong> 軍 <span class="tp">jee(oo)n</span> (<em>jūn</em>), 群 <span class="tp">tsee(oo)n2</span> (<em>qún</em>)</div>
+                </div>
+                <div class="map-item">
+                    <div class="map-header"><span><span class="hp-symbol">21. ang</span><span class="arrow">&rarr;</span><span class="tp-large">ang</span></span><span class="badge-tag">Velar Nasal</span></div>
+                    <p class="map-desc">Open back vowel <code>a</code> followed by deep velar nasal <code>-ng</code>.</p>
+                    <div class="map-ex"><strong>Examples:</strong> 忙 <span class="tp">mang2</span> (<em>máng</em>), 方 <span class="tp">fang</span> (<em>fāng</em>)</div>
+                </div>
+                <div class="map-item">
+                    <div class="map-header"><span><span class="hp-symbol">22. eng</span><span class="arrow">&rarr;</span><span class="tp-large">er-ng</span></span><span class="badge-tag">Velar Nasal</span></div>
+                    <p class="map-desc">Combines non-rhotic central vowel <span class="tp">er</span> + hyphen <code>-</code> + velar nasal <code>ng</code>.</p>
+                    <div class="map-ex"><strong>Examples:</strong> 風 <span class="tp">fer-ng</span> (<em>fēng</em>), 生 <span class="tp">(r)ser-ng</span> (<em>shēng</em>)</div>
+                </div>
+                <div class="map-item">
+                    <div class="map-header"><span><span class="hp-symbol">23. ing</span><span class="arrow">&rarr;</span><span class="tp-large">ing</span></span><span class="badge-tag">Velar Nasal</span></div>
+                    <p class="map-desc">Identical in spelling and sound to English <code>-ing</code> (<em>s<span class="underline-blend">ing</span></em>, <em>k<span class="underline-blend">ing</span></em>).</p>
+                    <div class="map-ex"><strong>Examples:</strong> 聽 <span class="tp">ting</span> (<em>tīng</em>), 明 <span class="tp">ming2</span> (<em>míng</em>)</div>
+                </div>
+                <div class="map-item">
+                    <div class="map-header"><span><span class="hp-symbol">24. ong</span><span class="arrow">&rarr;</span><span class="tp-large">er-oong</span></span><span class="badge-tag">Rounded Velar Nasal</span></div>
+                    <p class="map-desc">Glides from non-rhotic <span class="tp">er</span> through a hyphen into rounded back velar nasal <span class="tp">oong</span>.</p>
+                    <div class="map-ex"><strong>Examples:</strong> 東 <span class="tp">der-oong</span> (<em>dōng</em>), 紅 <span class="tp">her-oong2</span> (<em>hóng</em>)</div>
+                </div>
+                <div class="map-item">
+                    <div class="map-header"><span><span class="hp-symbol">25. ia / ian / iao</span><span class="arrow">&rarr;</span><span class="tp-large">eeah / eean / eeaw</span></span><span class="badge-tag">Medial Glides</span></div>
+                    <p class="map-desc">Blends palatal medial <span class="tp">ee</span> (<code>i</code>) with <span class="tp">ah</span>, <span class="tp">an</span>, or <span class="tp">aw</span> in a single beat (e.g., <em>Le<span class="underline-blend">t's see an</span></em> &rarr; <span class="tp">tseean</span>).</p>
+                    <div class="map-ex"><strong>Examples:</strong> 家 <span class="tp">jeeah</span>, 千 <span class="tp">tseean</span>, 小 <span class="tp">seeaw3</span></div>
+                </div>
+                <div class="map-item">
+                    <div class="map-header"><span><span class="hp-symbol">26. ua / uai / uan</span><span class="arrow">&rarr;</span><span class="tp-large">ooah / ooie / ooan</span></span><span class="badge-tag">Labial Glides</span></div>
+                    <p class="map-desc">Blends labial medial <span class="tp">oo</span> (<code>u</code>) with <span class="tp">ah</span>, <span class="tp">ie</span>, or <span class="tp">an</span> in one beat (e.g., 花 <span class="tp">hooah</span> sounds like <em>"<span class="underline-blend">who are</span>"</em>).</p>
+                    <div class="map-ex"><strong>Examples:</strong> 花 <span class="tp">hooah</span>, 快 <span class="tp">kooie4</span>, 關 <span class="tp">gooan</span></div>
+                </div>
+                <div class="map-item">
+                    <div class="map-header"><span><span class="hp-symbol">27. iong</span><span class="arrow">&rarr;</span><span class="tp-large">eer-oong</span></span><span class="badge-tag">Palatal Velar Nasal</span></div>
+                    <p class="map-desc">Blends palatal <span class="tp">eer</span> across a hyphen into rounded velar nasal <span class="tp">oong</span> in one beat.</p>
+                    <div class="map-ex"><strong>Examples:</strong> 窮 <span class="tp">tseer-oong2</span> (<em>qióng</em>), 兄 <span class="tp">seer-oong</span> (<em>xiōng</em>)</div>
+                </div>
+            </div>
+
+            <!-- 3.3 16 Overall Syllables -->
+            <h3 id="overall" class="subsection-title">3.3 Directory of 16 Overall Syllables (整體認讀音節解析)</h3>
+            <p>Overall syllables are read directly as indivisible whole units without splitting into initial + final:</p>
+            <div class="mapping-grid">
+                <div class="map-item">
+                    <div class="map-header"><span><span class="hp-symbol">1. zhi</span><span class="arrow">&rarr;</span><span class="tp-large">(r)ds</span></span><span class="badge-tag">Retroflex Overall</span></div>
+                    <p class="map-desc">Hold <code>r</code> curled tongue + articulate <code>ds</code> + sustain voiced apical vowel resonance (<code>i</code> omitted).</p>
+                    <div class="map-ex"><strong>Examples:</strong> 知 <span class="tp">(r)ds</span>, 直 <span class="tp">(r)ds2</span>, 只 <span class="tp">(r)ds3</span>, 至 <span class="tp">(r)ds4</span></div>
+                </div>
+                <div class="map-item">
+                    <div class="map-header"><span><span class="hp-symbol">2. chi</span><span class="arrow">&rarr;</span><span class="tp-large">(r)ts</span></span><span class="badge-tag">Retroflex Overall</span></div>
+                    <p class="map-desc">Hold <code>r</code> curled tongue + articulate aspirated <code>ts</code> + sustain voiced apical vowel resonance (<code>i</code> omitted).</p>
+                    <div class="map-ex"><strong>Examples:</strong> 吃 <span class="tp">(r)ts</span>, 遲 <span class="tp">(r)ts2</span>, 尺 <span class="tp">(r)ts3</span>, 赤 <span class="tp">(r)ts4</span></div>
+                </div>
+                <div class="map-item">
+                    <div class="map-header"><span><span class="hp-symbol">3. shi</span><span class="arrow">&rarr;</span><span class="tp-large">(r)s</span></span><span class="badge-tag">Retroflex Overall</span></div>
+                    <p class="map-desc">Hold <code>r</code> curled tongue + articulate <code>s</code> friction + sustain voiced apical vowel resonance (<code>i</code> omitted).</p>
+                    <div class="map-ex"><strong>Examples:</strong> 師 <span class="tp">(r)s</span>, 十 <span class="tp">(r)s2</span>, 使 <span class="tp">(r)s3</span>, 是 <span class="tp">(r)s4</span></div>
+                </div>
+                <div class="map-item">
+                    <div class="map-header"><span><span class="hp-symbol">4. ri</span><span class="arrow">&rarr;</span><span class="tp-large">(r)th</span></span><span class="badge-tag">Retroflex Overall</span></div>
+                    <p class="map-desc">Hold <code>r</code> curled tongue + articulate voiced <code>th</code> (/&eth;/) + sustain vocal resonance (<code>i</code> omitted).</p>
+                    <div class="map-ex"><strong>Example:</strong> 日 <span class="tp">(r)th4</span> (<em>rì</em>)</div>
+                </div>
+                <div class="map-item">
+                    <div class="map-header"><span><span class="hp-symbol">5. zi</span><span class="arrow">&rarr;</span><span class="tp-large">ds</span></span><span class="badge-tag">Alveolar Overall</span></div>
+                    <p class="map-desc">Articulate flat-tongue <code>ds</code> (<em>bi<span class="underline-blend">rds</span></em>) + transition immediately into a full voiced vowel (<code>i</code> omitted).</p>
+                    <div class="map-ex"><strong>Examples:</strong> 資 <span class="tp">ds</span>, 子 <span class="tp">ds3</span>, 字 <span class="tp">ds4</span></div>
+                </div>
+                <div class="map-item">
+                    <div class="map-header"><span><span class="hp-symbol">6. ci</span><span class="arrow">&rarr;</span><span class="tp-large">ts</span></span><span class="badge-tag">Alveolar Overall</span></div>
+                    <p class="map-desc">Articulate flat-tongue aspirated <code>ts</code> (<em>ca<span class="underline-blend">ts</span></em>) + transition immediately into a full voiced vowel (<code>i</code> omitted).</p>
+                    <div class="map-ex"><strong>Examples:</strong> 詞 <span class="tp">ts2</span>, 此 <span class="tp">ts3</span>, 次 <span class="tp">ts4</span></div>
+                </div>
+                <div class="map-item">
+                    <div class="map-header"><span><span class="hp-symbol">7. si</span><span class="arrow">&rarr;</span><span class="tp-large">s</span></span><span class="badge-tag">Alveolar Overall</span></div>
+                    <p class="map-desc">Start with sharp hiss <code>s</code> (like <code>-ce</code> in <em>for<span class="underline-blend">ce</span></em>) + transition into a strong resonant vowel (<code>i</code> omitted).</p>
+                    <div class="map-ex"><strong>Examples:</strong> 思 <span class="tp">s</span>, 死 <span class="tp">s3</span>, 四 <span class="tp">s4</span></div>
+                </div>
+                <div class="map-item">
+                    <div class="map-header"><span><span class="hp-symbol">8. yi</span><span class="arrow">&rarr;</span><span class="tp-large">yee</span></span><span class="badge-tag">Overall Syllable</span></div>
+                    <p class="map-desc">Semivowel <code>y</code> + long vowel <code>ee</code> (locked spelling).</p>
+                    <div class="map-ex"><strong>Examples:</strong> 一 <span class="tp">yee</span>, 姨 <span class="tp">yee2</span>, 以 <span class="tp">yee3</span>, 意 <span class="tp">yee4</span></div>
+                </div>
+                <div class="map-item">
+                    <div class="map-header"><span><span class="hp-symbol">9. wu</span><span class="arrow">&rarr;</span><span class="tp-large">woo</span></span><span class="badge-tag">Overall Syllable</span></div>
+                    <p class="map-desc">Semivowel <code>w</code> + rounded long vowel <code>oo</code> (as in English <em><span class="underline-blend">woo</span></em>).</p>
+                    <div class="map-ex"><strong>Examples:</strong> 屋 <span class="tp">woo</span>, 無 <span class="tp">woo2</span>, 五 <span class="tp">woo3</span>, 物 <span class="tp">woo4</span></div>
+                </div>
+                <div class="map-item">
+                    <div class="map-header"><span><span class="hp-symbol">10. yu</span><span class="arrow">&rarr;</span><span class="tp-large">yee(oo)</span></span><span class="badge-tag">Overall Syllable</span></div>
+                    <p class="map-desc">Semivowel <code>y</code> + rounded front vowel <span class="tp">ee(oo)</span> (say <code>yee</code> while holding <code>oo</code> rounded lips).</p>
+                    <div class="map-ex"><strong>Examples:</strong> 魚 <span class="tp">yee(oo)2</span>, 雨 <span class="tp">yee(oo)3</span>, 玉 <span class="tp">yee(oo)4</span></div>
+                </div>
+                <div class="map-item">
+                    <div class="map-header"><span><span class="hp-symbol">11. ye</span><span class="arrow">&rarr;</span><span class="tp-large">yer</span></span><span class="badge-tag">Overall Syllable</span></div>
+                    <p class="map-desc">Semivowel <code>y</code> + non-rhotic British <code>er</code> (locked spelling).</p>
+                    <div class="map-ex"><strong>Examples:</strong> 耶 <span class="tp">yer</span>, 爺 <span class="tp">yer2</span>, 也 <span class="tp">yer3</span>, 夜 <span class="tp">yer4</span></div>
+                </div>
+                <div class="map-item">
+                    <div class="map-header"><span><span class="hp-symbol">12. yue</span><span class="arrow">&rarr;</span><span class="tp-large">yee(oo)er</span></span><span class="badge-tag">Overall Syllable</span></div>
+                    <p class="map-desc">Glide from <span class="tp">yee(oo)</span> (<code>yu</code>) smoothly into non-rhotic British <span class="tp">er</span>.</p>
+                    <div class="map-ex"><strong>Examples:</strong> 約 <span class="tp">yee(oo)er</span>, 月 <span class="tp">yee(oo)er4</span></div>
+                </div>
+                <div class="map-item">
+                    <div class="map-header"><span><span class="hp-symbol">13. yuan</span><span class="arrow">&rarr;</span><span class="tp-large">yee(oo)an</span></span><span class="badge-tag">Overall Syllable</span></div>
+                    <p class="map-desc">Glide from <span class="tp">yee(oo)</span> (<code>yu</code>) smoothly into nasal <span class="tp">an</span>.</p>
+                    <div class="map-ex"><strong>Examples:</strong> 冤 <span class="tp">yee(oo)an</span>, 元 <span class="tp">yee(oo)an2</span>, 遠 <span class="tp">yee(oo)an3</span>, 願 <span class="tp">yee(oo)an4</span></div>
+                </div>
+                <div class="map-item">
+                    <div class="map-header"><span><span class="hp-symbol">14. yin</span><span class="arrow">&rarr;</span><span class="tp-large">yeen</span></span><span class="badge-tag">Overall Syllable</span></div>
+                    <p class="map-desc">Semivowel <code>y</code> + front nasal <code>een</code>.</p>
+                    <div class="map-ex"><strong>Examples:</strong> 因 <span class="tp">yeen</span>, 銀 <span class="tp">yeen2</span>, 引 <span class="tp">yeen3</span>, 印 <span class="tp">yeen4</span></div>
+                </div>
+                <div class="map-item">
+                    <div class="map-header"><span><span class="hp-symbol">15. yun</span><span class="arrow">&rarr;</span><span class="tp-large">yee(oo)n</span></span><span class="badge-tag">Overall Syllable</span></div>
+                    <p class="map-desc">Hold <span class="tp">yee(oo)</span> (<code>yu</code>) posture and close onto alveolar nasal <code>-n</code>.</p>
+                    <div class="map-ex"><strong>Examples:</strong> 暈 <span class="tp">yee(oo)n</span>, 雲 <span class="tp">yee(oo)n2</span>, 允 <span class="tp">yee(oo)n3</span>, 運 <span class="tp">yee(oo)n4</span></div>
+                </div>
+                <div class="map-item">
+                    <div class="map-header"><span><span class="hp-symbol">16. ying</span><span class="arrow">&rarr;</span><span class="tp-large">ying</span></span><span class="badge-tag">Overall Syllable</span></div>
+                    <p class="map-desc">Semivowel <code>y</code> + velar nasal <code>ing</code>.</p>
+                    <div class="map-ex"><strong>Examples:</strong> 英 <span class="tp">ying</span>, 迎 <span class="tp">ying2</span>, 影 <span class="tp">ying3</span>, 應 <span class="tp">ying4</span></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PART IV -->
+        <section id="part4" class="card-section">
+            <h2 class="section-title">PART IV: SIX CORE SPELLING RULES &amp; VOWEL OMISSION MECHANICS</h2>
+            <p>When combining initials and finals into complete Trees Pinyin syllables, six deterministic rules govern the orthography:</p>
+
+            <h3 class="subsection-title">Rule 1: Direct Concatenation (基礎直接拼接)</h3>
+            <p>Unless modified by Rules 2 through 6 below, a Mandarin syllable is formed by directly concatenating its Trees Pinyin initial and Trees Pinyin final with no space in between:</p>
+            <ul>
+                <li><code>b</code> (<span class="tp">b</span>) + <code>a</code> (<span class="tp">ah</span>) &rarr; <span class="tp">bah</span> (巴)</li>
+                <li><code>b</code> (<span class="tp">b</span>) + <code>o</code> (<span class="tp">ooer</span>) &rarr; <span class="tp">booer</span> (波)</li>
+                <li><code>d</code> (<span class="tp">d</span>) + <code>en</code> (<span class="tp">er-n</span>) &rarr; <span class="tp">der-n</span> (扽)</li>
+                <li><code>h</code> (<span class="tp">h</span>) + <code>ua</code> (<span class="tp">ooah</span>) &rarr; <span class="tp">hooah</span> (花)</li>
+            </ul>
+
+            <h3 class="subsection-title">Rule 2: Dual Contextual Mapping of Final <code>o</code> (<code>oh</code> vs. <code>ooer</code>)</h3>
+            <ul>
+                <li><strong>Standalone Syllable / Interjection:</strong> When <code>o</code> appears as an independent syllable without an initial, it maps to <span class="tp">oh</span> (e.g., 哦 / <em>ó</em> &rarr; <span class="tp">oh2</span>).</li>
+                <li><strong>Labial Initial Combinations (<code>bo, po, mo, fo</code>):</strong> When <code>o</code> follows labial initials <code>b, p, m, f</code>, it maps to <span class="tp">ooer</span> to reflect the natural lip-rounding glide: <code>bo</code> &rarr; <span class="tp">booer</span> | <code>po</code> &rarr; <span class="tp">pooer</span> | <code>mo</code> &rarr; <span class="tp">mooer</span> | <code>fo</code> &rarr; <span class="tp">fooer</span>.</li>
+            </ul>
+
+            <h3 class="subsection-title">Rule 3: Vowel Omission / Deduplication Mechanism (輔音帶元音消疊音機制)</h3>
+            <div class="callout">
+                <strong>Core Algorithmic Rule:</strong> When an initial that inherently contains or implies the vowel letters <code>ee</code>—specifically <strong><code>q</code> (<span class="tp">tsee</span>)</strong>, <strong><code>x</code> (<span class="tp">see</span>)</strong>, and <strong><code>j</code> (<span class="tp">j</span> / inherent <span class="tp">jee</span>)</strong>—combines with any final beginning with <strong><code>ee</code> or <code>i</code></strong>, <strong>the duplicate <code>ee</code> must be automatically omitted</strong> to prevent redundant letter strings (such as <em>tseeee</em>, <em>seeee</em>, <em>seeng</em>, or <em>jeeeer</em>).
+            </div>
+
+            <div class="paradigm-columns">
+                <div class="paradigm-card">
+                    <h4>Initial <code>q</code> (<span class="tp">tsee</span>) Series</h4>
+                    <ul>
+                        <li><code>qi</code>: tsee + ee &rarr; <span class="tp">tsee</span> <em>(NOT tseeee)</em></li>
+                        <li><code>qie</code>: tsee + eer &rarr; <span class="tp">tseer</span> <em>(NOT tseeeer)</em></li>
+                        <li><code>qia</code>: tsee + eeah &rarr; <span class="tp">tseeah</span></li>
+                        <li><code>qian</code>: tsee + eean &rarr; <span class="tp">tseean</span> <em>(千 qiān)</em></li>
+                        <li><code>qiao</code>: tsee + eeaw &rarr; <span class="tp">tseeaw</span></li>
+                        <li><code>qiu</code>: tsee + eeoh &rarr; <span class="tp">tseeoh</span></li>
+                        <li><code>qin</code>: tsee + een &rarr; <span class="tp">tseen</span></li>
+                        <li><code>qing</code>: tsee + ing &rarr; <span class="tp">tsing</span> <em>(ee omitted)</em></li>
+                        <li><code>qiong</code>: tsee + eer-oong &rarr; <span class="tp">tseer-oong</span></li>
+                        <li><code>qu (qü)</code>: tsee + ee(oo) &rarr; <span class="tp">tsee(oo)</span></li>
+                        <li><code>que (qüe)</code>: tsee + ee(oo)er &rarr; <span class="tp">tsee(oo)er</span></li>
+                        <li><code>quan (qüan)</code>: tsee + ee(oo)an &rarr; <span class="tp">tsee(oo)an</span></li>
+                        <li><code>qun (qün)</code>: tsee + ee(oo)n &rarr; <span class="tp">tsee(oo)n</span></li>
+                    </ul>
+                </div>
+                <div class="paradigm-card">
+                    <h4>Initial <code>x</code> (<span class="tp">see</span>) Series</h4>
+                    <ul>
+                        <li><code>xi</code>: see + ee &rarr; <span class="tp">see</span> <em>(NOT seeee)</em></li>
+                        <li><code>xie</code>: see + eer &rarr; <span class="tp">seer</span></li>
+                        <li><code>xia</code>: see + eeah &rarr; <span class="tp">seeah</span></li>
+                        <li><code>xian</code>: see + eean &rarr; <span class="tp">seean</span></li>
+                        <li><code>xiao</code>: see + eeaw &rarr; <span class="tp">seeaw</span></li>
+                        <li><code>xiu</code>: see + eeoh &rarr; <span class="tp">seeoh</span></li>
+                        <li><code>xin</code>: see + een &rarr; <span class="tp">seen</span></li>
+                        <li><code>xing</code>: see + ing &rarr; <span class="tp">sing</span> <em>(NOT seeng)</em></li>
+                        <li><code>xiong</code>: see + eer-oong &rarr; <span class="tp">seer-oong</span></li>
+                        <li><code>xu (xü)</code>: see + ee(oo) &rarr; <span class="tp">see(oo)</span></li>
+                        <li><code>xue (xüe)</code>: see + ee(oo)er &rarr; <span class="tp">see(oo)er</span></li>
+                        <li><code>xuan (xüan)</code>: see + ee(oo)an &rarr; <span class="tp">see(oo)an</span></li>
+                        <li><code>xun (xün)</code>: see + ee(oo)n &rarr; <span class="tp">see(oo)n</span></li>
+                    </ul>
+                </div>
+                <div class="paradigm-card">
+                    <h4>Initial <code>j</code> (<span class="tp">j</span> / <span class="tp">jee</span>) Series</h4>
+                    <ul>
+                        <li><code>ji</code> &rarr; <span class="tp">jee</span></li>
+                        <li><code>jie</code> &rarr; <span class="tp">jeer</span> <em>(NOT jeeeer, e.g., 節 jeer2)</em></li>
+                        <li><code>jia</code> &rarr; <span class="tp">jeeah</span></li>
+                        <li><code>jian</code> &rarr; <span class="tp">jeean</span></li>
+                        <li><code>jiao</code> &rarr; <span class="tp">jeeaw</span></li>
+                        <li><code>jiu</code> &rarr; <span class="tp">jeeoh</span></li>
+                        <li><code>jin</code> &rarr; <span class="tp">jeen</span></li>
+                        <li><code>jing</code> &rarr; <span class="tp">jing</span></li>
+                        <li><code>jiong</code> &rarr; <span class="tp">jeer-oong</span></li>
+                        <li><code>ju (jü)</code> &rarr; <span class="tp">jee(oo)</span></li>
+                        <li><code>jue (jüe)</code> &rarr; <span class="tp">jee(oo)er</span></li>
+                        <li><code>juan (jüan)</code> &rarr; <span class="tp">jee(oo)an</span></li>
+                        <li><code>jun (jün)</code> &rarr; <span class="tp">jee(oo)n</span></li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3 class="subsection-title">Rule 4: Locked High-Frequency Syllables &amp; Words (特例鎖定單字與音節)</h3>
+            <ol>
+                <li><strong>我 (<code>wo</code> / "I, me"):</strong> Base syllable locked as <span class="tp">wer</span>; with Tone 3, written as <span class="tp">wer3</span> (e.g., 我的 <em>wǒ de</em> &rarr; <span class="tp">wer3 der</span>).</li>
+                <li><strong>也 / 耶 / 爺 / 夜 (<code>ye</code>):</strong> Base syllable locked as <span class="tp">yer</span>; "also" (也 <em>yě</em>) is written as <span class="tp">yer3</span> (e.g., 也是 <em>yě shì</em> &rarr; <span class="tp">yer3 (r)s4</span>).</li>
+                <li><strong>一 (<code>yi</code> / "One"):</strong> Base syllable locked as <span class="tp">yee</span> (with tone numbers added dynamically when tone sandhi applies, e.g., 一定 <em>yí dìng</em> &rarr; <span class="tp">yee2 ding4</span>).</li>
+                <li><strong>兒 / 而 / 耳 (<code>er</code>) vs. 二 (<code>èr</code> / "Two"):</strong> General <code>er</code> words are locked as <span class="tp">(uh)-er</span> (e.g., 兒 <span class="tp">(uh)-er2</span>), whereas the fourth-tone number "Two" (二 <em>èr</em>) is locked without parentheses as <span class="tp">uh-er4</span> (e.g., 十二 <em>shí èr</em> &rarr; <span class="tp">(r)s2 uh-er4</span>).</li>
+            </ol>
+
+            <h3 class="subsection-title">Rule 5: Hyphen Anti-Confusion Rule (<code>er-n</code>, <code>er-ng</code>, <code>er-oong</code>, <code>eer-oong</code>)</h3>
+            <p>A hyphen <code>-</code> is strictly inserted inside the finals <code>en</code> (<span class="tp">er-n</span>), <code>eng</code> (<span class="tp">er-ng</span>), <code>ong</code> (<span class="tp">er-oong</span>), <code>iong</code> (<span class="tp">eer-oong</span>), and <code>er</code> (<span class="tp">(uh)-er</span> / <span class="tp">uh-er4</span>). Writing <span class="tp">er-n</span> (as in 們 <span class="tp">mer-n</span>, 很 <span class="tp">her-n3</span>, 問 <span class="tp">wer-n4</span>) prevents the adjacent italic letters <code>r</code> and <code>n</code> (<code>rn</code>) from visually merging into the letter <code>m</code>.</p>
+
+            <h3 class="subsection-title">Rule 6: Retroflex Prefix <code>(r)</code> &amp; Apical Vowel Omission (<code>zhi, chi, shi, ri, zi, ci, si</code>)</h3>
+            <p>The retroflex initials <code>zh, ch, sh, r</code> always carry the silent prefix <span class="tp">(r)</span>, mapping to <span class="tp">(r)ds, (r)ts, (r)s, (r)th</span>. When combined with the apical vowel <code>-i</code> in overall syllables (<code>zhi, chi, shi, ri</code>), the letter <code>i</code> is omitted, leaving <span class="tp">(r)ds, (r)ts, (r)s, (r)th</span>. Likewise, flat-tongue sibilants <code>zi, ci, si</code> omit <code>i</code> and are written simply as <span class="tp">ds, ts, s</span>.</p>
+        </section>
+
+        <!-- PART V -->
+        <section id="part5" class="card-section">
+            <h2 class="section-title">PART V: TONE NOTATION SYSTEM &amp; MNEMONIC ANCHORS</h2>
+
+            <h3 class="subsection-title">5.1 Four Tones &amp; Neutral Tone Notation Rules</h3>
+            <ul>
+                <li><strong>Tone 1 (High and steady <code>&mdash;</code>) &amp; Neutral Tone (Weak form):</strong> <strong>Omitted for brevity.</strong> Any unmarked Trees Pinyin syllable is pronounced in Tone 1 (e.g., 都 <em>dū</em> &rarr; <span class="tp">doo</span>) or as a soft, short neutral tone in grammatical particles, suffixes, and reduplicated words (e.g., 哥哥 <em>gē ge</em> / "Elder brother" &rarr; <span class="tp">ger ger</span>).</li>
+                <li><strong>Tone 2 (Rising <code>/</code>):</strong> Marked with <span class="tp">2</span> at the end of the syllable (e.g., 讀 <em>dú</em> &rarr; <span class="tp">doo2</span>; 哦 <em>ó</em> &rarr; <span class="tp">oh2</span>).</li>
+                <li><strong>Tone 3 (Dipping and rising <code>v</code>):</strong> Marked with <span class="tp">3</span> at the end of the syllable (e.g., 堵 <em>dǔ</em> &rarr; <span class="tp">doo3</span>; 我 <em>wǒ</em> &rarr; <span class="tp">wer3</span>).</li>
+                <li><strong>Tone 4 (Falling emphatically <code>\</code>):</strong> Marked with <span class="tp">4</span> at the end of the syllable (e.g., 度 <em>dù</em> &rarr; <span class="tp">doo4</span>; 四 <em>sì</em> &rarr; <span class="tp">s4</span>).</li>
+            </ul>
+
+            <h3 class="subsection-title">5.2 The "Do" Contextual Tone Method (Master the Melody)</h3>
+            <p>To internalize the four Mandarin tones effortlessly, anchor each tone to the natural English intonation of the word <strong>"do"</strong> across four everyday sentences:</p>
+            <div class="tone-grid">
+                <div class="tone-card">
+                    <div class="tone-num">Tone 1 (&mdash;) &bull; <span class="tp">doo</span></div>
+                    <p>Capital (都 / <em>dū</em>)</p>
+                    <p class="do-sentence">"<span class="underline-blend">Do</span> me a favor."</p>
+                    <small>High &amp; steady (marker 1 omitted)</small>
+                </div>
+                <div class="tone-card">
+                    <div class="tone-num">Tone 2 ( / ) &bull; <span class="tp">doo2</span></div>
+                    <p>Read (讀 / <em>dú</em>)</p>
+                    <p class="do-sentence">"Will it <span class="underline-blend">do</span>?"</p>
+                    <small>Rising naturally like a question</small>
+                </div>
+                <div class="tone-card">
+                    <div class="tone-num">Tone 3 ( v ) &bull; <span class="tp">doo3</span></div>
+                    <p>Block (堵 / <em>dǔ</em>)</p>
+                    <p class="do-sentence">"<span class="underline-blend">Do</span> you like reading?"</p>
+                    <small>Dipping &amp; rising with curiosity</small>
+                </div>
+                <div class="tone-card">
+                    <div class="tone-num">Tone 4 ( \ ) &bull; <span class="tp">doo4</span></div>
+                    <p>Degree (度 / <em>dù</em>)</p>
+                    <p class="do-sentence">"Yes, I <span class="underline-blend">do</span>."</p>
+                    <small>Falling with emphasis &amp; certainty</small>
+                </div>
+            </div>
+            <p><strong>Rhythm Game:</strong> Practice rapping the four tones in sequence—"<span class="tp">doo, doo2, doo3, doo4</span>"—to build immediate rhythmic muscle memory.</p>
+
+            <h3 class="subsection-title">5.3 Number-Tone Anchor Mnemonic System (數字聲調錨點記憶系統)</h3>
+            <div class="callout">
+                <p><strong>Canonical Example &mdash; Anchor <code>12</code> (Tone 2 + Tone 4):</strong></p>
+                <ul>
+                    <li><strong>Twelve (十二 / <em>shí èr</em> / <code>12</code>)</strong> is pronounced <span class="tp">(r)s2 uh-er4</span> (literally <span class="tp">(r)s2</span> "ten" + <span class="tp">uh-er4</span> "two", carrying a <strong>Tone 2 + Tone 4</strong> melody).</li>
+                    <li>The number <strong>12</strong> naturally evokes <strong>"Holiday"</strong> because it represents December (the 12th month) and the traditional <em>"Twelve Days of Christmas"</em> holiday song.</li>
+                    <li>In Mandarin, <strong>"Holiday" (節日 / <em>jié rì</em>)</strong> is pronounced <span class="tp">jeer2 (r)th4</span>—sharing the exact same <strong>Tone 2 + Tone 4</strong> melody as "Twelve" (<code>12</code>).</li>
+                    <li>Therefore, the entry is annotated as: <span class="tp">jeer2 (r)th4</span> <code>(holiday/節日/jié rì/12)</code>. All vocabulary phrases sharing the Tone 2 + Tone 4 pattern are tagged with <code>/12)</code> and chained into memorable sentences.</li>
+                </ul>
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <p>&copy; Trees Pinyin™ Intuitive Mandarin Phonics System. All Rights Reserved.</p>
+        <p>Official Audio &amp; Learning Portal: <a href="https://www.treespinyin.com" target="_blank" rel="noopener">www.treespinyin.com</a></p>
+    </footer>
+
+    <script>
+        // Instant filter for the Mapping Directory cards
+        const searchInput = document.getElementById('symbolSearch');
+        const mapItems = document.querySelectorAll('.map-item');
+
+        searchInput.addEventListener('input', function () {
+            const query = this.value.toLowerCase().trim();
+            mapItems.forEach(item => {
+                const text = item.innerText.toLowerCase();
+                item.style.display = text.includes(query) ? '' : 'none';
+            });
+        });
+    </script>
+</body>
+</html>
