@@ -1,0 +1,346 @@
+{
+  "version": "3.0",
+  "verified": true,
+  "greetings": [
+    {
+      "id": "greet-1",
+      "title": "New Year & Festive Greetings (新年與節日祝福)",
+      "lines": [
+        {
+          "en": "Happy New Year!",
+          "trees": ["Seen", "neean2", "kooie4", "Ler4", "！"],
+          "pinyin": ["xīn", "nián", "kuài", "lè", ""],
+          "hanzi": ["新", "年", "快", "樂", ""]
+        },
+        {
+          "en": "Congratulations and be prosperous (Wish you to be rich).",
+          "trees": ["Ger-oong", "see3", "fah", "tsie2", "。"],
+          "pinyin": ["gōng", "xǐ", "fā", "cái", ""],
+          "hanzi": ["恭", "喜", "發", "財", ""]
+        },
+        {
+          "en": "Happy birthday!",
+          "trees": ["(r)ser-ng", "(r)th4", "kooie4", "Ler4", "！"],
+          "pinyin": ["shēng", "rì", "kuài", "lè", ""],
+          "hanzi": ["生", "日", "快", "樂", ""]
+        },
+        {
+          "en": "Hello everyone!",
+          "trees": ["Dah4", "jeeah", "haw3", "！"],
+          "pinyin": ["dà", "jiā", "hǎo", ""],
+          "hanzi": ["大", "家", "好", ""]
+        }
+      ]
+    }
+  ],
+  "poems": [
+    {
+      "id": "poem-goose",
+      "titleEn": "Ode to the Goose",
+      "titleZh": "詠鵝",
+      "titleTrees": "yer-oong3 er2",
+      "authorEn": "Tang Dynasty · By Luo Binwang",
+      "authorZh": "唐 · 駱賓王",
+      "authorTrees": "tang2 Looer4 been wang2",
+      "lines": [
+        {
+          "en": "Goose, goose, goose,",
+          "trees": ["er2", "，", "er2", "，", "er2", "，"],
+          "pinyin": ["é", "", "é", "", "é", ""],
+          "hanzi": ["鵝", "", "鵝", "", "鵝", ""]
+        },
+        {
+          "en": "You curve your neck and sing toward the sky.",
+          "trees": ["tsee(oo)3", "seeang4", "seeang4", "teean", "ger", "。"],
+          "pinyin": ["qū", "xiàng", "xiàng", "tiān", "gē", ""],
+          "hanzi": ["曲", "項", "向", "天", "歌", ""]
+        },
+        {
+          "en": "Your white feathers float on the green water,",
+          "trees": ["bie2", "maw2", "foo2", "Lee(oo)4", "(r)sooay3", "，"],
+          "pinyin": ["bái", "máo", "fú", "lǜ", "shuǐ", ""],
+          "hanzi": ["白", "毛", "浮", "綠", "水", ""]
+        },
+        {
+          "en": "While your red webbed feet paddle the clear waves.",
+          "trees": ["her-oong2", "(r)dsang3", "booer", "tsing", "booer", "。"],
+          "pinyin": ["hóng", "zhǎng", "bō", "qīng", "bō", ""],
+          "hanzi": ["紅", "掌", "撥", "清", "波", ""]
+        }
+      ],
+      "appreciation": "Written when the poet Luo Binwang was only seven years old, this lively poem captures a white goose swimming happily in a pond."
+    },
+    {
+      "id": "poem-wind",
+      "titleEn": "The Wind",
+      "titleZh": "風",
+      "titleTrees": "fer-ng",
+      "authorEn": "Tang Dynasty · By Li Jiao",
+      "authorZh": "唐 · 李嶠",
+      "authorTrees": "tang2 Lee3 jeeaw4",
+      "lines": [
+        {
+          "en": "It can shake down the leaves of late autumn,",
+          "trees": ["jeer3", "Looer4", "san", "tseeoh", "yer4", "，"],
+          "pinyin": ["jiě", "luò", "sān", "qiū", "yè", ""],
+          "hanzi": ["解", "落", "三", "秋", "葉", ""]
+        },
+        {
+          "en": "And gently open the blossoms of early spring.",
+          "trees": ["ner-ng2", "kie", "uh-er4", "yee(oo)er4", "hooah", "。"],
+          "pinyin": ["néng", "kāi", "èr", "yuè", "huā", ""],
+          "hanzi": ["能", "開", "二", "月", "花", ""]
+        },
+        {
+          "en": "Sweeping across the river, it raises giant waves,",
+          "trees": ["gooer4", "jeeang", "tseean", "(r)ts3", "Lang4", "，"],
+          "pinyin": ["guò", "jiāng", "qiān", "chǐ", "làng", ""],
+          "hanzi": ["過", "江", "千", "尺", "浪", ""]
+        },
+        {
+          "en": "Blowing into the bamboo grove, it bends thousands of stalks.",
+          "trees": ["(r)thoo4", "(r)dsoo2", "wan4", "gan", "seer2", "。"],
+          "pinyin": ["rù", "zhú", "wàn", "gān", "xié", ""],
+          "hanzi": ["入", "竹", "萬", "竿", "斜", ""]
+        }
+      ],
+      "appreciation": "Without ever using the word for wind in the poem, the poet shows us what the wind can do: it brushes off autumn leaves, awakens spring flowers, stirs up waves, and makes bamboo bow."
+    },
+    {
+      "id": "poem-night",
+      "titleEn": "Quiet Night Thoughts",
+      "titleZh": "靜夜思",
+      "titleTrees": "jing4 yer4 s",
+      "authorEn": "Tang Dynasty · By Li Bai",
+      "authorZh": "唐 · 李白",
+      "authorTrees": "tang2 Lee3 bie2",
+      "lines": [
+        {
+          "en": "Bright moonlight shines right before my bed,",
+          "trees": ["(r)tsooang2", "tseean2", "ming2", "yee(oo)er4", "gooang", "，"],
+          "pinyin": ["chuáng", "qián", "míng", "yuè", "guāng", ""],
+          "hanzi": ["床", "前", "明", "月", "光", ""]
+        },
+        {
+          "en": "Looking just like a layer of white frost on the ground.",
+          "trees": ["yee2", "(r)s4", "dee4", "(r)sang4", "(r)sooang", "。"],
+          "pinyin": ["yí", "shì", "dì", "shàng", "shuāng", ""],
+          "hanzi": ["疑", "是", "地", "上", "霜", ""]
+        },
+        {
+          "en": "I raise my head to gaze at the glowing moon,",
+          "trees": ["jee(oo)3", "toh2", "wang4", "ming2", "yee(oo)er4", "，"],
+          "pinyin": ["jǔ", "tóu", "wàng", "míng", "yuè", ""],
+          "hanzi": ["舉", "頭", "望", "明", "月", ""]
+        },
+        {
+          "en": "Then lower my head, thinking of my hometown.",
+          "trees": ["dee", "toh2", "s", "goo4", "seeang", "。"],
+          "pinyin": ["dī", "tóu", "sī", "gù", "xiāng", ""],
+          "hanzi": ["低", "頭", "思", "故", "鄉", ""]
+        }
+      ],
+      "appreciation": "On a quiet, sleepless night far away from home, the poet sees silvery moonlight spilling across the floor and misses his hometown."
+    },
+    {
+      "id": "poem-spring",
+      "titleEn": "Spring Morning",
+      "titleZh": "春曉",
+      "titleTrees": "(r)tsoon seeaw3",
+      "authorEn": "Tang Dynasty · By Meng Haoran",
+      "authorZh": "唐 · 孟浩然",
+      "authorTrees": "tang2 mer-ng4 haw4 (r)than2",
+      "lines": [
+        {
+          "en": "Sleeping soundly in spring, I did not notice the dawn,",
+          "trees": ["(r)tsoon", "meean2", "boo4", "jee(oo)er2", "seeaw3", "，"],
+          "pinyin": ["chūn", "mián", "bù", "jué", "xiǎo", ""],
+          "hanzi": ["春", "眠", "不", "覺", "曉", ""]
+        },
+        {
+          "en": "Until I heard cheerful birds singing everywhere.",
+          "trees": ["(r)tsoo4", "(r)tsoo4", "wer-n2", "tee2", "neeaw3", "。"],
+          "pinyin": ["chù", "chù", "wén", "tí", "niǎo", ""],
+          "hanzi": ["處", "處", "聞", "啼", "鳥", ""]
+        },
+        {
+          "en": "Last night came the sound of wind and rain,",
+          "trees": ["yer4", "Lie2", "fer-ng", "yee(oo)3", "(r)ser-ng", "，"],
+          "pinyin": ["yè", "lái", "fēng", "yǔ", "shēng", ""],
+          "hanzi": ["夜", "來", "風", "雨", "聲", ""]
+        },
+        {
+          "en": "I wonder how many blossoms have fallen to the ground.",
+          "trees": ["hooah", "Looer4", "(r)ds", "dooer", "(r)saw3", "。"],
+          "pinyin": ["huā", "luò", "zhī", "duō", "shǎo", ""],
+          "hanzi": ["花", "落", "知", "多", "少", ""]
+        }
+      ],
+      "appreciation": "Spring nights are so cozy that the poet sleeps right through daybreak and wakes up to the joyful songs of birds."
+    },
+    {
+      "id": "poem-lotus",
+      "titleEn": "South of the River (Summer Lotus)",
+      "titleZh": "江南",
+      "titleTrees": "jeeang nan2",
+      "authorEn": "Han Dynasty Folk Song",
+      "authorZh": "漢樂府",
+      "authorTrees": "han4 yee(oo)er4 foo3",
+      "lines": [
+        {
+          "en": "South of the river is a wonderful place to pick lotus,",
+          "trees": ["jeeang", "nan2", "ker3", "tsie3", "Leean2", "，"],
+          "pinyin": ["jiāng", "nán", "kě", "cǎi", "lián", ""],
+          "hanzi": ["江", "南", "可", "採", "蓮", ""]
+        },
+        {
+          "en": "How lush and round the green lotus leaves grow!",
+          "trees": ["Leean2", "yer4", "her2", "teean2", "teean2", "。"],
+          "pinyin": ["lián", "yè", "hé", "tián", "tián", ""],
+          "hanzi": ["蓮", "葉", "何", "田", "田", ""]
+        },
+        {
+          "en": "Fish dart and play among the lotus leaves.",
+          "trees": ["yee(oo)2", "see4", "Leean2", "yer4", "jeean", "。"],
+          "pinyin": ["yú", "xì", "lián", "yè", "jiān", ""],
+          "hanzi": ["魚", "戲", "蓮", "葉", "間", ""]
+        }
+      ],
+      "appreciation": "This ancient folk song brings us to the sunny water towns south of the Yangtze River during summer lotus season."
+    },
+    {
+      "id": "poem-pond",
+      "titleEn": "On the Pond (Summer Lotus)",
+      "titleZh": "池上",
+      "titleTrees": "(r)ts2 (r)sang4",
+      "authorEn": "Tang Dynasty · By Bai Juyi",
+      "authorZh": "唐 · 白居易",
+      "authorTrees": "tang2 bie2 jee(oo) yee4",
+      "lines": [
+        {
+          "en": "A little child poles a tiny boat,",
+          "trees": ["seeaw3", "wah2", "(r)tser-ng", "seeaw3", "ting3", "，"],
+          "pinyin": ["xiǎo", "wá", "chēng", "xiǎo", "tǐng", ""],
+          "hanzi": ["小", "娃", "撐", "小", "艇", ""]
+        },
+        {
+          "en": "Secretly picking white lotus flowers before heading back.",
+          "trees": ["toh", "tsie3", "bie2", "Leean2", "hooay2", "。"],
+          "pinyin": ["tōu", "cǎi", "bái", "lián", "huí", ""],
+          "hanzi": ["偷", "採", "白", "蓮", "回", ""]
+        },
+        {
+          "en": "Not knowing how to hide the trail behind,",
+          "trees": ["boo4", "jeer3", "tsang2", "dser-oong", "jee4", "，"],
+          "pinyin": ["bù", "jiě", "cáng", "zōng", "jì", ""],
+          "hanzi": ["不", "解", "藏", "蹤", "跡", ""]
+        },
+        {
+          "en": "The boat parts a clear path through the floating duckweed.",
+          "trees": ["foo2", "ping2", "yee2", "daw4", "kie", "。"],
+          "pinyin": ["fú", "píng", "yí", "dào", "kāi", ""],
+          "hanzi": ["浮", "萍", "一", "道", "開", ""]
+        }
+      ],
+      "appreciation": "A playful child rows a tiny boat out onto the summer pond, picks white lotus flowers in secret, and leaves a trail through the green duckweed!"
+    }
+  ],
+  "dialogues": [
+    {
+      "id": "dlg-airport",
+      "title": "Unit 1 · Scenario 1: Airport Border Inspection (海關入境檢查)",
+      "lines": [
+        {
+          "en": "Officer: What is your purpose of visit?",
+          "trees": ["neen2", "Lie2", "dsooer4", "(r)ser-n2", "mer", "？"],
+          "pinyin": ["nín", "lái", "zuò", "shén", "me", ""],
+          "hanzi": ["您", "來", "做", "什", "麼", ""]
+        },
+        {
+          "en": "Traveler: I am here for tourism.",
+          "trees": ["wer3", "(r)s4", "Lie2", "Lee(oo)3", "yoh2", "der", "。"],
+          "pinyin": ["wǒ", "shì", "lái", "lǚ", "yóu", "de", ""],
+          "hanzi": ["我", "是", "來", "旅", "遊", "的", ""]
+        },
+        {
+          "en": "Officer: How long will you stay?",
+          "trees": ["neen2", "ting2", "Leeoh2", "dooer", "jeeoh3", "？"],
+          "pinyin": ["nín", "tíng", "liú", "duō", "jiǔ", ""],
+          "hanzi": ["您", "停", "留", "多", "久", ""]
+        },
+        {
+          "en": "Traveler: I will stay for two weeks.",
+          "trees": ["wer3", "ting2", "Leeoh2", "Leeang3", "(r)dsoh", "。"],
+          "pinyin": ["wǒ", "tíng", "liú", "liǎng", "zhōu", ""],
+          "hanzi": ["我", "停", "留", "兩", "周", ""]
+        },
+        {
+          "en": "Officer: Where will you stay?",
+          "trees": ["neen2", "(r)dsoo4", "dsie4", "nah3", "Lee3", "？"],
+          "pinyin": ["nín", "zhù", "zài", "nǎ", "lǐ", ""],
+          "hanzi": ["您", "住", "在", "哪", "裡", ""]
+        },
+        {
+          "en": "Traveler: I will stay at a hotel. Here is the address.",
+          "trees": ["wer3", "(r)dsoo4", "jeeoh3", "deean4", "。", "(r)dser4", "(r)s4", "dee4", "(r)ds3", "。"],
+          "pinyin": ["wǒ", "zhù", "jiǔ", "diàn", "", "zhè", "shì", "dì", "zhǐ", ""],
+          "hanzi": ["我", "住", "酒", "店", "", "這", "是", "地", "址", ""]
+        }
+      ]
+    },
+    {
+      "id": "dlg-customs",
+      "title": "Unit 1 · Scenario 2: Customs Declaration (海關申報)",
+      "lines": [
+        {
+          "en": "Officer: Do you have anything to declare?",
+          "trees": ["neen2", "yoh3", "der-oong", "see", "yaw4", "(r)ser-n", "baw4", "mah", "？"],
+          "pinyin": ["nín", "yǒu", "dōng", "xi", "yào", "shēn", "bào", "ma", ""],
+          "hanzi": ["您", "有", "東", "西", "要", "申", "報", "嗎", ""]
+        },
+        {
+          "en": "Traveler: No, I do not.",
+          "trees": ["may2", "yoh3", "。"],
+          "pinyin": ["méi", "yǒu", ""],
+          "hanzi": ["沒", "有", ""]
+        },
+        {
+          "en": "Officer: Please open your bag.",
+          "trees": ["tsing3", "dah3", "kie", "neen2", "der", "baw", "。"],
+          "pinyin": ["qǐng", "dǎ", "kāi", "nín", "de", "bāo", ""],
+          "hanzi": ["請", "打", "開", "您", "的", "包", ""]
+        },
+        {
+          "en": "Traveler: Okay, no problem.",
+          "trees": ["haw3", "der", "，", "may2", "wer-n4", "tee2", "。"],
+          "pinyin": ["hǎo", "de", "", "méi", "wèn", "tí", ""],
+          "hanzi": ["好", "的", "", "沒", "問", "題", ""]
+        }
+      ]
+    },
+    {
+      "id": "dlg-911",
+      "title": "Unit 3 · Scenario 1: 911 Emergency Dispatch (911 緊急求助)",
+      "lines": [
+        {
+          "en": "Operator: Nine one one, what is your emergency?",
+          "trees": ["jeeoh3", "yaw", "yaw", "，", "neen2", "yoh3", "(r)ser-n2", "mer", "jeen3", "jee2", "tsing2", "kooang4", "？"],
+          "pinyin": ["jiǔ", "yāo", "yāo", "", "nín", "yǒu", "shén", "me", "jǐn", "jí", "qíng", "kuàng", ""],
+          "hanzi": ["九", "幺", "幺", "", "您", "有", "什", "麼", "緊", "急", "情", "況", ""]
+        },
+        {
+          "en": "Caller: I need help!",
+          "trees": ["wer3", "see(oo)", "yaw4", "bang", "(r)dsoo4", "！"],
+          "pinyin": ["wǒ", "xū", "yào", "bāng", "zhù", ""],
+          "hanzi": ["我", "需", "要", "幫", "助", ""]
+        },
+        {
+          "en": "Operator: Okay, help is on the way.",
+          "trees": ["haw3", "der", "，", "jeeoh4", "yee(oo)an2", "mah3", "(r)sang4", "daw4", "。"],
+          "pinyin": ["hǎo", "de", "", "jiù", "yuán", "mǎ", "shàng", "dào", ""],
+          "hanzi": ["好", "的", "", "救", "援", "馬", "上", "到", ""]
+        }
+      ]
+    }
+  ]
+}
