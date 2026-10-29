@@ -1,0 +1,72 @@
+{
+  "version": "3.0",
+  "bookUrl": "https://www.amazon.com/dp/B0HCXLCK3K",
+  "packs": [
+    {
+      "packId": 1,
+      "title": "Pack 1: Starter Core & Numbers (初始免費 15 字)",
+      "unlockType": "free",
+      "cards": [
+        { "hanzi": "一", "trees": "yee", "pinyin": "yī", "meaning": "One (1)", "sound": "Sounds like 'each' without 'ch', or 'eagle' without 'gle'.", "mnemonic": "Think of Adam and Eve, the very first human beings. 'Eve' without 've' (Ee-) sounds like 'one'." },
+        { "hanzi": "二", "trees": "uh-er4", "pinyin": "èr", "meaning": "Two (2)", "sound": "Sounds like the first part of 'error' (retroflex).", "mnemonic": "An 'error' often occurs at a fork in the road when faced with two paths." },
+        { "hanzi": "三", "trees": "san", "pinyin": "sān", "meaning": "Three (3)", "sound": "Sounds like 'sun' and 'son'.", "mnemonic": "A sandwich relies on a 'tri-layer' (three) foundation." },
+        { "hanzi": "四", "trees": "s4", "pinyin": "sì", "meaning": "Four (4)", "sound": "Similar to the ending of 'force' (stressed hiss).", "mnemonic": "There are four fundamental forces in physics." },
+        { "hanzi": "五", "trees": "woo3", "pinyin": "wǔ", "meaning": "Five (5)", "sound": "Sounds like 'woo' or 'wou(ld)'.", "mnemonic": "If your pursuit (woo) is successful, give your friends a High Five!" },
+        { "hanzi": "六", "trees": "Leeoh4", "pinyin": "liù", "meaning": "Six (6)", "sound": "Sounds like 'Leo'.", "mnemonic": "Six (666) means things are going smoothly in China—you are a pro / a Leo!" },
+        { "hanzi": "七", "trees": "tsee", "pinyin": "qī", "meaning": "Seven (7)", "sound": "Sounds like 'sightsee' or 'Let's see'.", "mnemonic": "There are Seven wonders to sightsee with your wife (妻 tsee)." },
+        { "hanzi": "八", "trees": "bah", "pinyin": "bā", "meaning": "Eight (8)", "sound": "Sounds like 'bar' without 'r'.", "mnemonic": "8 is the symbol of fortune. Imagine a bar full of lucky people celebrating." },
+        { "hanzi": "九", "trees": "jeeoh3", "pinyin": "jiǔ", "meaning": "Nine (9)", "sound": "Sounds like 'Joe' (low-dipping tone like woo3).", "mnemonic": "Nine means Eternity/Long-lasting. May Uncle Joe have a long life!" },
+        { "hanzi": "十", "trees": "(r)s2", "pinyin": "shí", "meaning": "Ten (10)", "sound": "Sounds like the end of 'fish' (rising tone).", "mnemonic": "The Roman 'X' (10) is like a fish out of water. Catch the Fi-SH!" },
+        { "hanzi": "百", "trees": "bie3", "pinyin": "bǎi", "meaning": "Hundred (100)", "sound": "Similar to 'buy'.", "mnemonic": "These days, you need a hundred-dollar bill just to buy the basics." },
+        { "hanzi": "千", "trees": "tseean", "pinyin": "qiān", "meaning": "Thousand (1,000)", "sound": "Blend 'Let's see an' together.", "mnemonic": "Spend a thousand dollars to sightsee an Egyptian pyramid." },
+        { "hanzi": "萬", "trees": "wan4", "pinyin": "wàn", "meaning": "Ten thousand (10,000)", "sound": "Similar to 'won'.", "mnemonic": "He won ten thousand dollars!" },
+        { "hanzi": "你", "trees": "nee3", "pinyin": "nǐ", "meaning": "You", "sound": "Sounds like 'knee'.", "mnemonic": "Imagine kneeling down while greeting you." },
+        { "hanzi": "好", "trees": "haw3", "pinyin": "hǎo", "meaning": "Good", "sound": "Similar to 'how' (3rd tone).", "mnemonic": "Nee3 haw3 (你好) = Knee + how = Hello (Literally: You good)." }
+      ]
+    },
+    {
+      "packId": 2,
+      "title": "Pack 2: Everyday Greetings & Core Words (⭐ 五星好評解鎖 15 字)",
+      "unlockType": "rate",
+      "cards": [
+        { "hanzi": "我", "trees": "wer3", "pinyin": "wǒ", "meaning": "I / Me", "sound": "Memorize tone through woo3 (five) and nee3 (you).", "mnemonic": "In archaic Chinese, 'woo3 (吾)' represented 'I' or 'myself'." },
+        { "hanzi": "美", "trees": "may3", "pinyin": "měi", "meaning": "Beautiful", "sound": "Sounds like 'May' (3rd tone).", "mnemonic": "May -> Mayflower -> The United States (may3 gooer2) -> Beautiful." },
+        { "hanzi": "美國", "trees": "may3 gooer2", "pinyin": "měi guó", "meaning": "The United States (9,10)", "sound": "May + rapid contraction of 'ger' & 'wer3'.", "mnemonic": "No Mayflower, no United States. Digging a pool in the country to raise a goose." },
+        { "hanzi": "壞", "trees": "hooie4", "pinyin": "huài", "meaning": "Bad (6)", "sound": "Blend 'who' and 'why' rapidly.", "mnemonic": "Rap rhythm: 'woo3, Leeoh4 (5,6); haw3, hooie4 (good, bad)'." },
+        { "hanzi": "請問", "trees": "tsing3 wer-n4", "pinyin": "qǐng wèn", "meaning": "Excuse me / May I ask...? (5,6)", "sound": "Blend 'Let's sing when'.", "mnemonic": "Let's sing when we make a polite request!" },
+        { "hanzi": "謝謝", "trees": "seer4 seer", "pinyin": "xiè xie", "meaning": "Thank you!", "sound": "Sounds like 'See ye(s), See ya'.", "mnemonic": "'Seer4 seer' (Thank you) and 'See ya' always go hand in hand." },
+        { "hanzi": "再見", "trees": "dsie4 jeean4", "pinyin": "zài jiàn", "meaning": "Good-bye / See you", "sound": "Underlined parts of 'Xylophone, Gee an'.", "mnemonic": "In ancient China, friends played music ('Xylophone') when saying goodbye." },
+        { "hanzi": "不客氣", "trees": "boo2 ker4 tsee", "pinyin": "bú kè qi", "meaning": "You are welcome", "sound": "Sounds like 'Boo Cur-tsy'.", "mnemonic": "When someone thanks you with a curtsy, say 'Boo Curtsy' (Don't do this curtsy)." },
+        { "hanzi": "對不起", "trees": "dooay4 boo4 tsee3", "pinyin": "duì bù qǐ", "meaning": "I'm sorry / Pardon me", "sound": "Dwayne says 'boo qi'.", "mnemonic": "Dwayne is right (dooay4); Don't get angry (boo2 tsee4); I am sorry." },
+        { "hanzi": "沒關係", "trees": "may2 gooan see", "pinyin": "méi guān xi", "meaning": "It's OK / It doesn't matter", "sound": "Sounds like 'May lagoon see'.", "mnemonic": "Dwayne's wife would forgive him if they could see the lagoon." },
+        { "hanzi": "早上", "trees": "dsaw3 (r)sang4", "pinyin": "zǎo shang", "meaning": "Morning", "sound": "Sounds like 'jaw sang'.", "mnemonic": "The morning movement of yawning: your jaw sang! (Dsaw3 (r)sang4 haw3 = Good morning)." },
+        { "hanzi": "大家", "trees": "dah4 jeeah", "pinyin": "dà jiā", "meaning": "Everyone (Big Family)", "sound": "Do(zen) + Gee-Ah (jar).", "mnemonic": "Ah, gee, our big family eats a dozen eggs in a jar every morning!" },
+        { "hanzi": "快樂", "trees": "kooie4 Ler4", "pinyin": "kuài lè", "meaning": "Happy", "sound": "Underlined parts of 'qui(te) lo(vely)'.", "mnemonic": "Happy kids are quite lovely! (Seen neean2 kooie4 Ler4 = Happy New Year)." },
+        { "hanzi": "發財", "trees": "fah tsie2", "pinyin": "fā cái", "meaning": "Be prosperous / Make a fortune", "sound": "Similar to 'far try' or 'far it's I'.", "mnemonic": "Have a bold 'far try' to make a fortune! (Ger-oong see3 fah tsie2)." },
+        { "hanzi": "人", "trees": "(r)ther-n2", "pinyin": "rén", "meaning": "Human / Person / People (10)", "sound": "Keep 'r' tongue of 'rain' + weak form of 'then'.", "mnemonic": "Also similar to the ending of 'human vision'." }
+      ]
+    },
+    {
+      "packId": 3,
+      "title": "Pack 3: Travel, Family & Life (📤 推薦好友解鎖 15 字)",
+      "unlockType": "share",
+      "cards": [
+        { "hanzi": "旅遊", "trees": "Lee(oo)3 yoh2", "pinyin": "lǚ yóu", "meaning": "Traveling (9,10)", "sound": "Sa-lu(t) + you.", "mnemonic": "While traveling, say 'Hi' (Salut) to you!" },
+        { "hanzi": "導遊", "trees": "daw3 yoh2", "pinyin": "dǎo yóu", "meaning": "Tour Guide (9,10)", "sound": "Sounds like 'Dow, you'.", "mnemonic": "Dow, you are our tour guide!" },
+        { "hanzi": "女孩", "trees": "nee(oo)3 hie2", "pinyin": "nǚ hái", "meaning": "Girl (9,10)", "sound": "ee(oo) (French u) + Hi.", "mnemonic": "Associate a nice girl with traveling and saying 'Hi' (hie2)." },
+        { "hanzi": "兒子", "trees": "(uh)-er2 ds", "pinyin": "ér zi", "meaning": "Son (10,*)", "sound": "Contrast with 'two (uh-er4) birds'.", "mnemonic": "Son represents the Sun, and tone 11 represents sunbeams." },
+        { "hanzi": "姐姐", "trees": "jeer3 jeer", "pinyin": "jiě jie", "meaning": "Elder Sister (5,*)", "sound": "Sounds like 'jeer'.", "mnemonic": "The crowd, including my elder sister, jeered at me." },
+        { "hanzi": "哪裡", "trees": "nah3 Lee3", "pinyin": "nǎ lǐ", "meaning": "Where", "sound": "Sounds like 'Gnarly' without 'G'.", "mnemonic": "If you don't know WHERE you are, things are getting GNARLY!" },
+        { "hanzi": "可以", "trees": "ker3 yee3", "pinyin": "kě yǐ", "meaning": "Could / Can / May (5,9)", "sound": "Like 'ka(wa)ii'.", "mnemonic": "A kawaii girl asked, 'May I (ker3 yee3)...?'" },
+        { "hanzi": "買", "trees": "mie3", "pinyin": "mǎi", "meaning": "Buy / Get (5)", "sound": "Sounds like 'my'.", "mnemonic": "Once I buy it, it's all my own!" },
+        { "hanzi": "水果", "trees": "(r)sooay3 gooer3", "pinyin": "shuǐ guǒ", "meaning": "Fruit (5,9)", "sound": "Sounds like 'sway goer'.", "mnemonic": "Heavy fruits hang and sway across the countryside fields." },
+        { "hanzi": "想要", "trees": "seeang3 yaw4", "pinyin": "xiǎng yào", "meaning": "Would like / Want (5,6)", "sound": "'see young' + 'your'.", "mnemonic": "I want to see Young's beer. Yours (nee3 der = need) is what you want (yaw4)." },
+        { "hanzi": "烤肉", "trees": "kaw3 (r)thoh4", "pinyin": "kǎo ròu", "meaning": "BBQ / Barbecue (5,6)", "sound": "Sounds like 'Cow though'.", "mnemonic": "Cow though it is, it is still used for barbecue!" },
+        { "hanzi": "來自", "trees": "Lie2 ds4", "pinyin": "lái zì", "meaning": "From (12)", "sound": "Similar to 'Lies'.", "mnemonic": "The truth lies in where you come from." },
+        { "hanzi": "牛肉", "trees": "neeoh2 (r)thoh4", "pinyin": "niú ròu", "meaning": "Beef (12)", "sound": "Sounds like 'new though'.", "mnemonic": "New though the cook is, the beef is delicious!" },
+        { "hanzi": "朋友", "trees": "per-ng2 yoh3", "pinyin": "péng yǒu", "meaning": "Friend (15)", "sound": "Underlined parts of 'penguin you'.", "mnemonic": "The character 朋 pairs two moons—symbolizing enduring friendship." },
+        { "hanzi": "竹海", "trees": "(r)dsoo2 hie3", "pinyin": "zhú hǎi", "meaning": "Bamboo Sea (15)", "sound": "'zoo' + 'Hi'.", "mnemonic": "There are many bamboos in the zoo. Say 'Hi' to the sea!" }
+      ]
+    }
+  ]
+}
