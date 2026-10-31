@@ -36,7 +36,7 @@
     }
     .header {
       width: 100%;
-      max-width: 520px;
+      max-width: 540px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -65,18 +65,19 @@
       font-weight: 600;
     }
     .icon-btn {
-      background: none;
-      border: 1px solid #ccc;
+      background: #fff;
+      border: 1px solid #bbb;
       border-radius: 6px;
-      padding: 3px 7px;
+      padding: 4px 8px;
       font-size: 0.8rem;
+      font-weight: 600;
       cursor: pointer;
     }
 
     /* 控制輸入區 */
     .control-box {
       width: 100%;
-      max-width: 520px;
+      max-width: 540px;
       background: var(--card-bg);
       padding: 12px;
       border-radius: 14px;
@@ -103,7 +104,7 @@
       flex-wrap: wrap;
     }
     .btn {
-      padding: 9px 12px;
+      padding: 10px 12px;
       border: none;
       border-radius: 8px;
       font-size: 0.9rem;
@@ -117,41 +118,14 @@
       white-space: nowrap;
     }
     .btn-primary { background: var(--accent); color: white; }
+    .btn-ai { background: #1565c0; color: white; }
     .btn-secondary { background: var(--accent-light); color: var(--accent); border: 1px solid #c8e6c9; }
     .btn-dark { background: #222; color: white; font-size: 0.82rem; padding: 7px 10px; flex: unset; }
-
-    /* 快速場景與點餐生存膠囊 */
-    .quick-bar {
-      display: flex;
-      gap: 6px;
-      overflow-x: auto;
-      padding-bottom: 2px;
-      scrollbar-width: none;
-    }
-    .quick-bar::-webkit-scrollbar { display: none; }
-    .capsules {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      padding-top: 4px;
-      border-top: 1px solid #f0f0f0;
-    }
-    .capsule-chip {
-      background: #f1f3f4;
-      border: 1px solid #d0d7de;
-      border-radius: 16px;
-      padding: 4px 10px;
-      font-size: 0.8rem;
-      font-weight: 500;
-      cursor: pointer;
-      white-space: nowrap;
-    }
-    .capsule-chip:active { background: #d0d7de; }
 
     /* 展示卡片區 */
     .card-wrapper {
       width: 100%;
-      max-width: 520px;
+      max-width: 540px;
       margin-top: 12px;
       display: flex;
       flex-direction: column;
@@ -162,6 +136,7 @@
       justify-content: space-between;
       align-items: center;
       gap: 6px;
+      flex-wrap: wrap;
     }
     .display-card {
       background: #ffffff;
@@ -172,69 +147,82 @@
       display: flex;
       flex-direction: column;
       gap: 14px;
-      min-height: 150px;
+      min-height: 160px;
+    }
+    .photo-preview {
+      width: 100%;
+      max-height: 180px;
+      object-fit: cover;
+      border-radius: 8px;
+      display: none;
     }
     .desc-box {
       background: #f9fbe7;
       border-left: 4px solid var(--accent);
       padding: 8px 10px;
-      font-size: 0.88rem;
-      color: #333;
+      font-size: 0.9rem;
+      color: #222;
       border-radius: 4px;
-      line-height: 1.4;
+      line-height: 1.45;
+      display: none;
     }
     .annotation-block {
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 16px;
     }
     .sentence-row {
       display: flex;
       flex-direction: column;
-      gap: 4px;
-      padding-bottom: 10px;
-      border-bottom: 1px dashed #eee;
+      gap: 6px;
+      padding-bottom: 12px;
+      border-bottom: 1px dashed #e0e0e0;
     }
     .sentence-row:last-child { border-bottom: none; padding-bottom: 0; }
+    
+    /* 英文行：強制單詞不拆分 */
     .en-line {
-      font-size: 0.95rem;
-      color: #222;
+      font-size: 1rem;
+      color: #111;
       font-weight: 500;
       line-height: 1.35;
       word-break: normal;
       overflow-wrap: break-word;
+      hyphens: none;
     }
     .char-container {
       display: flex;
       flex-wrap: wrap;
-      gap: 4px 5px;
+      gap: 4px 0;
       align-items: flex-end;
-      margin-top: 2px;
     }
     .tp-col {
       display: inline-flex;
       flex-direction: column;
       align-items: center;
       justify-content: flex-end;
-      min-width: 1.1em;
+      margin-right: 0.42ch;
       cursor: pointer;
       padding: 2px 1px;
       border-radius: 4px;
     }
     .tp-col:active { background: #e8f5e9; }
+    
+    /* Trees Pinyin：純黑、粗斜體、標點懸浮於此行 */
     .tp-pinyin {
-      font-size: 0.95rem;
+      font-size: 1.05rem;
       font-weight: 700;
       font-style: italic;
       color: #000000;
-      line-height: 1.1;
+      line-height: 1.15;
       white-space: nowrap;
     }
     .tp-zh {
-      font-size: 1.3rem;
+      font-size: 1.25rem;
       font-weight: 600;
       color: #000000;
       line-height: 1.25;
+      min-height: 1.25em;
     }
     .card-footer-tip {
       font-size: 0.72rem;
@@ -243,7 +231,7 @@
       margin-top: 4px;
     }
 
-    /* 設定彈窗（用戶自帶 AI Key，保存在手機本機） */
+    /* 設定彈窗 */
     .modal {
       display: none;
       position: fixed;
@@ -257,7 +245,7 @@
     .modal-content {
       background: white;
       width: 100%;
-      max-width: 400px;
+      max-width: 420px;
       border-radius: 12px;
       padding: 16px;
       display: flex;
@@ -266,9 +254,10 @@
     }
     .modal-content input, .modal-content select {
       width: 100%;
-      padding: 8px;
+      padding: 9px;
       border: 1px solid #ccc;
       border-radius: 6px;
+      font-size: 0.9rem;
     }
 
     /* 橫屏全螢幕大字展示模式 */
@@ -283,7 +272,8 @@
     body.landscape-mode .header,
     body.landscape-mode .control-box,
     body.landscape-mode .card-actions,
-    body.landscape-mode .card-footer-tip { display: none !important; }
+    body.landscape-mode .card-footer-tip,
+    body.landscape-mode .photo-preview { display: none !important; }
     body.landscape-mode .card-wrapper {
       max-width: 100%; width: 100%; min-height: 100vh; margin: 0;
       justify-content: center;
@@ -294,10 +284,10 @@
       justify-content: center;
       padding: 32px 24px;
     }
-    body.landscape-mode .tp-pinyin { font-size: 1.75rem; }
-    body.landscape-mode .tp-zh { font-size: 2.6rem; }
-    body.landscape-mode .en-line { font-size: 1.35rem; }
-    body.landscape-mode .desc-box { font-size: 1.15rem; }
+    body.landscape-mode .tp-pinyin { font-size: 1.85rem; }
+    body.landscape-mode .tp-zh { font-size: 2.5rem; }
+    body.landscape-mode .en-line { font-size: 1.45rem; }
+    body.landscape-mode .desc-box { font-size: 1.2rem; }
     .close-landscape {
       display: none;
       position: fixed;
@@ -329,42 +319,37 @@
   <div class="header">
     <h1>🌳 Trees Pinyin Pocket</h1>
     <div class="header-btns">
-      <span class="badge" id="netStatus">本地離線引擎</span>
-      <button class="icon-btn" onclick="openSettings()">⚙️ AI 設定</button>
+      <span class="badge" id="netStatus">本地引擎就緒</span>
+      <button class="icon-btn" onclick="openSettings()">⚙️ AI Key 設定</button>
     </div>
   </div>
 
   <div class="control-box">
-    <textarea id="userInput" rows="2" placeholder="輸入/貼上中英文、AI 內容，或點鍵盤相機直接取詞...">麻婆豆腐</textarea>
+    <textarea id="userInput" rows="3" placeholder="1. 輸入中英文句子，點「翻譯並注音」
+2. 輸入任何主題/菜名/物品（如：買咖啡、烤鴨），點「AI 生成並注音」
+3. 點「拍照識物/識字」，自動識別任何物品、菜餚或文字"></textarea>
     
     <div class="btn-row">
-      <button class="btn btn-primary" onclick="processInput()">✨ 翻譯並注音</button>
+      <button class="btn btn-primary" onclick="handleDirectTranslate()">📝 翻譯並注音</button>
+      <button class="btn btn-ai" onclick="handleAIGenerate()">🤖 AI 生成並注音</button>
+    </div>
+
+    <div class="btn-row">
       <label class="btn btn-secondary">
-        📷 拍照識字/識菜
+        📷 拍照識物 / 識菜 / 識字
         <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display: none;" onchange="handleCameraPhoto(this)">
       </label>
-      <button class="btn btn-secondary" style="flex:0.4;" onclick="speakCard()" title="手機語音朗讀">🔊 發音</button>
+      <label class="btn btn-secondary" style="flex:0.6;">
+        🖼️ 相冊選圖
+        <input type="file" id="galleryInput" accept="image/*" style="display: none;" onchange="handleCameraPhoto(this)">
+      </label>
+      <button class="btn btn-secondary" style="flex:0.4;" onclick="speakCard()" title="手機語音朗讀">🔊 朗讀</button>
     </div>
-
-    <!-- 內置高頻菜品與景點快速按鈕（0 網路消耗） -->
-    <div class="quick-bar">
-      <span class="capsule-chip" onclick="quickSelect('麻婆豆腐')">🌶️ 麻婆豆腐</span>
-      <span class="capsule-chip" onclick="quickSelect('北京烤鸭')">🦆 北京烤鴨</span>
-      <span class="capsule-chip" onclick="quickSelect('牛肉面')">🍜 牛肉麵</span>
-      <span class="capsule-chip" onclick="quickSelect('火锅')">🍲 火鍋</span>
-      <span class="capsule-chip" onclick="quickSelect('珍珠奶茶')">🧋 珍珠奶茶</span>
-      <span class="capsule-chip" onclick="quickSelect('故宫')">🏛️ 故宮</span>
-      <span class="capsule-chip" onclick="quickSelect('长城')">🧱 長城</span>
-      <span class="capsule-chip" onclick="quickSelect('过敏忌口')">⚠️ 過敏忌口</span>
-    </div>
-
-    <!-- 動態生成的點餐/生存短語標籤 -->
-    <div class="capsules" id="capsuleArea" style="display:none;"></div>
   </div>
 
   <div class="card-wrapper">
     <div class="card-actions">
-      <span style="font-size:0.78rem; color:#555;">💡 點擊任意漢字可修改多音字</span>
+      <span style="font-size:0.76rem; color:#555;">💡 輕點任意漢字可修改多音字讀音</span>
       <div style="display:flex; gap:6px;">
         <button class="btn btn-dark" onclick="toggleLandscape()">🔄 橫屏大字</button>
         <button class="btn btn-dark" onclick="saveAsImage()">💾 存照片</button>
@@ -373,29 +358,30 @@
     </div>
 
     <div class="display-card" id="renderCard">
-      <div class="desc-box" id="descBox" style="display: none;"></div>
+      <img id="photoPreview" class="photo-preview" alt="Captured photo">
+      <div class="desc-box" id="descBox"></div>
       <div class="annotation-block" id="annotationBox"></div>
-      <div class="card-footer-tip">treespinyin.com/app • Natural Phonics</div>
+      <div class="card-footer-tip">treespinyin.com/app • Intuitive Chinese Phonics</div>
     </div>
   </div>
 
-  <!-- 用戶個人 AI Key 設定彈窗（100% 儲存在用戶手機 localStorage） -->
+  <!-- 用戶個人 AI Key 設定彈窗 -->
   <div class="modal" id="settingsModal">
     <div class="modal-content">
       <h3 style="margin:0; font-size:1.05rem;">⚙️ 手機端 AI 視覺與生成設定</h3>
-      <p style="font-size:0.8rem; color:#555; margin:0;">
-        Key 僅保存在您自己的手機瀏覽器內。配置免費 Gemini Key 後，拍照可直接識別無文字的實物菜餚與物品！
+      <p style="font-size:0.8rem; color:#555; margin:0; line-height:1.4;">
+        API Key 100% 保存在您自己的手機瀏覽器內。填入後即可使用「AI 主題生成」與「拍照自動識別萬物/菜餚/文字」！
       </p>
-      <label style="font-size:0.82rem; font-weight:600;">選擇用戶端 AI 服務：</label>
+      <label style="font-size:0.82rem; font-weight:600;">選擇您的 AI 服務：</label>
       <select id="aiProvider">
-        <option value="gemini">Google Gemini (推薦，支援免費拍照識菜/翻譯)</option>
-        <option value="deepseek">DeepSeek (超低成本中英生成與翻譯)</option>
-        <option value="openai">OpenAI (GPT-4o-mini 支援拍照識物)</option>
+        <option value="gemini">Google Gemini (推薦：支援拍照識物 + AI生成，有免費額度)</option>
+        <option value="openai">OpenAI GPT-4o-mini (支援拍照識物 + AI生成)</option>
+        <option value="deepseek">DeepSeek (支援文字 AI 生成與雙語翻譯)</option>
       </select>
-      <label style="font-size:0.82rem; font-weight:600;">填入您的 API Key（選填）：</label>
+      <label style="font-size:0.82rem; font-weight:600;">填入您的 API Key：</label>
       <input type="password" id="aiApiKey" placeholder="AIzaSy... 或 sk-...">
       <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:6px;">
-        <button class="btn btn-secondary" onclick="closeSettings()">取消</button>
+        <button class="btn btn-secondary" onclick="closeSettings()">關閉</button>
         <button class="btn btn-primary" onclick="saveSettings()">儲存至手機</button>
       </div>
     </div>
@@ -403,112 +389,52 @@
 
   <script>
     // =========================================================================
-    // 1. 內置高頻生活/美食/景點離線生存詞庫（0 流量、斷網秒出）
+    // 1. Trees Pinyin (v25) 官方標準映射表與編譯器（100% 嚴格遵循映射總覽）
     // =========================================================================
-    const SURVIVAL_KB = {
-      "麻婆豆腐": {
-        en: "Mapo Tofu",
-        desc: "經典四川名菜，豆腐嫩滑，特點為麻、辣、燙、鮮。 (Classic Sichuan dish: tender tofu in spicy & numbing sauce)",
-        tags: [
-          { zh: "微辣，少放花椒", en: "Mild spicy, less Sichuan pepper" },
-          { zh: "不要太辣，少油少盐", en: "Not too spicy, less oil and less salt" },
-          { zh: "请给我一碗米饭", en: "Please give me a bowl of rice" },
-          { zh: "不要放猪肉，做纯素的", en: "No pork please, make it vegetarian" }
-        ]
-      },
-      "北京烤鸭": {
-        en: "Peking Roast Duck",
-        desc: "北京傳統名菜，果木炭火烤製，皮脆肉嫩，配荷葉餅、甜麵醬與蔥絲。 (Traditional Beijing roast duck served with pancakes & sweet bean sauce)",
-        tags: [
-          { zh: "我们要半只烤鸭", en: "We would like half a roast duck" },
-          { zh: "请加一份荷叶饼", en: "Please add an extra portion of pancakes" },
-          { zh: "鸭架做成汤，不要油炸", en: "Make soup with the duck bones, not fried" }
-        ]
-      },
-      "牛肉面": {
-        en: "Braised Beef Noodle Soup",
-        desc: "中式經典湯麵，濃郁牛骨湯底配慢燉牛肉塊。 (Rich beef broth noodles with tender braised beef)",
-        tags: [
-          { zh: "不要香菜，不要葱", en: "No cilantro, no green onions" },
-          { zh: "微辣，少盐", en: "Mild spicy, less salt" },
-          { zh: "加一个卤蛋", en: "Add a braised egg" },
-          { zh: "面条煮软一点", en: "Cook the noodles a bit softer" }
-        ]
-      },
-      "火锅": {
-        en: "Chinese Hot Pot",
-        desc: "圍爐現煮美食，可選鴛鴦鍋（紅湯麻辣＋白湯不辣）。 (Simmering pot of soup stock at the table for cooking meats & vegetables)",
-        tags: [
-          { zh: "我们要鸳鸯锅，一边不辣", en: "We want a half-and-half pot, one side non-spicy" },
-          { zh: "请加一点汤", en: "Please add more soup base" },
-          { zh: "微辣，少油", en: "Mild spicy, less oil" }
-        ]
-      },
-      "珍珠奶茶": {
-        en: "Bubble Milk Tea / Boba Tea",
-        desc: "中式現調茶飲配Q彈木薯粉圓，可自選冰塊與甜度。 (Milk tea with chewy tapioca pearls, customizable ice & sweetness)",
-        tags: [
-          { zh: "少冰，三分糖", en: "Less ice, 30% sugar" },
-          { zh: "去冰，半糖", en: "No ice, 50% sugar" },
-          { zh: "热的，无糖", en: "Hot, no sugar" }
-        ]
-      },
-      "故宫": {
-        en: "The Forbidden City (Palace Museum)",
-        desc: "明清兩代共24位皇帝的皇家宮殿，位於北京中軸線中心。 (Imperial palace of the Ming and Qing dynasties in Beijing)",
-        tags: [
-          { zh: "请问午门入口怎么走？", en: "Excuse me, how do I get to the Meridian Gate entrance?" },
-          { zh: "我想租一个英文导览器", en: "I would like to rent an English audio guide" },
-          { zh: "我已经在线预约了门票", en: "I have booked my ticket online" }
-        ]
-      },
-      "长城": {
-        en: "The Great Wall of China",
-        desc: "中國古代偉大的軍事防禦工程，八達嶺與慕田峪最受遊客歡迎。 (Ancient Chinese military fortification; Badaling & Mutianyu are popular sections)",
-        tags: [
-          { zh: "请给我两张往返缆车票", en: "Two round-trip cable car tickets, please" },
-          { zh: "请问滑道在哪里乘坐？", en: "Where can I take the toboggan slide?" }
-        ]
-      },
-      "过敏忌口": {
-        en: "Food Allergies & Dietary Restrictions",
-        desc: "在餐廳點餐時直接橫屏出示給服務員看的救命忌口卡。 (Essential allergy & dietary phrases to show restaurant staff)",
-        tags: [
-          { zh: "我对花生和坚果严重过敏", en: "I am severely allergic to peanuts and nuts" },
-          { zh: "我对海鲜过敏，不能吃虾蟹", en: "I am allergic to seafood, no shrimp or crab" },
-          { zh: "我吃素，不吃肉和动物油", en: "I am vegetarian, no meat or animal fat" },
-          { zh: "请少放盐，不要放味精", en: "Less salt please, and no MSG" }
-        ]
-      }
+    const OVERALL_SYLLABLES = {
+      'zhi': '(r)ds', 'chi': '(r)ts', 'shi': '(r)s', 'ri': '(r)th',
+      'zi': 'ds', 'ci': 'ts', 'si': 's', 'yi': 'yee',
+      'wu': 'woo', 'yu': 'yee(oo)', 'ye': 'yer', 'yue': 'yee(oo)er',
+      'yuan': 'yee(oo)an', 'yin': 'yeen', 'yun': 'yee(oo)n', 'ying': 'ying'
     };
 
-    // 內置常用多音字詞組修正表（輔助 pinyin-pro 提升準確率）
-    const CUSTOM_POLYPHONES = {
-      "银行": "yin2 hang2", "行业": "hang2 ye4", "一行": "yi4 hang2",
-      "便宜": "pian2 yi5", "方便": "fang1 bian4",
-      "音乐": "yin1 yue4", "快乐": "kuai4 le4",
-      "看着": "kan4 zhe5", "着急": "zhao2 ji2", "睡着": "shui4 zhao2",
-      "长大": "zhang3 da4", "长城": "chang2 cheng2", "多长": "duo1 chang2",
-      "了解": "liao3 jie3", "好了": "hao3 le5",
-      "觉悟": "jue2 wu4", "觉得": "jue2 de5", "睡觉": "shui4 jiao4",
-      "重庆": "chong2 qing4", "重要": "zhong4 yao4",
-      "好客": "hao4 ke4", "好奇": "hao4 qi2",
-      "还钱": "huan2 qian2", "还有": "hai2 you3"
+    const LOCKED_SYLLABLES = {
+      'wo': 'wer',
+      'de': 'der',
+      'le': 'Ler',
+      'ren': '(r)ther-n',
+      'wen': 'wer-n',
+      'shun': 'soon',
+      'zun': 'dsoon',
+      'guo': 'gooer',
+      'o': 'oh',
+      // 輔音帶元音消疊音機制 (j, q, x, l, n 與 i/ü 系列)
+      'qi': 'tsee', 'qing': 'tsing', 'qie': 'tseer', 'qian': 'tseean', 'qiao': 'tseeaw',
+      'qiang': 'tseeang', 'qiong': 'tseer-oong', 'qu': 'tsee(oo)', 'que': 'tsee(oo)er',
+      'quan': 'tsee(oo)an', 'qun': 'tsee(oo)n', 'qin': 'tseen', 'qia': 'tseeah',
+      'xi': 'see', 'xing': 'sing', 'xie': 'seer', 'xian': 'seean', 'xiao': 'seeaw',
+      'xiang': 'seeang', 'xiong': 'seer-oong', 'xu': 'see(oo)', 'xue': 'see(oo)er',
+      'xuan': 'see(oo)an', 'xun': 'see(oo)n', 'xin': 'seen', 'xia': 'seeah',
+      'ji': 'jee', 'jing': 'jing', 'jie': 'jeer', 'jian': 'jeean', 'jiao': 'jeeaw',
+      'jiang': 'jeeang', 'jiong': 'jeer-oong', 'ju': 'jee(oo)', 'jue': 'jee(oo)er',
+      'juan': 'jee(oo)an', 'jun': 'jee(oo)n', 'jin': 'jeen', 'jia': 'jeeah',
+      'lv': 'Lee(oo)', 'lü': 'Lee(oo)', 'lve': 'Lee(oo)er', 'lüe': 'Lee(oo)er',
+      'nv': 'nee(oo)', 'nü': 'nee(oo)', 'nve': 'nee(oo)er', 'nüe': 'nee(oo)er'
     };
 
-    // =========================================================================
-    // 2. Trees Pinyin (v25) 核心自然拼讀編譯器
-    // =========================================================================
     const INITIALS = {
-      'b':'b', 'p':'p', 'm':'m', 'f':'f', 'd':'d', 't':'t', 'n':'n', 'l':'L',
-      'g':'g', 'k':'k', 'h':'h', 'j':'j', 'q':'tsee', 'x':'see',
+      'b':'b', 'p':'p', 'm':'m', 'f':'f',
+      'd':'d', 't':'t', 'n':'n', 'l':'L',
+      'g':'g', 'k':'k', 'h':'h', 'j':'j',
+      'q':'tsee', 'x':'see',
       'zh':'(r)ds', 'ch':'(r)ts', 'sh':'(r)s', 'r':'(r)th',
       'z':'ds', 'c':'ts', 's':'s', 'y':'y', 'w':'w'
     };
+
     const FINALS = {
       'a':'ah', 'o':'ooer', 'e':'er', 'i':'ee', 'u':'oo', 'v':'ee(oo)', 'ü':'ee(oo)',
       'ai':'ie', 'ei':'ay', 'ui':'ooay', 'ao':'aw', 'ou':'oh', 'iu':'eeoh',
-      'ie':'eer', 've':'ee(oo)er', 'üe':'ee(oo)er',
+      'ie':'eer', 've':'ee(oo)er', 'üe':'ee(oo)er', 'er':'(uh)-er',
       'an':'an', 'en':'er-n', 'in':'een', 'un':'oon', 'vn':'ee(oo)n', 'ün':'ee(oo)n',
       'ang':'ang', 'eng':'er-ng', 'ing':'ing', 'ong':'er-oong',
       'ia':'eeah', 'ian':'eean', 'iao':'eeaw', 'iang':'eeang', 'iong':'eer-oong',
@@ -518,77 +444,78 @@
 
     function compileToTreesPinyin(pyNum) {
       if (!pyNum) return '';
-      let m = pyNum.trim().match(/^([a-züv]+)([1-5]?)$/i);
+      // 支援 0~5 聲調（pinyin-pro 輕聲會輸出 0，如 de0）
+      let m = pyNum.trim().match(/^([a-züv:]+)([0-5]?)$/i);
       if (!m) return pyNum;
-      let syl = m[1].toLowerCase().replace('ü', 'v');
+      let syl = m[1].toLowerCase().replace('ü', 'v').replace('u:', 'v');
       let tone = m[2] || '';
 
-      // 整體認讀與高頻特例硬鎖定 (v25 標準)
-      if (syl === 'yi') syl = 'yee';
-      else if (syl === 'wo') syl = 'wer';
-      else if (syl === 'ye') syl = 'yer';
-      else if (syl === 'de') syl = 'der';
-      else if (syl === 'le') syl = 'Ler';
-      else if (syl === 'ren') syl = '(r)ther-n';
-      else if (syl === 'er') syl = (tone === '4') ? 'uh-er' : '(uh)-er';
-      else if (syl === 'wen') syl = 'wer-n';
-      else if (syl === 'guo') syl = 'gooer';
-      else if (syl === 'qie') syl = 'tseer';
-      else if (syl === 'xie') syl = 'seer';
-      else if (syl === 'jie') syl = 'jeer';
-      else if (syl === 'lie') syl = 'Leer';
-      else if (syl === 'nie') syl = 'neer';
-      else if (syl === 'bie') syl = 'beer';
-      else if (syl === 'pie') syl = 'peer';
-      else if (syl === 'mie') syl = 'meer';
-      else if (syl === 'die') syl = 'deer';
-      else if (syl === 'tie') syl = 'teer';
-      else if (syl === 'que') syl = 'tsee(oo)er';
-      else if (syl === 'xue') syl = 'see(oo)er';
-      else if (syl === 'jue') syl = 'jee(oo)er';
-      else if (syl === 'yue') syl = 'yee(oo)er';
-      else if (syl === 'qu') syl = 'tsee(oo)';
-      else if (syl === 'xu') syl = 'see(oo)';
-      else if (syl === 'ju') syl = 'jee(oo)';
-      else if (syl === 'yu') syl = 'yee(oo)';
-      else if (syl === 'quan') syl = 'tsee(oo)an';
-      else if (syl === 'xuan') syl = 'see(oo)an';
-      else if (syl === 'juan') syl = 'jee(oo)an';
-      else if (syl === 'yuan') syl = 'yee(oo)an';
-      else if (syl === 'qun') syl = 'tsee(oo)n';
-      else if (syl === 'xun') syl = 'see(oo)n';
-      else if (syl === 'jun') syl = 'jee(oo)n';
-      else if (syl === 'yun') syl = 'yee(oo)n';
-      else if (['zhi','chi','shi','ri','zi','ci','si'].includes(syl)) {
-        let init = syl.slice(0, -1);
-        syl = (INITIALS[init] || init) + '(ih)';
-      } else {
+      let mapped = '';
+
+      // 1. 優先檢查「er」特例（四聲二為 uh-er4，二三聲兒/耳為 (uh)-er2/3）
+      if (syl === 'er') {
+        mapped = (tone === '4') ? 'uh-er' : '(uh)-er';
+      }
+      // 2. 檢查 16 個整體認讀音節（如 shi2 -> (r)s2，絕不加 (ih)）
+      else if (OVERALL_SYLLABLES[syl]) {
+        mapped = OVERALL_SYLLABLES[syl];
+      }
+      // 3. 檢查鎖定詞與消疊音表
+      else if (LOCKED_SYLLABLES[syl]) {
+        mapped = LOCKED_SYLLABLES[syl];
+      }
+      // 4. 常規聲母 + 韻母拼接
+      else {
         let init = '', fin = syl;
-        for (let l of ['zh','ch','sh']) {
+        for (let l of ['zh', 'ch', 'sh']) {
           if (syl.startsWith(l)) { init = l; fin = syl.slice(2); break; }
         }
         if (!init && syl.length > 1 && 'bpmfdtnlgkhjqxzcsyw'.includes(syl[0])) {
           init = syl[0]; fin = syl.slice(1);
         }
+
         let mappedInit = INITIALS[init] || init;
         let mappedFin = FINALS[fin] || fin;
-        // 去重疊元音 (如 y + eeah -> yeeah)
-        if (mappedInit === 'y' && mappedFin.startsWith('ee')) mappedInit = 'y';
-        if (mappedInit === 'w' && mappedFin.startsWith('oo')) mappedFin = mappedFin.slice(2);
-        syl = mappedInit + mappedFin;
+
+        // 輔音帶元音消疊音保護：若聲母以 ee 結尾且韻母以 ee/i 開頭，去重
+        if (mappedInit.endsWith('ee') && mappedFin.startsWith('ee')) {
+          mapped = mappedInit + mappedFin.slice(2);
+        } else if (mappedInit.endsWith('ee') && mappedFin.startsWith('i')) {
+          mapped = mappedInit.slice(0, -2) + mappedFin;
+        } else if (init === 'y' && mappedFin.startsWith('ee')) {
+          mapped = 'y' + mappedFin;
+        } else if (init === 'w' && mappedFin.startsWith('oo')) {
+          mapped = 'w' + mappedFin;
+        } else {
+          mapped = mappedInit + mappedFin;
+        }
       }
 
-      // 聲調規則：1聲與5聲輕聲不標數字，2/3/4聲標數字
+      // 聲調規則：一聲(1)與輕聲(0/5/空)不加數字；僅二、三、四聲加 2, 3, 4
       let toneSuffix = (tone === '2' || tone === '3' || tone === '4') ? tone : '';
-      return syl + toneSuffix;
+      return mapped + toneSuffix;
     }
 
     // =========================================================================
-    // 3. 本地獲取漢語拼音陣列（結合自定義多音字詞典 + pinyin-pro）
+    // 2. 多音字消歧與變調處理
     // =========================================================================
+    const CUSTOM_POLYPHONES = {
+      "银行": "yin2 hang2", "行业": "hang2 ye4", "一行": "yi4 hang2",
+      "便宜": "pian2 yi5", "方便": "fang1 bian4",
+      "音乐": "yin1 yue4", "快乐": "kuai4 le4",
+      "看着": "kan4 zhe5", "着急": "zhao2 ji2", "睡着": "shui4 zhao2",
+      "长大": "zhang3 da4", "长城": "chang2 cheng2", "多长": "duo1 chang2",
+      "了解": "liao3 jie3", "好了": "hao3 le5", "太好了": "tai4 hao3 le5",
+      "觉悟": "jue2 wu4", "觉得": "jue2 de5", "睡觉": "shui4 jiao4",
+      "重庆": "chong2 qing4", "重要": "zhong4 yao4",
+      "好客": "hao4 ke4", "好奇": "hao4 qi2",
+      "还钱": "huan2 qian2", "还有": "hai2 you3",
+      "食物": "shi2 wu4", "食品": "shi2 pin3", "美食": "mei3 shi2", "食堂": "shi2 tang2",
+      "我的": "wo3 de5", "你的": "ni3 de5", "他的": "ta1 de5", "好的": "hao3 de5"
+    };
+
     function getAccuratePinyinArray(zhText) {
       let pyArr = pinyinPro.pinyin(zhText, { type: 'array', toneType: 'num' });
-      // 套用高頻多音字覆蓋
       for (let word in CUSTOM_POLYPHONES) {
         let idx = zhText.indexOf(word);
         while (idx !== -1) {
@@ -603,63 +530,179 @@
     }
 
     // =========================================================================
-    // 4. 智能處理用戶輸入（知識庫匹配 / 中英雙向翻譯 / AI 生成內容分段）
+    // 3. 功能一：「📝 翻譯並注音」（直接翻譯用戶輸入或貼上的中英文內容）
     // =========================================================================
-    async function processInput(forcedText) {
-      const rawText = (forcedText !== undefined ? forcedText : document.getElementById('userInput').value).trim();
-      if (!rawText) return;
+    async function handleDirectTranslate(customText) {
+      const rawText = (customText !== undefined ? customText : document.getElementById('userInput').value).trim();
+      if (!rawText) return alert('請先輸入或貼上需要翻譯注音的內容！');
 
-      const descBox = document.getElementById('descBox');
-      const capsuleArea = document.getElementById('capsuleArea');
+      document.getElementById('photoPreview').style.display = 'none';
+      document.getElementById('descBox').style.display = 'none';
       const annotationBox = document.getElementById('annotationBox');
       annotationBox.innerHTML = '';
-
-      // 情況 A：命中內置高頻美食/景點生存詞庫（100% 離線秒出）
-      if (SURVIVAL_KB[rawText]) {
-        const item = SURVIVAL_KB[rawText];
-        descBox.innerHTML = `<strong>${rawText} (${item.en})</strong><br>${item.desc}`;
-        descBox.style.display = 'block';
-        
-        capsuleArea.innerHTML = '';
-        capsuleArea.style.display = 'flex';
-        item.tags.forEach(tag => {
-          let chip = document.createElement('span');
-          chip.className = 'capsule-chip';
-          chip.innerText = '➕ ' + tag.zh;
-          chip.onclick = () => appendSentenceRow(tag.zh, tag.en);
-          capsuleArea.appendChild(chip);
-        });
-
-        appendSentenceRow(rawText, item.en);
-        // 默認附帶第一條最常用點餐/生存句
-        if (item.tags[0]) appendSentenceRow(item.tags[0].zh, item.tags[0].en);
-        return;
-      }
-
-      // 情況 B：自由輸入或貼上的 AI 內容（按行分割處理）
-      descBox.style.display = 'none';
-      capsuleArea.style.display = 'none';
 
       const lines = rawText.split(/\n+/).map(l => l.trim()).filter(Boolean);
       for (let line of lines) {
         const hasChinese = /[\u4e00-\u9fa5]/.test(line);
         if (hasChinese) {
-          // 輸入的是中文 -> 先本地立刻渲染注音，再異步補上英文翻譯
           const rowEl = appendSentenceRow(line, 'Translating...');
           translateTextOnClient(line, 'zh-CN', 'en').then(enTrans => {
             const enDiv = rowEl.querySelector('.en-line');
             if (enDiv) enDiv.innerText = enTrans || '';
           });
         } else {
-          // 輸入的是純英文 -> 翻譯成中文後立刻注音
+          const rowEl = appendSentenceRow('翻譯中...', line);
           const zhTrans = await translateTextOnClient(line, 'en', 'zh-CN');
+          rowEl.remove();
           appendSentenceRow(zhTrans || line, line);
         }
       }
     }
 
     // =========================================================================
-    // 5. 渲染單句（支援手機手指點擊漢字修改多音字）
+    // 4. 功能二：「🤖 AI 生成並注音」（根據用戶輸入的任意物品/菜名/場景自動生成）
+    // =========================================================================
+    async function handleAIGenerate() {
+      const topic = document.getElementById('userInput').value.trim();
+      if (!topic) return alert('請輸入您想生成的任何主題、菜名、景點或場景（例如：買咖啡、糖醋排骨、故宮、打車去機場）！');
+
+      const descBox = document.getElementById('descBox');
+      const annotationBox = document.getElementById('annotationBox');
+      document.getElementById('photoPreview').style.display = 'none';
+      descBox.style.display = 'block';
+      descBox.innerText = `🤖 正在透過 AI 為「${topic}」生成雙語介紹與實用短語...`;
+      annotationBox.innerHTML = '';
+
+      const prompt = `User input topic/item/scenario: "${topic}".
+Analyze what the user entered:
+- If it is a dish, food, or drink: provide its Chinese & English name, a 1-sentence appetizing introduction (both Chinese & English), and 3 practical ordering/customization phrases (e.g., spice level, salt, portion, allergies).
+- If it is a landmark, place, or daily object: provide its Chinese & English name, a 1-sentence cultural/functional introduction, and 3 useful survival sentences for tourists/learners.
+- If it is a conversational topic or request: generate a 1-sentence summary and 3-4 natural, practical bilingual sentences.
+
+Return STRICTLY in this JSON format without markdown code blocks:
+{
+  "title_zh": "中文標題",
+  "title_en": "English Title",
+  "intro": "一句話中英簡介",
+  "sentences": [
+    {"zh": "地道中文句子1", "en": "Natural English translation 1"},
+    {"zh": "地道中文句子2", "en": "Natural English translation 2"},
+    {"zh": "地道中文句子3", "en": "Natural English translation 3"}
+  ]
+}`;
+
+      const aiText = await requestSmartAI(prompt, null);
+      renderAIJsonResponse(aiText, topic);
+    }
+
+    // =========================================================================
+    // 5. 功能三：「📷 拍照識物 / 識菜 / 識字」（AI 自動判斷拍的是什麼）
+    // =========================================================================
+    async function handleCameraPhoto(input) {
+      if (!input.files || !input.files[0]) return;
+      const file = input.files[0];
+
+      const descBox = document.getElementById('descBox');
+      const preview = document.getElementById('photoPreview');
+      const annotationBox = document.getElementById('annotationBox');
+
+      descBox.style.display = 'block';
+      descBox.innerText = '📷 正在用手機晶片壓縮圖片並透過 AI 自動分析照片內容...';
+      annotationBox.innerHTML = '';
+
+      // 1. 手機本地壓縮圖片（防止大圖卡頓）
+      const base64DataUrl = await compressImageOnPhone(file, 900, 0.75);
+      preview.src = base64DataUrl;
+      preview.style.display = 'block';
+
+      const apiKey = localStorage.getItem('tp_ai_key') || '';
+      const provider = localStorage.getItem('tp_ai_provider') || 'gemini';
+
+      // 2. 如果用戶配置了支援視覺的 AI Key (Gemini / OpenAI)，直接讓 AI 自動判斷是物品、菜餚還是文字
+      if (apiKey && (provider === 'gemini' || provider === 'openai')) {
+        const visionPrompt = `Examine this image carefully and automatically determine what it is:
+Case 1: If the image is mainly text (a book page, sign, document, or multi-item menu), extract the key sentences/items and translate each into both Chinese and English.
+Case 2: If the image is a dish, food, drink, object, or landmark/building, identify what it is, write a concise 1-sentence introduction (in both Chinese and English), and provide 3 practical survival/ordering phrases related to it (e.g., mild spicy, less salt, how much is this, ticket info).
+
+Return STRICTLY in this JSON format without markdown blocks:
+{
+  "title_zh": "識別出的中文名稱或主題",
+  "title_en": "English Name or Topic",
+  "intro": "一句話中英文介紹（若是純文字圖片可填寫文字摘要）",
+  "sentences": [
+    {"zh": "中文句子或提取的內容1", "en": "English translation 1"},
+    {"zh": "中文句子或實用短語2", "en": "English translation 2"},
+    {"zh": "中文句子或實用短語3", "en": "English translation 3"}
+  ]
+}`;
+        const rawVision = await callUserAI(visionPrompt, base64DataUrl, provider, apiKey);
+        if (rawVision && rawVision.includes('{')) {
+          renderAIJsonResponse(rawVision, '拍照識別結果');
+          return;
+        }
+      }
+
+      // 3. 若未填 Vision Key，先走免費 OCR 提取照片中的文字，再交由免費 AI 生成介紹與翻譯注音
+      descBox.innerText = '🔍 正在提取照片文字並生成雙語注音（如需直接識別無文字實物菜餚，請在右上角填入免費 Gemini Key）...';
+      try {
+        const formData = new FormData();
+        formData.append('base64Image', base64DataUrl);
+        formData.append('language', 'chs');
+        formData.append('apikey', 'helloworld');
+
+        const res = await fetch('https://api.ocr.space/parse/image', { method: 'POST', body: formData });
+        const data = await res.json();
+        const extracted = data?.ParsedResults?.[0]?.ParsedText?.trim();
+
+        if (extracted) {
+          const cleanText = extracted.replace(/\r\n/g, '\n').trim();
+          document.getElementById('userInput').value = cleanText;
+          // 如果提取出的是短詞（如一個菜名或物品名），自動觸發 AI 擴展介紹；若是長文則直接逐句翻譯注音
+          if (cleanText.length <= 12) {
+            await handleAIGenerate();
+          } else {
+            await handleDirectTranslate(cleanText);
+          }
+        } else {
+          descBox.innerHTML = '⚠️ 照片中未檢測到文字。<b>因為您尚未填入視覺 AI Key，無法識別無文字的純實物照片。</b><br>👉 點擊右上角「⚙️ AI Key 設定」填入免費的 Google Gemini API Key，即可拍任何菜餚、物品、建築自動識別並給出雙語介紹！';
+        }
+      } catch (e) {
+        descBox.innerText = '⚠️ 網路請求失敗，請檢查網路或點擊右上角設定您的 AI Key。';
+      }
+    }
+
+    // 解析 AI 回傳的 JSON 並渲染卡片
+    function renderAIJsonResponse(rawText, fallbackTopic) {
+      const descBox = document.getElementById('descBox');
+      const annotationBox = document.getElementById('annotationBox');
+      annotationBox.innerHTML = '';
+
+      try {
+        const match = rawText && rawText.match(/\{[\s\S]*\}/);
+        if (match) {
+          const data = JSON.parse(match[0]);
+          descBox.style.display = 'block';
+          descBox.innerHTML = `<strong>${data.title_zh || fallbackTopic} (${data.title_en || ''})</strong><br>${data.intro || ''}`;
+
+          if (data.title_zh) {
+            appendSentenceRow(data.title_zh, data.title_en || '');
+          }
+          if (Array.isArray(data.sentences)) {
+            data.sentences.forEach(item => {
+              if (item.zh) appendSentenceRow(item.zh, item.en || '');
+            });
+          }
+          return;
+        }
+      } catch (e) {
+        console.warn('JSON parse fallback:', e);
+      }
+      // 若非標準 JSON，直接按文字翻譯注音
+      handleDirectTranslate(rawText || fallbackTopic);
+    }
+
+    // =========================================================================
+    // 6. 渲染單句（標點符號懸浮於 Trees Pinyin 行，點擊漢字改多音字）
     // =========================================================================
     function appendSentenceRow(zhText, enTranslation = '') {
       const annotationBox = document.getElementById('annotationBox');
@@ -682,25 +725,37 @@
       for (let i = 0; i < zhText.length; i++) {
         let char = zhText[i];
         let isChinese = /[\u4e00-\u9fa5]/.test(char);
-        let pyNum = isChinese ? (pinyinList[i] || '') : '';
-        let tp = isChinese ? compileToTreesPinyin(pyNum) : '';
+        let isPunct = /[，。！？；：、,.!?;:"'“”‘’（）()《》【】]/.test(char);
 
         let col = document.createElement('div');
         col.className = 'tp-col';
-        col.innerHTML = `
-          <span class="tp-pinyin">${tp || ' '}</span>
-          <span class="tp-zh">${char}</span>
-        `;
 
-        // 手機觸控點擊漢字：直接修改多音字讀音
         if (isChinese) {
+          let pyNum = pinyinList[i] || '';
+          let tp = compileToTreesPinyin(pyNum);
+          col.innerHTML = `
+            <span class="tp-pinyin">${tp}</span>
+            <span class="tp-zh">${char}</span>
+          `;
+          // 點擊漢字直接修改多音字
           col.onclick = function() {
-            let newPy = prompt(`修改「${char}」的漢語拼音（帶聲調數字 1~5，如 hang2 / zhao2）：`, pyNum);
+            let newPy = prompt(`修改「${char}」的漢語拼音（1聲與輕聲自動不標號，如 shi2 / de5 / hang2）：`, pyNum);
             if (newPy && newPy.trim()) {
               pyNum = newPy.trim();
               col.querySelector('.tp-pinyin').innerText = compileToTreesPinyin(pyNum);
             }
           };
+        } else if (isPunct) {
+          // 標點符號懸浮於拼音行，下方漢字行留空對齊
+          col.innerHTML = `
+            <span class="tp-pinyin">${char}</span>
+            <span class="tp-zh"> </span>
+          `;
+        } else {
+          col.innerHTML = `
+            <span class="tp-pinyin"> </span>
+            <span class="tp-zh">${char}</span>
+          `;
         }
 
         charContainer.appendChild(col);
@@ -712,20 +767,102 @@
     }
 
     // =========================================================================
-    // 6. 用戶手機端翻譯通道（本地快取 + 用戶 AI Key + 免費 MyMemory CORS 通道）
+    // 7. 智能 AI 請求分發（瀏覽器內置 AI -> 用戶自填 AI Key -> 免 Key 公共 AI 通道）
+    // =========================================================================
+    async function requestSmartAI(prompt, base64Img) {
+      const apiKey = localStorage.getItem('tp_ai_key') || '';
+      const provider = localStorage.getItem('tp_ai_provider') || 'gemini';
+
+      // 優先 1：用戶自填的 API Key
+      if (apiKey) {
+        const res = await callUserAI(prompt, base64Img, provider, apiKey);
+        if (res) return res;
+      }
+
+      // 優先 2：手機瀏覽器內置端側大模型 (window.ai / LanguageModel)
+      try {
+        if (window.LanguageModel) {
+          const session = await window.LanguageModel.create({ expectedOutputLanguages: ['en'], outputLanguage: 'en' });
+          return await session.prompt(prompt);
+        }
+      } catch (e) {}
+
+      // 優先 3：免 Key 公共免費 AI 文本生成接口 (Pollinations OpenAI-compatible 免費通道，從用戶手機直接發起)
+      if (!base64Img) {
+        try {
+          const res = await fetch('https://text.pollinations.ai/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              messages: [
+                { role: 'system', content: 'You are a helpful bilingual Chinese-English language assistant. Output valid JSON only.' },
+                { role: 'user', content: prompt }
+              ],
+              model: 'openai',
+              jsonMode: true
+            })
+          });
+          const text = await res.text();
+          if (text) return text;
+        } catch (e) {
+          console.warn('Free AI fallback error:', e);
+        }
+      }
+
+      return '';
+    }
+
+    async function callUserAI(prompt, base64Img, provider, apiKey) {
+      try {
+        if (provider === 'gemini') {
+          const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+          const parts = [{ text: prompt }];
+          if (base64Img) {
+            parts.push({ inline_data: { mime_type: 'image/jpeg', data: base64Img.split(',')[1] } });
+          }
+          const res = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ contents: [{ parts }] })
+          });
+          const data = await res.json();
+          return data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+        } else {
+          const endpoint = provider === 'deepseek'
+            ? 'https://api.deepseek.com/chat/completions'
+            : 'https://api.openai.com/v1/chat/completions';
+          const model = provider === 'deepseek' ? 'deepseek-chat' : 'gpt-4o-mini';
+          const content = base64Img
+            ? [{ type: 'text', text: prompt }, { type: 'image_url', image_url: { url: base64Img } }]
+            : prompt;
+          const res = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+            body: JSON.stringify({ model, messages: [{ role: 'user', content }] })
+          });
+          const data = await res.json();
+          return data?.choices?.[0]?.message?.content || '';
+        }
+      } catch (e) {
+        console.warn('User AI call error:', e);
+        return '';
+      }
+    }
+
+    // =========================================================================
+    // 8. 客戶端整句翻譯（用戶 AI Key -> Google GTX -> MyMemory）
     // =========================================================================
     const TRANS_CACHE = JSON.parse(localStorage.getItem('tp_trans_cache') || '{}');
 
     async function translateTextOnClient(text, fromLang, toLang) {
       const cacheKey = `${fromLang}_${toLang}_${text}`;
       if (TRANS_CACHE[cacheKey]) return TRANS_CACHE[cacheKey];
-      if (!navigator.onLine) return ''; // 離線時僅顯示本地注音
+      if (!navigator.onLine) return '';
 
       const apiKey = localStorage.getItem('tp_ai_key') || '';
       const provider = localStorage.getItem('tp_ai_provider') || 'gemini';
 
       try {
-        // 優先 1：如果用戶填了自己的 AI Key，走用戶的 AI
         if (apiKey) {
           const prompt = toLang === 'en'
             ? `Translate this Chinese into natural, concise English (output ONLY the English translation): ${text}`
@@ -737,18 +874,30 @@
           }
         }
 
-        // 優先 2：免費支援跨域 CORS 的 MyMemory 公共接口（直接由用戶手機發起）
+        // Google GTX 免費公共接口
+        try {
+          const gUrl = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${fromLang}&tl=${toLang}&dt=t&q=${encodeURIComponent(text)}`;
+          const gRes = await fetch(gUrl);
+          const gData = await gRes.json();
+          if (gData && gData[0]) {
+            const joined = gData[0].map(x => x[0]).join('');
+            if (joined) {
+              saveTransCache(cacheKey, joined);
+              return joined;
+            }
+          }
+        } catch (e) {}
+
+        // MyMemory 備援
         const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${fromLang}|${toLang}`;
         const res = await fetch(url);
         const data = await res.json();
-        if (data && data.responseData && data.responseData.translatedText) {
+        if (data?.responseData?.translatedText) {
           let result = data.responseData.translatedText;
           saveTransCache(cacheKey, result);
           return result;
         }
-      } catch (e) {
-        console.warn('Client translation skipped:', e);
-      }
+      } catch (e) {}
       return '';
     }
 
@@ -758,73 +907,8 @@
     }
 
     // =========================================================================
-    // 7. 手機拍照識字 / 識菜（本地 Canvas 極速壓縮 + 視覺 AI / 免費 OCR）
+    // 9. 手機圖片壓縮、語音朗讀、橫屏大字與設定儲存
     // =========================================================================
-    async function handleCameraPhoto(input) {
-      if (!input.files || !input.files[0]) return;
-      const file = input.files[0];
-      const descBox = document.getElementById('descBox');
-      descBox.style.display = 'block';
-      descBox.innerText = '📷 正在用手機晶片壓縮並識別照片...';
-
-      // 第一步：在手機本地用 Canvas 將幾 MB 的照片壓縮到 800px 寬度（約 120KB）
-      const base64DataUrl = await compressImageOnPhone(file, 800, 0.72);
-      const apiKey = localStorage.getItem('tp_ai_key') || '';
-      const provider = localStorage.getItem('tp_ai_provider') || 'gemini';
-
-      // 第二步：如果用戶配置了 Gemini / OpenAI Key，直接識別「菜餚/物品/文字」並給出介紹與常用詞！
-      if (apiKey && (provider === 'gemini' || provider === 'openai')) {
-        try {
-          const visionPrompt = `Look at this image. 
-1. If it contains Chinese or English text (like a menu or sign), extract the main text.
-2. If it is a dish, food, or landmark (like Mapo Tofu, Noodles, Palace), identify its Chinese name, provide a 1-sentence intro (Chinese & English), and 2 practical survival phrases (e.g., mild spicy, less salt).
-Return strictly in JSON format:
-{"title_zh":"中文名或提取文字","title_en":"English","desc":"一句話中英介紹","phrases":[{"zh":"實用短語1","en":"English 1"},{"zh":"實用短語2","en":"English 2"}]}`;
-          const rawJson = await callUserAI(visionPrompt, base64DataUrl, provider, apiKey);
-          const match = rawJson && rawJson.match(/\{[\s\S]*\}/);
-          if (match) {
-            const parsed = JSON.parse(match[0]);
-            document.getElementById('userInput').value = parsed.title_zh || '';
-            descBox.innerHTML = `<strong>${parsed.title_zh} (${parsed.title_en || ''})</strong><br>${parsed.desc || ''}`;
-            const annotationBox = document.getElementById('annotationBox');
-            annotationBox.innerHTML = '';
-            appendSentenceRow(parsed.title_zh, parsed.title_en);
-            if (Array.isArray(parsed.phrases)) {
-              parsed.phrases.forEach(p => appendSentenceRow(p.zh, p.en));
-            }
-            return;
-          }
-        } catch (err) {
-          console.warn('Vision AI fallback to free OCR:', err);
-        }
-      }
-
-      // 第三步：免 Key 免費公共 OCR.space 通道（直接從用戶手機提取圖片中的中文/英文）
-      try {
-        const formData = new FormData();
-        formData.append('base64Image', base64DataUrl);
-        formData.append('language', 'chs');
-        formData.append('apikey', 'helloworld'); // OCR.space 官方公共免費測試 Key
-
-        const res = await fetch('https://api.ocr.space/parse/image', {
-          method: 'POST',
-          body: formData
-        });
-        const data = await res.json();
-        const extracted = data?.ParsedResults?.[0]?.ParsedText?.trim();
-        if (extracted) {
-          const cleanText = extracted.replace(/\r\n/g, '\n').trim();
-          document.getElementById('userInput').value = cleanText;
-          processInput(cleanText);
-        } else {
-          descBox.innerText = '💡 未檢測到清晰文字。提示：您也可以點擊輸入框，直接用 iPhone/Android 鍵盤自帶的「掃描文字」相機離線秒取字！';
-        }
-      } catch (e) {
-        descBox.innerText = '💡 當前處於離線狀態。請點擊輸入框，使用手機鍵盤自帶的「相機掃描文字」功能即可 100% 離線取字注音！';
-      }
-    }
-
-    // 手機本地 Canvas 壓縮圖片函數
     function compressImageOnPhone(file, maxWidth, quality) {
       return new Promise((resolve) => {
         const reader = new FileReader();
@@ -845,57 +929,16 @@ Return strictly in JSON format:
       });
     }
 
-    // 調用用戶自帶 AI (Gemini / DeepSeek / OpenAI)
-    async function callUserAI(prompt, base64Img, provider, apiKey) {
-      if (provider === 'gemini') {
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
-        const parts = [{ text: prompt }];
-        if (base64Img) {
-          parts.push({ inline_data: { mime_type: 'image/jpeg', data: base64Img.split(',')[1] } });
-        }
-        const res = await fetch(url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ contents: [{ parts }] })
-        });
-        const data = await res.json();
-        return data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-      } else {
-        const endpoint = provider === 'deepseek'
-          ? 'https://api.deepseek.com/chat/completions'
-          : 'https://api.openai.com/v1/chat/completions';
-        const model = provider === 'deepseek' ? 'deepseek-chat' : 'gpt-4o-mini';
-        const content = base64Img
-          ? [{ type: 'text', text: prompt }, { type: 'image_url', image_url: { url: base64Img } }]
-          : prompt;
-        const res = await fetch(endpoint, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
-          body: JSON.stringify({ model, messages: [{ role: 'user', content }] })
-        });
-        const data = await res.json();
-        return data?.choices?.[0]?.message?.content || '';
-      }
-    }
-
-    // =========================================================================
-    // 8. 手機原生離線語音朗讀 (TTS)、橫屏大字、存照片與設定
-    // =========================================================================
     function speakCard() {
-      if (!('speechSynthesis' in window)) return alert('您的瀏覽器不支援語音朗讀');
+      if (!('speechSynthesis' in window)) return alert('您的手機瀏覽器不支援語音朗讀');
       window.speechSynthesis.cancel();
       const rows = document.querySelectorAll('.sentence-row');
       let allZh = Array.from(rows).map(r => r.dataset.zh).join('。');
       if (!allZh) allZh = document.getElementById('userInput').value;
       const utter = new SpeechSynthesisUtterance(allZh);
       utter.lang = 'zh-CN';
-      utter.rate = 0.85; // 稍慢一點，方便跟讀
+      utter.rate = 0.85;
       window.speechSynthesis.speak(utter);
-    }
-
-    function quickSelect(word) {
-      document.getElementById('userInput').value = word;
-      processInput(word);
     }
 
     function toggleLandscape() {
@@ -924,24 +967,16 @@ Return strictly in JSON format:
       localStorage.setItem('tp_ai_provider', document.getElementById('aiProvider').value);
       localStorage.setItem('tp_ai_key', document.getElementById('aiApiKey').value.trim());
       closeSettings();
-      alert('已保存在您的手機瀏覽器中！');
+      alert('API Key 已安全儲存在您的手機瀏覽器中！現在拍照可直接透過 AI 自動識別任何物品與菜餚。');
     }
-
-    // 網路狀態指示與 Service Worker 註冊
-    function updateOnlineStatus() {
-      const badge = document.getElementById('netStatus');
-      badge.innerText = navigator.onLine ? '🟢 手機端在線' : '⚡ 離線模式';
-    }
-    window.addEventListener('online', updateOnlineStatus);
-    window.addEventListener('offline', updateOnlineStatus);
-    updateOnlineStatus();
 
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('./sw.js').catch(() => {});
     }
 
-    // 初始加載展示「麻婆豆腐」
-    processInput('麻婆豆腐');
+    // 預設載入一句實用歡迎示例（檢驗「食 (r)s2」與「的 der」映射）
+    document.getElementById('userInput').value = '这是美味的中国食物。';
+    handleDirectTranslate('这是美味的中国食物。');
   </script>
 </body>
 </html>
