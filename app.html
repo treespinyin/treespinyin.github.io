@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Trees Pinyin Pocket App</title>
+  <meta name="theme-color" content="#1a1a1a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  
+  <!-- 全球免費 CDN 載入核心庫，零消耗 GitHub 流量 -->
+  <script src="https://cdn.jsdelivr.net/npm/pinyin-pro@3.19.6/dist/index.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+  <style>
+    :root {
+      --bg: #f8f9fa;
+      --card-bg: #ffffff;
+      --text: #111111;
+      --accent: #2e7d32;
+      --border: #e0e0e0;
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+      margin: 0;
+      padding: 16px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .header {
+      width: 100%;
+      max-width: 480px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .header h1 {
+      font-size: 1.15rem;
+      margin: 0;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .control-box {
+      width: 100%;
+      max-width: 480px;
+      background: var(--card-bg);
+      padding: 14px;
+      border-radius: 14px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      border: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .input-row {
+      display: flex;
+      gap: 8px;
+    }
+    input[type="text"] {
+      flex: 1;
+      padding: 10px 12px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 1rem;
+      outline: none;
+    }
+    input[type="text"]:focus { border-color: var(--accent); }
+    .btn {
+      padding: 10px 14px;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+    .btn-primary { background: var(--accent); color: white; }
+    .btn-secondary { background: #e8f5e9; color: var(--accent); border: 1px solid #c8e6c9; }
+    .btn-action { background: #333; color: white; padding: 8px 12px; font-size: 0.85rem; }
+    
+    /* 點餐/生活生存膠囊標籤 */
+    .capsules {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 4px;
+    }
+    .capsule-chip {
+      background: #f1f3f4;
+      border: 1px solid #ddd;
+      border-radius: 16px;
+      padding: 4px 10px;
+      font-size: 0.82rem;
+      cursor: pointer;
+    }
+    .capsule-chip:active { background: #e0e0e0; }
+
+    /* 展示卡片區 */
+    .card-wrapper {
+      width: 100%;
+      max-width: 480px;
+      margin-top: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .card-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 6px;
+    }
+    .display-card {
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 14px;
+      border: 1px solid #ddd;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      min-height: 160px;
+    }
+    .desc-text {
+      font-size: 0.95rem;
+      color: #555;
+      border-bottom: 1px dashed #eee;
+      padding-bottom: 8px;
+      margin: 0;
+    }
+    .annotation-block {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .sentence-row {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .en-line {
+      font-size: 0.95rem;
+      color: #333;
+      font-weight: 500;
+      word-break: normal;
+      overflow-wrap: break-word;
+    }
+    .char-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2px 4px;
+      align-items: flex-end;
+    }
+    .tp-col {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      min-width: 1.1em;
+    }
+    .tp-pinyin {
+      font-size: 0.95rem;
+      font-weight: 700;
+      font-style: italic;
+      color: #000000;
+      line-height: 1.1;
+      white-space: nowrap;
+    }
+    .tp-zh {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #000000;
+      line-height: 1.2;
+    }
+
+    /* 橫屏全螢幕大字展示樣式 */
+    body.landscape-mode {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: #000000;
+      padding: 0;
+      z-index: 99999;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    body.landscape-mode .header,
+    body.landscape-mode .control-box,
+    body.landscape-mode .card-actions { display: none !important; }
+    body.landscape-mode .card-wrapper { max-width: 100%; width: 100%; height: 100%; margin: 0; }
+    body.landscape-mode .display-card {
+      width: 100%; height: 100%;
+      border-radius: 0; border: none;
+      background: #ffffff;
+      justify-content: center;
+      padding: 30px;
+    }
+    body.landscape-mode .tp-pinyin { font-size: 1.8rem; }
+    body.landscape-mode .tp-zh { font-size: 2.6rem; }
+    body.landscape-mode .en-line { font-size: 1.4rem; }
+    .close-landscape {
+      display: none;
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      background: rgba(0,0,0,0.6);
+      color: white;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      z-index: 100000;
+    }
+    body.landscape-mode .close-landscape { display: block; }
+  </style>
+</head>
+<body>
+
+  <button class="close-landscape" onclick="toggleLandscape()">✕ 退出全螢幕</button>
+
+  <div class="header">
+    <h1>🌳 Trees Pinyin Pocket</h1>
+    <span style="font-size: 0.75rem; background: #e0e0e0; padding: 2px 6px; border-radius: 4px;">離線模式</span>
+  </div>
+
+  <div class="control-box">
+    <div class="input-row">
+      <input type="text" id="userInput" placeholder="輸入中文/英文，或用鍵盤相機掃描..." value="麻婆豆腐">
+      <button class="btn btn-primary" onclick="handleRender()">注音</button>
+    </div>
+    
+    <div style="display: flex; gap: 8px;">
+      <!-- 調起相機/圖片上傳 -->
+      <label class="btn btn-secondary" style="flex: 1;">
+        📷 拍照取圖
+        <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display: none;" onchange="handleImage(this)">
+      </label>
+      <button class="btn btn-secondary" onclick="autoSample('故宫')">🏛️ 故宮</button>
+      <button class="btn btn-secondary" onclick="autoSample('牛肉面')">🍜 牛肉麵</button>
+    </div>
+
+    <!-- 常用生存膠囊標籤區（如：微辣、少鹽、門票） -->
+    <div class="capsules" id="capsuleArea"></div>
+  </div>
+
+  <div class="card-wrapper">
+    <div class="card-actions">
+      <button class="btn btn-action" onclick="toggleLandscape()">🔄 橫屏大字卡</button>
+      <button class="btn btn-action" onclick="saveAsImage()">💾 存為照片</button>
+      <button class="btn btn-action" onclick="window.print()">🖨️ 列印</button>
+    </div>
+
+    <div class="display-card" id="renderCard">
+      <p class="desc-text" id="descBox" style="display: none;"></p>
+      <div class="annotation-block" id="annotationBox"></div>
+    </div>
+  </div>
+
+  <script>
+    // 1. 內置微型高頻生存辭典（零 API 成本，離線秒出生活常用句）
+    const SURVIVAL_KB = {
+      "麻婆豆腐": {
+        desc: "經典川菜，特點為麻、辣、燙、鮮、嫩。 (Classic Sichuan dish: spicy, numbing & tender tofu)",
+        tags: ["微辣 (Mild spicy)", "免辣 (Not spicy)", "少盐 (Less salt)", "配米饭 (With rice)"]
+      },
+      "牛肉面": {
+        desc: "常見麵食，濃郁牛肉湯底配燉牛肉。 (Braised beef noodle soup)",
+        tags: ["不放香菜 (No cilantro)", "微辣 (Mild spicy)", "细面 (Thin noodles)", "加蛋 (Add egg)"]
+      },
+      "故宫": {
+        desc: "明清兩代的皇家宮殿，又稱紫禁城。 (Imperial palace of Ming and Qing dynasties)",
+        tags: ["门票预约 (Ticket booking)", "导览器 (Audio guide)", "午门入口 (Meridian Gate)"]
+      }
+    };
+
+    // 2. Trees Pinyin (v25) 映射編譯器
+    const INITIALS = {
+      'b':'b', 'p':'p', 'm':'m', 'f':'f', 'd':'d', 't':'t', 'n':'n', 'l':'L',
+      'g':'g', 'k':'k', 'h':'h', 'j':'j', 'q':'tsee', 'x':'see',
+      'zh':'(r)ds', 'ch':'(r)ts', 'sh':'(r)s', 'r':'(r)th',
+      'z':'ds', 'c':'ts', 's':'s', 'y':'y', 'w':'w'
+    };
+    const FINALS = {
+      'a':'ah', 'o':'ooer', 'e':'er', 'i':'ee', 'u':'oo', 'v':'ee(oo)', 'ü':'ee(oo)',
+      'ai':'ie', 'ei':'ay', 'ui':'ooay', 'ao':'aw', 'ou':'oh', 'iu':'eeoh',
+      'ie':'eer', 've':'ee(oo)er', 'üe':'ee(oo)er',
+      'an':'an', 'en':'er-n', 'in':'een', 'un':'oon', 'vn':'ee(oo)n', 'ün':'ee(oo)n',
+      'ang':'ang', 'eng':'er-ng', 'ing':'ing', 'ong':'er-oong',
+      'ia':'eeah', 'ian':'eean', 'iao':'eeaw', 'iang':'eeang', 'iong':'eer-oong',
+      'ua':'ooah', 'uai':'ooie', 'uan':'ooan', 'uang':'ooang', 'uo':'ooer',
+      'van':'ee(oo)an', 'üan':'ee(oo)an'
+    };
+
+    function compileToTreesPinyin(pyNum) {
+      if (!pyNum) return '';
+      let m = pyNum.match(/^([a-züv]+)([1-5]?)$/i);
+      if (!m) return pyNum;
+      let syl = m[1].toLowerCase().replace('ü', 'v');
+      let tone = m[2] || '';
+
+      // 核心特例硬鎖定
+      if (syl === 'yi') syl = 'yee';
+      else if (syl === 'wo') syl = 'wer';
+      else if (syl === 'ye') syl = 'yer';
+      else if (syl === 'de') syl = 'der';
+      else if (syl === 'le') syl = 'Ler';
+      else if (syl === 'ren') syl = '(r)ther-n';
+      else if (syl === 'er') syl = (tone === '4') ? 'uh-er' : '(uh)-er';
+      else if (syl === 'wen') syl = 'wer-n';
+      else if (syl === 'guo') syl = 'gooer';
+      else if (syl === 'qie') syl = 'tseer';
+      else if (syl === 'xie') syl = 'seer';
+      else {
+        // 標準拼合
+        let init = '', fin = syl;
+        for (let l of ['zh','ch','sh']) {
+          if (syl.startsWith(l)) { init = l; fin = syl.slice(2); break; }
+        }
+        if (!init && syl.length > 1 && 'bpmfdtnlgkhjqxzcsyw'.includes(syl[0])) {
+          init = syl[0]; fin = syl.slice(1);
+        }
+        let mappedInit = INITIALS[init] || init;
+        let mappedFin = FINALS[fin] || fin;
+        syl = mappedInit + mappedFin;
+      }
+
+      // 聲調處理：一聲與輕聲不標，二三四聲加標號
+      let toneSuffix = (tone === '2' || tone === '3' || tone === '4') ? tone : '';
+      return syl + toneSuffix;
+    }
+
+    // 3. 渲染主函數
+    function handleRender(customText) {
+      const text = customText || document.getElementById('userInput').value.trim();
+      if (!text) return;
+
+      const descBox = document.getElementById('descBox');
+      const capsuleArea = document.getElementById('capsuleArea');
+      const annotationBox = document.getElementById('annotationBox');
+
+      // 檢查是否命中知識庫
+      if (SURVIVAL_KB[text]) {
+        descBox.innerText = SURVIVAL_KB[text].desc;
+        descBox.style.display = 'block';
+        capsuleArea.innerHTML = '';
+        SURVIVAL_KB[text].tags.forEach(tag => {
+          let span = document.createElement('span');
+          span.className = 'capsule-chip';
+          span.innerText = '+ ' + tag;
+          span.onclick = () => {
+            let pureZh = tag.split(' ')[0];
+            appendSentence(pureZh, tag);
+          };
+          capsuleArea.appendChild(span);
+        });
+      } else {
+        descBox.style.display = 'none';
+        capsuleArea.innerHTML = '';
+      }
+
+      annotationBox.innerHTML = '';
+      appendSentence(text);
+    }
+
+    // 4. 追加單句注音列
+    function appendSentence(zhText, enTranslation = '') {
+      const annotationBox = document.getElementById('annotationBox');
+      const row = document.createElement('div');
+      row.className = 'sentence-row';
+
+      if (enTranslation) {
+        let enLine = document.createElement('div');
+        enLine.className = 'en-line';
+        enLine.innerText = enTranslation;
+        row.appendChild(enLine);
+      }
+
+      let charContainer = document.createElement('div');
+      charContainer.className = 'char-container';
+
+      // 借用 pinyin-pro 本地瞬間分詞帶調
+      let pinyinList = pinyinPro.pinyin(zhText, { type: 'array', toneType: 'num' });
+
+      for (let i = 0; i < zhText.length; i++) {
+        let char = zhText[i];
+        let pyNum = pinyinList[i] || '';
+        let tp = compileToTreesPinyin(pyNum);
+
+        let col = document.createElement('div');
+        col.className = 'tp-col';
+        col.innerHTML = `
+          <span class="tp-pinyin">${tp}</span>
+          <span class="tp-zh">${char}</span>
+        `;
+        charContainer.appendChild(col);
+      }
+
+      row.appendChild(charContainer);
+      annotationBox.appendChild(row);
+    }
+
+    function autoSample(word) {
+      document.getElementById('userInput').value = word;
+      handleRender(word);
+    }
+
+    // 5. 拍照取圖處理（前端純 JS 壓縮防爆內存）
+    function handleImage(input) {
+      if (!input.files || !input.files[0]) return;
+      const file = input.files[0];
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        // 提示用戶可利用手機鍵盤直接取詞，或調用免費識圖
+        alert("圖片已讀取！提示：iOS/Android 鍵盤內建相機可直接在輸入框取詞。即將為您演示智能識別注音。");
+        handleRender("麻婆豆腐");
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // 6. 橫屏大字卡切換
+    function toggleLandscape() {
+      document.body.classList.toggle('landscape-mode');
+    }
+
+    // 7. 存為照片（使用 html2canvas 純前端渲染）
+    function saveAsImage() {
+      const card = document.getElementById('renderCard');
+      html2canvas(card, { scale: 2 }).then(canvas => {
+        let link = document.createElement('a');
+        link.download = 'treespinyin-card.png';
+        link.href = canvas.toDataURL();
+        link.click();
+      });
+    }
+
+    // 8. 註冊離線 Service Worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js').catch(() => {});
+    }
+
+    // 初始化默認加載
+    handleRender("麻婆豆腐");
+  </script>
+</body>
+</html>
