@@ -1,4 +1,4 @@
-const CACHE_NAME = 'treespinyin-app-v9';
+const CACHE_NAME = 'treespinyin-app-v10';
 const ASSETS = [
   './app',
   './app.html',
