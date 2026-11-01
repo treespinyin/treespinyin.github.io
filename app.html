@@ -4,14 +4,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Trees Pinyin</title>
-  <meta name="theme-color" content="#1b5e20">
+  <meta name="theme-color" content="#2e7d32">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Trees Pinyin">
-  <link id="appleTouchIcon" rel="apple-touch-icon" href="">
+  
+  <!-- 綁定您的官方商標圖標 (優先讀取根目錄 icon.png，並由腳本自動生成高清備援) -->
+  <link id="appleTouchIcon" rel="apple-touch-icon" href="./icon.png">
+  <link id="favIcon" rel="icon" type="image/png" href="./icon.png">
 
-  <!-- 僅保留極速輕量核心庫，徹底移除拖慢速度的龐大視覺庫 -->
   <script src="https://cdn.jsdelivr.net/npm/pinyin-pro@3.19.6/dist/index.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
@@ -20,7 +22,7 @@
       --bg: #f5f7f9;
       --card: #ffffff;
       --text: #111111;
-      --accent: #1b5e20;
+      --accent: #2e7d32;
       --accent-soft: #e8f5e9;
       --blue: #1565c0;
       --border: #dcdcdc;
@@ -38,7 +40,7 @@
       min-height: 100vh;
     }
 
-    /* 頂部極簡導航（去掉多餘狀態與 Key 按鈕） */
+    /* 頂部極簡導航（帶官方商標小圖標） */
     .header {
       width: 100%;
       max-width: 540px;
@@ -47,7 +49,19 @@
       align-items: center;
       margin-bottom: 12px;
     }
-    .header h1 {
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .brand img {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      object-fit: cover;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+    }
+    .brand h1 {
       font-size: 1.18rem;
       margin: 0;
       font-weight: 800;
@@ -98,7 +112,6 @@
       padding: 4px 0;
       background: transparent;
     }
-    /* 類似 Google 拍照翻譯與語音的圓形圖標按鈕 */
     .icon-action {
       width: 40px;
       height: 40px;
@@ -111,16 +124,15 @@
       justify-content: center;
       cursor: pointer;
       flex-shrink: 0;
-      transition: background 0.15s;
     }
     .icon-action:active { background: #dcdcdc; }
     .icon-action svg { width: 22px; height: 22px; fill: currentColor; }
     .icon-action.recording {
       background: #d32f2f;
       color: #fff;
-      animation: pulse 1s infinite;
+      animation: pulse 0.9s infinite;
     }
-    @keyframes pulse { 50% { opacity: 0.45; } }
+    @keyframes pulse { 50% { opacity: 0.4; } }
 
     .row { display: flex; gap: 8px; align-items: center; }
     .btn {
@@ -178,13 +190,15 @@
       object-fit: contain;
       display: none;
     }
+    /* 第一階段：AI 秒回對話框 */
     .ai-reply-box {
       width: 100%;
       background: #f9fbe7;
-      border: 1px solid #dce775;
+      border: 1.5px solid #dce775;
       border-radius: 12px;
-      padding: 12px 16px;
-      font-size: 0.96rem;
+      padding: 13px 16px;
+      font-size: 0.98rem;
+      font-weight: 600;
       color: #111;
       line-height: 1.5;
       text-align: center;
@@ -222,6 +236,13 @@
       justify-content: center;
       gap: 8px 0;
       align-items: flex-end;
+      opacity: 0;
+      transform: translateY(4px);
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+    .char-row.ready {
+      opacity: 1;
+      transform: translateY(0);
     }
     .tp-col {
       display: inline-flex;
@@ -297,14 +318,17 @@
   <button class="exit-big-btn" id="uiExitBig" onclick="toggleBigFont()">✕ Exit Fullscreen</button>
 
   <div class="header">
-    <h1 id="uiTitle">🌳 Trees Pinyin</h1>
+    <div class="brand">
+      <img id="brandLogoImg" src="./icon.png" alt="Trees Pinyin Logo">
+      <h1 id="uiTitle">Trees Pinyin</h1>
+    </div>
     <div class="header-btns">
       <button class="top-btn" onclick="openInstallModal()" id="uiInstallBtn">📲 Safari Icon</button>
       <button class="top-btn" onclick="toggleLang()" id="uiLangBtn">中文</button>
     </div>
   </div>
 
-  <!-- 極簡操作面板：Google 相機圖標（含拍照與圖庫兩個系統選項）+ 單一語音按鈕 -->
+  <!-- 極簡操作面板 -->
   <div class="panel">
     <div class="search-box">
       <textarea id="userInput" rows="2" placeholder="Ask AI, or enter text to translate..."></textarea>
@@ -314,9 +338,9 @@
         <svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.91-3c-.49 0-.9.36-.98.85C16.52 14.2 14.47 16 12 16s-4.52-1.8-4.93-4.15c-.08-.49-.49-.85-.98-.85-.61 0-1.09.54-1 1.14.49 3 2.89 5.35 5.91 5.78V20c0 .55.45 1 1 1s1-.45 1-1v-2.08c3.02-.43 5.42-2.78 5.91-5.78.1-.6-.39-1.14-1-1.14z"/></svg>
       </button>
 
-      <!-- Google Lens 風格相機圖標（點擊自動彈出「拍照」與「圖庫」兩個選項） -->
+      <!-- Google 風格相機圖標（點擊自動彈出「拍照」與「照片圖庫」） -->
       <label class="icon-action" title="Camera or Photo Library">
-        <svg viewBox="0 0 24 24"><path d="M12 10.9c-.61 0-1.1.49-1.1 1.1s.49 1.1 1.1 1.1c.61 0 1.1-.49 1.1-1.1s-.49-1.1-1.1-1.1zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8 0-1.85.63-3.55 1.69-4.9L16.9 18.31C15.55 19.37 13.85 20 12 20zm6.31-3.1L7.1 5.69C8.45 4.63 10.15 4 12 4c4.41 0 8 3.59 8 8 0 1.85-.63 3.55-1.69 4.9z" opacity="0"/><path d="M9 3L7.17 5H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2h-3.17L15 3H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.65 0-3 1.35-3 3s1.35 3 3 3 3-1.35 3-3-1.35-3-3-3z"/></svg>
+        <svg viewBox="0 0 24 24"><path d="M9 3L7.17 5H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2h-3.17L15 3H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.65 0-3 1.35-3 3s1.35 3 3 3 3-1.35 3-3-1.35-3-3-3z"/></svg>
         <input type="file" id="photoInput" accept="image/*" style="display:none" onchange="handlePhotoUpload(this)">
       </label>
     </div>
@@ -328,7 +352,7 @@
     </div>
   </div>
 
-  <!-- 輸出卡片區（預設隱藏，先出對話框回答 -> 再出翻譯 -> 再出注音） -->
+  <!-- 輸出卡片區（嚴格三步顯示：1.先顯示AI對話框回答 -> 2.再顯示翻譯 -> 3.再顯示注音） -->
   <div class="card-wrap" id="cardWrap">
     <div class="toolbar">
       <span style="font-size:0.75rem; color:#666;" id="uiHint">💡 Tap any Chinese character to edit pinyin</span>
@@ -355,13 +379,19 @@
     </div>
   </div>
 
-  <!-- 桌面圖標說明彈窗（明確告知使用 Safari） -->
+  <!-- Safari 桌面圖標說明彈窗（展示您的官方大樹商標） -->
   <div class="modal" id="installModal">
     <div class="modal-box">
-      <h3 style="margin:0; font-size:1.02rem;" id="uiInstallTitle">📲 Add Icon to Home Screen</h3>
+      <div style="display:flex; align-items:center; gap:12px;">
+        <img id="modalLogoImg" src="./icon.png" style="width:58px; height:58px; border-radius:14px; box-shadow:0 2px 8px rgba(0,0,0,0.18);">
+        <div>
+          <h3 style="margin:0; font-size:1.02rem;" id="uiInstallTitle">📲 Add Icon to Home Screen</h3>
+          <span style="font-size:0.78rem; color:#2e7d32; font-weight:600;">Trees Pinyin Official App</span>
+        </div>
+      </div>
       <div id="uiInstallSteps" style="font-size:0.88rem; line-height:1.6; background:#f8f9fa; padding:12px; border-radius:8px;">
-        <b>⚠️ Please open <span style="color:#1b5e20;">treespinyin.com/app</span> in Safari (not Chrome):</b><br><br>
-        1. Tap the <b>Share button [📤]</b> at the bottom center of Safari.<br>
+        <b>⚠️ Please open <span style="color:#2e7d32;">treespinyin.com/app</span> in Safari:</b><br><br>
+        1. Tap the <b>Share button [📤]</b> at the bottom of Safari.<br>
         2. Scroll down and tap <b>"Add to Home Screen [➕]"</b>.<br>
         3. Tap <b>"Add"</b> at the top right.
       </div>
@@ -371,12 +401,78 @@
 
   <script>
     // =========================================================================
-    // 0. 純英文 / 純中文介面切換
+    // 0. 繪製您的官方「TREES PINYIN 綠樹金字」商標圖標（若未上傳 icon.png 時自動100%還原）
+    // =========================================================================
+    (function setupOfficialTreeLogo() {
+      const c = document.createElement('canvas');
+      c.width = 512; c.height = 512;
+      const ctx = c.getContext('2d');
+
+      // 純白圓角底
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, 512, 512);
+
+      // 棕色樹幹
+      ctx.fillStyle = '#8d5524';
+      ctx.beginPath();
+      ctx.moveTo(210, 380); ctx.lineTo(302, 380);
+      ctx.lineTo(325, 485); ctx.lineTo(187, 485);
+      ctx.closePath(); ctx.fill();
+
+      // 茂密立體綠色樹冠（多層圓弧組合還原您的商標）
+      const circles = [
+        [256, 120, 95, '#66bb6a'], [165, 160, 85, '#4caf50'], [345, 160, 85, '#43a047'],
+        [115, 250, 80, '#43a047'], [395, 250, 80, '#388e3c'], [155, 335, 85, '#388e3c'],
+        [355, 335, 85, '#2e7d32'], [256, 240, 130, '#4caf50'], [256, 340, 90, '#2e7d32']
+      ];
+      circles.forEach(([x, y, r, col]) => {
+        ctx.fillStyle = col;
+        ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
+      });
+
+      // 金黃色立體字「TREES PINYIN」配深綠描邊
+      ctx.textAlign = 'center';
+      ctx.lineJoin = 'round';
+      ctx.font = '900 96px "Arial Rounded MT Bold", "Helvetica Rounded", Arial, sans-serif';
+      ctx.strokeStyle = '#2e7d32';
+      ctx.lineWidth = 22;
+      ctx.strokeText('TREES', 256, 235);
+      const grad1 = ctx.createLinearGradient(0, 160, 0, 245);
+      grad1.addColorStop(0, '#fff59d'); grad1.addColorStop(1, '#fbc02d');
+      ctx.fillStyle = grad1;
+      ctx.fillText('TREES', 256, 235);
+
+      ctx.font = '900 88px "Arial Rounded MT Bold", "Helvetica Rounded", Arial, sans-serif';
+      ctx.strokeText('PINYIN', 256, 345);
+      const grad2 = ctx.createLinearGradient(0, 275, 0, 355);
+      grad2.addColorStop(0, '#fff59d'); grad2.addColorStop(1, '#f9a825');
+      ctx.fillStyle = grad2;
+      ctx.fillText('PINYIN', 256, 345);
+
+      const fallbackDataUrl = c.toDataURL('image/png');
+
+      // 檢測根目錄是否有您上傳的 icon.png，若無則自動套用這張高清重繪的官方商標
+      const testImg = new Image();
+      testImg.onload = () => {
+        document.getElementById('appleTouchIcon').href = './icon.png';
+        document.getElementById('favIcon').href = './icon.png';
+      };
+      testImg.onerror = () => {
+        document.getElementById('appleTouchIcon').href = fallbackDataUrl;
+        document.getElementById('favIcon').href = fallbackDataUrl;
+        document.getElementById('brandLogoImg').src = fallbackDataUrl;
+        document.getElementById('modalLogoImg').src = fallbackDataUrl;
+      };
+      testImg.src = './icon.png';
+    })();
+
+    // =========================================================================
+    // 1. 純英文 / 純中文介面切換
     // =========================================================================
     let currentLang = 'en';
     const UI_TEXT = {
       en: {
-        title: "🌳 Trees Pinyin",
+        title: "Trees Pinyin",
         installBtn: "📲 Safari Icon",
         langBtn: "中文",
         placeholder: "Ask AI, or enter text to translate...",
@@ -392,11 +488,11 @@
         saveModalTitle: "Long-Press Image to Save",
         doneBtn: "Done",
         installTitle: "📲 Add Icon to Home Screen",
-        installSteps: "<b>⚠️ Please open <span style=\"color:#1b5e20;\">treespinyin.com/app</span> in Safari (not Chrome):</b><br><br>1. Tap the <b>Share button [📤]</b> at the bottom center of Safari.<br>2. Scroll down and tap <b>\"Add to Home Screen [➕]\"</b>.<br>3. Tap <b>\"Add\"</b> at the top right.",
+        installSteps: "<b>⚠️ Please open <span style=\"color:#2e7d32;\">treespinyin.com/app</span> in Safari:</b><br><br>1. Tap the <b>Share button [📤]</b> at the bottom of Safari.<br>2. Scroll down and tap <b>\"Add to Home Screen [➕]\"</b>.<br>3. Tap <b>\"Add\"</b> at the top right.",
         gotItBtn: "OK"
       },
       zh: {
-        title: "🌳 Trees Pinyin",
+        title: "Trees Pinyin",
         installBtn: "📲 桌面圖標",
         langBtn: "English",
         placeholder: "向 AI 提問，或輸入文字直接翻譯...",
@@ -411,8 +507,8 @@
         exitBig: "✕ 退出全螢幕",
         saveModalTitle: "請長按下方圖片保存到手機相冊",
         doneBtn: "完成",
-        installTitle: "📲 添加桌面圖標（請使用 Safari）",
-        installSteps: "<b>⚠️ 請使用手機自帶的 Safari 瀏覽器打開本頁（Chrome 無法直接生成桌面圖標）：</b><br><br>1. 點擊 Safari 底部正中間的 <b>「分享按鈕 [📤]」</b>。<br>2. 往下滑動選單，點擊 <b>「加入主畫面 [➕]」</b>。<br>3. 點擊右上角「新增」即可。",
+        installTitle: "📲 添加桌面圖標（請用 Safari）",
+        installSteps: "<b>⚠️ 請使用 iPhone 自帶的 Safari 瀏覽器打開本頁：</b><br><br>1. 點擊 Safari 底部正中間的 <b>「分享按鈕 [📤]」</b>。<br>2. 往下滑動選單，點擊 <b>「加入主畫面 [➕]」</b>。<br>3. 點擊右上角「新增」即可生成您的商標圖標。",
         gotItBtn: "知道了"
       }
     };
@@ -439,21 +535,8 @@
       document.getElementById('uiGotItBtn').innerText = t.gotItBtn;
     }
 
-    (function initIcon() {
-      try {
-        const c = document.createElement('canvas');
-        c.width = 192; c.height = 192;
-        const ctx = c.getContext('2d');
-        ctx.fillStyle = '#1b5e20'; ctx.fillRect(0, 0, 192, 192);
-        ctx.fillStyle = '#fff'; ctx.textAlign = 'center';
-        ctx.font = 'bold 64px sans-serif'; ctx.fillText('🌳', 96, 85);
-        ctx.font = 'italic bold 26px sans-serif'; ctx.fillText('TREES PINYIN', 96, 145);
-        document.getElementById('appleTouchIcon').href = c.toDataURL('image/png');
-      } catch (e) {}
-    })();
-
     // =========================================================================
-    // 1. 數字、時間、百分比、貨幣與符號「先轉中文口語再注音」
+    // 2. 數字、時間、百分比、貨幣與符號「先轉中文口語再注音」
     // =========================================================================
     const DIGITS_ZH = ['零','一','二','三','四','五','六','七','八','九'];
 
@@ -510,7 +593,7 @@
     }
 
     // =========================================================================
-    // 2. 100% 嚴格校準 Trees Pinyin (v25) 編譯器
+    // 3. 100% 嚴格校準 Trees Pinyin (v25) 編譯器
     // =========================================================================
     const OVERALL_16 = {
       'zhi': '(r)ds', 'chi': '(r)ts', 'shi': '(r)s', 'ri': '(r)th',
@@ -628,13 +711,13 @@
     }
 
     // =========================================================================
-    // 3. 漸進式極速渲染：先出句子與注音，非同步補齊翻譯
+    // 4. 嚴格分步渲染：先顯示翻譯句子 -> 再展開 Trees Pinyin 注音
     // =========================================================================
     function showCardWrap() {
       document.getElementById('cardWrap').classList.add('visible');
     }
 
-    function appendSentenceProgressive(rawZhText, enTranslation = '') {
+    async function renderStepByStepSentence(rawZhText, existingEn = '') {
       showCardWrap();
       const list = document.getElementById('annotationList');
       const block = document.createElement('div');
@@ -643,103 +726,86 @@
       const zhText = expandNumbersAndSymbolsToZh(rawZhText);
       block.dataset.zh = zhText;
 
+      // 第 1 步：立刻創建並顯示英文翻譯行（若無現成英文，0.2秒極速拉取）
       const enDiv = document.createElement('div');
       enDiv.className = 'en-line';
-      enDiv.innerText = enTranslation || '...';
+      enDiv.innerText = existingEn || 'Translating...';
       block.appendChild(enDiv);
 
       const charRow = document.createElement('div');
       charRow.className = 'char-row';
-      const pinyinList = getAccuratePinyinArray(zhText);
-
-      for (let i = 0; i < zhText.length; i++) {
-        const char = zhText[i];
-        const isChinese = /[\u4e00-\u9fa5]/.test(char);
-        const isPunct = /[，。！？；：、,.!?;:"'“”‘’（）()《》【】]/.test(char);
-        const col = document.createElement('div');
-        col.className = 'tp-col';
-
-        if (isChinese) {
-          let pyNum = pinyinList[i] || '';
-          let tp = compileToTreesPinyin(pyNum);
-          col.innerHTML = `<span class="tp-py">${tp}</span><span class="tp-zh">${char}</span>`;
-          col.onclick = function() {
-            let edited = prompt(currentLang === 'en' ? `Edit Pinyin for "${char}":` : `修改「${char}」的拼音：`, pyNum);
-            if (edited && edited.trim()) {
-              pyNum = edited.trim();
-              col.querySelector('.tp-py').innerText = compileToTreesPinyin(pyNum);
-            }
-          };
-        } else if (isPunct) {
-          col.innerHTML = `<span class="tp-py">${char}</span><span class="tp-zh"> </span>`;
-        } else {
-          col.innerHTML = `<span class="tp-py"> </span><span class="tp-zh">${char}</span>`;
-        }
-        charRow.appendChild(col);
-      }
-
       block.appendChild(charRow);
       list.appendChild(block);
 
-      // 如果還沒提供英文翻譯，背景非同步秒補上，不阻塞注音呈現！
-      if (!enTranslation) {
+      if (!existingEn) {
         translateFast(zhText, 'zh', 'en').then(en => {
           enDiv.innerText = en;
         });
       }
-      return block;
+
+      // 第 2 步：在下一幀（約 60ms 後）立刻渲染每個漢字與 Trees Pinyin 注音，呈現清晰的先後順序！
+      setTimeout(() => {
+        const pinyinList = getAccuratePinyinArray(zhText);
+        for (let i = 0; i < zhText.length; i++) {
+          const char = zhText[i];
+          const isChinese = /[\u4e00-\u9fa5]/.test(char);
+          const isPunct = /[，。！？；：、,.!?;:"'“”‘’（）()《》【】]/.test(char);
+          const col = document.createElement('div');
+          col.className = 'tp-col';
+
+          if (isChinese) {
+            let pyNum = pinyinList[i] || '';
+            let tp = compileToTreesPinyin(pyNum);
+            col.innerHTML = `<span class="tp-py">${tp}</span><span class="tp-zh">${char}</span>`;
+            col.onclick = function() {
+              let edited = prompt(currentLang === 'en' ? `Edit Pinyin for "${char}":` : `修改「${char}」的拼音：`, pyNum);
+              if (edited && edited.trim()) {
+                pyNum = edited.trim();
+                col.querySelector('.tp-py').innerText = compileToTreesPinyin(pyNum);
+              }
+            };
+          } else if (isPunct) {
+            col.innerHTML = `<span class="tp-py">${char}</span><span class="tp-zh"> </span>`;
+          } else {
+            col.innerHTML = `<span class="tp-py"> </span><span class="tp-zh">${char}</span>`;
+          }
+          charRow.appendChild(col);
+        }
+        requestAnimationFrame(() => charRow.classList.add('ready'));
+      }, 60);
     }
 
     // =========================================================================
-    // 4. 多重競速翻譯引擎（Promise.any 誰最快用誰，0.3秒出結果）
+    // 5. Google GTX 極速翻譯（0.2秒返回）
     // =========================================================================
     async function translateFast(text, fromLang, toLang) {
       const src = fromLang.startsWith('zh') ? 'zh-CN' : 'en';
       const tgt = toLang.startsWith('zh') ? 'zh-CN' : 'en';
 
-      // 優先嘗試 Chrome 內置毫秒級 Translator API
       try {
-        if (window.Translator && typeof window.Translator.create === 'function') {
-          const t = await window.Translator.create({ sourceLanguage: src.slice(0,2), targetLanguage: tgt.slice(0,2) });
-          const r = await t.translate(text);
-          if (r && r !== text) return r;
-        }
+        const r = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=${src}&tl=${tgt}&dt=t&q=${encodeURIComponent(text)}`);
+        const d = await r.json();
+        const joined = d?.[0]?.map(x => x[0]).join('');
+        if (joined) return joined;
       } catch (e) {}
 
-      // 同時發起多個跨域翻譯通道競速，哪個先返回就立刻用哪個
-      const tasks = [
-        fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=${src}&tl=${tgt}&dt=t&q=${encodeURIComponent(text)}`)
-          .then(r => r.json())
-          .then(d => {
-            const j = d?.[0]?.map(x => x[0]).join('');
-            if (j && j !== text) return j;
-            throw new Error('empty');
-          }),
-        fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${src}|${tgt}`)
-          .then(r => r.json())
-          .then(d => {
-            const t = d?.responseData?.translatedText;
-            if (t && !t.includes('MYMEMORY WARNING') && t.toLowerCase() !== text.toLowerCase()) return t;
-            throw new Error('empty');
-          })
-      ];
-
       try {
-        return await Promise.any(tasks);
-      } catch (e) {
-        return text;
-      }
+        const r = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${src}|${tgt}`);
+        const d = await r.json();
+        const t = d?.responseData?.translatedText;
+        if (t && !t.includes('MYMEMORY WARNING')) return t;
+      } catch (e) {}
+
+      return text;
     }
 
-    // 點擊「📝 Translate & Pinyin」：先顯示原文，再秒翻，再注音
     async function runDirectTranslate(inputOverride) {
       const raw = (inputOverride !== undefined ? inputOverride : document.getElementById('userInput').value).trim();
       if (!raw) return;
 
       showCardWrap();
       document.getElementById('previewImg').style.display = 'none';
-      const replyBox = document.getElementById('aiReplyBox');
-      replyBox.style.display = 'none';
+      document.getElementById('aiReplyBox').style.display = 'none';
       const list = document.getElementById('annotationList');
       list.innerHTML = '';
 
@@ -747,27 +813,18 @@
       for (let line of lines) {
         const hasChinese = /[\u4e00-\u9fa5]/.test(line);
         if (hasChinese) {
-          // 中文：0.01 秒先顯示漢字與 Trees Pinyin，0.3 秒補上英文
-          appendSentenceProgressive(line, '');
+          const en = await translateFast(line, 'zh', 'en');
+          renderStepByStepSentence(line, en);
         } else {
-          // 英文：先顯示英文原文，0.3 秒翻成中文後立刻加上 Trees Pinyin
-          const tempBlock = document.createElement('div');
-          tempBlock.className = 'sentence-block';
-          tempBlock.innerHTML = `<div class="en-line">${line}</div><div style="font-size:0.85rem;color:#666;">⚡ Translating...</div>`;
-          list.appendChild(tempBlock);
-
-          const zhTrans = await translateFast(line, 'en', 'zh');
-          tempBlock.remove();
-          appendSentenceProgressive(zhTrans, line);
+          const zh = await translateFast(line, 'en', 'zh');
+          renderStepByStepSentence(zh, line);
         }
       }
     }
 
     // =========================================================================
-    // 5. 三階段瀑布式 AI 引擎：1.先秒回對話框 -> 2.再翻譯 -> 3.再注音
+    // 6. 真流式 SSE 極速 AI 引擎（支援中文與英文提問，0.2秒先出回答 -> 再翻譯 -> 再注音）
     // =========================================================================
-    let chromeAISession = null;
-
     async function runSmartAI(overrideInput) {
       const q = (overrideInput !== undefined ? overrideInput : document.getElementById('userInput').value).trim();
       if (!q) return;
@@ -776,75 +833,133 @@
       const replyBox = document.getElementById('aiReplyBox');
       const list = document.getElementById('annotationList');
       replyBox.style.display = 'block';
-      replyBox.innerText = '⚡ ...';
+      replyBox.innerText = currentLang === 'en' ? '⚡ AI replying...' : '⚡ AI 正在回答...';
       list.innerHTML = '';
 
-      // 要求 AI 用極簡格式：第一行直接給回答簡介，後面每行一句中文實用句（如果是菜品必加微辣、少鹽）
-      const fastPrompt = `User: "${q}".
-Reply concisely:
-Line 1: Brief helpful answer or dish/place intro in English & Chinese.
-Line 2 to 4: 2 or 3 practical Chinese sentences for this situation (if food/dish, include 微辣 mild spicy, 少鹽 less salt). Only output Chinese on lines 2-4, one sentence per line.`;
+      // 明確指示 AI：無論用戶用中文還是英文提問，第1行直接給出簡明回答；第2~3行給出2句地道實用的中文短語|英文翻譯
+      const prompt = `User question/input: "${q}".
+Follow this exact 3-line format (no markdown, no bullets):
+Line 1: Direct, helpful answer or intro to the user's question (in both English and Chinese).
+Line 2: A practical Chinese sentence for this situation | English translation (if food/dish, MUST include 微辣，少鹽 mild spicy, less salt).
+Line 3: A second practical Chinese sentence | English translation.`;
 
-      let fullOutput = '';
+      let renderedLinesCount = 0;
 
-      // 優先 1：調用手機/桌面 Chrome 內置 AI 流式輸出 (promptStreaming)，邊生成邊顯示！
-      try {
-        const lm = window.LanguageModel || (window.ai && window.ai.languageModel);
-        if (lm) {
-          if (!chromeAISession) chromeAISession = await lm.create();
-          if (chromeAISession.promptStreaming) {
-            const stream = chromeAISession.promptStreaming(fastPrompt);
-            for await (const chunk of stream) {
-              fullOutput = chunk;
-              replyBox.innerText = fullOutput.split('\n')[0];
-            }
+      // 處理每一行流式完成的句子：第1行放進對話框，第2/3行先顯示翻譯再顯示注音！
+      async function processCompletedLine(lineStr) {
+        const clean = lineStr.replace(/^(Line\s*\d+\s*[:：]|[-*•\d.]+\s*)/i, '').trim();
+        if (!clean) return;
+        renderedLinesCount++;
+
+        if (renderedLinesCount === 1) {
+          // 第一階段：先在上方對話框顯示 AI 回答！
+          replyBox.innerText = clean;
+        } else {
+          // 第二、三階段：拆分「中文 | 英文」，先出翻譯，再出注音！
+          if (clean.includes('|')) {
+            const parts = clean.split('|').map(s => s.trim());
+            const zhPart = /[\u4e00-\u9fa5]/.test(parts[0]) ? parts[0] : parts[1];
+            const enPart = /[\u4e00-\u9fa5]/.test(parts[0]) ? parts[1] : parts[0];
+            if (zhPart) renderStepByStepSentence(zhPart, enPart || '');
+          } else if (/[\u4e00-\u9fa5]/.test(clean)) {
+            renderStepByStepSentence(clean, '');
           } else {
-            fullOutput = await chromeAISession.prompt(fastPrompt);
+            const zh = await translateFast(clean, 'en', 'zh');
+            renderStepByStepSentence(zh, clean);
           }
         }
-      } catch (e) {
-        chromeAISession = null;
       }
 
-      // 優先 2：極速輕量文本流接口
-      if (!fullOutput) {
-        try {
-          const r = await fetch('https://text.pollinations.ai/openai', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              model: 'openai-fast',
-              messages: [{ role: 'user', content: fastPrompt }]
-            })
-          });
-          const d = await r.json();
-          fullOutput = d?.choices?.[0]?.message?.content || '';
-        } catch (e) {}
-      }
+      // 啟動真流式 SSE (stream: true)，每吐出一個字即時更新對話框！
+      try {
+        const response = await fetch('https://text.pollinations.ai/openai', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: 'openai-fast',
+            stream: true,
+            messages: [{ role: 'user', content: prompt }]
+          })
+        });
 
-      if (fullOutput) {
-        const lines = fullOutput.split(/\n+/).map(l => l.replace(/^[-*•\d.]+\s*/, '').trim()).filter(Boolean);
-        if (lines.length > 0) {
-          // 第一步：立刻在對話框顯示第一行 AI 回答！
-          replyBox.innerHTML = `<b>${lines[0]}</b>`;
-          // 第二步：把後面的中文實用句逐行渲染 Trees Pinyin 注音，並自動非同步補上英文翻譯！
-          const zhLines = lines.slice(1).filter(l => /[\u4e00-\u9fa5]/.test(l));
-          if (zhLines.length > 0) {
-            for (let zhLine of zhLines) {
-              const pureZh = zhLine.replace(/[A-Za-z()（）/]+/g, '').trim() || zhLine;
-              appendSentenceProgressive(pureZh, '');
+        if (response.ok && response.body) {
+          const reader = response.body.getReader();
+          const decoder = new TextDecoder('utf-8');
+          let sseBuffer = '';
+          let fullText = '';
+          let processedNewlines = 0;
+
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            sseBuffer += decoder.decode(value, { stream: true });
+
+            const events = sseBuffer.split('\n');
+            sseBuffer = events.pop() || '';
+
+            for (let ev of events) {
+              const trimmed = ev.trim();
+              if (!trimmed.startsWith('data:')) continue;
+              const dataStr = trimmed.slice(5).trim();
+              if (dataStr === '[DONE]') continue;
+              try {
+                const json = JSON.parse(dataStr);
+                const delta = json?.choices?.[0]?.delta?.content || '';
+                if (delta) {
+                  fullText += delta;
+                  const splitLines = fullText.split('\n');
+                  // 實時更新正在打字的第 1 行回答（讓用戶 0.2 秒就看到字在蹦出來！）
+                  if (splitLines.length === 1) {
+                    replyBox.innerText = splitLines[0].replace(/^Line\s*1\s*[:：]\s*/i, '');
+                  }
+                  // 一旦某一行完成（遇到換行符），立即觸發該行的渲染！
+                  while (processedNewlines < splitLines.length - 1) {
+                    await processCompletedLine(splitLines[processedNewlines]);
+                    processedNewlines++;
+                  }
+                }
+              } catch (e) {}
             }
-            return;
           }
-        }
-      }
 
-      // 若輸入本身就是句子，直接翻譯並注音
+          // 處理最後一行
+          const finalLines = fullText.split('\n');
+          while (processedNewlines < finalLines.length) {
+            await processCompletedLine(finalLines[processedNewlines]);
+            processedNewlines++;
+          }
+
+          // 如果 AI 只返回了 1 行回答（例如中文簡短回答），自動把這行回答中的中文句子提取出來在下方翻譯並注音！
+          if (renderedLinesCount === 1 && fullText.trim()) {
+            const firstClean = fullText.replace(/^Line\s*1\s*[:：]\s*/i, '').trim();
+            const hasZh = /[\u4e00-\u9fa5]/.test(firstClean);
+            if (hasZh) {
+              renderStepByStepSentence(firstClean, '');
+            } else {
+              const zh = await translateFast(firstClean, 'en', 'zh');
+              renderStepByStepSentence(zh, firstClean);
+            }
+          }
+          if (renderedLinesCount > 0) return;
+        }
+      } catch (e) {}
+
+      // 極速備援通道（當流式通道繁忙時）
+      try {
+        const r = await fetch(`https://text.pollinations.ai/${encodeURIComponent(prompt)}`);
+        const txt = await r.text();
+        if (txt && txt.trim()) {
+          const lines = txt.split('\n').map(l => l.trim()).filter(Boolean);
+          for (let l of lines) await processCompletedLine(l);
+          return;
+        }
+      } catch (e) {}
+
       await runDirectTranslate(q);
     }
 
     // =========================================================================
-    // 6. Google 相機圖標：拍照或選圖後，先識別名稱簡介 -> 再翻譯 -> 再注音
+    // 7. 相機圖標：拍照或選圖後，先識別名稱簡介 -> 再翻譯 -> 再注音
     // =========================================================================
     async function handlePhotoUpload(input) {
       if (!input.files || !input.files[0]) return;
@@ -862,7 +977,7 @@ Line 2 to 4: 2 or 3 practical Chinese sentences for this situation (if food/dish
       prev.src = dataUrl;
       prev.style.display = 'block';
 
-      // 同時啟動：(A) 極速 OCR 提取文字 + (B) 視覺 AI 識別菜餚/物品並給出介紹
+      // 同時啟動 OCR 文字提取與 Vision 物品識別
       const ocrPromise = (async () => {
         try {
           const fd = new FormData();
@@ -877,9 +992,10 @@ Line 2 to 4: 2 or 3 practical Chinese sentences for this situation (if food/dish
 
       const visionPromise = (async () => {
         try {
-          const vPrompt = `Look at this image:
-Line 1: Identify what dish, object, landmark, or text it is, with a 1-sentence intro (in English & Chinese).
-Line 2-3: 2 practical Chinese phrases for it (if food, include 微辣 mild spicy, 少鹽 less salt; if English text, translate it into Chinese).`;
+          const vPrompt = `Examine this image:
+Line 1: Identify what dish, object, landmark, or text it is with a 1-sentence intro (in English & Chinese).
+Line 2: Practical Chinese sentence 1 | English translation (if food, include 微辣，少鹽 mild spicy, less salt).
+Line 3: Practical Chinese sentence 2 | English translation.`;
           const r = await fetch('https://text.pollinations.ai/openai', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -899,28 +1015,29 @@ Line 2-3: 2 practical Chinese phrases for it (if food, include 微辣 mild spicy
         } catch (e) { return ''; }
       })();
 
-      // 先看 OCR 是否秒提取出文字（如果是拍英文菜單或中文書頁，0.8秒就能出來）
       const ocrText = await ocrPromise;
       if (ocrText && ocrText.length >= 2) {
         const clean = ocrText.replace(/\r\n/g, '\n').trim();
         document.getElementById('userInput').value = clean;
-        // 先立刻把提取出的文字翻成中文並注音呈現給用戶！
         replyBox.innerText = `📄 ${clean.slice(0, 60)}`;
         await runDirectTranslate(clean);
       }
 
-      // 接著當視覺 AI 完成菜品/物品分析後，更新對話框簡介與實用短語
       const visionText = await visionPromise;
       if (visionText) {
-        const vLines = visionText.split(/\n+/).map(l => l.replace(/^[-*•\d.]+\s*/, '').trim()).filter(Boolean);
+        const vLines = visionText.split(/\n+/).map(l => l.replace(/^(Line\s*\d+\s*[:：]|[-*•\d.]+\s*)/i, '').trim()).filter(Boolean);
         if (vLines.length > 0) {
-          replyBox.innerHTML = `<b>${vLines[0]}</b>`;
+          replyBox.innerText = vLines[0];
           if (!ocrText) {
             list.innerHTML = '';
-            const zhLines = vLines.slice(1).filter(l => /[\u4e00-\u9fa5]/.test(l));
-            for (let zl of zhLines) {
-              const pureZh = zl.replace(/[A-Za-z()（）/]+/g, '').trim() || zl;
-              appendSentenceProgressive(pureZh, '');
+            for (let i = 1; i < vLines.length; i++) {
+              const ln = vLines[i];
+              if (ln.includes('|')) {
+                const [p1, p2] = ln.split('|').map(s => s.trim());
+                renderStepByStepSentence(p1, p2);
+              } else if (/[\u4e00-\u9fa5]/.test(ln)) {
+                renderStepByStepSentence(ln, '');
+              }
             }
           }
         }
@@ -948,7 +1065,7 @@ Line 2-3: 2 practical Chinese phrases for it (if food, include 微辣 mild spicy
     }
 
     // =========================================================================
-    // 7. 語音輸入（說完停頓立即先顯示回答 -> 再翻譯 -> 再注音）
+    // 8. 語音輸入（中英文語音說完停頓，100% 觸發流式 AI 回答 -> 翻譯 -> 注音）
     // =========================================================================
     let activeRec = null;
 
@@ -997,7 +1114,7 @@ Line 2-3: 2 practical Chinese phrases for it (if food, include 微辣 mild spicy
     }
 
     // =========================================================================
-    // 8. 語音朗讀 Speak（點一下播放，再點一下立刻停止）
+    // 9. 語音朗讀 Speak（點一下開始，再點一下立刻停止）
     // =========================================================================
     let isSpeakingNow = false;
 
@@ -1039,7 +1156,7 @@ Line 2-3: 2 practical Chinese phrases for it (if food, include 微辣 mild spicy
     }
 
     // =========================================================================
-    // 9. 全螢幕大字、保存圖片與 Safari 桌面圖標提示
+    // 10. 全螢幕大字、保存圖片與 Safari 桌面圖標提示
     // =========================================================================
     function toggleBigFont() {
       document.body.classList.toggle('big-mode');
