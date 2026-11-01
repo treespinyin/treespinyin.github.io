@@ -38,7 +38,7 @@
       min-height: 100vh;
     }
 
-    /* 頂部極簡導航（去掉多餘狀態與 Key 按鈕） */
+    /* 頂部極簡導航 */
     .header {
       width: 100%;
       max-width: 540px;
@@ -53,7 +53,7 @@
       font-weight: 800;
       color: var(--accent);
     }
-    .header-btns { display: flex; gap: 6px; }
+    .header-btns { display: flex; gap: 6px; align-items: center; }
     .top-btn {
       background: #fff;
       border: 1px solid #ccc;
@@ -63,6 +63,11 @@
       font-weight: 600;
       cursor: pointer;
       color: #222;
+    }
+    .top-btn.turbo-on {
+      background: #e8f5e9;
+      border-color: #81c784;
+      color: #1b5e20;
     }
 
     /* Google 風格極簡輸入控制區 */
@@ -190,6 +195,21 @@
       text-align: center;
       display: none;
     }
+    /* 當免費通道較慢時才溫和浮現的提速引導條（不彈窗嚇人） */
+    .speed-tip-bar {
+      width: 100%;
+      font-size: 0.78rem;
+      color: #555;
+      background: #f1f8e9;
+      border: 1px dashed #a5d6a7;
+      border-radius: 10px;
+      padding: 7px 12px;
+      text-align: center;
+      cursor: pointer;
+      display: none;
+    }
+    .speed-tip-bar b { color: var(--accent); text-decoration: underline; }
+
     .annotation-list {
       width: 100%;
       display: flex;
@@ -258,7 +278,8 @@
     body.big-mode .header,
     body.big-mode .panel,
     body.big-mode .toolbar,
-    body.big-mode .preview-img { display: none !important; }
+    body.big-mode .preview-img,
+    body.big-mode .speed-tip-bar { display: none !important; }
     body.big-mode .card-wrap { max-width: 100%; width: 100%; min-height: 100vh; margin: 0; justify-content: center; }
     body.big-mode .sheet-card {
       border: none; box-shadow: none; border-radius: 0;
@@ -281,12 +302,17 @@
       background: rgba(0,0,0,0.6); z-index: 9999; justify-content: center; align-items: center; padding: 16px;
     }
     .modal-box {
-      background: #fff; width: 100%; max-width: 400px; border-radius: 14px;
+      background: #fff; width: 100%; max-width: 410px; border-radius: 14px;
       padding: 18px; display: flex; flex-direction: column; gap: 12px;
     }
+    .key-input {
+      width: 100%; padding: 10px 12px; border: 1.5px solid #ccc;
+      border-radius: 8px; font-size: 0.9rem; outline: none;
+    }
+    .key-input:focus { border-color: var(--accent); }
 
     @media print {
-      .header, .panel, .toolbar, .exit-big-btn, .preview-img { display: none !important; }
+      .header, .panel, .toolbar, .exit-big-btn, .preview-img, .speed-tip-bar { display: none !important; }
       body { background: #fff; padding: 0; }
       .sheet-card { border: none; box-shadow: none; padding: 12mm; }
     }
@@ -299,6 +325,7 @@
   <div class="header">
     <h1 id="uiTitle">🌳 Trees Pinyin</h1>
     <div class="header-btns">
+      <button class="top-btn" onclick="openSpeedModal()" id="uiSpeedBtn" title="Optional Speed Up">⚡ Speed</button>
       <button class="top-btn" onclick="openInstallModal()" id="uiInstallBtn">📲 Safari Icon</button>
       <button class="top-btn" onclick="toggleLang()" id="uiLangBtn">中文</button>
     </div>
@@ -307,7 +334,7 @@
   <!-- 極簡操作面板：Google 相機圖標（含拍照與圖庫兩個系統選項）+ 單一語音按鈕 -->
   <div class="panel">
     <div class="search-box">
-      <textarea id="userInput" rows="2" placeholder="Ask AI, or enter text to translate..."></textarea>
+      <textarea id="userInput" rows="2" placeholder="Ask AI, take a photo, or enter text..."></textarea>
       
       <!-- 語音輸入按鈕 -->
       <button class="icon-action" id="micBtn" onclick="toggleVoice()" title="Voice Input">
@@ -328,7 +355,7 @@
     </div>
   </div>
 
-  <!-- 輸出卡片區（預設隱藏，先出對話框回答 -> 再出翻譯 -> 再出注音） -->
+  <!-- 輸出卡片區（預設隱藏，先出對話框回答 -> 自動語音回答 -> 再出翻譯與注音） -->
   <div class="card-wrap" id="cardWrap">
     <div class="toolbar">
       <span style="font-size:0.75rem; color:#666;" id="uiHint">💡 Tap any Chinese character to edit pinyin</span>
@@ -343,6 +370,11 @@
       <img id="previewImg" class="preview-img" alt="Preview">
       <div class="ai-reply-box" id="aiReplyBox"></div>
       <div class="annotation-list" id="annotationList"></div>
+    </div>
+
+    <!-- 僅在用戶感覺免費通道慢時才顯示的溫和提速引導 -->
+    <div class="speed-tip-bar" id="speedTipBar" onclick="openSpeedModal()">
+      ⚡ Using free public channel. Want <b>0.5s instant speed</b>? Tap here for a 30-second free setup guide.
     </div>
   </div>
 
@@ -369,17 +401,40 @@
     </div>
   </div>
 
+  <!-- 嫌慢時才打開的「可選極速 API 教學與設置」彈窗 -->
+  <div class="modal" id="speedModal">
+    <div class="modal-box">
+      <h3 style="margin:0; font-size:1.02rem;" id="uiSpeedTitle">⚡ Optional: 0.5s Instant Speed Setup</h3>
+      <div id="uiSpeedSteps" style="font-size:0.84rem; line-height:1.55; background:#f8f9fa; padding:12px; border-radius:8px; color:#222;">
+        <b>No key is required for normal use!</b> If the free public channel feels slow, you can get your own free Google AI Key in 30 seconds:<br><br>
+        1. Tap <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:#1565c0;font-weight:700;">aistudio.google.com/app/apikey</a> and sign in with Google.<br>
+        2. Tap <b>"Create API key"</b> and copy the key (starts with <code>AIza...</code>).<br>
+        3. Paste it below (saved only on your phone):
+      </div>
+      <input type="password" id="userApiKeyInput" class="key-input" placeholder="Paste Google Gemini API Key (AIza...)">
+      <div style="display:flex; gap:8px;">
+        <button class="btn btn-green" onclick="saveUserApiKey()" id="uiSaveKeyBtn">Save & Enable Turbo</button>
+        <button class="btn btn-soft" style="flex:0.5;" onclick="clearUserApiKey()" id="uiClearKeyBtn">Use Free</button>
+      </div>
+      <button class="btn" style="background:#eee; color:#333; padding:8px;" onclick="document.getElementById('speedModal').style.display='none'" id="uiCloseSpeedBtn">Close</button>
+    </div>
+  </div>
+
   <script>
     // =========================================================================
-    // 0. 純英文 / 純中文介面切換
+    // 0. 純英文 / 純中文介面切換 & 可選 API Key 狀態管理（絕不主動彈窗）
     // =========================================================================
     let currentLang = 'en';
+    const KEY_STORAGE_NAME = 'tp_v10_gemini_key';
+
     const UI_TEXT = {
       en: {
         title: "🌳 Trees Pinyin",
+        speedBtn: "⚡ Speed",
+        speedBtnOn: "⚡ Turbo ON",
         installBtn: "📲 Safari Icon",
         langBtn: "中文",
-        placeholder: "Ask AI, or enter text to translate...",
+        placeholder: "Ask AI, take a photo, or enter text...",
         aiBtn: "✨ AI Reply & Pinyin",
         transBtn: "📝 Translate & Pinyin",
         speakBtn: "🔊 Speak",
@@ -393,13 +448,21 @@
         doneBtn: "Done",
         installTitle: "📲 Add Icon to Home Screen",
         installSteps: "<b>⚠️ Please open <span style=\"color:#1b5e20;\">treespinyin.com/app</span> in Safari (not Chrome):</b><br><br>1. Tap the <b>Share button [📤]</b> at the bottom center of Safari.<br>2. Scroll down and tap <b>\"Add to Home Screen [➕]\"</b>.<br>3. Tap <b>\"Add\"</b> at the top right.",
-        gotItBtn: "OK"
+        gotItBtn: "OK",
+        speedTip: "⚡ Using free public channel. Feel slow? <b>Tap here for 0.5s instant speed guide</b>.",
+        speedTitle: "⚡ Optional: 0.5s Instant Speed Setup",
+        speedSteps: "<b>No key is required for normal use!</b> If the free channel feels slow, get a free Google Gemini Key in 30 seconds:<br><br>1. Open <a href=\"https://aistudio.google.com/app/apikey\" target=\"_blank\" style=\"color:#1565c0;font-weight:700;\">Google AI Studio (Get API Key)</a>.<br>2. Tap <b>\"Create API key\"</b> and copy the code (starts with <code>AIza...</code>).<br>3. Paste it below (saved privately on your device only):",
+        saveKeyBtn: "Save & Enable Turbo",
+        clearKeyBtn: "Use Free Mode",
+        closeSpeedBtn: "Close"
       },
       zh: {
         title: "🌳 Trees Pinyin",
+        speedBtn: "⚡ 提速",
+        speedBtnOn: "⚡ 極速已開",
         installBtn: "📲 桌面圖標",
         langBtn: "English",
-        placeholder: "向 AI 提問，或輸入文字直接翻譯...",
+        placeholder: "向 AI 提問、拍照識物，或輸入文字翻譯...",
         aiBtn: "✨ AI 回答並注音",
         transBtn: "📝 翻譯並注音",
         speakBtn: "🔊 朗讀",
@@ -413,9 +476,53 @@
         doneBtn: "完成",
         installTitle: "📲 添加桌面圖標（請使用 Safari）",
         installSteps: "<b>⚠️ 請使用手機自帶的 Safari 瀏覽器打開本頁（Chrome 無法直接生成桌面圖標）：</b><br><br>1. 點擊 Safari 底部正中間的 <b>「分享按鈕 [📤]」</b>。<br>2. 往下滑動選單，點擊 <b>「加入主畫面 [➕]」</b>。<br>3. 點擊右上角「新增」即可。",
-        gotItBtn: "知道了"
+        gotItBtn: "知道了",
+        speedTip: "⚡ 當前為免費公共通道，若覺得慢，<b>點此查看 30 秒免費開啟 0.5 秒極速模式教學</b>",
+        speedTitle: "⚡ 嫌慢可選：30秒免費開啟 0.5 秒極速模式",
+        speedSteps: "<b>不填 Key 也能直接免費使用！</b>如果您覺得公共通道排隊較慢，可按以下 3 步免費申請專屬極速通道：<br><br>1. 點擊打開 <a href=\"https://aistudio.google.com/app/apikey\" target=\"_blank\" style=\"color:#1565c0;font-weight:700;\">Google 官方免費 Key 頁面</a>（登入 Google 帳號）。<br>2. 點擊藍色按鈕 <b>「Create API key」</b> 並複製（以 <code>AIza</code> 開頭）。<br>3. 貼到下方輸入框保存（僅保存在您自己手機中）：",
+        saveKeyBtn: "保存並開啟極速",
+        clearKeyBtn: "恢復免費通道",
+        closeSpeedBtn: "關閉"
       }
     };
+
+    function getUserApiKey() {
+      return (localStorage.getItem(KEY_STORAGE_NAME) || '').trim();
+    }
+
+    function updateSpeedBtnUI() {
+      const btn = document.getElementById('uiSpeedBtn');
+      const t = UI_TEXT[currentLang];
+      const hasKey = !!getUserApiKey();
+      btn.innerText = hasKey ? t.speedBtnOn : t.speedBtn;
+      btn.classList.toggle('turbo-on', hasKey);
+      if (hasKey) {
+        document.getElementById('speedTipBar').style.display = 'none';
+      }
+    }
+
+    function openSpeedModal() {
+      document.getElementById('userApiKeyInput').value = getUserApiKey();
+      document.getElementById('speedModal').style.display = 'flex';
+    }
+
+    function saveUserApiKey() {
+      const val = document.getElementById('userApiKeyInput').value.trim();
+      if (val) {
+        localStorage.setItem(KEY_STORAGE_NAME, val);
+      } else {
+        localStorage.removeItem(KEY_STORAGE_NAME);
+      }
+      updateSpeedBtnUI();
+      document.getElementById('speedModal').style.display = 'none';
+    }
+
+    function clearUserApiKey() {
+      localStorage.removeItem(KEY_STORAGE_NAME);
+      document.getElementById('userApiKeyInput').value = '';
+      updateSpeedBtnUI();
+      document.getElementById('speedModal').style.display = 'none';
+    }
 
     function toggleLang() {
       currentLang = currentLang === 'en' ? 'zh' : 'en';
@@ -437,9 +544,17 @@
       document.getElementById('uiInstallTitle').innerText = t.installTitle;
       document.getElementById('uiInstallSteps').innerHTML = t.installSteps;
       document.getElementById('uiGotItBtn').innerText = t.gotItBtn;
+      document.getElementById('speedTipBar').innerHTML = t.speedTip;
+      document.getElementById('uiSpeedTitle').innerText = t.speedTitle;
+      document.getElementById('uiSpeedSteps').innerHTML = t.speedSteps;
+      document.getElementById('uiSaveKeyBtn').innerText = t.saveKeyBtn;
+      document.getElementById('uiClearKeyBtn').innerText = t.clearKeyBtn;
+      document.getElementById('uiCloseSpeedBtn').innerText = t.closeSpeedBtn;
+      updateSpeedBtnUI();
     }
 
     (function initIcon() {
+      updateSpeedBtnUI();
       try {
         const c = document.createElement('canvas');
         c.width = 192; c.height = 192;
@@ -681,7 +796,6 @@
       block.appendChild(charRow);
       list.appendChild(block);
 
-      // 如果還沒提供英文翻譯，背景非同步秒補上，不阻塞注音呈現！
       if (!enTranslation) {
         translateFast(zhText, 'zh', 'en').then(en => {
           enDiv.innerText = en;
@@ -691,13 +805,12 @@
     }
 
     // =========================================================================
-    // 4. 多重競速翻譯引擎（Promise.any 誰最快用誰，0.3秒出結果）
+    // 4. 多重競速翻譯引擎（Promise.any 誰最快用誰，0.2~0.3秒出結果）
     // =========================================================================
     async function translateFast(text, fromLang, toLang) {
       const src = fromLang.startsWith('zh') ? 'zh-CN' : 'en';
       const tgt = toLang.startsWith('zh') ? 'zh-CN' : 'en';
 
-      // 優先嘗試 Chrome 內置毫秒級 Translator API
       try {
         if (window.Translator && typeof window.Translator.create === 'function') {
           const t = await window.Translator.create({ sourceLanguage: src.slice(0,2), targetLanguage: tgt.slice(0,2) });
@@ -706,7 +819,6 @@
         }
       } catch (e) {}
 
-      // 同時發起多個跨域翻譯通道競速，哪個先返回就立刻用哪個
       const tasks = [
         fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=${src}&tl=${tgt}&dt=t&q=${encodeURIComponent(text)}`)
           .then(r => r.json())
@@ -731,7 +843,6 @@
       }
     }
 
-    // 點擊「📝 Translate & Pinyin」：先顯示原文，再秒翻，再注音
     async function runDirectTranslate(inputOverride) {
       const raw = (inputOverride !== undefined ? inputOverride : document.getElementById('userInput').value).trim();
       if (!raw) return;
@@ -747,10 +858,8 @@
       for (let line of lines) {
         const hasChinese = /[\u4e00-\u9fa5]/.test(line);
         if (hasChinese) {
-          // 中文：0.01 秒先顯示漢字與 Trees Pinyin，0.3 秒補上英文
           appendSentenceProgressive(line, '');
         } else {
-          // 英文：先顯示英文原文，0.3 秒翻成中文後立刻加上 Trees Pinyin
           const tempBlock = document.createElement('div');
           tempBlock.className = 'sentence-block';
           tempBlock.innerHTML = `<div class="en-line">${line}</div><div style="font-size:0.85rem;color:#666;">⚡ Translating...</div>`;
@@ -764,87 +873,168 @@
     }
 
     // =========================================================================
-    // 5. 三階段瀑布式 AI 引擎：1.先秒回對話框 -> 2.再翻譯 -> 3.再注音
+    // 5. 極速 AI 調度核心：優先用戶自備 Gemini Key (0.5s)，否則多節點免費競速
+    //    若免費請求耗時超過 1.8 秒，自動在卡片底部溫和顯示「嫌慢可提速」引導
     // =========================================================================
     let chromeAISession = null;
+
+    async function callFastAI(promptText, base64Image = null) {
+      const userKey = getUserApiKey();
+      const tipBar = document.getElementById('speedTipBar');
+      let slowTimer = null;
+
+      if (!userKey) {
+        slowTimer = setTimeout(() => {
+          tipBar.innerHTML = UI_TEXT[currentLang].speedTip;
+          tipBar.style.display = 'block';
+        }, 1800);
+      } else {
+        tipBar.style.display = 'none';
+      }
+
+      try {
+        // 通道 A：如果用戶設置了自己的 Google Gemini API Key -> 0.5 秒官方極速直連
+        if (userKey) {
+          const parts = [{ text: promptText }];
+          if (base64Image) {
+            const mime = base64Image.substring(base64Image.indexOf(':') + 1, base64Image.indexOf(';')) || 'image/jpeg';
+            const rawB64 = base64Image.split(',')[1];
+            parts.push({ inline_data: { mime_type: mime, data: rawB64 } });
+          }
+          const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(userKey)}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [{ parts }],
+              generationConfig: { temperature: 0.4, maxOutputTokens: 300 }
+            })
+          });
+          if (r.ok) {
+            const d = await r.json();
+            const txt = d?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+            if (txt) return txt;
+          }
+        }
+
+        // 通道 B：純文字時優先試用瀏覽器本地毫秒級 AI
+        if (!base64Image) {
+          try {
+            const lm = window.LanguageModel || (window.ai && window.ai.languageModel);
+            if (lm) {
+              if (!chromeAISession) chromeAISession = await lm.create();
+              const res = await chromeAISession.prompt(promptText);
+              if (res) return res;
+            }
+          } catch (e) { chromeAISession = null; }
+        }
+
+        // 通道 C：免費多節點併發競速（Promise.any 誰先返回用誰）
+        const buildPollinationsReq = (modelName) => {
+          const contentPayload = base64Image
+            ? [{ type: 'text', text: promptText }, { type: 'image_url', image_url: { url: base64Image } }]
+            : promptText;
+          return fetch('https://text.pollinations.ai/openai', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              model: modelName,
+              messages: [{ role: 'user', content: contentPayload }]
+            })
+          }).then(r => r.json()).then(d => {
+            const out = d?.choices?.[0]?.message?.content?.trim();
+            if (out) return out;
+            throw new Error('empty');
+          });
+        };
+
+        const raceTasks = base64Image
+          ? [buildPollinationsReq('openai'), buildPollinationsReq('openai-fast')]
+          : [
+              buildPollinationsReq('openai-fast'),
+              buildPollinationsReq('openai'),
+              fetch(`https://text.pollinations.ai/${encodeURIComponent(promptText)}?model=openai-fast`).then(r => r.text()).then(t => {
+                if (t && t.trim().length > 2 && !t.includes('<!DOCTYPE')) return t.trim();
+                throw new Error('empty');
+              })
+            ];
+
+        return await Promise.any(raceTasks);
+      } catch (e) {
+        return '';
+      } finally {
+        if (slowTimer) clearTimeout(slowTimer);
+      }
+    }
+
+    // 渲染 AI 輸出並自動語音回答（像 Google 手機 AI 一樣邊看邊聽）
+    function renderAndSpeakAIResult(fullOutput, shouldAutoSpeak = true) {
+      const replyBox = document.getElementById('aiReplyBox');
+      const list = document.getElementById('annotationList');
+      const lines = fullOutput.split(/\n+/).map(l => l.replace(/^[-*•\d.]+\s*/, '').trim()).filter(Boolean);
+      if (lines.length === 0) return false;
+
+      // 第一行：顯示 AI 識別結果或回答
+      replyBox.style.display = 'block';
+      replyBox.innerHTML = `<b>${lines[0]}</b>`;
+
+      // 後續行：提取中文實用句並生成中英對照 + Trees Pinyin
+      const zhLines = lines.slice(1).filter(l => /[\u4e00-\u9fa5]/.test(l));
+      let spokenZhList = [];
+
+      if (zhLines.length > 0) {
+        list.innerHTML = '';
+        for (let zhLine of zhLines) {
+          // 若同一行帶有英文括號則分離，保留純中文注音
+          const pureZh = zhLine.replace(/[A-Za-z()（）/]+/g, '').trim() || zhLine;
+          spokenZhList.push(pureZh);
+          appendSentenceProgressive(pureZh, '');
+        }
+      } else if (/[\u4e00-\u9fa5]/.test(lines[0])) {
+        const onlyZh = lines[0].replace(/[A-Za-z()（）/:-]+/g, '').trim();
+        if (onlyZh) {
+          spokenZhList.push(onlyZh);
+          appendSentenceProgressive(onlyZh, '');
+        }
+      }
+
+      // 像 Google 手機 AI 一樣自動語音回答
+      if (shouldAutoSpeak) {
+        const replySpeakText = lines[0] + (spokenZhList.length ? '。' + spokenZhList.join('。') : '');
+        autoSpeakAnswer(replySpeakText);
+      }
+      return true;
+    }
 
     async function runSmartAI(overrideInput) {
       const q = (overrideInput !== undefined ? overrideInput : document.getElementById('userInput').value).trim();
       if (!q) return;
 
       showCardWrap();
+      document.getElementById('previewImg').style.display = 'none';
       const replyBox = document.getElementById('aiReplyBox');
       const list = document.getElementById('annotationList');
       replyBox.style.display = 'block';
       replyBox.innerText = '⚡ ...';
       list.innerHTML = '';
 
-      // 要求 AI 用極簡格式：第一行直接給回答簡介，後面每行一句中文實用句（如果是菜品必加微辣、少鹽）
-      const fastPrompt = `User: "${q}".
-Reply concisely:
-Line 1: Brief helpful answer or dish/place intro in English & Chinese.
-Line 2 to 4: 2 or 3 practical Chinese sentences for this situation (if food/dish, include 微辣 mild spicy, 少鹽 less salt). Only output Chinese on lines 2-4, one sentence per line.`;
+      const fastPrompt = `User asks: "${q}".
+Reply concisely in 3 lines:
+Line 1: Direct, friendly answer in English and Chinese.
+Line 2: Practical Chinese sentence 1 for this topic (Chinese characters only; if food/dish, include 微辣少鹽).
+Line 3: Practical Chinese sentence 2 for this topic (Chinese characters only).`;
 
-      let fullOutput = '';
-
-      // 優先 1：調用手機/桌面 Chrome 內置 AI 流式輸出 (promptStreaming)，邊生成邊顯示！
-      try {
-        const lm = window.LanguageModel || (window.ai && window.ai.languageModel);
-        if (lm) {
-          if (!chromeAISession) chromeAISession = await lm.create();
-          if (chromeAISession.promptStreaming) {
-            const stream = chromeAISession.promptStreaming(fastPrompt);
-            for await (const chunk of stream) {
-              fullOutput = chunk;
-              replyBox.innerText = fullOutput.split('\n')[0];
-            }
-          } else {
-            fullOutput = await chromeAISession.prompt(fastPrompt);
-          }
-        }
-      } catch (e) {
-        chromeAISession = null;
+      const fullOutput = await callFastAI(fastPrompt, null);
+      if (fullOutput && renderAndSpeakAIResult(fullOutput, true)) {
+        return;
       }
 
-      // 優先 2：極速輕量文本流接口
-      if (!fullOutput) {
-        try {
-          const r = await fetch('https://text.pollinations.ai/openai', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              model: 'openai-fast',
-              messages: [{ role: 'user', content: fastPrompt }]
-            })
-          });
-          const d = await r.json();
-          fullOutput = d?.choices?.[0]?.message?.content || '';
-        } catch (e) {}
-      }
-
-      if (fullOutput) {
-        const lines = fullOutput.split(/\n+/).map(l => l.replace(/^[-*•\d.]+\s*/, '').trim()).filter(Boolean);
-        if (lines.length > 0) {
-          // 第一步：立刻在對話框顯示第一行 AI 回答！
-          replyBox.innerHTML = `<b>${lines[0]}</b>`;
-          // 第二步：把後面的中文實用句逐行渲染 Trees Pinyin 注音，並自動非同步補上英文翻譯！
-          const zhLines = lines.slice(1).filter(l => /[\u4e00-\u9fa5]/.test(l));
-          if (zhLines.length > 0) {
-            for (let zhLine of zhLines) {
-              const pureZh = zhLine.replace(/[A-Za-z()（）/]+/g, '').trim() || zhLine;
-              appendSentenceProgressive(pureZh, '');
-            }
-            return;
-          }
-        }
-      }
-
-      // 若輸入本身就是句子，直接翻譯並注音
+      // 兜底：若無 AI 輸出則直接秒翻並注音 + 朗讀
       await runDirectTranslate(q);
+      toggleSpeak();
     }
 
     // =========================================================================
-    // 6. Google 相機圖標：拍照或選圖後，先識別名稱簡介 -> 再翻譯 -> 再注音
+    // 6. Google 相機識物：512px 極速壓縮 -> 識別物品/文字 -> 語音回答 -> 翻譯注音
     // =========================================================================
     async function handlePhotoUpload(input) {
       if (!input.files || !input.files[0]) return;
@@ -854,15 +1044,22 @@ Line 2 to 4: 2 or 3 practical Chinese sentences for this situation (if food/dish
       const replyBox = document.getElementById('aiReplyBox');
       const list = document.getElementById('annotationList');
       replyBox.style.display = 'block';
-      replyBox.innerText = currentLang === 'en' ? '📷 Analyzing photo...' : '📷 正在識別照片...';
+      replyBox.innerText = currentLang === 'en' ? '📷 Identifying object & text...' : '📷 正在極速識別物品與文字...';
       list.innerHTML = '';
 
-      const dataUrl = await compressImg(file, 800, 0.75);
+      // 強制壓縮至 512px / 0.65 (~35KB)，消除上傳延遲
+      const dataUrl = await compressImg(file, 512, 0.65);
       const prev = document.getElementById('previewImg');
       prev.src = dataUrl;
       prev.style.display = 'block';
 
-      // 同時啟動：(A) 極速 OCR 提取文字 + (B) 視覺 AI 識別菜餚/物品並給出介紹
+      const vPrompt = `Look at this photo like Google Lens AI:
+Line 1: Tell the user what object, dish, plant, landmark, or text this is, with a brief helpful explanation (in English & Chinese).
+Line 2: 1st useful Chinese sentence about this item (Chinese characters only; if food, include 微辣少鹽).
+Line 3: 2nd useful Chinese sentence about this item (Chinese characters only).`;
+
+      // 併發啟動：視覺 AI 識物 + 極速 OCR 文字提取
+      const visionPromise = callFastAI(vPrompt, dataUrl);
       const ocrPromise = (async () => {
         try {
           const fd = new FormData();
@@ -875,53 +1072,28 @@ Line 2 to 4: 2 or 3 practical Chinese sentences for this situation (if food/dish
         } catch (e) { return ''; }
       })();
 
-      const visionPromise = (async () => {
-        try {
-          const vPrompt = `Look at this image:
-Line 1: Identify what dish, object, landmark, or text it is, with a 1-sentence intro (in English & Chinese).
-Line 2-3: 2 practical Chinese phrases for it (if food, include 微辣 mild spicy, 少鹽 less salt; if English text, translate it into Chinese).`;
-          const r = await fetch('https://text.pollinations.ai/openai', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              model: 'openai',
-              messages: [{
-                role: 'user',
-                content: [
-                  { type: 'text', text: vPrompt },
-                  { type: 'image_url', image_url: { url: dataUrl } }
-                ]
-              }]
-            })
-          });
-          const d = await r.json();
-          return d?.choices?.[0]?.message?.content || '';
-        } catch (e) { return ''; }
-      })();
-
-      // 先看 OCR 是否秒提取出文字（如果是拍英文菜單或中文書頁，0.8秒就能出來）
+      // 先檢查 OCR 是否有明顯文字（如菜單、路牌）
       const ocrText = await ocrPromise;
+      let ocrRendered = false;
       if (ocrText && ocrText.length >= 2) {
         const clean = ocrText.replace(/\r\n/g, '\n').trim();
         document.getElementById('userInput').value = clean;
-        // 先立刻把提取出的文字翻成中文並注音呈現給用戶！
         replyBox.innerText = `📄 ${clean.slice(0, 60)}`;
         await runDirectTranslate(clean);
+        ocrRendered = true;
       }
 
-      // 接著當視覺 AI 完成菜品/物品分析後，更新對話框簡介與實用短語
+      // 視覺 AI 返回物品識別與介紹後，更新頂部對話框並語音播報回答
       const visionText = await visionPromise;
       if (visionText) {
-        const vLines = visionText.split(/\n+/).map(l => l.replace(/^[-*•\d.]+\s*/, '').trim()).filter(Boolean);
-        if (vLines.length > 0) {
-          replyBox.innerHTML = `<b>${vLines[0]}</b>`;
-          if (!ocrText) {
-            list.innerHTML = '';
-            const zhLines = vLines.slice(1).filter(l => /[\u4e00-\u9fa5]/.test(l));
-            for (let zl of zhLines) {
-              const pureZh = zl.replace(/[A-Za-z()（）/]+/g, '').trim() || zl;
-              appendSentenceProgressive(pureZh, '');
-            }
+        if (!ocrRendered) {
+          renderAndSpeakAIResult(visionText, true);
+        } else {
+          const vLines = visionText.split(/\n+/).map(l => l.replace(/^[-*•\d.]+\s*/, '').trim()).filter(Boolean);
+          if (vLines.length > 0) {
+            replyBox.style.display = 'block';
+            replyBox.innerHTML = `<b>${vLines[0]}</b>`;
+            autoSpeakAnswer(vLines[0]);
           }
         }
       }
@@ -948,7 +1120,7 @@ Line 2-3: 2 practical Chinese phrases for it (if food, include 微辣 mild spicy
     }
 
     // =========================================================================
-    // 7. 語音輸入（說完停頓立即先顯示回答 -> 再翻譯 -> 再注音）
+    // 7. 語音輸入（說完停頓立即 AI 回答 + 語音播報 + 翻譯注音）
     // =========================================================================
     let activeRec = null;
 
@@ -961,6 +1133,9 @@ Line 2-3: 2 practical Chinese phrases for it (if food, include 微辣 mild spicy
         activeRec.stop();
         return;
       }
+
+      // 錄音前先停止正在播放的語音
+      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
 
       activeRec = new SR();
       activeRec.lang = currentLang === 'en' ? 'en-US' : 'zh-CN';
@@ -997,21 +1172,47 @@ Line 2-3: 2 practical Chinese phrases for it (if food, include 微辣 mild spicy
     }
 
     // =========================================================================
-    // 8. 語音朗讀 Speak（點一下播放，再點一下立刻停止）
+    // 8. 語音朗讀 Speak & AI 自動語音回答（點一下播放，再點一下立刻停止）
     // =========================================================================
     let isSpeakingNow = false;
 
+    function resetSpeakBtnUI() {
+      isSpeakingNow = false;
+      const btn = document.getElementById('speakBtn');
+      btn.innerText = UI_TEXT[currentLang].speakBtn;
+      btn.style.background = '';
+      btn.style.color = '';
+    }
+
+    function autoSpeakAnswer(rawText) {
+      if (!('speechSynthesis' in window) || !rawText) return;
+      window.speechSynthesis.cancel();
+
+      // 提取中文部分優先朗讀，讓學中文與聽回答更自然
+      const zhMatches = rawText.match(/[\u4e00-\u9fa5，。！？、；：「」]+/g);
+      const textToRead = (zhMatches && zhMatches.join('，').length >= 2) ? zhMatches.join('，') : rawText;
+
+      const utter = new SpeechSynthesisUtterance(textToRead);
+      utter.lang = /[\u4e00-\u9fa5]/.test(textToRead) ? 'zh-CN' : 'en-US';
+      utter.rate = 0.9;
+
+      const btn = document.getElementById('speakBtn');
+      isSpeakingNow = true;
+      btn.innerText = UI_TEXT[currentLang].stopSpeakBtn;
+      btn.style.background = '#d32f2f';
+      btn.style.color = '#fff';
+
+      utter.onend = resetSpeakBtnUI;
+      utter.onerror = resetSpeakBtnUI;
+      window.speechSynthesis.speak(utter);
+    }
+
     function toggleSpeak() {
       if (!('speechSynthesis' in window)) return;
-      const btn = document.getElementById('speakBtn');
-      const t = UI_TEXT[currentLang];
 
       if (window.speechSynthesis.speaking || isSpeakingNow) {
         window.speechSynthesis.cancel();
-        isSpeakingNow = false;
-        btn.innerText = t.speakBtn;
-        btn.style.background = '';
-        btn.style.color = '';
+        resetSpeakBtnUI();
         return;
       }
 
@@ -1020,22 +1221,7 @@ Line 2-3: 2 practical Chinese phrases for it (if food, include 微辣 mild spicy
       if (!allZh) allZh = document.getElementById('userInput').value;
       if (!allZh) return;
 
-      const utter = new SpeechSynthesisUtterance(allZh);
-      utter.lang = 'zh-CN';
-      utter.rate = 0.85;
-      isSpeakingNow = true;
-      btn.innerText = t.stopSpeakBtn;
-      btn.style.background = '#d32f2f';
-      btn.style.color = '#fff';
-
-      utter.onend = () => {
-        isSpeakingNow = false;
-        btn.innerText = UI_TEXT[currentLang].speakBtn;
-        btn.style.background = '';
-        btn.style.color = '';
-      };
-      utter.onerror = utter.onend;
-      window.speechSynthesis.speak(utter);
+      autoSpeakAnswer(allZh);
     }
 
     // =========================================================================
