@@ -10,7 +10,6 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Trees Pinyin">
   
-  <!-- 綁定您的官方商標圖標 (優先讀取根目錄 icon.png，並由腳本自動生成高清備援) -->
   <link id="appleTouchIcon" rel="apple-touch-icon" href="./icon.png">
   <link id="favIcon" rel="icon" type="image/png" href="./icon.png">
 
@@ -40,7 +39,7 @@
       min-height: 100vh;
     }
 
-    /* 頂部極簡導航（帶官方商標小圖標） */
+    /* 頂部導航（帶官方商標） */
     .header {
       width: 100%;
       max-width: 540px;
@@ -79,7 +78,7 @@
       color: #222;
     }
 
-    /* Google 風格極簡輸入控制區 */
+    /* 極簡輸入控制區 */
     .panel {
       width: 100%;
       max-width: 540px;
@@ -190,7 +189,7 @@
       object-fit: contain;
       display: none;
     }
-    /* 第一階段：AI 秒回對話框 */
+    /* 第一階段：AI 回答對話框 */
     .ai-reply-box {
       width: 100%;
       background: #f9fbe7;
@@ -238,7 +237,7 @@
       align-items: flex-end;
       opacity: 0;
       transform: translateY(4px);
-      transition: opacity 0.2s ease, transform 0.2s ease;
+      transition: opacity 0.18s ease, transform 0.18s ease;
     }
     .char-row.ready {
       opacity: 1;
@@ -338,7 +337,7 @@
         <svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.91-3c-.49 0-.9.36-.98.85C16.52 14.2 14.47 16 12 16s-4.52-1.8-4.93-4.15c-.08-.49-.49-.85-.98-.85-.61 0-1.09.54-1 1.14.49 3 2.89 5.35 5.91 5.78V20c0 .55.45 1 1 1s1-.45 1-1v-2.08c3.02-.43 5.42-2.78 5.91-5.78.1-.6-.39-1.14-1-1.14z"/></svg>
       </button>
 
-      <!-- Google 風格相機圖標（點擊自動彈出「拍照」與「照片圖庫」） -->
+      <!-- Google 風格相機圖標（含拍照與圖庫兩個選項） -->
       <label class="icon-action" title="Camera or Photo Library">
         <svg viewBox="0 0 24 24"><path d="M9 3L7.17 5H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2h-3.17L15 3H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.65 0-3 1.35-3 3s1.35 3 3 3 3-1.35 3-3-1.35-3-3-3z"/></svg>
         <input type="file" id="photoInput" accept="image/*" style="display:none" onchange="handlePhotoUpload(this)">
@@ -379,7 +378,7 @@
     </div>
   </div>
 
-  <!-- Safari 桌面圖標說明彈窗（展示您的官方大樹商標） -->
+  <!-- Safari 桌面圖標說明彈窗 -->
   <div class="modal" id="installModal">
     <div class="modal-box">
       <div style="display:flex; align-items:center; gap:12px;">
@@ -401,14 +400,13 @@
 
   <script>
     // =========================================================================
-    // 0. 繪製您的官方「TREES PINYIN 綠樹金字」商標圖標（若未上傳 icon.png 時自動100%還原）
+    // 0. 綁定您的「TREES PINYIN 綠樹金字」官方商標圖標
     // =========================================================================
     (function setupOfficialTreeLogo() {
       const c = document.createElement('canvas');
       c.width = 512; c.height = 512;
       const ctx = c.getContext('2d');
 
-      // 純白圓角底
       ctx.fillStyle = '#ffffff';
       ctx.fillRect(0, 0, 512, 512);
 
@@ -419,7 +417,7 @@
       ctx.lineTo(325, 485); ctx.lineTo(187, 485);
       ctx.closePath(); ctx.fill();
 
-      // 茂密立體綠色樹冠（多層圓弧組合還原您的商標）
+      // 茂密立體綠色樹冠
       const circles = [
         [256, 120, 95, '#66bb6a'], [165, 160, 85, '#4caf50'], [345, 160, 85, '#43a047'],
         [115, 250, 80, '#43a047'], [395, 250, 80, '#388e3c'], [155, 335, 85, '#388e3c'],
@@ -451,7 +449,6 @@
 
       const fallbackDataUrl = c.toDataURL('image/png');
 
-      // 檢測根目錄是否有您上傳的 icon.png，若無則自動套用這張高清重繪的官方商標
       const testImg = new Image();
       testImg.onload = () => {
         document.getElementById('appleTouchIcon').href = './icon.png';
@@ -711,7 +708,7 @@
     }
 
     // =========================================================================
-    // 4. 嚴格分步渲染：先顯示翻譯句子 -> 再展開 Trees Pinyin 注音
+    // 4. 嚴格分步渲染：先顯示翻譯句子 -> 80ms 後展開 Trees Pinyin 注音
     // =========================================================================
     function showCardWrap() {
       document.getElementById('cardWrap').classList.add('visible');
@@ -726,7 +723,7 @@
       const zhText = expandNumbersAndSymbolsToZh(rawZhText);
       block.dataset.zh = zhText;
 
-      // 第 1 步：立刻創建並顯示英文翻譯行（若無現成英文，0.2秒極速拉取）
+      // 第 1 步：立刻顯示英文翻譯行
       const enDiv = document.createElement('div');
       enDiv.className = 'en-line';
       enDiv.innerText = existingEn || 'Translating...';
@@ -743,7 +740,7 @@
         });
       }
 
-      // 第 2 步：在下一幀（約 60ms 後）立刻渲染每個漢字與 Trees Pinyin 注音，呈現清晰的先後順序！
+      // 第 2 步：80ms 後展開每個漢字與 Trees Pinyin 注音
       setTimeout(() => {
         const pinyinList = getAccuratePinyinArray(zhText);
         for (let i = 0; i < zhText.length; i++) {
@@ -772,11 +769,11 @@
           charRow.appendChild(col);
         }
         requestAnimationFrame(() => charRow.classList.add('ready'));
-      }, 60);
+      }, 80);
     }
 
     // =========================================================================
-    // 5. Google GTX 極速翻譯（0.2秒返回）
+    // 5. 極速翻譯（0.2秒返回）
     // =========================================================================
     async function translateFast(text, fromLang, toLang) {
       const src = fromLang.startsWith('zh') ? 'zh-CN' : 'en';
@@ -823,143 +820,102 @@
     }
 
     // =========================================================================
-    // 6. 真流式 SSE 極速 AI 引擎（支援中文與英文提問，0.2秒先出回答 -> 再翻譯 -> 再注音）
+    // 6. 100% 可靠的雙並行 AI 競速引擎（修復 AI 不回答問題，實現秒回 -> 翻譯 -> 注音）
     // =========================================================================
+    async function fetchAICompletion(promptText) {
+      // 優先嘗試 Chrome 內置 AI
+      try {
+        const lm = window.LanguageModel || (window.ai && window.ai.languageModel);
+        if (lm) {
+          const session = await lm.create();
+          const res = await session.prompt(promptText);
+          if (res && res.trim()) return res.trim();
+        }
+      } catch (e) {}
+
+      // 同時發起兩個高可靠 POST 通道競速，誰先返回就立刻採用誰！
+      const postOpenAI = fetch('https://text.pollinations.ai/openai', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'openai',
+          messages: [{ role: 'user', content: promptText }]
+        })
+      }).then(r => r.json()).then(d => {
+        const content = d?.choices?.[0]?.message?.content?.trim();
+        if (content) return content;
+        throw new Error('empty');
+      });
+
+      const postRoot = fetch('https://text.pollinations.ai/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: [{ role: 'user', content: promptText }],
+          model: 'openai'
+        })
+      }).then(r => r.text()).then(t => {
+        if (t && t.trim() && !t.startsWith('<!DOCTYPE')) return t.trim();
+        throw new Error('empty');
+      });
+
+      try {
+        return await Promise.any([postOpenAI, postRoot]);
+      } catch (e) {
+        return '';
+      }
+    }
+
     async function runSmartAI(overrideInput) {
       const q = (overrideInput !== undefined ? overrideInput : document.getElementById('userInput').value).trim();
       if (!q) return;
 
       showCardWrap();
+      document.getElementById('previewImg').style.display = 'none';
       const replyBox = document.getElementById('aiReplyBox');
       const list = document.getElementById('annotationList');
       replyBox.style.display = 'block';
-      replyBox.innerText = currentLang === 'en' ? '⚡ AI replying...' : '⚡ AI 正在回答...';
+      replyBox.innerText = currentLang === 'en' ? '⚡ AI is answering...' : '⚡ AI 正在回答您的問題...';
       list.innerHTML = '';
 
-      // 明確指示 AI：無論用戶用中文還是英文提問，第1行直接給出簡明回答；第2~3行給出2句地道實用的中文短語|英文翻譯
-      const prompt = `User question/input: "${q}".
-Follow this exact 3-line format (no markdown, no bullets):
-Line 1: Direct, helpful answer or intro to the user's question (in both English and Chinese).
-Line 2: A practical Chinese sentence for this situation | English translation (if food/dish, MUST include 微辣，少鹽 mild spicy, less salt).
-Line 3: A second practical Chinese sentence | English translation.`;
+      // 拆成兩個輕量任務並行：
+      // 任務 A：只要求 AI 用 1 句話直接回答問題（字數少，極速返回，立刻填滿對話框！）
+      const answerPrompt = `User asked: "${q}". Answer the question or introduce the item directly in 1 short sentence (include both English and Chinese). Output ONLY that 1 sentence.`;
+      
+      // 任務 B：生成 2 句針對該場景的中文實用短語（如果是菜品/食物，必帶「微辣，少鹽」）
+      const phrasesPrompt = `User input: "${q}". Write 2 short, practical Chinese sentences a person can speak in this situation (if it is about food/dishes, MUST include 微辣，少鹽). Output ONLY the 2 Chinese sentences, one per line, no numbering, no English.`;
 
-      let renderedLinesCount = 0;
+      // 任務 A 完成後第一時間顯示在對話框！
+      fetchAICompletion(answerPrompt).then(ans => {
+        if (ans) {
+          replyBox.innerText = ans.replace(/^["']|["']$/g, '');
+        }
+      });
 
-      // 處理每一行流式完成的句子：第1行放進對話框，第2/3行先顯示翻譯再顯示注音！
-      async function processCompletedLine(lineStr) {
-        const clean = lineStr.replace(/^(Line\s*\d+\s*[:：]|[-*•\d.]+\s*)/i, '').trim();
-        if (!clean) return;
-        renderedLinesCount++;
+      // 任務 B 完成後，逐句先出英文翻譯 -> 再出 Trees Pinyin 注音！
+      const phrasesRaw = await fetchAICompletion(phrasesPrompt);
+      if (phrasesRaw) {
+        const zhLines = phrasesRaw
+          .split(/\n+/)
+          .map(l => l.replace(/^[-*•\d.()（）\s]+/, '').trim())
+          .filter(l => /[\u4e00-\u9fa5]/.test(l))
+          .slice(0, 3);
 
-        if (renderedLinesCount === 1) {
-          // 第一階段：先在上方對話框顯示 AI 回答！
-          replyBox.innerText = clean;
-        } else {
-          // 第二、三階段：拆分「中文 | 英文」，先出翻譯，再出注音！
-          if (clean.includes('|')) {
-            const parts = clean.split('|').map(s => s.trim());
-            const zhPart = /[\u4e00-\u9fa5]/.test(parts[0]) ? parts[0] : parts[1];
-            const enPart = /[\u4e00-\u9fa5]/.test(parts[0]) ? parts[1] : parts[0];
-            if (zhPart) renderStepByStepSentence(zhPart, enPart || '');
-          } else if (/[\u4e00-\u9fa5]/.test(clean)) {
-            renderStepByStepSentence(clean, '');
-          } else {
-            const zh = await translateFast(clean, 'en', 'zh');
-            renderStepByStepSentence(zh, clean);
+        if (zhLines.length > 0) {
+          for (let zhLine of zhLines) {
+            const enTrans = await translateFast(zhLine, 'zh', 'en');
+            await renderStepByStepSentence(zhLine, enTrans);
           }
+          return;
         }
       }
 
-      // 啟動真流式 SSE (stream: true)，每吐出一個字即時更新對話框！
-      try {
-        const response = await fetch('https://text.pollinations.ai/openai', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            model: 'openai-fast',
-            stream: true,
-            messages: [{ role: 'user', content: prompt }]
-          })
-        });
-
-        if (response.ok && response.body) {
-          const reader = response.body.getReader();
-          const decoder = new TextDecoder('utf-8');
-          let sseBuffer = '';
-          let fullText = '';
-          let processedNewlines = 0;
-
-          while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
-            sseBuffer += decoder.decode(value, { stream: true });
-
-            const events = sseBuffer.split('\n');
-            sseBuffer = events.pop() || '';
-
-            for (let ev of events) {
-              const trimmed = ev.trim();
-              if (!trimmed.startsWith('data:')) continue;
-              const dataStr = trimmed.slice(5).trim();
-              if (dataStr === '[DONE]') continue;
-              try {
-                const json = JSON.parse(dataStr);
-                const delta = json?.choices?.[0]?.delta?.content || '';
-                if (delta) {
-                  fullText += delta;
-                  const splitLines = fullText.split('\n');
-                  // 實時更新正在打字的第 1 行回答（讓用戶 0.2 秒就看到字在蹦出來！）
-                  if (splitLines.length === 1) {
-                    replyBox.innerText = splitLines[0].replace(/^Line\s*1\s*[:：]\s*/i, '');
-                  }
-                  // 一旦某一行完成（遇到換行符），立即觸發該行的渲染！
-                  while (processedNewlines < splitLines.length - 1) {
-                    await processCompletedLine(splitLines[processedNewlines]);
-                    processedNewlines++;
-                  }
-                }
-              } catch (e) {}
-            }
-          }
-
-          // 處理最後一行
-          const finalLines = fullText.split('\n');
-          while (processedNewlines < finalLines.length) {
-            await processCompletedLine(finalLines[processedNewlines]);
-            processedNewlines++;
-          }
-
-          // 如果 AI 只返回了 1 行回答（例如中文簡短回答），自動把這行回答中的中文句子提取出來在下方翻譯並注音！
-          if (renderedLinesCount === 1 && fullText.trim()) {
-            const firstClean = fullText.replace(/^Line\s*1\s*[:：]\s*/i, '').trim();
-            const hasZh = /[\u4e00-\u9fa5]/.test(firstClean);
-            if (hasZh) {
-              renderStepByStepSentence(firstClean, '');
-            } else {
-              const zh = await translateFast(firstClean, 'en', 'zh');
-              renderStepByStepSentence(zh, firstClean);
-            }
-          }
-          if (renderedLinesCount > 0) return;
-        }
-      } catch (e) {}
-
-      // 極速備援通道（當流式通道繁忙時）
-      try {
-        const r = await fetch(`https://text.pollinations.ai/${encodeURIComponent(prompt)}`);
-        const txt = await r.text();
-        if (txt && txt.trim()) {
-          const lines = txt.split('\n').map(l => l.trim()).filter(Boolean);
-          for (let l of lines) await processCompletedLine(l);
-          return;
-        }
-      } catch (e) {}
-
+      // 保底：若未提取到分行短語，直接將問題翻譯並注音
       await runDirectTranslate(q);
     }
 
     // =========================================================================
-    // 7. 相機圖標：拍照或選圖後，先識別名稱簡介 -> 再翻譯 -> 再注音
+    // 7. 相機圖標：拍照或選圖（保持快速識別）
     // =========================================================================
     async function handlePhotoUpload(input) {
       if (!input.files || !input.files[0]) return;
@@ -977,7 +933,6 @@ Line 3: A second practical Chinese sentence | English translation.`;
       prev.src = dataUrl;
       prev.style.display = 'block';
 
-      // 同時啟動 OCR 文字提取與 Vision 物品識別
       const ocrPromise = (async () => {
         try {
           const fd = new FormData();
@@ -994,8 +949,8 @@ Line 3: A second practical Chinese sentence | English translation.`;
         try {
           const vPrompt = `Examine this image:
 Line 1: Identify what dish, object, landmark, or text it is with a 1-sentence intro (in English & Chinese).
-Line 2: Practical Chinese sentence 1 | English translation (if food, include 微辣，少鹽 mild spicy, less salt).
-Line 3: Practical Chinese sentence 2 | English translation.`;
+Line 2: Practical Chinese sentence 1 (if food, include 微辣，少鹽).
+Line 3: Practical Chinese sentence 2.`;
           const r = await fetch('https://text.pollinations.ai/openai', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -1030,14 +985,10 @@ Line 3: Practical Chinese sentence 2 | English translation.`;
           replyBox.innerText = vLines[0];
           if (!ocrText) {
             list.innerHTML = '';
-            for (let i = 1; i < vLines.length; i++) {
-              const ln = vLines[i];
-              if (ln.includes('|')) {
-                const [p1, p2] = ln.split('|').map(s => s.trim());
-                renderStepByStepSentence(p1, p2);
-              } else if (/[\u4e00-\u9fa5]/.test(ln)) {
-                renderStepByStepSentence(ln, '');
-              }
+            const zhLines = vLines.slice(1).filter(l => /[\u4e00-\u9fa5]/.test(l));
+            for (let zl of zhLines) {
+              const en = await translateFast(zl, 'zh', 'en');
+              await renderStepByStepSentence(zl, en);
             }
           }
         }
@@ -1065,7 +1016,7 @@ Line 3: Practical Chinese sentence 2 | English translation.`;
     }
 
     // =========================================================================
-    // 8. 語音輸入（中英文語音說完停頓，100% 觸發流式 AI 回答 -> 翻譯 -> 注音）
+    // 8. 語音輸入（中英文說完停頓，100% 觸發 AI 回答 -> 翻譯 -> 注音）
     // =========================================================================
     let activeRec = null;
 
@@ -1114,7 +1065,7 @@ Line 3: Practical Chinese sentence 2 | English translation.`;
     }
 
     // =========================================================================
-    // 9. 語音朗讀 Speak（點一下開始，再點一下立刻停止）
+    // 9. 語音朗讀 Speak（點一下播放，再點一下停止）
     // =========================================================================
     let isSpeakingNow = false;
 
