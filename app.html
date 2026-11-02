@@ -386,7 +386,7 @@
         1. <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:#1565c0; font-weight:700;">👉 Get Free Key at Google AI Studio</a><br>
         2. Tap <b>"Create API key"</b> &amp; paste below:
       </div>
-      <input type="password" id="apiKeyInput" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;font-size:0.9rem;" placeholder="AIzaSy... (Optional)">
+      <input type="password" id="apiKeyInput" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;font-size:0.9rem;" placeholder="AQ.Ab8... or AIzaSy... (Optional)">
       <div class="row">
         <button class="btn btn-green" onclick="saveBackupKey()" id="uiKeySave">Save</button>
         <button class="btn btn-soft" style="flex:0.45;" onclick="clearBackupKey()" id="uiKeyClear">Clear</button>
@@ -801,7 +801,7 @@
     }
 
     function nextPaintTick() {
-      return new Promise(resolve => requestAnimationFrame(() => setTimeout(resolve, 45)));
+      return new Promise(resolve => requestAnimationFrame(resolve));
     }
 
     function appendSentenceProgressive(rawZhText, enTranslation = '') {
@@ -932,7 +932,7 @@
     }
 
     // =========================================================================
-    // 5. 分階段瀑布式 AI 引擎：100% 保留 V22 極速 + Cloudflare 商業網關無縫護航
+    // 5. 極速雙擎競速 AI 引擎（Cloudflare 商業網關 + V22 同時競速，誰先出字立刻渲染誰！）
     // =========================================================================
     let chromeAISession = null;
 
@@ -952,11 +952,21 @@ Reply concisely:
 Line 1: Brief helpful answer or dish/place intro in English & Chinese.
 From Line 2 onwards: Practical Chinese sentences for this situation (output the exact number of sentences the user asked for, or 2-3 sentences if not specified; if food/dish, include 微辣 mild spicy, 少鹽 less salt). Only output Chinese on lines 2+, one sentence per line.`;
 
+      let activeWinner = null;
       let renderedLineCount = 0;
+      const cfCtrl = new AbortController();
+      const v22Ctrl = new AbortController();
 
-      async function renderOneLineStaged(rawLine) {
+      async function renderOneLineFrom(source, rawLine) {
         const cleanLine = rawLine.replace(/^[-*•\d.)、]+\s*/, '').trim();
-        if (!cleanLine) return;
+        if (!cleanLine || cleanLine.startsWith('{"error"')) return;
+
+        if (!activeWinner) {
+          activeWinner = source;
+          if (source === 'cf') v22Ctrl.abort();
+          if (source === 'v22') cfCtrl.abort();
+        }
+        if (activeWinner !== source) return;
 
         renderedLineCount++;
         if (renderedLineCount === 1) {
@@ -969,126 +979,58 @@ From Line 2 onwards: Practical Chinese sentences for this situation (output the 
         }
       }
 
-      // 優先 1：Chrome 內置 AI 流式輸出
-      try {
-        const lm = window.LanguageModel || (window.ai && window.ai.languageModel);
-        if (lm) {
-          if (!chromeAISession) chromeAISession = await lm.create();
-          if (chromeAISession.promptStreaming) {
-            const stream = chromeAISession.promptStreaming(fastPrompt);
-            let prevLen = 0, buf = '';
-            for await (const chunk of stream) {
-              const delta = chunk.slice(prevLen);
-              prevLen = chunk.length;
-              buf += delta;
-              let nl;
-              while ((nl = buf.indexOf('\n')) !== -1) {
-                const oneLine = buf.slice(0, nl).trim();
-                buf = buf.slice(nl + 1);
-                if (oneLine) await renderOneLineStaged(oneLine);
-              }
-            }
-            if (buf.trim()) await renderOneLineStaged(buf.trim());
-            if (renderedLineCount > 0) return;
-          }
-        }
-      } catch (e) {
-        chromeAISession = null;
-      }
+      // 同時發起 (A) 您的 Cloudflare Worker 網關 與 (B) V22 openai-fast，誰最快用誰！
+      const cfTask = streamFromCloudflareGateway(
+        fastPrompt,
+        (line) => renderOneLineFrom('cf', line),
+        null,
+        cfCtrl.signal
+      );
 
-      // 優先 2：100% 原版 V22 極速輕量文本流接口（保持 V22 原生閃電速度）
-      try {
-        const r = await fetch('https://text.pollinations.ai/openai', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            model: 'openai-fast',
-            stream: true,
-            messages: [{ role: 'user', content: fastPrompt }]
-          })
-        });
-
-        if (r.ok && r.body) {
-          const cType = (r.headers.get('content-type') || '').toLowerCase();
-          if (cType.includes('event-stream')) {
-            const reader = r.body.getReader();
-            const decoder = new TextDecoder('utf-8');
-            let sseBuf = '', textBuf = '';
-
-            while (true) {
-              const { done, value } = await reader.read();
-              if (done) break;
-              sseBuf += decoder.decode(value, { stream: true });
-              let lines = sseBuf.split('\n');
-              sseBuf = lines.pop() || '';
-
-              for (const line of lines) {
-                const tr = line.trim();
-                if (tr.startsWith('data:')) {
-                  const dataStr = tr.slice(5).trim();
-                  if (!dataStr || dataStr === '[DONE]') continue;
-                  try {
-                    const j = JSON.parse(dataStr);
-                    const delta = j?.choices?.[0]?.delta?.content || '';
-                    if (delta) {
-                      textBuf += delta;
-                      let nl;
-                      while ((nl = textBuf.indexOf('\n')) !== -1) {
-                        const readyLine = textBuf.slice(0, nl).trim();
-                        textBuf = textBuf.slice(nl + 1);
-                        if (readyLine) await renderOneLineStaged(readyLine);
-                      }
-                    }
-                  } catch (e) {}
-                }
-              }
-            }
-            if (textBuf.trim()) await renderOneLineStaged(textBuf.trim());
-            if (renderedLineCount > 0) return;
-          } else {
-            const rawText = await r.text();
-            let fullOutput = rawText;
-            try {
-              const d = JSON.parse(rawText);
-              fullOutput = d?.choices?.[0]?.message?.content || '';
-            } catch (e) {}
-
-            if (fullOutput) {
-              const lines = fullOutput.split(/\n+/).map(l => l.trim()).filter(Boolean);
-              for (const line of lines) {
-                await renderOneLineStaged(line);
-              }
-              if (renderedLineCount > 0) return;
+      const v22Task = (async () => {
+        try {
+          const r = await fetch('https://text.pollinations.ai/openai', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            signal: v22Ctrl.signal,
+            body: JSON.stringify({
+              model: 'openai-fast',
+              messages: [{ role: 'user', content: fastPrompt }]
+            })
+          });
+          if (!r.ok) return;
+          const rawText = await r.text();
+          let fullOutput = rawText;
+          try {
+            const d = JSON.parse(rawText);
+            fullOutput = d?.choices?.[0]?.message?.content || '';
+          } catch (e) {}
+          if (fullOutput) {
+            for (const line of fullOutput.split(/\n+/)) {
+              if (line.trim()) await renderOneLineFrom('v22', line.trim());
             }
           }
-        }
-      } catch (e) {}
+        } catch (e) {}
+      })();
 
-      // 優先 3：當公共免費通道因人數過多限流時，自動無縫切換至您的 Cloudflare Worker 商業網關！
-      if (renderedLineCount === 0) {
-        await streamFromCloudflareGateway(fastPrompt, renderOneLineStaged);
-        if (renderedLineCount > 0) return;
-      }
+      await Promise.allSettled([cfTask, v22Task]);
 
-      // 優先 4：若用戶本地還填了備用 Key，作為最後一層保護
       if (renderedLineCount === 0 && backupKey) {
         const fb = await fetchGeminiFallback(fastPrompt);
         if (fb) {
           for (const line of fb.split(/\n+/)) {
-            await renderOneLineStaged(line);
+            await renderOneLineFrom('backup', line);
           }
-          if (renderedLineCount > 0) return;
         }
       }
 
-      await runDirectTranslate(q);
+      if (renderedLineCount === 0) {
+        await runDirectTranslate(q);
+      }
     }
 
     // =========================================================================
-    // 6. 極速圖片識別（Cloudflare 商業網關 + V22 雙引擎並發競速，誰快用誰！）
-    //    - 512px 黃金壓縮（僅 ~25KB），手機秒傳不卡頓
-    //    - 徹底解除 OCR 對視覺流式的阻塞
-    //    - 同時向 Cloudflare Worker 網關與 V22 視覺流發起競速，第一時間流式出字！
+    // 6. 極速圖片識別（砍掉雙重上傳與無效請求，448px 18KB 單通道秒傳秒出！）
     // =========================================================================
     async function handlePhotoUpload(input) {
       if (!input.files || !input.files[0]) return;
@@ -1101,8 +1043,8 @@ From Line 2 onwards: Practical Chinese sentences for this situation (output the 
       replyBox.innerText = currentLang === 'en' ? '📷 Analyzing photo...' : '📷 正在識別照片...';
       list.innerHTML = '';
 
-      // 512px 極速壓縮，體積縮小 70%（僅 ~25KB），上傳瞬間完成
-      const dataUrl = await compressImg(file, 512, 0.62);
+      // 448px 極速輕量壓縮（僅 ~18KB），手機 0.1 秒瞬間上傳完畢，絕不堵塞頻寬
+      const dataUrl = await compressImg(file, 448, 0.58);
       const prev = document.getElementById('previewImg');
       prev.src = dataUrl;
       prev.style.display = 'block';
@@ -1111,20 +1053,19 @@ From Line 2 onwards: Practical Chinese sentences for this situation (output the 
 Line 1: Identify what dish, object, landmark, or text it is, with a 1-sentence intro (in English & Chinese).
 Line 2-3: 2 practical Chinese phrases for it (if food, include 微辣 mild spicy, 少鹽 less salt; if English text, translate it into Chinese). Only output Chinese on lines 2+, one sentence per line.`;
 
-      let activeWinner = null; // 'cf' | 'v22' | 'ocr'
+      let activeWinner = null;
       let visionLineCount = 0;
       const cfCtrl = new AbortController();
-      const v22Ctrl = new AbortController();
+      const directCtrl = new AbortController();
 
       async function renderVisionLineFrom(source, rawLine) {
         const cleanLine = rawLine.replace(/^[-*•\d.)、]+\s*/, '').trim();
-        if (!cleanLine) return;
+        if (!cleanLine || cleanLine.startsWith('{"error"')) return;
 
-        // 誰先吐出第一行有效內容，誰就獲勝並自動取消慢的那一路，杜絕重複渲染
         if (!activeWinner) {
           activeWinner = source;
-          if (source === 'cf') v22Ctrl.abort();
-          if (source === 'v22') cfCtrl.abort();
+          if (source === 'cf') directCtrl.abort();
+          if (source === 'direct') cfCtrl.abort();
         }
         if (activeWinner !== source) return;
 
@@ -1139,116 +1080,22 @@ Line 2-3: 2 practical Chinese phrases for it (if food, include 微辣 mild spicy
         }
       }
 
-      // 背景非阻塞 OCR（僅在純文字圖片且比視覺更快時提供輔助，絕不阻塞視覺流！）
-      (async () => {
-        try {
-          const fd = new FormData();
-          fd.append('base64Image', dataUrl);
-          fd.append('language', 'chs');
-          fd.append('apikey', 'helloworld');
-          const r = await fetch('https://api.ocr.space/parse/image', { method: 'POST', body: fd });
-          const d = await r.json();
-          const ocrText = d?.ParsedResults?.[0]?.ParsedText?.trim() || '';
-          if (ocrText && ocrText.length >= 2 && !activeWinner) {
-            activeWinner = 'ocr';
-            cfCtrl.abort();
-            v22Ctrl.abort();
-            const clean = ocrText.replace(/\r\n/g, '\n').trim();
-            document.getElementById('userInput').value = clean;
-            replyBox.innerText = `📄 ${clean.slice(0, 60)}`;
-            await runDirectTranslate(clean);
-          }
-        } catch (e) {}
-      })();
-
-      // 雙引擎同時起跑競速：(A) 您的 Cloudflare Worker 商業網關 + (B) V22 openai-fast 視覺流
-      const cfTask = streamFromCloudflareGateway(
+      // 第一時間單通道發給您的 Cloudflare 商業網關（18KB 秒傳）
+      const cfPromise = streamFromCloudflareGateway(
         vPrompt,
         (line) => renderVisionLineFrom('cf', line),
         dataUrl,
         cfCtrl.signal
       );
 
-      const v22Task = (async () => {
+      // 1.5 秒智能對沖保護：若網關在 1.5 秒內尚未返回，自動併發啟動備用視覺通道
+      const hedgePromise = new Promise(resolve => setTimeout(resolve, 1500)).then(async () => {
+        if (activeWinner) return;
         try {
           const r = await fetch('https://text.pollinations.ai/openai', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            signal: v22Ctrl.signal,
-            body: JSON.stringify({
-              model: 'openai-fast',
-              stream: true,
-              messages: [{
-                role: 'user',
-                content: [
-                  { type: 'text', text: vPrompt },
-                  { type: 'image_url', image_url: { url: dataUrl } }
-                ]
-              }]
-            })
-          });
-
-          if (r.ok && r.body) {
-            const cType = (r.headers.get('content-type') || '').toLowerCase();
-            if (cType.includes('event-stream')) {
-              const reader = r.body.getReader();
-              const decoder = new TextDecoder('utf-8');
-              let sseBuf = '', textBuf = '';
-
-              while (true) {
-                const { done, value } = await reader.read();
-                if (done) break;
-                sseBuf += decoder.decode(value, { stream: true });
-                let lines = sseBuf.split('\n');
-                sseBuf = lines.pop() || '';
-
-                for (const line of lines) {
-                  const tr = line.trim();
-                  if (tr.startsWith('data:')) {
-                    const dataStr = tr.slice(5).trim();
-                    if (!dataStr || dataStr === '[DONE]') continue;
-                    try {
-                      const j = JSON.parse(dataStr);
-                      const delta = j?.choices?.[0]?.delta?.content || '';
-                      if (delta) {
-                        textBuf += delta;
-                        let nl;
-                        while ((nl = textBuf.indexOf('\n')) !== -1) {
-                          const readyLine = textBuf.slice(0, nl).trim();
-                          textBuf = textBuf.slice(nl + 1);
-                          if (readyLine) await renderVisionLineFrom('v22', readyLine);
-                        }
-                      }
-                    } catch (e) {}
-                  }
-                }
-              }
-              if (textBuf.trim()) await renderVisionLineFrom('v22', textBuf.trim());
-            } else {
-              const rawText = await r.text();
-              let fullOutput = rawText;
-              try {
-                const d = JSON.parse(rawText);
-                fullOutput = d?.choices?.[0]?.message?.content || '';
-              } catch (e) {}
-              if (fullOutput) {
-                for (const line of fullOutput.split(/\n+/)) {
-                  if (line.trim()) await renderVisionLineFrom('v22', line.trim());
-                }
-              }
-            }
-          }
-        } catch (e) {}
-      })();
-
-      await Promise.allSettled([cfTask, v22Task]);
-
-      // 保底回退：若雙引擎均未返回，嘗試標準 openai 視覺與本地備用 Key
-      if (!activeWinner && visionLineCount === 0) {
-        try {
-          const r2 = await fetch('https://text.pollinations.ai/openai', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            signal: directCtrl.signal,
             body: JSON.stringify({
               model: 'openai',
               messages: [{
@@ -1260,15 +1107,18 @@ Line 2-3: 2 practical Chinese phrases for it (if food, include 微辣 mild spicy
               }]
             })
           });
-          const d2 = await r2.json();
-          const vText = d2?.choices?.[0]?.message?.content || '';
+          if (!r.ok) return;
+          const d = await r.json();
+          const vText = d?.choices?.[0]?.message?.content || '';
           if (vText) {
             for (const line of vText.split(/\n+/)) {
-              await renderVisionLineFrom('v22-fallback', line);
+              if (line.trim()) await renderVisionLineFrom('direct', line.trim());
             }
           }
         } catch (e) {}
-      }
+      });
+
+      await Promise.allSettled([cfPromise, hedgePromise]);
 
       if (!activeWinner && visionLineCount === 0 && backupKey) {
         const fb = await fetchGeminiFallback(vPrompt, dataUrl);
