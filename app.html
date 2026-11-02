@@ -39,7 +39,7 @@
       min-height: 100vh;
     }
 
-    /* 頂部極簡導航 */
+    /* 頂部極簡導航（去掉多餘狀態與 Key 按鈕） */
     .header {
       width: 100%;
       max-width: 540px;
@@ -64,11 +64,6 @@
       font-weight: 600;
       cursor: pointer;
       color: #222;
-    }
-    .top-btn.has-key {
-      border-color: #2e7d32;
-      color: #1b5e20;
-      background: #e8f5e9;
     }
 
     /* Google 風格極簡輸入控制區 */
@@ -305,7 +300,6 @@
   <div class="header">
     <h1 id="uiTitle">🌳 Trees Pinyin</h1>
     <div class="header-btns">
-      <button class="top-btn" onclick="openKeyModal()" id="uiKeyBtn">🔑 API Key</button>
       <button class="top-btn" onclick="openInstallModal()" id="uiInstallBtn">📲 Safari Icon</button>
       <button class="top-btn" onclick="toggleLang()" id="uiLangBtn">中文</button>
     </div>
@@ -376,37 +370,14 @@
     </div>
   </div>
 
-  <!-- 備用 API Key 彈窗（100% 不干擾 V22 原生請求，僅在 V22 高峰擁擠失敗時自動頂上） -->
-  <div class="modal" id="keyModal">
-    <div class="modal-box">
-      <h3 style="margin:0; font-size:1.02rem;" id="uiKeyTitle">🔑 Backup Gemini API Key</h3>
-      <div id="uiKeyDesc" style="font-size:0.85rem; line-height:1.55; background:#f8f9fa; padding:12px; border-radius:8px;">
-        <b>Default V22 high-speed mode works for free!</b><br>
-        If public servers are busy, your personal Google Gemini Key will automatically step in:<br><br>
-        1. <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:#1565c0; font-weight:700;">👉 Get Free Key at Google AI Studio</a><br>
-        2. Tap <b>"Create API key"</b> & paste below:
-      </div>
-      <input type="password" id="apiKeyInput" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;font-size:0.9rem;" placeholder="AIzaSy... (Optional)">
-      <div class="row">
-        <button class="btn btn-green" onclick="saveBackupKey()" id="uiKeySave">Save</button>
-        <button class="btn btn-soft" style="flex:0.45;" onclick="clearBackupKey()" id="uiKeyClear">Clear</button>
-      </div>
-      <button class="top-btn" style="width:100%;padding:8px;" onclick="document.getElementById('keyModal').style.display='none'" id="uiKeyClose">Close</button>
-    </div>
-  </div>
-
   <script>
     // =========================================================================
-    // 0. 純英文 / 純中文介面切換 + 備用 Key 存取
+    // 0. 純英文 / 純中文介面切換
     // =========================================================================
     let currentLang = 'en';
-    let backupKey = (localStorage.getItem('tp_v22_backup_key') || '').trim();
-    let backupModel = localStorage.getItem('tp_v22_backup_model') || 'gemini-flash-latest';
-
     const UI_TEXT = {
       en: {
         title: "🌳 Trees Pinyin",
-        keyBtn: "🔑 API Key",
         installBtn: "📲 Safari Icon",
         langBtn: "中文",
         placeholder: "Ask AI, or enter text to translate...",
@@ -423,16 +394,10 @@
         doneBtn: "Done",
         installTitle: "📲 Add Icon to Home Screen",
         installSteps: "<b>⚠️ Please open <span style=\"color:#1b5e20;\">treespinyin.com/app</span> in Safari (not Chrome):</b><br><br>1. Tap the <b>Share button [📤]</b> at the bottom center of Safari.<br>2. Scroll down and tap <b>\"Add to Home Screen [➕]\"</b>.<br>3. Tap <b>\"Add\"</b> at the top right.",
-        gotItBtn: "OK",
-        keyTitle: "🔑 Backup Gemini API Key",
-        keyDesc: "<b>Default V22 high-speed mode works for free!</b><br>If public servers are busy, your personal Google Gemini Key will automatically step in:<br><br>1. <a href=\"https://aistudio.google.com/app/apikey\" target=\"_blank\" style=\"color:#1565c0; font-weight:700;\">👉 Get Free Key at Google AI Studio</a><br>2. Tap <b>\"Create API key\"</b> & paste below:",
-        keySave: "Save",
-        keyClear: "Clear",
-        keyClose: "Close"
+        gotItBtn: "OK"
       },
       zh: {
         title: "🌳 Trees Pinyin",
-        keyBtn: "🔑 備用 Key",
         installBtn: "📲 桌面圖標",
         langBtn: "English",
         placeholder: "向 AI 提問，或輸入文字直接翻譯...",
@@ -449,83 +414,14 @@
         doneBtn: "完成",
         installTitle: "📲 添加桌面圖標（請使用 Safari）",
         installSteps: "<b>⚠️ 請使用手機自帶的 Safari 瀏覽器打開本頁（Chrome 無法直接生成桌面圖標）：</b><br><br>1. 點擊 Safari 底部正中間的 <b>「分享按鈕 [📤]」</b>。<br>2. 往下滑動選單，點擊 <b>「加入主畫面 [➕]」</b>。<br>3. 點擊右上角「新增」即可。",
-        gotItBtn: "知道了",
-        keyTitle: "🔑 備用 Google Gemini Key",
-        keyDesc: "<b>預設 100% 走 V22 極速免費通道！</b><br>當未來人數眾多、免費通道擁擠時，系統才會自動啟用您的個人 Key：<br><br>1. <a href=\"https://aistudio.google.com/app/apikey\" target=\"_blank\" style=\"color:#1565c0; font-weight:700;\">👉 點此打開 Google AI Studio 免費領取</a><br>2. 點擊 <b>\"Create API key\"</b> 並貼到下方：",
-        keySave: "保存",
-        keyClear: "清除",
-        keyClose: "關閉"
+        gotItBtn: "知道了"
       }
     };
-
-    function refreshKeyBtnStyle() {
-      const btn = document.getElementById('uiKeyBtn');
-      if (backupKey) btn.classList.add('has-key');
-      else btn.classList.remove('has-key');
-    }
-    refreshKeyBtnStyle();
-
-    function openKeyModal() {
-      document.getElementById('apiKeyInput').value = backupKey;
-      document.getElementById('keyModal').style.display = 'flex';
-    }
-
-    function saveBackupKey() {
-      backupKey = document.getElementById('apiKeyInput').value.trim();
-      localStorage.setItem('tp_v22_backup_key', backupKey);
-      refreshKeyBtnStyle();
-      document.getElementById('keyModal').style.display = 'none';
-      // 保存時在背景自動查詢該 Key 支持的最新 Flash 模型，永久不過時
-      if (backupKey) {
-        fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(backupKey)}`)
-          .then(r => r.json())
-          .then(d => {
-            const list = d.models || [];
-            if (list.some(m => m.name === 'models/gemini-flash-latest')) {
-              backupModel = 'gemini-flash-latest';
-            } else {
-              const flash = list.filter(m => {
-                const n = (m.name || '').toLowerCase();
-                return n.includes('gemini') && n.includes('flash') && !n.includes('thinking') && !n.includes('preview') && (m.supportedGenerationMethods || []).includes('generateContent');
-              });
-              if (flash.length) backupModel = flash[flash.length - 1].name.replace('models/', '');
-            }
-            localStorage.setItem('tp_v22_backup_model', backupModel);
-          }).catch(() => {});
-      }
-    }
-
-    function clearBackupKey() {
-      backupKey = '';
-      localStorage.removeItem('tp_v22_backup_key');
-      document.getElementById('apiKeyInput').value = '';
-      refreshKeyBtnStyle();
-    }
-
-    // 僅在 V22 免費接口失敗時才會調用的後備函數
-    async function fetchGeminiFallback(promptText, dataUrl = null) {
-      if (!backupKey) return '';
-      try {
-        const parts = [{ text: promptText }];
-        if (dataUrl && dataUrl.includes(',')) {
-          const mime = dataUrl.substring(dataUrl.indexOf(':') + 1, dataUrl.indexOf(';'));
-          parts.push({ inline_data: { mime_type: mime, data: dataUrl.split(',')[1] } });
-        }
-        const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${backupModel}:generateContent?key=${encodeURIComponent(backupKey)}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ contents: [{ parts }] })
-        });
-        const d = await r.json();
-        return d?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-      } catch (e) { return ''; }
-    }
 
     function toggleLang() {
       currentLang = currentLang === 'en' ? 'zh' : 'en';
       const t = UI_TEXT[currentLang];
       document.getElementById('uiTitle').innerText = t.title;
-      document.getElementById('uiKeyBtn').innerText = t.keyBtn;
       document.getElementById('uiInstallBtn').innerText = t.installBtn;
       document.getElementById('uiLangBtn').innerText = t.langBtn;
       document.getElementById('userInput').placeholder = t.placeholder;
@@ -542,11 +438,6 @@
       document.getElementById('uiInstallTitle').innerText = t.installTitle;
       document.getElementById('uiInstallSteps').innerHTML = t.installSteps;
       document.getElementById('uiGotItBtn').innerText = t.gotItBtn;
-      document.getElementById('uiKeyTitle').innerText = t.keyTitle;
-      document.getElementById('uiKeyDesc').innerHTML = t.keyDesc;
-      document.getElementById('uiKeySave').innerText = t.keySave;
-      document.getElementById('uiKeyClear').innerText = t.keyClear;
-      document.getElementById('uiKeyClose').innerText = t.keyClose;
     }
 
     // =========================================================================
@@ -867,7 +758,7 @@
     }
 
     // =========================================================================
-    // 5. 分階段瀑布式 AI 引擎：100% 原版 V22 代碼一字不改！
+    // 5. 分階段瀑布式 AI 引擎：1.先秒回對話框 -> 2.每做好一句立刻顯示一句並翻譯注音
     // =========================================================================
     let chromeAISession = null;
 
@@ -900,7 +791,7 @@ From Line 2 onwards: Practical Chinese sentences for this situation (output the 
           replyBox.innerHTML = `<b>${cleanLine}</b>`;
           await nextPaintTick();
         } else if (/[\u4e00-\u9fa5]/.test(cleanLine)) {
-          const pureZh = cleanLine.replace(/[A-Za-zāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ()（）/]+/g, '').trim() || cleanLine;
+          const pureZh = cleanLine.replace(/[A-Za-z()（）/]+/g, '').trim() || cleanLine;
           appendSentenceProgressive(pureZh, '');
           await nextPaintTick();
         }
@@ -940,7 +831,7 @@ From Line 2 onwards: Practical Chinese sentences for this situation (output the 
         chromeAISession = null;
       }
 
-      // 優先 2：100% 原版 V22 極速輕量文本流接口（不加任何 AbortController，完全保持 V22 原生速度！）
+      // 優先 2：極速輕量文本流接口（開啟 stream: true 邊收邊顯示，若返回整包也逐句分階段上屏）
       try {
         const r = await fetch('https://text.pollinations.ai/openai', {
           method: 'POST',
@@ -1009,23 +900,12 @@ From Line 2 onwards: Practical Chinese sentences for this situation (output the 
         }
       } catch (e) {}
 
-      // 僅當上面 V22 原版通道因為人多徹底失敗時，才調用備用 Key
-      if (backupKey) {
-        const fb = await fetchGeminiFallback(fastPrompt);
-        if (fb) {
-          for (const line of fb.split(/\n+/)) {
-            await renderOneLineStaged(line);
-          }
-          if (renderedLineCount > 0) return;
-        }
-      }
-
       // 若輸入本身就是句子，直接逐句翻譯並注音
       await runDirectTranslate(q);
     }
 
     // =========================================================================
-    // 6. Google 相機圖標：100% 原版 V22 代碼，失敗時才走備用 Key
+    // 6. Google 相機圖標：拍照或選圖後，先識別名稱簡介 -> 再逐句翻譯注音
     // =========================================================================
     async function handlePhotoUpload(input) {
       if (!input.files || !input.files[0]) return;
@@ -1043,10 +923,6 @@ From Line 2 onwards: Practical Chinese sentences for this situation (output the 
       prev.src = dataUrl;
       prev.style.display = 'block';
 
-      const vPrompt = `Look at this image:
-Line 1: Identify what dish, object, landmark, or text it is, with a 1-sentence intro (in English & Chinese).
-Line 2-3: 2 practical Chinese phrases for it (if food, include 微辣 mild spicy, 少鹽 less salt; if English text, translate it into Chinese).`;
-
       // 同時啟動：(A) 極速 OCR 提取文字 + (B) 視覺 AI 識別菜餚/物品並給出介紹
       const ocrPromise = (async () => {
         try {
@@ -1062,6 +938,9 @@ Line 2-3: 2 practical Chinese phrases for it (if food, include 微辣 mild spicy
 
       const visionPromise = (async () => {
         try {
+          const vPrompt = `Look at this image:
+Line 1: Identify what dish, object, landmark, or text it is, with a 1-sentence intro (in English & Chinese).
+Line 2-3: 2 practical Chinese phrases for it (if food, include 微辣 mild spicy, 少鹽 less salt; if English text, translate it into Chinese).`;
           const r = await fetch('https://text.pollinations.ai/openai', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -1091,11 +970,7 @@ Line 2-3: 2 practical Chinese phrases for it (if food, include 微辣 mild spicy
       }
 
       // 接著當視覺 AI 完成菜品/物品分析後，先更新對話框簡介，再逐句顯示實用短語
-      let visionText = await visionPromise;
-      if (!visionText && !ocrText && backupKey) {
-        visionText = await fetchGeminiFallback(vPrompt, dataUrl);
-      }
-
+      const visionText = await visionPromise;
       if (visionText) {
         const vLines = visionText.split(/\n+/).map(l => l.replace(/^[-*•\d.]+\s*/, '').trim()).filter(Boolean);
         if (vLines.length > 0) {
@@ -1105,7 +980,7 @@ Line 2-3: 2 practical Chinese phrases for it (if food, include 微辣 mild spicy
             list.innerHTML = '';
             const zhLines = vLines.slice(1).filter(l => /[\u4e00-\u9fa5]/.test(l));
             for (let zl of zhLines) {
-              const pureZh = zl.replace(/[A-Za-zāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ()（）/]+/g, '').trim() || zl;
+              const pureZh = zl.replace(/[A-Za-z()（）/]+/g, '').trim() || zl;
               appendSentenceProgressive(pureZh, '');
               await nextPaintTick();
             }
