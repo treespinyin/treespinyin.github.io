@@ -1,19 +1,1137 @@
-const CACHE_NAME = 'treespinyin-app-v28';
-const ASSETS = [
-  './app',
-  './app.html',
-  'https://cdn.jsdelivr.net/npm/pinyin-pro@3.19.6/dist/index.js',
-  'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js'
-];
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Trees Pinyin</title>
+  <meta name="theme-color" content="#1b5e20">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Trees Pinyin">
+  <link rel="icon" type="image/png" href="icon.png">
+  <link id="appleTouchIcon" rel="apple-touch-icon" href="icon.png">
 
-self.addEventListener('install', (e) => {
-  e.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
-  );
-});
+  <!-- 僅保留極速輕量核心庫，徹底移除拖慢速度的龐大視覺庫 -->
+  <script src="https://cdn.jsdelivr.net/npm/pinyin-pro@3.19.6/dist/index.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
-self.addEventListener('fetch', (e) => {
-  e.respondWith(
-    caches.match(e.request).then((res) => res || fetch(e.request))
-  );
-});
+  <style>
+    :root {
+      --bg: #f5f7f9;
+      --card: #ffffff;
+      --text: #111111;
+      --accent: #1b5e20;
+      --accent-soft: #e8f5e9;
+      --blue: #1565c0;
+      --border: #dcdcdc;
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+      margin: 0;
+      padding: 14px 12px 36px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    /* 頂部極簡導航（去掉多餘狀態與 Key 按鈕） */
+    .header {
+      width: 100%;
+      max-width: 540px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .header h1 {
+      font-size: 1.18rem;
+      margin: 0;
+      font-weight: 800;
+      color: var(--accent);
+    }
+    .header-btns { display: flex; gap: 6px; }
+    .top-btn {
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 5px 10px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      color: #222;
+    }
+
+    /* Google 風格極簡輸入控制區 */
+    .panel {
+      width: 100%;
+      max-width: 540px;
+      background: var(--card);
+      padding: 12px;
+      border-radius: 16px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+      border: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .search-box {
+      display: flex;
+      align-items: center;
+      border: 1.5px solid #ccc;
+      border-radius: 14px;
+      padding: 6px 8px 6px 12px;
+      background: #fff;
+      gap: 6px;
+    }
+    .search-box:focus-within { border-color: var(--accent); }
+    textarea {
+      flex: 1;
+      border: none;
+      font-size: 0.98rem;
+      resize: none;
+      outline: none;
+      font-family: inherit;
+      padding: 4px 0;
+      background: transparent;
+    }
+    /* 類似 Google 拍照翻譯與語音的圓形圖標按鈕 */
+    .icon-action {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: none;
+      background: #f1f3f4;
+      color: #333;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: background 0.15s;
+    }
+    .icon-action:active { background: #dcdcdc; }
+    .icon-action svg { width: 22px; height: 22px; fill: currentColor; }
+    .icon-action.recording {
+      background: #d32f2f;
+      color: #fff;
+      animation: pulse 1s infinite;
+    }
+    @keyframes pulse { 50% { opacity: 0.45; } }
+
+    .row { display: flex; gap: 8px; align-items: center; }
+    .btn {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 10px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      white-space: nowrap;
+    }
+    .btn-blue { background: var(--blue); color: #fff; }
+    .btn-green { background: var(--accent); color: #fff; }
+    .btn-soft { background: var(--accent-soft); color: var(--accent); border: 1px solid #c8e6c9; }
+    .btn-dark { background: #222; color: #fff; font-size: 0.78rem; padding: 7px 11px; flex: unset; }
+
+    /* 輸出卡片區（初始隱藏，居中美觀留白） */
+    .card-wrap {
+      width: 100%;
+      max-width: 540px;
+      margin-top: 12px;
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .card-wrap.visible { display: flex; }
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .sheet-card {
+      background: #ffffff;
+      padding: 30px 22px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 20px;
+    }
+    .preview-img {
+      max-width: 82%;
+      max-height: 150px;
+      border-radius: 10px;
+      object-fit: contain;
+      display: none;
+    }
+    .ai-reply-box {
+      width: 100%;
+      background: #f9fbe7;
+      border: 1px solid #dce775;
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-size: 0.96rem;
+      color: #111;
+      line-height: 1.5;
+      text-align: center;
+      display: none;
+    }
+    .annotation-list {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 22px;
+    }
+    .sentence-block {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      padding-bottom: 16px;
+      border-bottom: 1px dashed #eee;
+    }
+    .sentence-block:last-child { border-bottom: none; padding-bottom: 0; }
+    .en-line {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: #111;
+      line-height: 1.4;
+      word-break: normal;
+      overflow-wrap: break-word;
+      max-width: 94%;
+    }
+    .char-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px 0;
+      align-items: flex-end;
+    }
+    .tp-col {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      margin: 0 0.25ch;
+      cursor: pointer;
+      padding: 2px 1px;
+      border-radius: 4px;
+    }
+    .tp-col:active { background: #e8f5e9; }
+    .tp-py {
+      font-size: 1.08rem;
+      font-weight: 700;
+      font-style: italic;
+      color: #000;
+      line-height: 1.15;
+      white-space: nowrap;
+    }
+    .tp-zh {
+      font-size: 1.34rem;
+      font-weight: 600;
+      color: #000;
+      line-height: 1.25;
+      min-height: 1.25em;
+    }
+
+    /* 橫屏/全螢幕大字模式 */
+    body.big-mode {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background: #fff; padding: 0; z-index: 99999; overflow-y: auto;
+    }
+    body.big-mode .header,
+    body.big-mode .panel,
+    body.big-mode .toolbar,
+    body.big-mode .preview-img { display: none !important; }
+    body.big-mode .card-wrap { max-width: 100%; width: 100%; min-height: 100vh; margin: 0; justify-content: center; }
+    body.big-mode .sheet-card {
+      border: none; box-shadow: none; border-radius: 0;
+      min-height: 100vh; justify-content: center; padding: 40px 24px;
+    }
+    body.big-mode .tp-py { font-size: 1.95rem; }
+    body.big-mode .tp-zh { font-size: 2.6rem; }
+    body.big-mode .en-line { font-size: 1.55rem; }
+    body.big-mode .ai-reply-box { font-size: 1.25rem; }
+    .exit-big-btn {
+      display: none; position: fixed; top: 14px; right: 14px;
+      background: #111; color: #fff; border: none; border-radius: 20px;
+      padding: 9px 16px; font-size: 0.9rem; font-weight: 700; z-index: 100000;
+    }
+    body.big-mode .exit-big-btn { display: block; }
+
+    /* 彈窗 */
+    .modal {
+      display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.6); z-index: 9999; justify-content: center; align-items: center; padding: 16px;
+    }
+    .modal-box {
+      background: #fff; width: 100%; max-width: 400px; border-radius: 14px;
+      padding: 18px; display: flex; flex-direction: column; gap: 12px;
+    }
+
+    @media print {
+      .header, .panel, .toolbar, .exit-big-btn, .preview-img { display: none !important; }
+      body { background: #fff; padding: 0; }
+      .sheet-card { border: none; box-shadow: none; padding: 12mm; }
+    }
+  </style>
+</head>
+<body>
+
+  <button class="exit-big-btn" id="uiExitBig" onclick="toggleBigFont()">✕ Exit Fullscreen</button>
+
+  <div class="header">
+    <h1 id="uiTitle">🌳 Trees Pinyin</h1>
+    <div class="header-btns">
+      <button class="top-btn" onclick="openInstallModal()" id="uiInstallBtn">📲 Safari Icon</button>
+      <button class="top-btn" onclick="toggleLang()" id="uiLangBtn">中文</button>
+    </div>
+  </div>
+
+  <!-- 極簡操作面板：Google 相機圖標（含拍照與圖庫兩個系統選項）+ 單一語音按鈕 -->
+  <div class="panel">
+    <div class="search-box">
+      <textarea id="userInput" rows="2" placeholder="Ask AI, or enter text to translate..."></textarea>
+      
+      <!-- 語音輸入按鈕 -->
+      <button class="icon-action" id="micBtn" onclick="toggleVoice()" title="Voice Input">
+        <svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.91-3c-.49 0-.9.36-.98.85C16.52 14.2 14.47 16 12 16s-4.52-1.8-4.93-4.15c-.08-.49-.49-.85-.98-.85-.61 0-1.09.54-1 1.14.49 3 2.89 5.35 5.91 5.78V20c0 .55.45 1 1 1s1-.45 1-1v-2.08c3.02-.43 5.42-2.78 5.91-5.78.1-.6-.39-1.14-1-1.14z"/></svg>
+      </button>
+
+      <!-- Google Lens 風格相機圖標（點擊自動彈出「拍照」與「圖庫」兩個選項） -->
+      <label class="icon-action" title="Camera or Photo Library">
+        <svg viewBox="0 0 24 24"><path d="M12 10.9c-.61 0-1.1.49-1.1 1.1s.49 1.1 1.1 1.1c.61 0 1.1-.49 1.1-1.1s-.49-1.1-1.1-1.1zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8 0-1.85.63-3.55 1.69-4.9L16.9 18.31C15.55 19.37 13.85 20 12 20zm6.31-3.1L7.1 5.69C8.45 4.63 10.15 4 12 4c4.41 0 8 3.59 8 8 0 1.85-.63 3.55-1.69 4.9z" opacity="0"/><path d="M9 3L7.17 5H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2h-3.17L15 3H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.65 0-3 1.35-3 3s1.35 3 3 3 3-1.35 3-3-1.35-3-3-3z"/></svg>
+        <input type="file" id="photoInput" accept="image/*" style="display:none" onchange="handlePhotoUpload(this)">
+      </label>
+    </div>
+
+    <div class="row">
+      <button class="btn btn-blue" onclick="runSmartAI()" id="uiAIBtn">✨ AI Reply & Pinyin</button>
+      <button class="btn btn-green" onclick="runDirectTranslate()" id="uiTransBtn">📝 Translate & Pinyin</button>
+      <button class="btn btn-soft" style="flex:0.42;" id="speakBtn" onclick="toggleSpeak()">🔊 Speak</button>
+    </div>
+  </div>
+
+  <!-- 輸出卡片區（預設隱藏，先出對話框回答 -> 再一句一句出翻譯與注音） -->
+  <div class="card-wrap" id="cardWrap">
+    <div class="toolbar">
+      <span style="font-size:0.75rem; color:#666;" id="uiHint">💡 Tap any Chinese character to edit pinyin</span>
+      <div style="display:flex; gap:6px;">
+        <button class="btn btn-dark" onclick="toggleBigFont()" id="uiBigBtn">🔄 Big Screen</button>
+        <button class="btn btn-dark" onclick="exportCardImage()" id="uiSaveBtn">💾 Save Photo</button>
+        <button class="btn btn-dark" onclick="window.print()" id="uiPrintBtn">🖨️ Print</button>
+      </div>
+    </div>
+
+    <div class="sheet-card" id="sheetCard">
+      <img id="previewImg" class="preview-img" alt="Preview">
+      <div class="ai-reply-box" id="aiReplyBox"></div>
+      <div class="annotation-list" id="annotationList"></div>
+    </div>
+  </div>
+
+  <!-- 保存圖片彈窗 -->
+  <div class="modal" id="imgModal">
+    <div class="modal-box" style="align-items:center; text-align:center;">
+      <h3 style="margin:0; font-size:0.98rem;" id="uiSaveModalTitle">Long-Press Image to Save</h3>
+      <img id="generatedImg" style="width:100%; max-height:60vh; object-fit:contain; border:1px solid #ccc; border-radius:8px;">
+      <button class="btn btn-green" style="width:100%;" onclick="document.getElementById('imgModal').style.display='none'" id="uiDoneBtn">Done</button>
+    </div>
+  </div>
+
+  <!-- 桌面圖標說明彈窗（明確告知使用 Safari） -->
+  <div class="modal" id="installModal">
+    <div class="modal-box">
+      <h3 style="margin:0; font-size:1.02rem;" id="uiInstallTitle">📲 Add Icon to Home Screen</h3>
+      <div id="uiInstallSteps" style="font-size:0.88rem; line-height:1.6; background:#f8f9fa; padding:12px; border-radius:8px;">
+        <b>⚠️ Please open <span style="color:#1b5e20;">treespinyin.com/app</span> in Safari (not Chrome):</b><br><br>
+        1. Tap the <b>Share button [📤]</b> at the bottom center of Safari.<br>
+        2. Scroll down and tap <b>"Add to Home Screen [➕]"</b>.<br>
+        3. Tap <b>"Add"</b> at the top right.
+      </div>
+      <button class="btn btn-green" onclick="document.getElementById('installModal').style.display='none'" id="uiGotItBtn">OK</button>
+    </div>
+  </div>
+
+  <script>
+    // =========================================================================
+    // 0. 純英文 / 純中文介面切換
+    // =========================================================================
+    let currentLang = 'en';
+    const UI_TEXT = {
+      en: {
+        title: "🌳 Trees Pinyin",
+        installBtn: "📲 Safari Icon",
+        langBtn: "中文",
+        placeholder: "Ask AI, or enter text to translate...",
+        aiBtn: "✨ AI Reply & Pinyin",
+        transBtn: "📝 Translate & Pinyin",
+        speakBtn: "🔊 Speak",
+        stopSpeakBtn: "⏹️ Stop",
+        hint: "💡 Tap any Chinese character to edit pinyin",
+        bigBtn: "🔄 Big Screen",
+        saveBtn: "💾 Save Photo",
+        printBtn: "🖨️ Print",
+        exitBig: "✕ Exit Fullscreen",
+        saveModalTitle: "Long-Press Image to Save",
+        doneBtn: "Done",
+        installTitle: "📲 Add Icon to Home Screen",
+        installSteps: "<b>⚠️ Please open <span style=\"color:#1b5e20;\">treespinyin.com/app</span> in Safari (not Chrome):</b><br><br>1. Tap the <b>Share button [📤]</b> at the bottom center of Safari.<br>2. Scroll down and tap <b>\"Add to Home Screen [➕]\"</b>.<br>3. Tap <b>\"Add\"</b> at the top right.",
+        gotItBtn: "OK"
+      },
+      zh: {
+        title: "🌳 Trees Pinyin",
+        installBtn: "📲 桌面圖標",
+        langBtn: "English",
+        placeholder: "向 AI 提問，或輸入文字直接翻譯...",
+        aiBtn: "✨ AI 回答並注音",
+        transBtn: "📝 翻譯並注音",
+        speakBtn: "🔊 朗讀",
+        stopSpeakBtn: "⏹️ 停止",
+        hint: "💡 點擊任意漢字可修改多音字讀音",
+        bigBtn: "🔄 橫屏大字",
+        saveBtn: "💾 保存圖片",
+        printBtn: "🖨️ 列印",
+        exitBig: "✕ 退出全螢幕",
+        saveModalTitle: "請長按下方圖片保存到手機相冊",
+        doneBtn: "完成",
+        installTitle: "📲 添加桌面圖標（請使用 Safari）",
+        installSteps: "<b>⚠️ 請使用手機自帶的 Safari 瀏覽器打開本頁（Chrome 無法直接生成桌面圖標）：</b><br><br>1. 點擊 Safari 底部正中間的 <b>「分享按鈕 [📤]」</b>。<br>2. 往下滑動選單，點擊 <b>「加入主畫面 [➕]」</b>。<br>3. 點擊右上角「新增」即可。",
+        gotItBtn: "知道了"
+      }
+    };
+
+    function toggleLang() {
+      currentLang = currentLang === 'en' ? 'zh' : 'en';
+      const t = UI_TEXT[currentLang];
+      document.getElementById('uiTitle').innerText = t.title;
+      document.getElementById('uiInstallBtn').innerText = t.installBtn;
+      document.getElementById('uiLangBtn').innerText = t.langBtn;
+      document.getElementById('userInput').placeholder = t.placeholder;
+      document.getElementById('uiAIBtn').innerText = t.aiBtn;
+      document.getElementById('uiTransBtn').innerText = t.transBtn;
+      if (!isSpeakingNow) document.getElementById('speakBtn').innerText = t.speakBtn;
+      document.getElementById('uiHint').innerText = t.hint;
+      document.getElementById('uiBigBtn').innerText = t.bigBtn;
+      document.getElementById('uiSaveBtn').innerText = t.saveBtn;
+      document.getElementById('uiPrintBtn').innerText = t.printBtn;
+      document.getElementById('uiExitBig').innerText = t.exitBig;
+      document.getElementById('uiSaveModalTitle').innerText = t.saveModalTitle;
+      document.getElementById('uiDoneBtn').innerText = t.doneBtn;
+      document.getElementById('uiInstallTitle').innerText = t.installTitle;
+      document.getElementById('uiInstallSteps').innerHTML = t.installSteps;
+      document.getElementById('uiGotItBtn').innerText = t.gotItBtn;
+    }
+
+    // =========================================================================
+    // 1. 數字、時間、百分比、貨幣與符號「先轉中文口語再注音」
+    // =========================================================================
+    const DIGITS_ZH = ['零','一','二','三','四','五','六','七','八','九'];
+
+    function intToChinese(numStr) {
+      let n = parseInt(numStr, 10);
+      if (isNaN(n)) return numStr;
+      if (n === 0) return '零';
+      if (n < 0) return '負' + intToChinese(String(-n));
+      if (numStr.length === 4 && n >= 1900 && n <= 2099) {
+        return numStr.split('').map(d => DIGITS_ZH[parseInt(d, 10)]).join('');
+      }
+      if (n < 10) return DIGITS_ZH[n];
+      if (n < 100) {
+        let ten = Math.floor(n / 10), rem = n % 10;
+        return (ten === 1 ? '十' : DIGITS_ZH[ten] + '十') + (rem > 0 ? DIGITS_ZH[rem] : '');
+      }
+      if (n < 1000) {
+        let hun = Math.floor(n / 100), rem = n % 100;
+        if (rem === 0) return DIGITS_ZH[hun] + '百';
+        if (rem < 10) return DIGITS_ZH[hun] + '百零' + DIGITS_ZH[rem];
+        return DIGITS_ZH[hun] + '百' + intToChinese(String(rem));
+      }
+      if (n < 10000) {
+        let th = Math.floor(n / 1000), rem = n % 1000;
+        if (rem === 0) return DIGITS_ZH[th] + '千';
+        if (rem < 100) return DIGITS_ZH[th] + '千零' + intToChinese(String(rem));
+        return DIGITS_ZH[th] + '千' + intToChinese(String(rem));
+      }
+      return numStr.split('').map(d => DIGITS_ZH[parseInt(d, 10)] || d).join('');
+    }
+
+    function numberToChinese(str) {
+      if (str.includes('.')) {
+        let parts = str.split('.');
+        let intPart = intToChinese(parts[0] || '0');
+        let decPart = parts[1].split('').map(d => DIGITS_ZH[parseInt(d, 10)]).join('');
+        return intPart + '點' + decPart;
+      }
+      return intToChinese(str);
+    }
+
+    function expandNumbersAndSymbolsToZh(text) {
+      if (!text) return '';
+      let s = text;
+      s = s.replace(/\bH2O\b/gi, '水').replace(/\bCO2\b/gi, '二氧化碳').replace(/\bO2\b/gi, '氧氣');
+      s = s.replace(/°C|℃/g, '攝氏度').replace(/°F|℉/g, '華氏度');
+      s = s.replace(/\b(\d{1,2}):(\d{2})\b/g, (_, h, m) => intToChinese(h) + '點' + (m === '00' ? '整' : intToChinese(m) + '分'));
+      s = s.replace(/(\d+(?:\.\d+)?)\s*%/g, (_, num) => '百分之' + numberToChinese(num));
+      s = s.replace(/\$\s*(\d+(?:\.\d+)?)/g, (_, num) => numberToChinese(num) + '美元');
+      s = s.replace(/[¥￥]\s*(\d+(?:\.\d+)?)/g, (_, num) => numberToChinese(num) + '元');
+      s = s.replace(/\+/g, '加').replace(/=/g, '等於').replace(/&/g, '和');
+      s = s.replace(/\d+(?:\.\d+)?/g, (match) => numberToChinese(match));
+      return s;
+    }
+
+    // =========================================================================
+    // 2. 100% 嚴格校準 Trees Pinyin (v25) 編譯器
+    // =========================================================================
+    const OVERALL_16 = {
+      'zhi': '(r)ds', 'chi': '(r)ts', 'shi': '(r)s', 'ri': '(r)th',
+      'zi': 'ds', 'ci': 'ts', 'si': 's', 'yi': 'yee',
+      'wu': 'woo', 'yu': 'yee(oo)', 'ye': 'yer', 'yue': 'yee(oo)er',
+      'yuan': 'yee(oo)an', 'yin': 'yeen', 'yun': 'yee(oo)n', 'ying': 'ying'
+    };
+
+    const LOCKED_MAP = {
+      'wo': 'wer', 'de': 'der', 'le': 'Ler',
+      'ren': '(r)ther-n', 'wen': 'wer-n', 'shun': 'soon', 'zun': 'dsoon',
+      'guo': 'gooer', 'o': 'oh',
+      'qi': 'tsee', 'qing': 'tsing', 'qie': 'tseer', 'qian': 'tseean', 'qiao': 'tseeaw',
+      'qiang': 'tseeang', 'qiong': 'tseer-oong', 'qu': 'tsee(oo)', 'que': 'tsee(oo)er',
+      'quan': 'tsee(oo)an', 'qun': 'tsee(oo)n', 'qin': 'tseen', 'qia': 'tseeah',
+      'xi': 'see', 'xing': 'sing', 'xie': 'seer', 'xian': 'seean', 'xiao': 'seeaw',
+      'xiang': 'seeang', 'xiong': 'seer-oong', 'xu': 'see(oo)', 'xue': 'see(oo)er',
+      'xuan': 'see(oo)an', 'xun': 'see(oo)n', 'xin': 'seen', 'xia': 'seeah',
+      'ji': 'jee', 'jing': 'jing', 'jie': 'jeer', 'jian': 'jeean', 'jiao': 'jeeaw',
+      'jiang': 'jeeang', 'jiong': 'jeer-oong', 'ju': 'jee(oo)', 'jue': 'jee(oo)er',
+      'juan': 'jee(oo)an', 'jun': 'jee(oo)n', 'jin': 'jeen', 'jia': 'jeeah',
+      'lv': 'Lee(oo)', 'lü': 'Lee(oo)', 'lve': 'Lee(oo)er', 'lüe': 'Lee(oo)er',
+      'nv': 'nee(oo)', 'nü': 'nee(oo)', 'nve': 'nee(oo)er', 'nüe': 'nee(oo)er'
+    };
+
+    const INITIALS = {
+      'b':'b', 'p':'p', 'm':'m', 'f':'f',
+      'd':'d', 't':'t', 'n':'n', 'l':'L',
+      'g':'g', 'k':'k', 'h':'h', 'j':'j',
+      'q':'tsee', 'x':'see',
+      'zh':'(r)ds', 'ch':'(r)ts', 'sh':'(r)s', 'r':'(r)th',
+      'z':'ds', 'c':'ts', 's':'s', 'y':'y', 'w':'w'
+    };
+
+    const FINALS = {
+      'a':'ah', 'o':'ooer', 'e':'er', 'i':'ee', 'u':'oo', 'v':'ee(oo)', 'ü':'ee(oo)',
+      'ai':'ie', 'ei':'ay', 'ui':'ooay', 'ao':'aw', 'ou':'oh', 'iu':'eeoh',
+      'ie':'eer', 've':'ee(oo)er', 'üe':'ee(oo)er', 'er':'(uh)-er',
+      'an':'an', 'en':'er-n', 'in':'een', 'un':'oon', 'vn':'ee(oo)n', 'ün':'ee(oo)n',
+      'ang':'ang', 'eng':'er-ng', 'ing':'ing', 'ong':'er-oong',
+      'ia':'eeah', 'ian':'eean', 'iao':'eeaw', 'iang':'eeang', 'iong':'eer-oong',
+      'ua':'ooah', 'uai':'ooie', 'uan':'ooan', 'uang':'ooang', 'uo':'ooer',
+      'van':'ee(oo)an', 'üan':'ee(oo)an'
+    };
+
+    function compileToTreesPinyin(pyNum) {
+      if (!pyNum) return '';
+      let m = pyNum.trim().match(/^([a-züv:]+)([0-5]?)$/i);
+      if (!m) return pyNum;
+      let syl = m[1].toLowerCase().replace('ü', 'v').replace('u:', 'v');
+      let tone = m[2] || '';
+
+      let mapped = '';
+      if (syl === 'er') {
+        mapped = (tone === '4') ? 'uh-er' : '(uh)-er';
+      } else if (OVERALL_16[syl]) {
+        mapped = OVERALL_16[syl];
+      } else if (LOCKED_MAP[syl]) {
+        mapped = LOCKED_MAP[syl];
+      } else {
+        let init = '', fin = syl;
+        for (let l of ['zh', 'ch', 'sh']) {
+          if (syl.startsWith(l)) { init = l; fin = syl.slice(2); break; }
+        }
+        if (!init && syl.length > 1 && 'bpmfdtnlgkhjqxzcsryw'.includes(syl[0])) {
+          init = syl[0]; fin = syl.slice(1);
+        }
+        let mappedInit = INITIALS[init] || init;
+        let mappedFin = FINALS[fin] || fin;
+
+        if (mappedInit.endsWith('ee') && mappedFin.startsWith('ee')) {
+          mapped = mappedInit + mappedFin.slice(2);
+        } else if (mappedInit.endsWith('ee') && mappedFin.startsWith('i')) {
+          mapped = mappedInit.slice(0, -2) + mappedFin;
+        } else if (init === 'y' && mappedFin.startsWith('ee')) {
+          mapped = 'y' + mappedFin;
+        } else if (init === 'w' && mappedFin.startsWith('oo')) {
+          mapped = 'w' + mappedFin;
+        } else {
+          mapped = mappedInit + mappedFin;
+        }
+      }
+
+      let toneSuffix = (tone === '2' || tone === '3' || tone === '4') ? tone : '';
+      return mapped + toneSuffix;
+    }
+
+    const CUSTOM_POLYPHONES = {
+      "银行": "yin2 hang2", "行业": "hang2 ye4", "一行": "yi4 hang2",
+      "便宜": "pian2 yi5", "方便": "fang1 bian4",
+      "音乐": "yin1 yue4", "快乐": "kuai4 le4",
+      "看着": "kan4 zhe5", "着急": "zhao2 ji2", "睡着": "shui4 zhao2",
+      "长大": "zhang3 da4", "长城": "chang2 cheng2", "多长": "duo1 chang2",
+      "了解": "liao3 jie3", "好了": "hao3 le5", "太好了": "tai4 hao3 le5",
+      "觉得": "jue2 de5", "睡觉": "shui4 jiao4",
+      "重庆": "chong2 qing4", "重要": "zhong4 yao4",
+      "还钱": "huan2 qian2", "还有": "hai2 you3",
+      "食物": "shi2 wu4", "美食": "mei3 shi2",
+      "我的": "wo3 de5", "你的": "ni3 de5", "好的": "hao3 de5", "微辣": "wei1 la4", "少盐": "shao3 yan2"
+    };
+
+    function getAccuratePinyinArray(zhText) {
+      let pyArr = pinyinPro.pinyin(zhText, { type: 'array', toneType: 'num' });
+      for (let word in CUSTOM_POLYPHONES) {
+        let idx = zhText.indexOf(word);
+        while (idx !== -1) {
+          let fixedPys = CUSTOM_POLYPHONES[word].split(' ');
+          for (let k = 0; k < fixedPys.length; k++) {
+            pyArr[idx + k] = fixedPys[k];
+          }
+          idx = zhText.indexOf(word, idx + 1);
+        }
+      }
+      return pyArr;
+    }
+
+    // =========================================================================
+    // 3. 漸進式極速渲染：做好一句就立刻顯示一句，非同步補齊翻譯
+    // =========================================================================
+    function showCardWrap() {
+      document.getElementById('cardWrap').classList.add('visible');
+    }
+
+    // 讓瀏覽器立刻把當前這一句畫到螢幕上，不憋到最後一起出
+    function nextPaintTick() {
+      return new Promise(resolve => requestAnimationFrame(() => setTimeout(resolve, 45)));
+    }
+
+    function appendSentenceProgressive(rawZhText, enTranslation = '') {
+      showCardWrap();
+      const list = document.getElementById('annotationList');
+      const block = document.createElement('div');
+      block.className = 'sentence-block';
+
+      const zhText = expandNumbersAndSymbolsToZh(rawZhText);
+      block.dataset.zh = zhText;
+
+      const enDiv = document.createElement('div');
+      enDiv.className = 'en-line';
+      enDiv.innerText = enTranslation || '...';
+      block.appendChild(enDiv);
+
+      const charRow = document.createElement('div');
+      charRow.className = 'char-row';
+      const pinyinList = getAccuratePinyinArray(zhText);
+
+      for (let i = 0; i < zhText.length; i++) {
+        const char = zhText[i];
+        const isChinese = /[\u4e00-\u9fa5]/.test(char);
+        const isPunct = /[，。！？；：、,.!?;:"'“”‘’（）()《》【】]/.test(char);
+        const col = document.createElement('div');
+        col.className = 'tp-col';
+
+        if (isChinese) {
+          let pyNum = pinyinList[i] || '';
+          let tp = compileToTreesPinyin(pyNum);
+          col.innerHTML = `<span class="tp-py">${tp}</span><span class="tp-zh">${char}</span>`;
+          col.onclick = function() {
+            let edited = prompt(currentLang === 'en' ? `Edit Pinyin for "${char}":` : `修改「${char}」的拼音：`, pyNum);
+            if (edited && edited.trim()) {
+              pyNum = edited.trim();
+              col.querySelector('.tp-py').innerText = compileToTreesPinyin(pyNum);
+            }
+          };
+        } else if (isPunct) {
+          col.innerHTML = `<span class="tp-py">${char}</span><span class="tp-zh"> </span>`;
+        } else {
+          col.innerHTML = `<span class="tp-py"> </span><span class="tp-zh">${char}</span>`;
+        }
+        charRow.appendChild(col);
+      }
+
+      block.appendChild(charRow);
+      list.appendChild(block);
+
+      // 如果還沒提供英文翻譯，背景非同步秒補上，不阻塞注音呈現！
+      if (!enTranslation) {
+        translateFast(zhText, 'zh', 'en').then(en => {
+          enDiv.innerText = en;
+        });
+      }
+      return block;
+    }
+
+    // =========================================================================
+    // 4. 多重競速翻譯引擎（Promise.any 誰最快用誰，0.3秒出結果）
+    // =========================================================================
+    async function translateFast(text, fromLang, toLang) {
+      const src = fromLang.startsWith('zh') ? 'zh-CN' : 'en';
+      const tgt = toLang.startsWith('zh') ? 'zh-CN' : 'en';
+
+      // 優先嘗試 Chrome 內置毫秒級 Translator API
+      try {
+        if (window.Translator && typeof window.Translator.create === 'function') {
+          const t = await window.Translator.create({ sourceLanguage: src.slice(0,2), targetLanguage: tgt.slice(0,2) });
+          const r = await t.translate(text);
+          if (r && r !== text) return r;
+        }
+      } catch (e) {}
+
+      // 同時發起多個跨域翻譯通道競速，哪個先返回就立刻用哪個
+      const tasks = [
+        fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=${src}&tl=${tgt}&dt=t&q=${encodeURIComponent(text)}`)
+          .then(r => r.json())
+          .then(d => {
+            const j = d?.[0]?.map(x => x[0]).join('');
+            if (j && j !== text) return j;
+            throw new Error('empty');
+          }),
+        fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${src}|${tgt}`)
+          .then(r => r.json())
+          .then(d => {
+            const t = d?.responseData?.translatedText;
+            if (t && !t.includes('MYMEMORY WARNING') && t.toLowerCase() !== text.toLowerCase()) return t;
+            throw new Error('empty');
+          })
+      ];
+
+      try {
+        return await Promise.any(tasks);
+      } catch (e) {
+        return text;
+      }
+    }
+
+    // 點擊「📝 Translate & Pinyin」：按句切分，做好一句立刻顯示一句
+    async function runDirectTranslate(inputOverride) {
+      const raw = (inputOverride !== undefined ? inputOverride : document.getElementById('userInput').value).trim();
+      if (!raw) return;
+
+      showCardWrap();
+      document.getElementById('previewImg').style.display = 'none';
+      const replyBox = document.getElementById('aiReplyBox');
+      replyBox.style.display = 'none';
+      const list = document.getElementById('annotationList');
+      list.innerHTML = '';
+
+      // 將長段文字按換行或句號拆成單句，實現「做好一句、立刻顯示一句」
+      const lines = raw.split(/\n+|(?<=[。！？.!?])\s*/).map(l => l.trim()).filter(Boolean);
+      for (let line of lines) {
+        const hasChinese = /[\u4e00-\u9fa5]/.test(line);
+        if (hasChinese) {
+          appendSentenceProgressive(line, '');
+          await nextPaintTick();
+        } else {
+          const tempBlock = document.createElement('div');
+          tempBlock.className = 'sentence-block';
+          tempBlock.innerHTML = `<div class="en-line">${line}</div><div style="font-size:0.85rem;color:#666;">⚡ Translating...</div>`;
+          list.appendChild(tempBlock);
+
+          const zhTrans = await translateFast(line, 'en', 'zh');
+          tempBlock.remove();
+          appendSentenceProgressive(zhTrans, line);
+          await nextPaintTick();
+        }
+      }
+    }
+
+    // =========================================================================
+    // 5. 分階段瀑布式 AI 引擎：1.先秒回對話框 -> 2.每做好一句立刻顯示一句並翻譯注音
+    // =========================================================================
+    let chromeAISession = null;
+
+    async function runSmartAI(overrideInput) {
+      const q = (overrideInput !== undefined ? overrideInput : document.getElementById('userInput').value).trim();
+      if (!q) return;
+
+      showCardWrap();
+      const replyBox = document.getElementById('aiReplyBox');
+      const list = document.getElementById('annotationList');
+      replyBox.style.display = 'block';
+      replyBox.innerText = '⚡ ...';
+      list.innerHTML = '';
+
+      // 第一行給回答簡介；後面每行一句中文實用句（嚴格按用戶要求的句數輸出）
+      const fastPrompt = `User: "${q}".
+Reply concisely:
+Line 1: Brief helpful answer or dish/place intro in English & Chinese.
+From Line 2 onwards: Practical Chinese sentences for this situation (output the exact number of sentences the user asked for, or 2-3 sentences if not specified; if food/dish, include 微辣 mild spicy, 少鹽 less salt). Only output Chinese on lines 2+, one sentence per line.`;
+
+      let renderedLineCount = 0;
+
+      // 分階段渲染單行：第 1 行立刻顯示在頂部回答框，後續行每收到一句立刻渲染注音與翻譯
+      async function renderOneLineStaged(rawLine) {
+        const cleanLine = rawLine.replace(/^[-*•\d.)、]+\s*/, '').trim();
+        if (!cleanLine) return;
+
+        renderedLineCount++;
+        if (renderedLineCount === 1) {
+          replyBox.innerHTML = `<b>${cleanLine}</b>`;
+          await nextPaintTick();
+        } else if (/[\u4e00-\u9fa5]/.test(cleanLine)) {
+          const pureZh = cleanLine.replace(/[A-Za-z()（）/]+/g, '').trim() || cleanLine;
+          appendSentenceProgressive(pureZh, '');
+          await nextPaintTick();
+        }
+      }
+
+      // 優先 1：調用手機/桌面 Chrome 內置 AI 流式輸出 (promptStreaming)，邊生成邊逐行顯示
+      try {
+        const lm = window.LanguageModel || (window.ai && window.ai.languageModel);
+        if (lm) {
+          if (!chromeAISession) chromeAISession = await lm.create();
+          if (chromeAISession.promptStreaming) {
+            const stream = chromeAISession.promptStreaming(fastPrompt);
+            let prevLen = 0;
+            let buf = '';
+            for await (const chunk of stream) {
+              const delta = chunk.slice(prevLen);
+              prevLen = chunk.length;
+              buf += delta;
+              let nl;
+              while ((nl = buf.indexOf('\n')) !== -1) {
+                const oneLine = buf.slice(0, nl).trim();
+                buf = buf.slice(nl + 1);
+                if (oneLine) await renderOneLineStaged(oneLine);
+              }
+            }
+            if (buf.trim()) await renderOneLineStaged(buf.trim());
+            if (renderedLineCount > 0) return;
+          } else {
+            const full = await chromeAISession.prompt(fastPrompt);
+            for (const l of full.split(/\n+/)) {
+              await renderOneLineStaged(l);
+            }
+            if (renderedLineCount > 0) return;
+          }
+        }
+      } catch (e) {
+        chromeAISession = null;
+      }
+
+      // 優先 2：極速輕量文本流接口（開啟 stream: true 邊收邊顯示，若返回整包也逐句分階段上屏）
+      try {
+        const r = await fetch('https://text.pollinations.ai/openai', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: 'openai-fast',
+            stream: true,
+            messages: [{ role: 'user', content: fastPrompt }]
+          })
+        });
+
+        if (r.ok && r.body) {
+          const cType = (r.headers.get('content-type') || '').toLowerCase();
+          if (cType.includes('event-stream')) {
+            const reader = r.body.getReader();
+            const decoder = new TextDecoder('utf-8');
+            let sseBuf = '';
+            let textBuf = '';
+
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) break;
+              sseBuf += decoder.decode(value, { stream: true });
+              let lines = sseBuf.split('\n');
+              sseBuf = lines.pop() || '';
+
+              for (const line of lines) {
+                const tr = line.trim();
+                if (tr.startsWith('data:')) {
+                  const dataStr = tr.slice(5).trim();
+                  if (!dataStr || dataStr === '[DONE]') continue;
+                  try {
+                    const j = JSON.parse(dataStr);
+                    const delta = j?.choices?.[0]?.delta?.content || '';
+                    if (delta) {
+                      textBuf += delta;
+                      let nl;
+                      while ((nl = textBuf.indexOf('\n')) !== -1) {
+                        const readyLine = textBuf.slice(0, nl).trim();
+                        textBuf = textBuf.slice(nl + 1);
+                        if (readyLine) await renderOneLineStaged(readyLine);
+                      }
+                    }
+                  } catch (e) {}
+                }
+              }
+            }
+            if (textBuf.trim()) await renderOneLineStaged(textBuf.trim());
+            if (renderedLineCount > 0) return;
+          } else {
+            const rawText = await r.text();
+            let fullOutput = rawText;
+            try {
+              const d = JSON.parse(rawText);
+              fullOutput = d?.choices?.[0]?.message?.content || '';
+            } catch (e) {}
+
+            if (fullOutput) {
+              const lines = fullOutput.split(/\n+/).map(l => l.trim()).filter(Boolean);
+              for (const line of lines) {
+                await renderOneLineStaged(line);
+              }
+              if (renderedLineCount > 0) return;
+            }
+          }
+        }
+      } catch (e) {}
+
+      // 若輸入本身就是句子，直接逐句翻譯並注音
+      await runDirectTranslate(q);
+    }
+
+    // =========================================================================
+    // 6. Google 相機圖標：拍照或選圖後，先識別名稱簡介 -> 再逐句翻譯注音
+    // =========================================================================
+    async function handlePhotoUpload(input) {
+      if (!input.files || !input.files[0]) return;
+      const file = input.files[0];
+
+      showCardWrap();
+      const replyBox = document.getElementById('aiReplyBox');
+      const list = document.getElementById('annotationList');
+      replyBox.style.display = 'block';
+      replyBox.innerText = currentLang === 'en' ? '📷 Analyzing photo...' : '📷 正在識別照片...';
+      list.innerHTML = '';
+
+      const dataUrl = await compressImg(file, 800, 0.75);
+      const prev = document.getElementById('previewImg');
+      prev.src = dataUrl;
+      prev.style.display = 'block';
+
+      // 同時啟動：(A) 極速 OCR 提取文字 + (B) 視覺 AI 識別菜餚/物品並給出介紹
+      const ocrPromise = (async () => {
+        try {
+          const fd = new FormData();
+          fd.append('base64Image', dataUrl);
+          fd.append('language', 'chs');
+          fd.append('apikey', 'helloworld');
+          const r = await fetch('https://api.ocr.space/parse/image', { method: 'POST', body: fd });
+          const d = await r.json();
+          return d?.ParsedResults?.[0]?.ParsedText?.trim() || '';
+        } catch (e) { return ''; }
+      })();
+
+      const visionPromise = (async () => {
+        try {
+          const vPrompt = `Look at this image:
+Line 1: Identify what dish, object, landmark, or text it is, with a 1-sentence intro (in English & Chinese).
+Line 2-3: 2 practical Chinese phrases for it (if food, include 微辣 mild spicy, 少鹽 less salt; if English text, translate it into Chinese).`;
+          const r = await fetch('https://text.pollinations.ai/openai', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              model: 'openai',
+              messages: [{
+                role: 'user',
+                content: [
+                  { type: 'text', text: vPrompt },
+                  { type: 'image_url', image_url: { url: dataUrl } }
+                ]
+              }]
+            })
+          });
+          const d = await r.json();
+          return d?.choices?.[0]?.message?.content || '';
+        } catch (e) { return ''; }
+      })();
+
+      // 先看 OCR 是否秒提取出文字（如果是拍英文菜單或中文書頁，0.8秒就能出來）
+      const ocrText = await ocrPromise;
+      if (ocrText && ocrText.length >= 2) {
+        const clean = ocrText.replace(/\r\n/g, '\n').trim();
+        document.getElementById('userInput').value = clean;
+        replyBox.innerText = `📄 ${clean.slice(0, 60)}`;
+        await runDirectTranslate(clean);
+      }
+
+      // 接著當視覺 AI 完成菜品/物品分析後，先更新對話框簡介，再逐句顯示實用短語
+      const visionText = await visionPromise;
+      if (visionText) {
+        const vLines = visionText.split(/\n+/).map(l => l.replace(/^[-*•\d.]+\s*/, '').trim()).filter(Boolean);
+        if (vLines.length > 0) {
+          replyBox.innerHTML = `<b>${vLines[0]}</b>`;
+          await nextPaintTick();
+          if (!ocrText) {
+            list.innerHTML = '';
+            const zhLines = vLines.slice(1).filter(l => /[\u4e00-\u9fa5]/.test(l));
+            for (let zl of zhLines) {
+              const pureZh = zl.replace(/[A-Za-z()（）/]+/g, '').trim() || zl;
+              appendSentenceProgressive(pureZh, '');
+              await nextPaintTick();
+            }
+          }
+        }
+      }
+      input.value = '';
+    }
+
+    function compressImg(file, maxW, quality) {
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = () => {
+            const c = document.createElement('canvas');
+            let w = img.width, h = img.height;
+            if (w > maxW) { h = Math.round((h * maxW) / w); w = maxW; }
+            c.width = w; c.height = h;
+            c.getContext('2d').drawImage(img, 0, 0, w, h);
+            resolve(c.toDataURL('image/jpeg', quality));
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // =========================================================================
+    // 7. 語音輸入（說完停頓立即先顯示回答 -> 再逐句翻譯注音）
+    // =========================================================================
+    let activeRec = null;
+
+    function toggleVoice() {
+      const btn = document.getElementById('micBtn');
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SR) return alert(currentLang === 'en' ? 'Voice input not supported in this browser.' : '當前瀏覽器不支援語音輸入。');
+
+      if (activeRec) {
+        activeRec.stop();
+        return;
+      }
+
+      activeRec = new SR();
+      activeRec.lang = currentLang === 'en' ? 'en-US' : 'zh-CN';
+      activeRec.interimResults = true;
+      activeRec.continuous = false;
+      btn.classList.add('recording');
+
+      let finalTranscript = '';
+
+      activeRec.onresult = (e) => {
+        let interim = '';
+        for (let i = e.resultIndex; i < e.results.length; i++) {
+          if (e.results[i].isFinal) finalTranscript += e.results[i][0].transcript;
+          else interim += e.results[i][0].transcript;
+        }
+        document.getElementById('userInput').value = (finalTranscript || interim).trim();
+      };
+
+      activeRec.onend = () => {
+        btn.classList.remove('recording');
+        activeRec = null;
+        const spoken = document.getElementById('userInput').value.trim();
+        if (spoken) {
+          runSmartAI(spoken);
+        }
+      };
+
+      activeRec.onerror = () => {
+        btn.classList.remove('recording');
+        activeRec = null;
+      };
+
+      activeRec.start();
+    }
+
+    // =========================================================================
+    // 8. 語音朗讀 Speak（點一下播放，再點一下立刻停止）
+    // =========================================================================
+    let isSpeakingNow = false;
+
+    function toggleSpeak() {
+      if (!('speechSynthesis' in window)) return;
+      const btn = document.getElementById('speakBtn');
+      const t = UI_TEXT[currentLang];
+
+      if (window.speechSynthesis.speaking || isSpeakingNow) {
+        window.speechSynthesis.cancel();
+        isSpeakingNow = false;
+        btn.innerText = t.speakBtn;
+        btn.style.background = '';
+        btn.style.color = '';
+        return;
+      }
+
+      const blocks = document.querySelectorAll('.sentence-block');
+      let allZh = Array.from(blocks).map(b => b.dataset.zh).join('。');
+      if (!allZh) allZh = document.getElementById('userInput').value;
+      if (!allZh) return;
+
+      const utter = new SpeechSynthesisUtterance(allZh);
+      utter.lang = 'zh-CN';
+      utter.rate = 0.85;
+      isSpeakingNow = true;
+      btn.innerText = t.stopSpeakBtn;
+      btn.style.background = '#d32f2f';
+      btn.style.color = '#fff';
+
+      utter.onend = () => {
+        isSpeakingNow = false;
+        btn.innerText = UI_TEXT[currentLang].speakBtn;
+        btn.style.background = '';
+        btn.style.color = '';
+      };
+      utter.onerror = utter.onend;
+      window.speechSynthesis.speak(utter);
+    }
+
+    // =========================================================================
+    // 9. 全螢幕大字、保存圖片與 Safari 桌面圖標提示
+    // =========================================================================
+    function toggleBigFont() {
+      document.body.classList.toggle('big-mode');
+    }
+
+    async function exportCardImage() {
+      const card = document.getElementById('sheetCard');
+      try {
+        const canvas = await html2canvas(card, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
+        const dataUrl = canvas.toDataURL('image/png');
+
+        if (navigator.canShare && navigator.share) {
+          try {
+            const blob = await (await fetch(dataUrl)).blob();
+            const file = new File([blob], 'TreesPinyin.png', { type: 'image/png' });
+            if (navigator.canShare({ files: [file] })) {
+              await navigator.share({ files: [file], title: 'Trees Pinyin' });
+              return;
+            }
+          } catch (e) {}
+        }
+
+        document.getElementById('generatedImg').src = dataUrl;
+        document.getElementById('imgModal').style.display = 'flex';
+      } catch (err) {}
+    }
+
+    function openInstallModal() {
+      document.getElementById('installModal').style.display = 'flex';
+    }
+  </script>
+</body>
+</html>
