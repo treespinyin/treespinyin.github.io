@@ -53,15 +53,6 @@
       margin: 0;
       font-weight: 800;
       color: var(--accent);
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-    }
-    .header-logo {
-      width: 26px;
-      height: 26px;
-      border-radius: 6px;
-      object-fit: cover;
     }
     .header-btns { display: flex; gap: 6px; }
     .top-btn {
@@ -73,11 +64,8 @@
       font-weight: 600;
       cursor: pointer;
       color: #222;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
     }
-    .top-btn.vip-ready {
+    .top-btn.vip-on {
       background: #e8f5e9;
       border-color: #2e7d32;
       color: #1b5e20;
@@ -315,16 +303,10 @@
   <button class="exit-big-btn" id="uiExitBig" onclick="toggleBigFont()">✕ Exit Fullscreen</button>
 
   <div class="header">
-    <h1>
-      <img src="icon.png" alt="Logo" class="header-logo" onerror="this.style.display='none'">
-      <span id="uiTitle">Trees Pinyin</span>
-    </h1>
+    <h1 id="uiTitle">🌳 Trees Pinyin</h1>
     <div class="header-btns">
-      <button class="top-btn" onclick="openKeyModal()" id="uiKeyBtn">⚡ Backup Key</button>
-      <button class="top-btn" onclick="openInstallModal()" id="uiInstallBtn">
-        <img src="icon.png" alt="" style="width:15px;height:15px;border-radius:3px;" onerror="this.style.display='none'">
-        <span id="uiInstallBtnText">Safari Icon</span>
-      </button>
+      <button class="top-btn" onclick="openKeyModal()" id="uiKeyBtn">⚡ VIP Key</button>
+      <button class="top-btn" onclick="openInstallModal()" id="uiInstallBtn">📲 Safari Icon</button>
       <button class="top-btn" onclick="toggleLang()" id="uiLangBtn">中文</button>
     </div>
   </div>
@@ -380,13 +362,10 @@
     </div>
   </div>
 
-  <!-- 桌面圖標說明彈窗（預覽 GitHub 上的 icon.png 並明確告知使用 Safari） -->
+  <!-- 桌面圖標說明彈窗（明確告知使用 Safari） -->
   <div class="modal" id="installModal">
     <div class="modal-box">
-      <div style="display:flex; align-items:center; gap:10px;">
-        <img src="icon.png" alt="App Icon" style="width:44px; height:44px; border-radius:10px; border:1px solid #eee;" onerror="this.style.display='none'">
-        <h3 style="margin:0; font-size:1.02rem;" id="uiInstallTitle">Add Icon to Home Screen</h3>
-      </div>
+      <h3 style="margin:0; font-size:1.02rem;" id="uiInstallTitle">📲 Add Icon to Home Screen</h3>
       <div id="uiInstallSteps" style="font-size:0.88rem; line-height:1.6; background:#f8f9fa; padding:12px; border-radius:8px;">
         <b>⚠️ Please open <span style="color:#1b5e20;">treespinyin.com/app</span> in Safari (not Chrome):</b><br><br>
         1. Tap the <b>Share button [📤]</b> at the bottom center of Safari.<br>
@@ -397,22 +376,20 @@
     </div>
   </div>
 
-  <!-- 備用個人 API Key 彈窗（V22 永遠第一優先，僅在 V22 高峰擁堵時自動啟用此 Key！） -->
+  <!-- VIP Google API Key 傻瓜式引導彈窗（永久自動適配未來模型，解決人多擁擠） -->
   <div class="modal" id="keyModal">
     <div class="modal-box">
-      <h3 style="margin:0; font-size:1.02rem;" id="uiKeyModalTitle">⚡ Backup Personal API Key</h3>
-      <div id="uiKeySteps" style="font-size:0.84rem; line-height:1.55; background:#f8f9fa; padding:12px; border-radius:8px; color:#333;">
-        <b>V22 High-Speed Channel is ALWAYS used first!</b><br>
-        Your personal Google Gemini Key is only used as an automatic backup if public servers are crowded during peak hours:<br><br>
-        1. <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:#1565c0; font-weight:700;">👉 Tap here to get a Free Key (Google AI Studio)</a><br>
-        2. Sign in & tap <b>"Create API key"</b>.<br>
-        3. Paste below (auto-upgrades to future Gemini 2.5 / 3 / 4+ models):
+      <h3 style="margin:0; font-size:1.02rem;" id="uiKeyModalTitle">⚡ VIP Personal API Key</h3>
+      <div id="uiKeySteps" style="font-size:0.85rem; line-height:1.55; background:#f8f9fa; padding:12px; border-radius:8px; color:#333;">
+        Works for free out-of-the-box! When public servers are crowded, bind your own free Google Gemini Key for unlimited instant speed:<br><br>
+        1. <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:#1565c0; font-weight:700;">👉 Tap here to open Google AI Studio</a><br>
+        2. Sign in & tap <b>"Create API key"</b> (Free).<br>
+        3. Paste your key below (auto-upgrades to future Gemini models):
       </div>
-      <input type="password" id="apiKeyInput" style="width:100%;padding:10px;border:1.5px solid #ccc;border-radius:8px;font-size:0.9rem;outline:none;" placeholder="Paste AIzaSy... backup key (optional)">
-      <div id="keyStatusBadge" style="font-size:0.78rem;color:#1b5e20;background:#e8f5e9;padding:6px 10px;border-radius:6px;display:none;"></div>
+      <input type="password" id="apiKeyInput" style="width:100%;padding:10px;border:1.5px solid #ccc;border-radius:8px;font-size:0.9rem;outline:none;" placeholder="Paste AIzaSy... key here (leave blank for free mode)">
       <div class="row">
-        <button class="btn btn-green" onclick="saveBackupKey()" id="uiSaveKeyBtn">Save Backup Key</button>
-        <button class="btn btn-soft" style="flex:0.45;" onclick="clearBackupKey()" id="uiClearKeyBtn">Clear</button>
+        <button class="btn btn-green" onclick="saveVipKey()" id="uiSaveKeyBtn">Save Key</button>
+        <button class="btn btn-soft" style="flex:0.45;" onclick="clearVipKey()" id="uiClearKeyBtn">Clear</button>
       </div>
       <button class="top-btn" style="justify-content:center;padding:8px;width:100%;" onclick="document.getElementById('keyModal').style.display='none'" id="uiCloseKeyBtn">Close</button>
     </div>
@@ -420,22 +397,15 @@
 
   <script>
     // =========================================================================
-    // 0. 自動清除舊版慢速緩存 + 純英文 / 純中文介面切換
+    // 0. 純英文 / 純中文介面切換
     // =========================================================================
-    // 徹底清除之前測試殘留的慢速 Key 緩存，避免舊緩存搶佔 V22 通道
-    localStorage.removeItem('tp_gemini_key');
-    localStorage.removeItem('tp_gemini_model');
-
-    let backupApiKey = (localStorage.getItem('tp_backup_gemini_key') || '').trim();
-    let backupGeminiModel = localStorage.getItem('tp_backup_gemini_model') || 'gemini-flash-latest';
-
     let currentLang = 'en';
     const UI_TEXT = {
       en: {
-        title: "Trees Pinyin",
-        keyBtnOff: "⚡ Backup Key",
-        keyBtnOn: "⚡ Backup Ready",
-        installBtnText: "Safari Icon",
+        title: "🌳 Trees Pinyin",
+        keyBtnOff: "⚡ VIP Key",
+        keyBtnOn: "⚡ VIP On",
+        installBtn: "📲 Safari Icon",
         langBtn: "中文",
         placeholder: "Ask AI, or enter text to translate...",
         aiBtn: "✨ AI Reply & Pinyin",
@@ -449,21 +419,21 @@
         exitBig: "✕ Exit Fullscreen",
         saveModalTitle: "Long-Press Image to Save",
         doneBtn: "Done",
-        installTitle: "Add Icon to Home Screen",
+        installTitle: "📲 Add Icon to Home Screen",
         installSteps: "<b>⚠️ Please open <span style=\"color:#1b5e20;\">treespinyin.com/app</span> in Safari (not Chrome):</b><br><br>1. Tap the <b>Share button [📤]</b> at the bottom center of Safari.<br>2. Scroll down and tap <b>\"Add to Home Screen [➕]\"</b>.<br>3. Tap <b>\"Add\"</b> at the top right.",
         gotItBtn: "OK",
-        keyModalTitle: "⚡ Backup Personal API Key",
-        keySteps: "<b>V22 High-Speed Channel is ALWAYS used first!</b><br>Your personal Google Gemini Key is only used as an automatic backup if public servers are crowded:<br><br>1. <a href=\"https://aistudio.google.com/app/apikey\" target=\"_blank\" style=\"color:#1565c0; font-weight:700;\">👉 Tap here to get a Free Key (Google AI Studio)</a><br>2. Sign in & tap <b>\"Create API key\"</b>.<br>3. Paste below (auto-upgrades to future Gemini models):",
-        keyPlaceholder: "Paste AIzaSy... backup key (optional)",
-        saveKeyBtn: "Save Backup Key",
+        keyModalTitle: "⚡ VIP Personal API Key",
+        keySteps: "Works for free out-of-the-box! When public servers are crowded, bind your own free Google Gemini Key for unlimited instant speed:<br><br>1. <a href=\"https://aistudio.google.com/app/apikey\" target=\"_blank\" style=\"color:#1565c0; font-weight:700;\">👉 Tap here to open Google AI Studio</a><br>2. Sign in & tap <b>\"Create API key\"</b> (Free).<br>3. Paste your key below (auto-upgrades to future Gemini models):",
+        keyPlaceholder: "Paste AIzaSy... key here (leave blank for free mode)",
+        saveKeyBtn: "Save Key",
         clearKeyBtn: "Clear",
         closeKeyBtn: "Close"
       },
       zh: {
-        title: "Trees Pinyin",
-        keyBtnOff: "⚡ 備用 Key",
-        keyBtnOn: "⚡ 備用已就緒",
-        installBtnText: "桌面圖標",
+        title: "🌳 Trees Pinyin",
+        keyBtnOff: "⚡ VIP Key",
+        keyBtnOn: "⚡ VIP 已開啟",
+        installBtn: "📲 桌面圖標",
         langBtn: "English",
         placeholder: "向 AI 提問，或輸入文字直接翻譯...",
         aiBtn: "✨ AI 回答並注音",
@@ -477,118 +447,133 @@
         exitBig: "✕ 退出全螢幕",
         saveModalTitle: "請長按下方圖片保存到手機相冊",
         doneBtn: "完成",
-        installTitle: "添加桌面圖標（請使用 Safari）",
+        installTitle: "📲 添加桌面圖標（請使用 Safari）",
         installSteps: "<b>⚠️ 請使用手機自帶的 Safari 瀏覽器打開本頁（Chrome 無法直接生成桌面圖標）：</b><br><br>1. 點擊 Safari 底部正中間的 <b>「分享按鈕 [📤]」</b>。<br>2. 往下滑動選單，點擊 <b>「加入主畫面 [➕]」</b>。<br>3. 點擊右上角「新增」即可。",
         gotItBtn: "知道了",
-        keyModalTitle: "⚡ 個人備用 API Key（僅在高峰擁堵時啟用）",
-        keySteps: "<b>系統永遠 100% 優先使用 V22 原生極速通道！</b><br>您綁定的個人免費 Google Gemini Key 僅作為「後備保險」，只有當未來用戶過多、公共通道限流時才會自動接管：<br><br>1. <a href=\"https://aistudio.google.com/app/apikey\" target=\"_blank\" style=\"color:#1565c0; font-weight:700;\">👉 點此打開 Google AI Studio 免費領取</a><br>2. 登入並點擊 <b>\"Create API key\"</b>。<br>3. 貼到下方保存（保存時自動鎖定最新模型，永久不過時）：",
-        keyPlaceholder: "貼上 AIzaSy... 備用 Key（選填）",
-        saveKeyBtn: "保存備用 Key",
+        keyModalTitle: "⚡ VIP 個人專屬極速 Key（永久不過時）",
+        keySteps: "本頁預設免配置即可免費使用！若遇高峰期人多擁擠，可綁定您個人的免費 Google Gemini Key 享受無限極速：<br><br>1. <a href=\"https://aistudio.google.com/app/apikey\" target=\"_blank\" style=\"color:#1565c0; font-weight:700;\">👉 點此打開 Google AI Studio 免費領取</a><br>2. 登入並點擊 <b>\"Create API key\"</b>。<br>3. 複製 Key 貼到下方保存（未來模型升級也會自動適配，永久有效）：",
+        keyPlaceholder: "貼上 AIzaSy... 開頭的 Key（留空則用預設免費通道）",
+        saveKeyBtn: "保存 Key",
         clearKeyBtn: "清除",
         closeKeyBtn: "關閉"
       }
     };
 
+    // =========================================================================
+    // 0.5 永久防過時個人 Key 增量補丁（未填 Key 時 0 耗時，100% 走 V22 原生極速通道）
+    // =========================================================================
+    let userApiKey = (localStorage.getItem('tp_gemini_key') || '').trim();
+    let activeGeminiModel = localStorage.getItem('tp_gemini_model') || 'gemini-flash-latest';
+
     function updateKeyBtnUI() {
       const btn = document.getElementById('uiKeyBtn');
       const t = UI_TEXT[currentLang];
-      if (backupApiKey) {
+      if (userApiKey) {
         btn.innerText = t.keyBtnOn;
-        btn.classList.add('vip-ready');
+        btn.classList.add('vip-on');
       } else {
         btn.innerText = t.keyBtnOff;
-        btn.classList.remove('vip-ready');
+        btn.classList.remove('vip-on');
       }
     }
 
     function openKeyModal() {
-      document.getElementById('apiKeyInput').value = backupApiKey;
-      const badge = document.getElementById('keyStatusBadge');
-      if (backupApiKey) {
-        badge.style.display = 'block';
-        badge.innerText = `✅ Backup Model Ready: ${backupGeminiModel}`;
-      } else {
-        badge.style.display = 'none';
-      }
+      document.getElementById('apiKeyInput').value = userApiKey;
       document.getElementById('keyModal').style.display = 'flex';
     }
 
-    // 鐵律 3：只在「點擊保存 Key」時在後台探測一次最新可用模型，絕不在用戶提問時探測！
-    async function detectBestModelOnSave(apiKey) {
+    function saveVipKey() {
+      userApiKey = document.getElementById('apiKeyInput').value.trim();
+      localStorage.setItem('tp_gemini_key', userApiKey);
+      if (userApiKey) autoDetectFastFlashModel(userApiKey);
+      updateKeyBtnUI();
+      document.getElementById('keyModal').style.display = 'none';
+    }
+
+    function clearVipKey() {
+      userApiKey = '';
+      localStorage.removeItem('tp_gemini_key');
+      localStorage.removeItem('tp_gemini_model');
+      activeGeminiModel = 'gemini-flash-latest';
+      document.getElementById('apiKeyInput').value = '';
+      updateKeyBtnUI();
+    }
+
+    // 永久防過時：自動向 Google 查詢該 Key 可用的最新正式版 Flash 模型（排除慢速 thinking/preview）
+    async function autoDetectFastFlashModel(apiKey) {
       try {
         const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(apiKey)}`);
-        if (!r.ok) return 'gemini-flash-latest';
         const d = await r.json();
         const models = d.models || [];
         if (models.some(m => m.name === 'models/gemini-flash-latest')) {
-          backupGeminiModel = 'gemini-flash-latest';
+          activeGeminiModel = 'gemini-flash-latest';
         } else {
           const fast = models.filter(m => {
             const n = (m.name || '').toLowerCase();
             return n.includes('gemini') && n.includes('flash') && !n.includes('thinking') && !n.includes('preview') && !n.includes('exp') && (m.supportedGenerationMethods || []).includes('generateContent');
           });
-          if (fast.length > 0) backupGeminiModel = fast[fast.length - 1].name.replace('models/', '');
+          if (fast.length > 0) activeGeminiModel = fast[fast.length - 1].name.replace('models/', '');
         }
-        localStorage.setItem('tp_backup_gemini_model', backupGeminiModel);
+        localStorage.setItem('tp_gemini_model', activeGeminiModel);
       } catch (e) {}
-      return backupGeminiModel;
+      return activeGeminiModel;
     }
 
-    async function saveBackupKey() {
-      const val = document.getElementById('apiKeyInput').value.trim();
-      const badge = document.getElementById('keyStatusBadge');
-      if (!val) {
-        clearBackupKey();
-        return;
-      }
-      backupApiKey = val;
-      localStorage.setItem('tp_backup_gemini_key', val);
-      updateKeyBtnUI();
-      badge.style.display = 'block';
-      badge.innerText = currentLang === 'en' ? '⏳ Detecting latest Gemini model...' : '⏳ 正在綁定最新世代模型...';
-      const m = await detectBestModelOnSave(val);
-      badge.innerText = currentLang === 'en' ? `✅ Saved! Backup model: ${m}` : `✅ 備用通道已就緒（模型：${m}）`;
-      setTimeout(() => {
-        document.getElementById('keyModal').style.display = 'none';
-      }, 600);
-    }
-
-    function clearBackupKey() {
-      backupApiKey = '';
-      localStorage.removeItem('tp_backup_gemini_key');
-      localStorage.removeItem('tp_backup_gemini_model');
-      backupGeminiModel = 'gemini-flash-latest';
-      document.getElementById('apiKeyInput').value = '';
-      document.getElementById('keyStatusBadge').style.display = 'none';
-      updateKeyBtnUI();
-    }
-
-    // 單次極速直連個人備用 Key（不帶任何實驗參數，絕不連續重試，僅在 V22 限流時觸發）
-    async function callBackupGeminiOnce(promptText, base64Img = null) {
-      if (!backupApiKey) return '';
+    // 極速流式調用個人 Key（邊收邊顯 + 0 思考延遲 + 404 自動換新模型重試）
+    async function streamWithUserKey(promptText, onLine, base64Img = null) {
+      if (!userApiKey) return false;
       const parts = [{ text: promptText }];
       if (base64Img && base64Img.includes(',')) {
         const mime = base64Img.substring(base64Img.indexOf(':') + 1, base64Img.indexOf(';'));
         parts.push({ inline_data: { mime_type: mime, data: base64Img.split(',')[1] } });
       }
-      try {
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/${backupGeminiModel}:generateContent?key=${encodeURIComponent(backupApiKey)}`;
-        const r = await fetch(url, {
+
+      async function reqStream(model, noThink) {
+        const cfg = { temperature: 0.3 };
+        if (noThink) cfg.thinkingConfig = { thinkingBudget: 0 };
+        return await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:streamGenerateContent?alt=sse&key=${encodeURIComponent(userApiKey)}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ contents: [{ parts }] })
+          body: JSON.stringify({ contents: [{ parts }], generationConfig: cfg })
         });
-        if (r.status === 404) {
-          // 若未來模型迭代，後台更新模型指針供下次使用
-          detectBestModelOnSave(backupApiKey);
-          return '';
-        }
-        if (!r.ok) return '';
-        const d = await r.json();
-        return d?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-      } catch (e) {
-        return '';
       }
+
+      try {
+        let res = await reqStream(activeGeminiModel, true);
+        if (res.status === 400) res = await reqStream(activeGeminiModel, false);
+        if (res.status === 404) {
+          await autoDetectFastFlashModel(userApiKey);
+          res = await reqStream(activeGeminiModel, false);
+        }
+        if (!res.ok || !res.body) return false;
+
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder('utf-8');
+        let sseBuf = '', textBuf = '', ok = false;
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          sseBuf += decoder.decode(value, { stream: true });
+          const lines = sseBuf.split('\n');
+          sseBuf = lines.pop() || '';
+          for (const line of lines) {
+            if (line.trim().startsWith('data:')) {
+              try {
+                const chunk = JSON.parse(line.trim().slice(5))?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+                textBuf += chunk;
+                let nl;
+                while ((nl = textBuf.indexOf('\n')) !== -1) {
+                  const one = textBuf.slice(0, nl).trim();
+                  textBuf = textBuf.slice(nl + 1);
+                  if (one) { ok = true; await onLine(one); }
+                }
+              } catch (e) {}
+            }
+          }
+        }
+        if (textBuf.trim()) { ok = true; await onLine(textBuf.trim()); }
+        return ok;
+      } catch (e) { return false; }
     }
 
     function toggleLang() {
@@ -596,7 +581,7 @@
       const t = UI_TEXT[currentLang];
       document.getElementById('uiTitle').innerText = t.title;
       updateKeyBtnUI();
-      document.getElementById('uiInstallBtnText').innerText = t.installBtnText;
+      document.getElementById('uiInstallBtn').innerText = t.installBtn;
       document.getElementById('uiLangBtn').innerText = t.langBtn;
       document.getElementById('userInput').placeholder = t.placeholder;
       document.getElementById('uiAIBtn').innerText = t.aiBtn;
@@ -815,7 +800,7 @@
       const block = document.createElement('div');
       block.className = 'sentence-block';
 
-      // 過濾可能夾雜的帶調拼音字符（如 ǐ ǎ à ě），杜絕亂碼
+      // 自動過濾夾雜的孤立帶調拼音字符（如 ǐ ǎ à ě），確保只保留純淨中文與正常文字
       const cleanRaw = rawZhText.replace(/[āáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ]+/gi, '').trim();
       const zhText = expandNumbersAndSymbolsToZh(cleanRaw);
       block.dataset.zh = zhText;
@@ -942,7 +927,7 @@
     }
 
     // =========================================================================
-    // 5. 分階段瀑布式 AI 引擎：鐵律 1（100% 永遠先跑 V22 原生通道！僅在 V22 失敗時走備用）
+    // 5. 分階段瀑布式 AI 引擎：1.先秒回對話框 -> 2.每做好一句立刻顯示一句並翻譯注音
     // =========================================================================
     let chromeAISession = null;
 
@@ -957,11 +942,11 @@
       replyBox.innerText = '⚡ ...';
       list.innerHTML = '';
 
-      // 100% 保持 V22 原版 Prompt 一字不改，確保命中邊緣極速路由
+      // 第一行給回答簡介；後面每行一句中文實用句（嚴格按用戶要求的句數輸出，禁止輸出漢語拼音）
       const fastPrompt = `User: "${q}".
-Reply concisely:
-Line 1: Brief helpful answer or dish/place intro in English & Chinese.
-From Line 2 onwards: Practical Chinese sentences for this situation (output the exact number of sentences the user asked for, or 2-3 sentences if not specified; if food/dish, include 微辣 mild spicy, 少鹽 less salt). Only output Chinese on lines 2+, one sentence per line.`;
+Reply concisely (do NOT output any pinyin):
+Line 1: Brief helpful answer in English & Chinese.
+From Line 2 onwards: Practical Chinese sentences for this situation (output the exact number of sentences the user asked for, or 2-3 sentences if not specified; if food/dish, include 微辣 mild spicy, 少鹽 less salt). Only output Chinese characters on lines 2+, one sentence per line.`;
 
       let renderedLineCount = 0;
 
@@ -980,6 +965,9 @@ From Line 2 onwards: Practical Chinese sentences for this situation (output the 
           await nextPaintTick();
         }
       }
+
+      // 若用戶綁定了個人 VIP Key，走極速流式專屬通道（未填 Key 時 0 耗時直接跳過）
+      if (userApiKey && await streamWithUserKey(fastPrompt, renderOneLineStaged)) return;
 
       // 優先 1：調用手機/桌面 Chrome 內置 AI 流式輸出 (promptStreaming)，邊生成邊逐行顯示
       try {
@@ -1015,99 +1003,81 @@ From Line 2 onwards: Practical Chinese sentences for this situation (output the 
         chromeAISession = null;
       }
 
-      // 優先 2（鐵律 1 & 2）：100% 原版 V22 極速輕量文本流接口 + 免費多節點自動輪詢（openai-fast -> openai -> mistral）
-      const freeModels = ['openai-fast', 'openai', 'mistral'];
-      for (const mName of freeModels) {
-        try {
-          const ctrl = new AbortController();
-          const tId = setTimeout(() => ctrl.abort(), mName === 'openai-fast' ? 4200 : 3500);
-          const r = await fetch('https://text.pollinations.ai/openai', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            signal: ctrl.signal,
-            body: JSON.stringify({
-              model: mName,
-              stream: true,
-              messages: [{ role: 'user', content: fastPrompt }]
-            })
-          });
-          clearTimeout(tId);
+      // 優先 2：極速輕量文本流接口（開啟 stream: true 邊收邊顯示，若返回整包也逐句分階段上屏）
+      try {
+        const r = await fetch('https://text.pollinations.ai/openai', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: 'openai-fast',
+            stream: true,
+            messages: [{ role: 'user', content: fastPrompt }]
+          })
+        });
 
-          if (r.ok && r.body) {
-            const cType = (r.headers.get('content-type') || '').toLowerCase();
-            if (cType.includes('event-stream')) {
-              const reader = r.body.getReader();
-              const decoder = new TextDecoder('utf-8');
-              let sseBuf = '';
-              let textBuf = '';
+        if (r.ok && r.body) {
+          const cType = (r.headers.get('content-type') || '').toLowerCase();
+          if (cType.includes('event-stream')) {
+            const reader = r.body.getReader();
+            const decoder = new TextDecoder('utf-8');
+            let sseBuf = '';
+            let textBuf = '';
 
-              while (true) {
-                const { done, value } = await reader.read();
-                if (done) break;
-                sseBuf += decoder.decode(value, { stream: true });
-                let lines = sseBuf.split('\n');
-                sseBuf = lines.pop() || '';
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) break;
+              sseBuf += decoder.decode(value, { stream: true });
+              let lines = sseBuf.split('\n');
+              sseBuf = lines.pop() || '';
 
-                for (const line of lines) {
-                  const tr = line.trim();
-                  if (tr.startsWith('data:')) {
-                    const dataStr = tr.slice(5).trim();
-                    if (!dataStr || dataStr === '[DONE]') continue;
-                    try {
-                      const j = JSON.parse(dataStr);
-                      const delta = j?.choices?.[0]?.delta?.content || '';
-                      if (delta) {
-                        textBuf += delta;
-                        let nl;
-                        while ((nl = textBuf.indexOf('\n')) !== -1) {
-                          const readyLine = textBuf.slice(0, nl).trim();
-                          textBuf = textBuf.slice(nl + 1);
-                          if (readyLine) await renderOneLineStaged(readyLine);
-                        }
+              for (const line of lines) {
+                const tr = line.trim();
+                if (tr.startsWith('data:')) {
+                  const dataStr = tr.slice(5).trim();
+                  if (!dataStr || dataStr === '[DONE]') continue;
+                  try {
+                    const j = JSON.parse(dataStr);
+                    const delta = j?.choices?.[0]?.delta?.content || '';
+                    if (delta) {
+                      textBuf += delta;
+                      let nl;
+                      while ((nl = textBuf.indexOf('\n')) !== -1) {
+                        const readyLine = textBuf.slice(0, nl).trim();
+                        textBuf = textBuf.slice(nl + 1);
+                        if (readyLine) await renderOneLineStaged(readyLine);
                       }
-                    } catch (e) {}
-                  }
+                    }
+                  } catch (e) {}
                 }
-              }
-              if (textBuf.trim()) await renderOneLineStaged(textBuf.trim());
-              if (renderedLineCount > 0) return;
-            } else {
-              const rawText = await r.text();
-              let fullOutput = rawText;
-              try {
-                const d = JSON.parse(rawText);
-                fullOutput = d?.choices?.[0]?.message?.content || '';
-              } catch (e) {}
-
-              if (fullOutput) {
-                const lines = fullOutput.split(/\n+/).map(l => l.trim()).filter(Boolean);
-                for (const line of lines) {
-                  await renderOneLineStaged(line);
-                }
-                if (renderedLineCount > 0) return;
               }
             }
-          }
-        } catch (e) {}
-      }
+            if (textBuf.trim()) await renderOneLineStaged(textBuf.trim());
+            if (renderedLineCount > 0) return;
+          } else {
+            const rawText = await r.text();
+            let fullOutput = rawText;
+            try {
+              const d = JSON.parse(rawText);
+              fullOutput = d?.choices?.[0]?.message?.content || '';
+            } catch (e) {}
 
-      // 優先 3（鐵律 1 & 3）：只有當上面 V22 免費節點全部因人多限流失敗時，才調用一次用戶的備用 Key！
-      if (backupApiKey) {
-        const backupText = await callBackupGeminiOnce(fastPrompt);
-        if (backupText) {
-          for (const line of backupText.split(/\n+/)) {
-            await renderOneLineStaged(line);
+            if (fullOutput) {
+              const lines = fullOutput.split(/\n+/).map(l => l.trim()).filter(Boolean);
+              for (const line of lines) {
+                await renderOneLineStaged(line);
+              }
+              if (renderedLineCount > 0) return;
+            }
           }
-          if (renderedLineCount > 0) return;
         }
-      }
+      } catch (e) {}
 
-      // 終極保底：直接逐句翻譯並注音
+      // 若輸入本身就是句子，直接逐句翻譯並注音
       await runDirectTranslate(q);
     }
 
     // =========================================================================
-    // 6. Google 相機圖標：100% 先跑 V22 原生 OCR + 視覺，僅在失敗時自動切換備用 Key
+    // 6. Google 相機圖標：拍照或選圖後，先識別名稱簡介 -> 再逐句翻譯注音
     // =========================================================================
     async function handlePhotoUpload(input) {
       if (!input.files || !input.files[0]) return;
@@ -1125,11 +1095,33 @@ From Line 2 onwards: Practical Chinese sentences for this situation (output the 
       prev.src = dataUrl;
       prev.style.display = 'block';
 
-      const vPrompt = `Look at this image:
+      const vPrompt = `Look at this image (do NOT output any pinyin):
 Line 1: Identify what dish, object, landmark, or text it is, with a 1-sentence intro (in English & Chinese).
-Line 2-3: 2 practical Chinese phrases for it (if food, include 微辣 mild spicy, 少鹽 less salt; if English text, translate it into Chinese).`;
+Line 2-3: 2 practical Chinese phrases for it (if food, include 微辣 mild spicy, 少鹽 less salt; if English text, translate it into Chinese). Only output Chinese characters on lines 2+, one sentence per line.`;
 
-      // 100% 原版 V22：同時啟動 (A) 極速 OCR 提取文字 + (B) 視覺 AI 識別菜餚/物品
+      // 若用戶綁定了個人 VIP Key，直接走極速流式視覺識別（未填 Key 時 0 耗時跳過）
+      if (userApiKey) {
+        let vCount = 0;
+        const vipOk = await streamWithUserKey(vPrompt, async (rawLine) => {
+          const clean = rawLine.replace(/^[-*•\d.)、]+\s*/, '').trim();
+          if (!clean) return;
+          vCount++;
+          if (vCount === 1) {
+            replyBox.innerHTML = `<b>${clean}</b>`;
+            await nextPaintTick();
+          } else if (/[\u4e00-\u9fa5]/.test(clean)) {
+            const pureZh = clean.replace(/[A-Za-zāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ()（）/]+/g, '').trim() || clean;
+            appendSentenceProgressive(pureZh, '');
+            await nextPaintTick();
+          }
+        }, dataUrl);
+        if (vipOk && vCount > 0) {
+          input.value = '';
+          return;
+        }
+      }
+
+      // 同時啟動：(A) 極速 OCR 提取文字 + (B) 視覺 AI 識別菜餚/物品並給出介紹
       const ocrPromise = (async () => {
         try {
           const fd = new FormData();
@@ -1173,13 +1165,7 @@ Line 2-3: 2 practical Chinese phrases for it (if food, include 微辣 mild spicy
       }
 
       // 接著當視覺 AI 完成菜品/物品分析後，先更新對話框簡介，再逐句顯示實用短語
-      let visionText = await visionPromise;
-
-      // 僅當 V22 免費視覺與 OCR 都因人多限流未返回時，才自動啟用備用 Key
-      if (!visionText && !ocrText && backupApiKey) {
-        visionText = await callBackupGeminiOnce(vPrompt, dataUrl);
-      }
-
+      const visionText = await visionPromise;
       if (visionText) {
         const vLines = visionText.split(/\n+/).map(l => l.replace(/^[-*•\d.]+\s*/, '').trim()).filter(Boolean);
         if (vLines.length > 0) {
