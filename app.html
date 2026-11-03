@@ -13,8 +13,9 @@
   <link rel="icon" type="image/png" href="icon.png">
   <link rel="shortcut icon" type="image/png" href="icon.png">
   <link id="appleTouchIcon" rel="apple-touch-icon" href="icon.png">
+  <link rel="apple-touch-icon-precomposed" href="icon.png">
 
-  <!-- 僅保留極速輕量核心庫 -->
+  <!-- 僅保留極速輕量核心庫（PDF與Word解析庫僅在用戶上傳對應文件時才按需秒載，0毫秒影響首屏速度！） -->
   <script src="https://cdn.jsdelivr.net/npm/pinyin-pro@3.19.6/dist/index.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
@@ -77,11 +78,20 @@
       font-weight: 600;
       cursor: pointer;
       color: #222;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
     }
     .top-btn.has-key {
       border-color: #2e7d32;
       color: #1b5e20;
       background: #e8f5e9;
+    }
+    .btn-mini-icon {
+      width: 16px;
+      height: 16px;
+      border-radius: 3px;
+      object-fit: cover;
     }
 
     /* 輸入控制區 */
@@ -351,7 +361,10 @@
     </div>
     <div class="header-btns">
       <button class="top-btn" onclick="openKeyModal()" id="uiKeyBtn">🔑 API Key</button>
-      <button class="top-btn" onclick="openInstallModal()" id="uiInstallBtn">📲 Safari Icon</button>
+      <button class="top-btn" onclick="openInstallModal()" id="uiInstallBtn">
+        <img src="icon.png" alt="" class="btn-mini-icon" onerror="this.style.display='none'">
+        <span id="uiInstallBtnText">Safari Icon</span>
+      </button>
       <button class="top-btn" onclick="toggleLang()" id="uiLangBtn">中文</button>
     </div>
   </div>
@@ -373,8 +386,8 @@
         </svg>
       </button>
 
-      <!-- 隱藏的文件與照片 Input -->
-      <input type="file" id="docFileInput" accept=".txt,.md,.csv,.json,.html,text/plain" style="display:none" onchange="handleDocFileUpload(this)">
+      <!-- 隱藏的文件（支持 PDF, Word .docx/.doc, Docs, TXT 等）與照片 Input -->
+      <input type="file" id="docFileInput" accept=".txt,.md,.csv,.json,.html,.rtf,.pdf,.docx,.doc,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword,text/plain" style="display:none" onchange="handleDocFileUpload(this)">
       <input type="file" id="galleryInput" accept="image/*" style="display:none" onchange="handlePhotoUpload(this)">
       <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none" onchange="handlePhotoUpload(this)">
     </div>
@@ -409,10 +422,10 @@
     <div class="modal-box">
       <h3 style="margin:0; font-size:1.05rem;" id="uiFileMenuTitle">📁 File & Camera Options</h3>
       
-      <!-- 選項 1：上傳文檔文件（本地毫秒級讀取注音） -->
+      <!-- 選項 1：上傳文檔文件（支持 PDF / Word / Docs / TXT 本地秒讀注音） -->
       <button class="option-card-btn" onclick="triggerDocUpload()">
         <div>
-          <div id="uiOptDocTitle">📄 Upload Text File (.txt / .md / .csv)</div>
+          <div id="uiOptDocTitle">📄 Upload File (PDF / Word / Docs / TXT)</div>
           <div style="font-size:0.78rem; color:#555; font-weight:400; margin-top:3px;" id="uiOptDocSub">Instant local reading & Pinyin translation</div>
         </div>
         <span>➔</span>
@@ -427,7 +440,7 @@
         <span>➔</span>
       </button>
 
-      <button class="top-btn" style="width:100%; padding:9px;" onclick="document.getElementById('fileMenuModal').style.display='none'" id="uiFileMenuCancel">Cancel</button>
+      <button class="top-btn" style="width:100%; padding:9px; justify-content:center;" onclick="document.getElementById('fileMenuModal').style.display='none'" id="uiFileMenuCancel">Cancel</button>
     </div>
   </div>
 
@@ -453,7 +466,7 @@
         <button class="btn btn-blue" onclick="triggerDirectCamera()" id="uiBtnTakePhoto">📸 Take Photo</button>
       </div>
 
-      <button class="top-btn" style="width:100%; padding:9px;" onclick="document.getElementById('cameraNoticeModal').style.display='none'" id="uiCamNoticeClose">Back</button>
+      <button class="top-btn" style="width:100%; padding:9px; justify-content:center;" onclick="document.getElementById('cameraNoticeModal').style.display='none'" id="uiCamNoticeClose">Back</button>
     </div>
   </div>
 
@@ -470,14 +483,14 @@
   <div class="modal" id="installModal">
     <div class="modal-box">
       <div style="display:flex; align-items:center; gap:10px;">
-        <img src="icon.png" alt="App Icon" style="width:42px; height:42px; border-radius:10px; border:1px solid #ddd;" onerror="this.style.display='none'">
-        <h3 style="margin:0; font-size:1.02rem;" id="uiInstallTitle">📲 Add Icon to Home Screen</h3>
+        <img src="icon.png" alt="App Icon" style="width:44px; height:44px; border-radius:10px; border:1px solid #ddd;" onerror="this.style.display='none'">
+        <h3 style="margin:0; font-size:1.02rem;" id="uiInstallTitle">Add Icon to Home Screen</h3>
       </div>
       <div id="uiInstallSteps" style="font-size:0.88rem; line-height:1.6; background:#f8f9fa; padding:12px; border-radius:8px;">
         <b>⚠️ Please open <span style="color:#1b5e20;">treespinyin.com/app</span> in Safari (not Chrome):</b><br><br>
         1. Tap the <b>Share button [📤]</b> at the bottom center of Safari.<br>
         2. Scroll down and tap <b>"Add to Home Screen [➕]"</b>.<br>
-        3. Tap <b>"Add"</b> at the top right.
+        3. Tap <b>"Add"</b> at the top right (uses <code>icon.png</code>).
       </div>
       <button class="btn btn-green" onclick="document.getElementById('installModal').style.display='none'" id="uiGotItBtn">OK</button>
     </div>
@@ -498,14 +511,37 @@
         <button class="btn btn-green" onclick="saveBackupKey()" id="uiKeySave">Save</button>
         <button class="btn btn-soft" style="flex:0.45;" onclick="clearBackupKey()" id="uiKeyClear">Clear</button>
       </div>
-      <button class="top-btn" style="width:100%;padding:8px;" onclick="document.getElementById('keyModal').style.display='none'" id="uiKeyClose">Close</button>
+      <button class="top-btn" style="width:100%;padding:8px;justify-content:center;" onclick="document.getElementById('keyModal').style.display='none'" id="uiKeyClose">Close</button>
     </div>
   </div>
 
   <script>
     // =========================================================================
-    // 0. 純英文 / 純中文介面切換 + 備用 Key 存取
+    // 0. 純英文 / 純中文介面切換 + 備用 Key 存取 + Web Manifest 綁定 icon.png
     // =========================================================================
+    (function injectManifestWithIconPng() {
+      try {
+        const iconUrl = new URL('icon.png', window.location.href).href;
+        const manifest = {
+          name: "Trees Pinyin",
+          short_name: "Trees Pinyin",
+          start_url: window.location.pathname || "./",
+          display: "standalone",
+          background_color: "#f5f7f9",
+          theme_color: "#1b5e20",
+          icons: [
+            { src: iconUrl, sizes: "192x192", type: "image/png" },
+            { src: iconUrl, sizes: "512x512", type: "image/png" }
+          ]
+        };
+        const blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+        const link = document.createElement('link');
+        link.rel = 'manifest';
+        link.href = URL.createObjectURL(blob);
+        document.head.appendChild(link);
+      } catch (e) {}
+    })();
+
     localStorage.removeItem('tp_gemini_key');
     localStorage.removeItem('tp_gemini_model');
 
@@ -517,7 +553,7 @@
       en: {
         title: "Trees Pinyin",
         keyBtn: "🔑 API Key",
-        installBtn: "📲 Safari Icon",
+        installBtnText: "Safari Icon",
         langBtn: "中文",
         placeholder: "Ask AI, or enter text to translate...",
         aiBtn: "✨ AI Reply & Pinyin",
@@ -531,8 +567,8 @@
         exitBig: "✕ Exit Fullscreen",
         saveModalTitle: "Long-Press Image to Save",
         doneBtn: "Done",
-        installTitle: "📲 Add Icon to Home Screen",
-        installSteps: "<b>⚠️ Please open <span style=\"color:#1b5e20;\">treespinyin.com/app</span> in Safari (not Chrome):</b><br><br>1. Tap the <b>Share button [📤]</b> at the bottom center of Safari.<br>2. Scroll down and tap <b>\"Add to Home Screen [➕]\"</b>.<br>3. Tap <b>\"Add\"</b> at the top right.",
+        installTitle: "Add Icon to Home Screen",
+        installSteps: "<b>⚠️ Please open <span style=\"color:#1b5e20;\">treespinyin.com/app</span> in Safari (not Chrome):</b><br><br>1. Tap the <b>Share button [📤]</b> at the bottom center of Safari.<br>2. Scroll down and tap <b>\"Add to Home Screen [➕]\"</b>.<br>3. Tap <b>\"Add\"</b> at the top right (uses <code>icon.png</code>).",
         gotItBtn: "OK",
         keyTitle: "🔑 Backup Gemini API Key",
         keyDesc: "<b>Default V22 high-speed mode works for free!</b><br>If public servers are busy, your personal Google Gemini Key will automatically step in:<br><br>1. <a href=\"https://aistudio.google.com/app/apikey\" target=\"_blank\" style=\"color:#1565c0; font-weight:700;\">👉 Get Free Key at Google AI Studio</a><br>2. Tap <b>\"Create API key\"</b> & paste below:",
@@ -540,7 +576,7 @@
         keyClear: "Clear",
         keyClose: "Close",
         fileMenuTitle: "📁 File & Camera Options",
-        optDocTitle: "📄 Upload Text File (.txt / .md / .csv)",
+        optDocTitle: "📄 Upload File (PDF / Word / Docs / TXT)",
         optDocSub: "Instant local reading & Pinyin translation",
         optCamTitle: "📷 Camera & Photo Library",
         optCamSub: "Recognize short text or objects from photos",
@@ -555,7 +591,7 @@
       zh: {
         title: "Trees Pinyin",
         keyBtn: "🔑 備用 Key",
-        installBtn: "📲 桌面圖標",
+        installBtnText: "桌面圖標",
         langBtn: "English",
         placeholder: "向 AI 提問，或輸入文字直接翻譯...",
         aiBtn: "✨ AI 回答並注音",
@@ -569,8 +605,8 @@
         exitBig: "✕ 退出全螢幕",
         saveModalTitle: "請長按下方圖片保存到手機相冊",
         doneBtn: "完成",
-        installTitle: "📲 添加桌面圖標（請使用 Safari）",
-        installSteps: "<b>⚠️ 請使用手機自帶的 Safari 瀏覽器打開本頁（Chrome 無法直接生成桌面圖標）：</b><br><br>1. 點擊 Safari 底部正中間的 <b>「分享按鈕 [📤]」</b>。<br>2. 往下滑動選單，點擊 <b>「加入主畫面 [➕]」</b>。<br>3. 點擊右上角「新增」即可。",
+        installTitle: "添加桌面圖標（請使用 Safari）",
+        installSteps: "<b>⚠️ 請使用手機自帶的 Safari 瀏覽器打開本頁（Chrome 無法直接生成桌面圖標）：</b><br><br>1. 點擊 Safari 底部正中間的 <b>「分享按鈕 [📤]」</b>。<br>2. 往下滑動選單，點擊 <b>「加入主畫面 [➕]」</b>。<br>3. 點擊右上角「新增」即可（自動使用 <code>icon.png</code> 圖標）。",
         gotItBtn: "知道了",
         keyTitle: "🔑 備用 Google Gemini Key",
         keyDesc: "<b>預設 100% 走 V22 極速免費通道！</b><br>當未來人數眾多、免費通道擁擠時，系統才會自動啟用您的個人 Key：<br><br>1. <a href=\"https://aistudio.google.com/app/apikey\" target=\"_blank\" style=\"color:#1565c0; font-weight:700;\">👉 點此打開 Google AI Studio 免費領取</a><br>2. 點擊 <b>\"Create API key\"</b> 並貼到下方：",
@@ -578,8 +614,8 @@
         keyClear: "清除",
         keyClose: "關閉",
         fileMenuTitle: "📁 文件上傳與拍照功能",
-        optDocTitle: "📄 上傳文本文件 (.txt / .md / .csv)",
-        optDocSub: "手機端本地秒速讀取，立即翻譯並注音",
+        optDocTitle: "📄 上傳文件 (PDF / Word / Docs / TXT)",
+        optDocSub: "手機端本地秒速提取文字，立即翻譯並注音",
         optCamTitle: "📷 拍照或從圖庫選圖",
         optCamSub: "適合圖片中字數很少或單個物品識別",
         fileMenuCancel: "取消",
@@ -658,7 +694,7 @@
       const t = UI_TEXT[currentLang];
       document.getElementById('uiTitle').innerText = t.title;
       document.getElementById('uiKeyBtn').innerText = t.keyBtn;
-      document.getElementById('uiInstallBtn').innerText = t.installBtn;
+      document.getElementById('uiInstallBtnText').innerText = t.installBtnText;
       document.getElementById('uiLangBtn').innerText = t.langBtn;
       document.getElementById('userInput').placeholder = t.placeholder;
       document.getElementById('uiAIBtn').innerText = t.aiBtn;
@@ -694,7 +730,7 @@
     }
 
     // =========================================================================
-    // 0.5 文件與拍照彈窗控制邏輯（先提示速度與蘋果相機提取建議，再選圖庫或拍照）
+    // 0.5 文件（TXT / PDF / Word / Docs）與拍照彈窗控制邏輯（按需秒載解析庫，不拖慢首屏）
     // =========================================================================
     function openFileMenuModal() {
       document.getElementById('fileMenuModal').style.display = 'flex';
@@ -720,20 +756,84 @@
       document.getElementById('cameraInput').click();
     }
 
-    // 本地讀取文本文件（毫秒級極速上屏並逐句翻譯注音）
-    function handleDocFileUpload(input) {
+    function loadScriptDynamic(src) {
+      return new Promise((resolve, reject) => {
+        if (document.querySelector(`script[src="${src}"]`)) return resolve();
+        const s = document.createElement('script');
+        s.src = src;
+        s.onload = resolve;
+        s.onerror = reject;
+        document.head.appendChild(s);
+      });
+    }
+
+    async function extractPdfTextFast(file) {
+      await loadScriptDynamic('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js');
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+      const buf = await file.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+      let out = [];
+      const maxPages = Math.min(pdf.numPages, 15); // 手機端極速讀取前15頁
+      for (let i = 1; i <= maxPages; i++) {
+        const page = await pdf.getPage(i);
+        const tc = await page.getTextContent();
+        const pageStr = tc.items.map(item => item.str).join(' ');
+        if (pageStr.trim()) out.push(pageStr.trim());
+      }
+      return out.join('\n');
+    }
+
+    async function extractWordTextFast(file) {
+      await loadScriptDynamic('https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js');
+      const buf = await file.arrayBuffer();
+      const res = await mammoth.extractRawText({ arrayBuffer: buf });
+      return (res.value || '').trim();
+    }
+
+    // 本地讀取 TXT / PDF / Word (.docx) / Docs 導出文件（像 TXT 一樣秒速讀取並逐句翻譯注音！）
+    async function handleDocFileUpload(input) {
       if (!input.files || !input.files[0]) return;
       const file = input.files[0];
-      const reader = new FileReader();
-      reader.onload = async (e) => {
-        const content = (e.target.result || '').trim();
-        if (content) {
-          document.getElementById('userInput').value = content.slice(0, 3000);
-          await runDirectTranslate(content.slice(0, 3000));
-        }
-      };
-      reader.readAsText(file, 'UTF-8');
+      const name = (file.name || '').toLowerCase();
       input.value = '';
+
+      showCardWrap();
+      const replyBox = document.getElementById('aiReplyBox');
+      replyBox.style.display = 'block';
+      replyBox.innerText = currentLang === 'en' ? `📄 Reading ${file.name}...` : `📄 正在極速讀取 ${file.name}...`;
+
+      try {
+        let extractedText = '';
+        if (name.endsWith('.pdf') || file.type === 'application/pdf') {
+          extractedText = await extractPdfTextFast(file);
+        } else if (name.endsWith('.docx') || file.type.includes('wordprocessingml')) {
+          extractedText = await extractWordTextFast(file);
+        } else {
+          extractedText = await file.text();
+          // 若是 HTML 或 Google Docs 網頁導出格式，自動剝離標籤保留純文字
+          if (name.endsWith('.html') || name.endsWith('.htm')) {
+            const tmp = document.createElement('div');
+            tmp.innerHTML = extractedText;
+            extractedText = tmp.innerText || tmp.textContent || '';
+          }
+        }
+
+        const clean = (extractedText || '').trim();
+        if (!clean) {
+          replyBox.innerText = currentLang === 'en'
+            ? '⚠️ No selectable text found in this file (it may be a scanned image PDF).'
+            : '⚠️ 未能從該文件中提取到文字（可能是純圖片掃描版 PDF）。';
+          return;
+        }
+
+        const clipped = clean.slice(0, 3000);
+        document.getElementById('userInput').value = clipped;
+        await runDirectTranslate(clipped);
+      } catch (err) {
+        replyBox.innerText = currentLang === 'en'
+          ? '⚠️ Failed to read file. Please save as .txt, .docx, or standard .pdf.'
+          : '⚠️ 讀取文件失敗，請確認為標準 .txt、.docx 或文字版 .pdf 文件。';
+      }
     }
 
     // =========================================================================
@@ -1071,7 +1171,6 @@ From Line 2 onwards: Practical Chinese sentences for this situation (output the 
 
       let renderedLineCount = 0;
 
-      // 逐行/逐段上屏：第 1 段先上頂部回答框，後續每句中文立即逐段渲染注音與翻譯
       async function renderOneLineStaged(rawLine) {
         const cleanLine = rawLine.replace(/^[-*•\d.)、]+\s*/, '').trim();
         if (!cleanLine) return;
@@ -1082,7 +1181,6 @@ From Line 2 onwards: Practical Chinese sentences for this situation (output the 
           await nextPaintTick();
         } else if (/[\u4e00-\u9fa5]/.test(cleanLine)) {
           const pureZh = cleanLine.replace(/[A-Za-zāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ()（）/]+/g, '').trim() || cleanLine;
-          // 若單段內包含多個句子，拆分為逐句立刻顯示
           const subSentences = pureZh.split(/(?<=[。！？!?])\s*/).map(s => s.trim()).filter(Boolean);
           for (const sub of subSentences) {
             appendSentenceProgressive(sub, '');
@@ -1091,7 +1189,6 @@ From Line 2 onwards: Practical Chinese sentences for this situation (output the 
         }
       }
 
-      // 優先 1：手機/桌面端內置 AI 流式輸出
       try {
         const lm = window.LanguageModel || (window.ai && window.ai.languageModel);
         if (lm) {
@@ -1119,7 +1216,6 @@ From Line 2 onwards: Practical Chinese sentences for this situation (output the 
         chromeAISession = null;
       }
 
-      // 優先 2：極速流式接口（邊接收邊逐段渲染上屏）
       try {
         const r = await fetch('https://text.pollinations.ai/openai', {
           method: 'POST',
@@ -1188,7 +1284,6 @@ From Line 2 onwards: Practical Chinese sentences for this situation (output the 
         }
       } catch (e) {}
 
-      // 優先 3：若設置了備用 Gemini Key，自動無縫接管並逐段顯示
       if (backupKey) {
         const fb = await fetchGeminiFallback(fastPrompt);
         if (fb) {
@@ -1203,7 +1298,7 @@ From Line 2 onwards: Practical Chinese sentences for this situation (output the 
     }
 
     // =========================================================================
-    // 6. 少量文字/物品極速圖片識別（保持 V22_fast_photo 架構並進一步壓縮提速）
+    // 6. 少量文字/物品極速圖片識別
     // =========================================================================
     async function handlePhotoUpload(input) {
       if (!input.files || !input.files[0]) return;
@@ -1216,7 +1311,6 @@ From Line 2 onwards: Practical Chinese sentences for this situation (output the 
       replyBox.innerText = currentLang === 'en' ? '📷 Analyzing photo...' : '📷 正在識別照片...';
       list.innerHTML = '';
 
-      // 480px 超輕量壓縮（~20KB），手機瞬間預覽並秒傳
       const dataUrl = await compressImg(file, 480, 0.6);
       const prev = document.getElementById('previewImg');
       prev.src = dataUrl;
@@ -1244,7 +1338,6 @@ Line 2-3: 2 practical Chinese phrases for it (if food, include 微辣 mild spicy
         }
       }
 
-      // 背景並行 OCR（針對少量文字圖片秒速提取）
       (async () => {
         try {
           const fd = new FormData();
@@ -1264,7 +1357,6 @@ Line 2-3: 2 practical Chinese phrases for it (if food, include 微辣 mild spicy
         } catch (e) {}
       })();
 
-      // 視覺 AI 流式輸出（逐段顯示）
       try {
         const r = await fetch('https://text.pollinations.ai/openai', {
           method: 'POST',
