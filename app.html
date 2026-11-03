@@ -63,11 +63,6 @@
       cursor: pointer;
       color: #222;
     }
-    .top-btn.has-key {
-      border-color: #2e7d32;
-      color: #1b5e20;
-      background: #e8f5e9;
-    }
 
     .panel {
       width: 100%;
@@ -206,6 +201,11 @@
       gap: 8px;
       padding-bottom: 16px;
       border-bottom: 1px dashed #eee;
+      animation: fadeInStage 0.18s ease-out;
+    }
+    @keyframes fadeInStage {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
     }
     .sentence-block.first-answer-block {
       background: #f9fbe7;
@@ -368,9 +368,8 @@
   </div>
 
   <script>
-    // =========================================================================
-    // 0. 純英文 / 純中文介面切換
-    // =========================================================================
+    const WORKER_GATEWAY_URL = "https://treespinyin-api.treespinyin.workers.dev";
+
     let currentLang = 'en';
     const UI_TEXT = {
       en: {
@@ -613,34 +612,22 @@
     }
 
     // =========================================================================
-    // 3. 漸進式極速渲染：每一段（包含第 1 段回答）都 100% 呈現「全英文 + Trees Pinyin + 漢字」
+    // 3. 真正的「0 阻塞分階段漸進式渲染」：
+    //    - 每一句都在 0 毫秒內同步插入畫面（絕不 await 網路翻譯後才顯示）！
+    //    - 階段與階段之間強制留出 85ms 獨立渲染幀，肉眼清晰看到一句一句依序跳出！
     // =========================================================================
     function showCardWrap() {
       document.getElementById('cardWrap').classList.add('visible');
     }
 
     function nextPaintTick() {
-      return new Promise(resolve => requestAnimationFrame(() => setTimeout(resolve, 20)));
+      return new Promise(resolve => requestAnimationFrame(() => setTimeout(resolve, 85)));
     }
 
-    function appendSentenceProgressive(rawZhText, enTranslation = '', isFirstAnswer = false) {
-      showCardWrap();
-      document.getElementById('aiReplyBox').style.display = 'none';
-
-      const list = document.getElementById('annotationList');
-      const block = document.createElement('div');
-      block.className = isFirstAnswer ? 'sentence-block first-answer-block' : 'sentence-block';
-
+    function fillCharRowNodes(charRow, block, rawZhText) {
+      charRow.innerHTML = '';
       const zhText = expandNumbersAndSymbolsToZh(rawZhText);
       block.dataset.zh = zhText;
-
-      const enDiv = document.createElement('div');
-      enDiv.className = 'en-line';
-      enDiv.innerText = enTranslation || '...';
-      block.appendChild(enDiv);
-
-      const charRow = document.createElement('div');
-      charRow.className = 'char-row';
       const pinyinList = getAccuratePinyinArray(zhText);
 
       for (let i = 0; i < zhText.length; i++) {
@@ -662,34 +649,24 @@
             }
           };
         } else if (isPunct) {
-          col.innerHTML = `<span class="tp-py">${char}</span><span class="tp-zh"> </span>`;
+          col.innerHTML = `<span class="tp-py">${char}</span><span class="tp-zh">&nbsp;</span>`;
         } else {
-          col.innerHTML = `<span class="tp-py"> </span><span class="tp-zh">${char}</span>`;
+          col.innerHTML = `<span class="tp-py">&nbsp;</span><span class="tp-zh">${char}</span>`;
         }
         charRow.appendChild(col);
       }
-
-      block.appendChild(charRow);
-      list.appendChild(block);
-
-      if (!enTranslation) {
-        translateFast(zhText, 'zh', 'en').then(en => {
-          enDiv.innerText = en;
-        });
-      }
-      return block;
+      return zhText;
     }
 
-    // 精準清洗並渲染任意一行（徹底剝離漢語拼音，確保全英文 + Trees Pinyin + 全中文）
-    async function renderBilingualBlock(rawLine, isFirstAnswer = false) {
+    // 0 毫秒同步上屏：不論拿到的是中文、英文或雙語，都在當前這一幀立刻畫到螢幕上，翻譯在背景非同步秒補齊！
+    function renderStageBlockInstant(rawLine, isFirstAnswer = false) {
       let s = rawLine.replace(/^(?:Line\s*\d+\s*[:：]|[-*•\d.)、]+)\s*/i, '').trim();
       if (!s || s.startsWith('{') || s.startsWith('<')) return false;
 
-      // 移除括號內帶聲調的普通漢語拼音（如 (Gōngbǎo Jīdīng)）與單詞
+      // 剝離帶聲調的普通漢語拼音（如 (Gōngbǎo Jīdīng)）
       s = s.replace(/[(\[（【][^)\]）】]*[āáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ][^)\]）】]*[)\]）】]/gi, '');
       s = s.replace(/\b\w*[āáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ]\w*\b/gi, '');
 
-      // 提取漢字部分與英文部分
       const zhMatches = s.match(/[\u4e00-\u9fa5，。！？；：、¥￥\d]+/g);
       let zhPart = zhMatches ? zhMatches.join('').replace(/^[，。！？；：、\s]+/, '').trim() : '';
       if (!/[\u4e00-\u9fa5]/.test(zhPart)) zhPart = '';
@@ -697,32 +674,49 @@
       let enPart = s.replace(/[\u4e00-\u9fa5，。！？；：、（）《》【】()|-]+/g, ' ').replace(/\s+/g, ' ').trim();
       if (!/[A-Za-z]{2,}/.test(enPart)) enPart = '';
 
-      // 情況 1：主要為英文句子（或僅夾帶一個短中文詞），先秒譯為完整中文再渲染
-      if (enPart && (zhPart.length < 4 && enPart.split(' ').length >= 4)) {
-        const fullZh = await translateFast(enPart, 'en', 'zh');
-        if (fullZh && /[\u4e00-\u9fa5]/.test(fullZh)) {
-          appendSentenceProgressive(fullZh, enPart, isFirstAnswer);
-          await nextPaintTick();
-          return true;
+      if (!zhPart && !enPart) return false;
+
+      showCardWrap();
+      document.getElementById('aiReplyBox').style.display = 'none';
+
+      const list = document.getElementById('annotationList');
+      const block = document.createElement('div');
+      block.className = isFirstAnswer ? 'sentence-block first-answer-block' : 'sentence-block';
+
+      const enDiv = document.createElement('div');
+      enDiv.className = 'en-line';
+      block.appendChild(enDiv);
+
+      const charRow = document.createElement('div');
+      charRow.className = 'char-row';
+      block.appendChild(charRow);
+      list.appendChild(block);
+
+      // 情況 A：已有完整中文句子（或中英皆有） -> 0ms 立即畫出漢字與 Trees Pinyin，背景補英文
+      if (zhPart && (zhPart.length >= 3 || !enPart || enPart.split(' ').length < 4)) {
+        const expandedZh = fillCharRowNodes(charRow, block, zhPart);
+        if (enPart && enPart.split(' ').length >= 2) {
+          enDiv.innerText = enPart;
+        } else {
+          enDiv.innerText = '...';
+          translateFast(expandedZh, 'zh', 'en').then(en => {
+            enDiv.innerText = en;
+          });
         }
-      }
-
-      // 情況 2：包含完整中文句子
-      if (zhPart) {
-        appendSentenceProgressive(zhPart, enPart, isFirstAnswer);
-        await nextPaintTick();
         return true;
       }
 
-      // 情況 3：純英文短句
-      if (enPart) {
-        const fullZh = await translateFast(enPart, 'en', 'zh');
-        appendSentenceProgressive(fullZh, enPart, isFirstAnswer);
-        await nextPaintTick();
-        return true;
-      }
-
-      return false;
+      // 情況 B：主要為英文句子 -> 0ms 立即畫出英文句子，背景非同步秒補漢字與 Trees Pinyin（絕不阻塞下一階段！）
+      enDiv.innerText = enPart;
+      charRow.innerHTML = `<span style="font-size:0.85rem;color:#888;">⚡ ...</span>`;
+      translateFast(enPart, 'en', 'zh').then(fullZh => {
+        if (fullZh && /[\u4e00-\u9fa5]/.test(fullZh)) {
+          fillCharRowNodes(charRow, block, fullZh);
+        } else if (zhPart) {
+          fillCharRowNodes(charRow, block, zhPart);
+        }
+      });
+      return true;
     }
 
     // =========================================================================
@@ -764,6 +758,7 @@
       }
     }
 
+    // 點擊「📝 Translate & Pinyin」：按句切分，分階段做好一句立刻跳出一句
     async function runDirectTranslate(inputOverride) {
       const raw = (inputOverride !== undefined ? inputOverride : document.getElementById('userInput').value).trim();
       if (!raw) return;
@@ -776,12 +771,16 @@
 
       const lines = raw.split(/\n+|(?<=[。！？.!?])\s*/).map(l => l.trim()).filter(Boolean);
       for (let line of lines) {
-        await renderBilingualBlock(line, false);
+        if (renderStageBlockInstant(line, false)) {
+          await nextPaintTick();
+        }
       }
     }
 
     // =========================================================================
-    // 5. V22 原生流式 AI 引擎：每一段（含第 1 段回答）均渲染為「全英文 + Trees Pinyin + 漢字」
+    // 5. 分階段瀑布式 AI 引擎：
+    //    - 第 1 階段：收到第 1 行立刻 0ms 畫出回答卡片（不再被 await translateFast 卡住）
+    //    - 第 2~3 階段：後續例句每隔 85ms 依序分階段滑出
     // =========================================================================
     let chromeAISession = null;
 
@@ -798,15 +797,18 @@
       list.innerHTML = '';
 
       const fastPrompt = `User: "${q}".
-Reply concisely in pure Chinese sentences (NO Pinyin, 1 sentence per line):
-Line 1: Direct 1-sentence helpful answer or intro in Chinese.
-Line 2-3: 2 practical Chinese sentences for this situation (if food/dish, include 微辣少鹽).`;
+Reply concisely:
+Line 1: Brief helpful answer or dish/place intro in English & Chinese (NO Pinyin).
+From Line 2 onwards: 2 practical Chinese sentences for this situation (if food/dish, include 微辣少鹽). Only output Chinese on lines 2+, one sentence per line, NO Pinyin.`;
 
       let renderedLineCount = 0;
 
       async function renderOneLineStaged(rawLine) {
-        const ok = await renderBilingualBlock(rawLine, renderedLineCount === 0);
-        if (ok) renderedLineCount++;
+        const ok = renderStageBlockInstant(rawLine, renderedLineCount === 0);
+        if (ok) {
+          renderedLineCount++;
+          await nextPaintTick();
+        }
       }
 
       // 優先 1：Chrome 內置 AI 流式輸出
@@ -836,7 +838,7 @@ Line 2-3: 2 practical Chinese sentences for this situation (if food/dish, includ
         chromeAISession = null;
       }
 
-      // 優先 2：V22 原版極速流式接口（移除誤殺請求的 4.5 秒定時器，邊收邊上屏）
+      // 優先 2：V22 極速輕量流式接口（邊收邊上屏，0 阻塞分階段顯示）
       for (const mdl of ['openai-fast', 'openai']) {
         try {
           const r = await fetch('https://text.pollinations.ai/openai', {
@@ -911,8 +913,24 @@ Line 2-3: 2 practical Chinese sentences for this situation (if food/dish, includ
     }
 
     // =========================================================================
-    // 6. V22 原版圖片識別（恢復 V22 純淨 3 參數 OCR + 視覺識別，全英文+中文+注音）
+    // 6. 極速照片識別（徹底修復「雜訊假鎖死」與「r.json() 崩潰」兩大 Bug！）
+    //    - 雙尺寸壓縮：OCR 用 760px 清晰圖提字，Vision AI 用 480px (18KB) 極速小圖識物
+    //    - 第 1 階段：OCR 若提取出真實文字（0.8~1.2秒），立即分階段逐句上屏！
+    //    - 第 2 階段：Vision AI 識別出菜品/物品/場景後，若 OCR 未提取到有效文字，立即分階段逐句上屏！
     // =========================================================================
+    function extractValidOcrLines(rawText) {
+      if (!rawText) return [];
+      return rawText
+        .replace(/\r\n/g, '\n')
+        .split(/\n+/)
+        .map(l => l.replace(/[|¦_~`^#*+=<>\[\]{}\\/]+/g, ' ').replace(/\s+/g, ' ').trim())
+        .filter(l => {
+          // 必須包含至少 1 個漢字，或至少 1 個 3 字母以上的英文單詞（徹底過濾 "12"、"--" 等背景雜訊！）
+          return /[\u4e00-\u9fa5]/.test(l) || /[A-Za-z]{3,}/.test(l);
+        })
+        .slice(0, 6);
+    }
+
     async function handlePhotoUpload(input) {
       if (!input.files || !input.files[0]) return;
       const file = input.files[0];
@@ -924,78 +942,87 @@ Line 2-3: 2 practical Chinese sentences for this situation (if food/dish, includ
       replyBox.innerText = currentLang === 'en' ? '📷 Analyzing photo...' : '📷 正在識別照片...';
       list.innerHTML = '';
 
-      // 560px 輕量壓縮（同時限制寬高，體積僅 ~25KB，手機秒傳）
-      const dataUrl = await compressImg(file, 560, 0.68);
+      // 一次讀取同時生成：760px 清晰 OCR 圖 + 480px (18KB) 極速視覺小圖
+      const { ocrDataUrl, visionDataUrl } = await compressImgDual(file);
       const prev = document.getElementById('previewImg');
-      prev.src = dataUrl;
+      prev.src = ocrDataUrl;
       prev.style.display = 'block';
 
-      let renderedAny = false;
+      let renderedCount = 0;
 
-      // (A) 100% 恢復 V22 原版純淨 3 參數 OCR（移除導致報錯的 scale: 'true'）
+      // (A) V22 原版純淨 3 參數 OCR 通道（專提圖片文字，0.8~1.2 秒返回）
       const ocrPromise = (async () => {
         try {
           const fd = new FormData();
-          fd.append('base64Image', dataUrl);
+          fd.append('base64Image', ocrDataUrl);
           fd.append('language', 'chs');
           fd.append('apikey', 'helloworld');
           const r = await fetch('https://api.ocr.space/parse/image', { method: 'POST', body: fd });
           const d = await r.json();
           const ocrText = d?.ParsedResults?.[0]?.ParsedText?.trim() || '';
-          if (ocrText && ocrText.length >= 2 && !renderedAny) {
-            const cleanLines = ocrText.replace(/\r\n/g, '\n').split(/\n+/).map(l => l.trim()).filter(Boolean).slice(0, 6);
-            if (cleanLines.length > 0) {
-              renderedAny = true;
-              document.getElementById('userInput').value = cleanLines.join('\n');
-              for (let i = 0; i < cleanLines.length; i++) {
-                await renderBilingualBlock(cleanLines[i], i === 0);
+          const validLines = extractValidOcrLines(ocrText);
+
+          if (validLines.length > 0 && renderedCount === 0) {
+            document.getElementById('userInput').value = validLines.join('\n');
+            for (let i = 0; i < validLines.length; i++) {
+              if (renderStageBlockInstant(validLines[i], renderedCount === 0)) {
+                renderedCount++;
+                await nextPaintTick();
               }
-              return true;
             }
           }
         } catch (e) {}
-        return false;
       })();
 
-      // (B) V22 視覺 AI 識別（當圖片無文字或為實物/菜品時自動渲染雙語注音）
+      // (B) 視覺 AI 通道（480px 18KB 極速上傳 + 相容純文本與 JSON + 多模型自動回退）
       const visionPromise = (async () => {
-        try {
-          const vPrompt = `Look at this image:
-Line 1: Identify what dish, object, landmark, or text it is in Chinese (1 short sentence, NO Pinyin).
-Line 2-3: 2 practical Chinese phrases for it (if food, include 微辣少鹽; if English text, translate it into Chinese).`;
-          const r = await fetch('https://text.pollinations.ai/openai', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              model: 'openai',
-              messages: [{
-                role: 'user',
-                content: [
-                  { type: 'text', text: vPrompt },
-                  { type: 'image_url', image_url: { url: dataUrl } }
-                ]
-              }]
-            })
-          });
-          const d = await r.json();
-          const visionText = d?.choices?.[0]?.message?.content || '';
-          if (visionText && !renderedAny) {
-            const vLines = visionText.split(/\n+/).map(l => l.trim()).filter(Boolean);
-            if (vLines.length > 0) {
-              renderedAny = true;
+        const vPrompt = `Look at this image:
+Line 1: Identify what dish, object, landmark, or text it is, with a 1-sentence intro in English & Chinese (NO Pinyin).
+Line 2-3: 2 practical Chinese phrases for it (if food, include 微辣少鹽; if English text, translate it into Chinese). Only output Chinese on lines 2+, one sentence per line, NO Pinyin.`;
+
+        for (const mdl of ['openai', 'openai-fast']) {
+          if (renderedCount > 0) return;
+          try {
+            const r = await fetch('https://text.pollinations.ai/openai', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                model: mdl,
+                messages: [{
+                  role: 'user',
+                  content: [
+                    { type: 'text', text: vPrompt },
+                    { type: 'image_url', image_url: { url: visionDataUrl } }
+                  ]
+                }]
+              })
+            });
+            if (!r.ok) continue;
+            // 關鍵修復：使用 r.text() 相容純文本與 JSON，絕不因 r.json() 拋錯而丟失識別結果！
+            const rawText = await r.text();
+            let visionText = rawText;
+            try {
+              const d = JSON.parse(rawText);
+              visionText = d?.choices?.[0]?.message?.content || rawText;
+            } catch (e) {}
+
+            if (visionText && !visionText.startsWith('{') && renderedCount === 0) {
+              const vLines = visionText.split(/\n+/).map(l => l.trim()).filter(Boolean);
               for (let i = 0; i < vLines.length; i++) {
-                await renderBilingualBlock(vLines[i], i === 0);
+                if (renderStageBlockInstant(vLines[i], renderedCount === 0)) {
+                  renderedCount++;
+                  await nextPaintTick();
+                }
               }
-              return true;
+              if (renderedCount > 0) return;
             }
-          }
-        } catch (e) {}
-        return false;
+          } catch (e) {}
+        }
       })();
 
       await Promise.allSettled([ocrPromise, visionPromise]);
 
-      if (!renderedAny) {
+      if (renderedCount === 0) {
         replyBox.style.display = 'block';
         replyBox.innerText = currentLang === 'en'
           ? '⚠️ Could not recognize photo. Please try a clearer photo.'
@@ -1005,21 +1032,30 @@ Line 2-3: 2 practical Chinese phrases for it (if food, include 微辣少鹽; if 
       input.value = '';
     }
 
-    function compressImg(file, maxDim, quality) {
+    function compressImgDual(file) {
       return new Promise((resolve) => {
         const reader = new FileReader();
         reader.onload = (e) => {
           const img = new Image();
           img.onload = () => {
-            const c = document.createElement('canvas');
-            let w = img.width, h = img.height;
-            if (w > maxDim || h > maxDim) {
-              if (w >= h) { h = Math.round((h * maxDim) / w); w = maxDim; }
-              else { w = Math.round((w * maxDim) / h); h = maxDim; }
+            function makeJpeg(maxDim, quality) {
+              const c = document.createElement('canvas');
+              let w = img.width, h = img.height;
+              if (w > maxDim || h > maxDim) {
+                if (w >= h) { h = Math.round((h * maxDim) / w); w = maxDim; }
+                else { w = Math.round((w * maxDim) / h); h = maxDim; }
+              }
+              c.width = w; c.height = h;
+              const ctx = c.getContext('2d');
+              ctx.fillStyle = '#ffffff';
+              ctx.fillRect(0, 0, w, h);
+              ctx.drawImage(img, 0, 0, w, h);
+              return c.toDataURL('image/jpeg', quality);
             }
-            c.width = w; c.height = h;
-            c.getContext('2d').drawImage(img, 0, 0, w, h);
-            resolve(c.toDataURL('image/jpeg', quality));
+            resolve({
+              ocrDataUrl: makeJpeg(760, 0.72),
+              visionDataUrl: makeJpeg(480, 0.60)
+            });
           };
           img.src = e.target.result;
         };
