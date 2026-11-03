@@ -207,7 +207,6 @@
       padding-bottom: 16px;
       border-bottom: 1px dashed #eee;
     }
-    /* 第一段（AI 回答問題本身或圖片識別首段）以淡綠底卡片突顯，且 100% 具備完整英文 + Trees Pinyin + 漢字 */
     .sentence-block.first-answer-block {
       background: #f9fbe7;
       border: 1px solid #dce775;
@@ -374,11 +373,11 @@
       <h3 style="margin:0; font-size:1.02rem;" id="uiKeyTitle">🔑 Backup Gemini API Key</h3>
       <div id="uiKeyDesc" style="font-size:0.85rem; line-height:1.55; background:#f8f9fa; padding:12px; border-radius:8px;">
         <b>High-Speed Mode is active by default!</b><br>
-        Optionally, you can also bind your own free Google Gemini Key:<br><br>
+        Optionally, you can also bind your own free Google AI Studio Key (`AIzaSy...`):<br><br>
         1. <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:#1565c0; font-weight:700;">👉 Get Free Key at Google AI Studio</a><br>
         2. Tap <b>"Create API key"</b> &amp; paste below:
       </div>
-      <input type="password" id="apiKeyInput" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;font-size:0.9rem;" placeholder="AQ.Ab8... or AIzaSy... (Optional)">
+      <input type="password" id="apiKeyInput" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;font-size:0.9rem;" placeholder="AIzaSy... (Optional)">
       <div class="row">
         <button class="btn btn-green" onclick="saveBackupKey()" id="uiKeySave">Save</button>
         <button class="btn btn-soft" style="flex:0.45;" onclick="clearBackupKey()" id="uiKeyClear">Clear</button>
@@ -388,8 +387,6 @@
   </div>
 
   <script>
-    const WORKER_GATEWAY_URL = "https://treespinyin-api.treespinyin.workers.dev";
-
     let currentLang = 'en';
     let backupKey = (localStorage.getItem('tp_v22_backup_key') || '').trim();
 
@@ -415,7 +412,7 @@
         installSteps: "<b>⚠️ Please open <span style=\"color:#1b5e20;\">treespinyin.com/app</span> in Safari (not Chrome):</b><br><br>1. Tap the <b>Share button [📤]</b> at the bottom center of Safari.<br>2. Scroll down and tap <b>\"Add to Home Screen [➕]\"</b>.<br>3. Tap <b>\"Add\"</b> at the top right.",
         gotItBtn: "OK",
         keyTitle: "🔑 Backup Gemini API Key",
-        keyDesc: "<b>High-Speed Mode is active by default!</b><br>Optionally, you can also bind your own free Google Gemini Key:<br><br>1. <a href=\"https://aistudio.google.com/app/apikey\" target=\"_blank\" style=\"color:#1565c0; font-weight:700;\">👉 Get Free Key at Google AI Studio</a><br>2. Tap <b>\"Create API key\"</b> &amp; paste below:",
+        keyDesc: "<b>High-Speed Mode is active by default!</b><br>Optionally, you can also bind your own free Google AI Studio Key:<br><br>1. <a href=\"https://aistudio.google.com/app/apikey\" target=\"_blank\" style=\"color:#1565c0; font-weight:700;\">👉 Get Free Key at Google AI Studio</a><br>2. Tap <b>\"Create API key\"</b> &amp; paste below:",
         keySave: "Save",
         keyClear: "Clear",
         keyClose: "Close"
@@ -678,7 +675,7 @@
     }
 
     // =========================================================================
-    // 3. 漸進式極速渲染：每一段（包含第一段回答）都 100% 呈現「全英文 + Trees Pinyin + 漢字」
+    // 3. 極速雙語注音渲染：0 毫秒先出漢字與 Trees Pinyin，0.15 秒自動補齊英文
     // =========================================================================
     function showCardWrap() {
       document.getElementById('cardWrap').classList.add('visible');
@@ -691,14 +688,12 @@
     function extractPureZh(line) {
       let s = line.replace(/^[-*•\d.)、]+\s*/, '').trim();
       s = s.replace(/\([^)\u4e00-\u9fa5]*\)/g, '').replace(/（[^）\u4e00-\u9fa5]*）/g, '');
-      let zhOnly = s.replace(/[A-Za-zāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ/|-]+/g, ' ').replace(/\s+/g, '').trim();
-      return zhOnly;
+      return s.replace(/[A-Za-zāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ/|-]+/g, ' ').replace(/\s+/g, '').trim();
     }
 
     function appendSentenceProgressive(rawZhText, enTranslation = '', isFirstAnswer = false) {
       showCardWrap();
-      const replyBox = document.getElementById('aiReplyBox');
-      replyBox.style.display = 'none';
+      document.getElementById('aiReplyBox').style.display = 'none';
 
       const list = document.getElementById('annotationList');
       const block = document.createElement('div');
@@ -754,11 +749,11 @@
       return block;
     }
 
-    async function renderFullBilingualLine(rawLine, isFirstAnswer = false) {
-      let line = rawLine.replace(/^[-*•\d.)、]+\s*/, '').trim();
-      if (!line || line.startsWith('{"error"')) return false;
+    // 無論輸入是中文、英文還是中英混合，100% 轉為「全英文 + Trees Pinyin + 全中文」，絕不丟棄任何有效行
+    async function renderAnyLine(rawLine, isFirstAnswer = false) {
+      let line = rawLine.replace(/^(Line\s*\d+\s*:|[-*•\d.)、]+)\s*/i, '').trim();
+      if (!line || line.startsWith('{') || line.startsWith('<')) return false;
 
-      // 若已是 English ||| 中文 雙語直出格式，0 延遲直接上屏（無需二次調用翻譯 API）
       if (line.includes('|||')) {
         const parts = line.split('|||').map(x => x.trim());
         const enPart = parts[0].replace(/[\u4e00-\u9fa5āáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ()（）]+/g, '').trim();
@@ -770,15 +765,15 @@
         }
       }
 
-      const zhPart = extractPureZh(line);
-      if (zhPart && /[\u4e00-\u9fa5]/.test(zhPart)) {
-        // 若同一行前半段自帶純英文句子，直接提取作為英文翻譯，免去網路請求
-        let enCandidate = line.replace(/[\u4e00-\u9fa5，。！？；：、（）《》【】āáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ/|-]+/g, ' ').replace(/\s+/g, ' ').trim();
-        if (enCandidate.split(' ').length < 2) enCandidate = '';
-        appendSentenceProgressive(zhPart, enCandidate, isFirstAnswer);
-        await nextPaintTick();
-        return true;
-      } else if (/[A-Za-z]/.test(line)) {
+      const hasZh = /[\u4e00-\u9fa5]/.test(line);
+      if (hasZh) {
+        const zhPart = extractPureZh(line);
+        if (zhPart) {
+          appendSentenceProgressive(zhPart, '', isFirstAnswer);
+          await nextPaintTick();
+          return true;
+        }
+      } else if (/[A-Za-z]{2,}/.test(line)) {
         const cleanEn = line.replace(/[āáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ]+/gi, '').trim();
         const zhTrans = await translateFast(cleanEn, 'en', 'zh');
         if (zhTrans && /[\u4e00-\u9fa5]/.test(zhTrans)) {
@@ -791,34 +786,27 @@
     }
 
     // =========================================================================
-    // 4. 多重競速翻譯引擎（Promise.any 0.3秒出結果）
+    // 4. 極速翻譯（Google 全球邊緣 GTX 接口，150ms 秒回）
     // =========================================================================
     async function translateFast(text, fromLang, toLang) {
       const src = fromLang.startsWith('zh') ? 'zh-CN' : 'en';
       const tgt = toLang.startsWith('zh') ? 'zh-CN' : 'en';
 
-      const tasks = [
-        fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=${src}&tl=${tgt}&dt=t&q=${encodeURIComponent(text)}`)
-          .then(r => r.json())
-          .then(d => {
-            const j = d?.[0]?.map(x => x[0]).join('');
-            if (j && j !== text) return j;
-            throw new Error('empty');
-          }),
-        fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${src}|${tgt}`)
-          .then(r => r.json())
-          .then(d => {
-            const t = d?.responseData?.translatedText;
-            if (t && !t.includes('MYMEMORY WARNING') && t.toLowerCase() !== text.toLowerCase()) return t;
-            throw new Error('empty');
-          })
-      ];
+      try {
+        const r = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=${src}&tl=${tgt}&dt=t&q=${encodeURIComponent(text)}`);
+        const d = await r.json();
+        const j = d?.[0]?.map(x => x[0]).join('');
+        if (j && j.trim()) return j.trim();
+      } catch (e) {}
 
       try {
-        return await Promise.any(tasks);
-      } catch (e) {
-        return text;
-      }
+        const r2 = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${src}|${tgt}`);
+        const d2 = await r2.json();
+        const t = d2?.responseData?.translatedText;
+        if (t && !t.includes('MYMEMORY WARNING')) return t.trim();
+      } catch (e) {}
+
+      return text;
     }
 
     async function runDirectTranslate(inputOverride) {
@@ -827,27 +815,17 @@
 
       showCardWrap();
       document.getElementById('previewImg').style.display = 'none';
-      const replyBox = document.getElementById('aiReplyBox');
-      replyBox.style.display = 'none';
-      const list = document.getElementById('annotationList');
-      list.innerHTML = '';
+      document.getElementById('aiReplyBox').style.display = 'none';
+      document.getElementById('annotationList').innerHTML = '';
 
       const lines = raw.split(/\n+|(?<=[。！？.!?])\s*/).map(l => l.trim()).filter(Boolean);
-      for (let line of lines) {
-        const hasChinese = /[\u4e00-\u9fa5]/.test(line);
-        if (hasChinese) {
-          appendSentenceProgressive(line, '', false);
-          await nextPaintTick();
-        } else {
-          const zhTrans = await translateFast(line, 'en', 'zh');
-          appendSentenceProgressive(zhTrans, line, false);
-          await nextPaintTick();
-        }
+      for (let i = 0; i < lines.length; i++) {
+        await renderAnyLine(lines[i], false);
       }
     }
 
     // =========================================================================
-    // 5. 極速 AI 回答（3 通道流式並發競速，1.5~2.5 秒秒出第一段，全英文+中文+注音）
+    // 5. 極速 AI 回答問題（單通道純流式，避免同 IP 併發觸發限流，第 1 句 1~2 秒秒出！）
     // =========================================================================
     async function runSmartAI(overrideInput) {
       const q = (overrideInput !== undefined ? overrideInput : document.getElementById('userInput').value).trim();
@@ -861,150 +839,138 @@
       replyBox.innerText = '⚡ ...';
       list.innerHTML = '';
 
-      // 讓 AI 直接按「English ||| 中文」輸出 3 行：第 1 行直接回答問題，第 2-3 行實用短句，免去二次翻譯等待！
-      const fastPrompt = `Q: "${q}"
-Reply in 3 lines using exact format: English sentence ||| 中文句子 (NO Pinyin).
-Line 1: Direct 1-sentence answer/intro in English ||| 對應中文回答
-Line 2: Practical sentence 1 in English ||| 實用中文短句1
-Line 3: Practical sentence 2 in English ||| 實用中文短句2`;
+      // 簡短純中文指令：AI 只需生成約 30 個漢字（耗時僅 1 秒），前端自動在 0.15 秒內配齊純正英文與 Trees Pinyin！
+      const shortPrompt = `用簡短中文回答「${q}」：第1行直接回答問題（1句話），第2至3行給出2句最實用的日常中文短句。規則：每行只輸出純中文句子，不要拼音，不要序號。`;
 
-      let activeChannel = null;
-      let lineIndex = 0;
-      const ctrlStream = new AbortController();
-      const ctrlGet = new AbortController();
-      const ctrlCf = new AbortController();
+      let renderedCount = 0;
 
-      async function onLineFromChannel(ch, rawLine) {
-        const tr = rawLine.replace(/^[-*•\d.)、]+\s*/, '').trim();
-        if (!tr || !/[\u4e00-\u9fa5]/.test(tr) || tr.startsWith('{')) return false;
-
-        if (!activeChannel) {
-          activeChannel = ch;
-          if (ch !== 'stream') ctrlStream.abort();
-          if (ch !== 'get') ctrlGet.abort();
-          if (ch !== 'cf') ctrlCf.abort();
-        }
-        if (activeChannel !== ch) return false;
-
-        const isFirst = (lineIndex === 0);
-        lineIndex++;
-        return await renderFullBilingualLine(tr, isFirst);
-      }
-
-      // 通道 A：V22 原生 SSE 流式輸出（生成第 1 行時立即上屏，不等全文結束！）
-      const streamTask = (async () => {
+      // 若用戶配置了標準 AIzaSy 備用 Key，優先直連 Google Gemini 2.5 Flash (0思考延遲，0.8秒極速)
+      if (backupKey && backupKey.startsWith('AIza')) {
         try {
-          const r = await fetch('https://text.pollinations.ai/openai', {
+          const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(backupKey)}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            signal: ctrlStream.signal,
             body: JSON.stringify({
-              model: 'openai-fast',
-              stream: true,
-              messages: [{ role: 'user', content: fastPrompt }]
+              contents: [{ parts: [{ text: shortPrompt }] }],
+              generationConfig: { temperature: 0.2, thinkingConfig: { thinkingBudget: 0 } }
             })
           });
-          if (!r.ok || !r.body) throw new Error('stream fail');
+          if (r.ok) {
+            const d = await r.json();
+            const txt = d?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+            for (const line of txt.split(/\n+/)) {
+              if (line.trim()) {
+                const ok = await renderAnyLine(line.trim(), renderedCount === 0);
+                if (ok) renderedCount++;
+              }
+            }
+            if (renderedCount > 0) return;
+          }
+        } catch (e) {}
+      }
+
+      // 單一乾淨 SSE 流式請求（絕不同時發 2 個請求去觸發 Pollinations 防刷懲罰隊列！）
+      const ctrl = new AbortController();
+      const timeoutId = setTimeout(() => {
+        if (renderedCount === 0) ctrl.abort();
+      }, 4500);
+
+      try {
+        const r = await fetch('https://text.pollinations.ai/openai', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          signal: ctrl.signal,
+          body: JSON.stringify({
+            model: 'openai-fast',
+            stream: true,
+            messages: [{ role: 'user', content: shortPrompt }]
+          })
+        });
+
+        if (r.ok && r.body) {
           const cType = (r.headers.get('content-type') || '').toLowerCase();
           if (cType.includes('event-stream')) {
             const reader = r.body.getReader();
             const decoder = new TextDecoder('utf-8');
             let sseBuf = '', textBuf = '';
+
             while (true) {
               const { done, value } = await reader.read();
               if (done) break;
               sseBuf += decoder.decode(value, { stream: true });
               let lines = sseBuf.split('\n');
               sseBuf = lines.pop() || '';
-              for (const l of lines) {
-                const s = l.trim();
-                if (s.startsWith('data:')) {
-                  const dStr = s.slice(5).trim();
-                  if (!dStr || dStr === '[DONE]') continue;
+
+              for (const line of lines) {
+                const tr = line.trim();
+                if (tr.startsWith('data:')) {
+                  const dataStr = tr.slice(5).trim();
+                  if (!dataStr || dataStr === '[DONE]') continue;
                   try {
-                    const j = JSON.parse(dStr);
+                    const j = JSON.parse(dataStr);
                     const delta = j?.choices?.[0]?.delta?.content || '';
                     if (delta) {
                       textBuf += delta;
                       let nl;
                       while ((nl = textBuf.indexOf('\n')) !== -1) {
-                        const one = textBuf.slice(0, nl).trim();
+                        const oneLine = textBuf.slice(0, nl).trim();
                         textBuf = textBuf.slice(nl + 1);
-                        if (one) await onLineFromChannel('stream', one);
+                        if (oneLine) {
+                          const ok = await renderAnyLine(oneLine, renderedCount === 0);
+                          if (ok) renderedCount++;
+                        }
                       }
                     }
                   } catch (e) {}
                 }
               }
             }
-            if (textBuf.trim()) await onLineFromChannel('stream', textBuf.trim());
+            if (textBuf.trim()) {
+              const ok = await renderAnyLine(textBuf.trim(), renderedCount === 0);
+              if (ok) renderedCount++;
+            }
           } else {
-            const raw = await r.text();
-            let txt = raw;
-            try { txt = JSON.parse(raw)?.choices?.[0]?.message?.content || raw; } catch (e) {}
-            for (const l of txt.split(/\n+/)) {
-              if (l.trim()) await onLineFromChannel('stream', l.trim());
+            const rawText = await r.text();
+            let fullOutput = rawText;
+            try {
+              fullOutput = JSON.parse(rawText)?.choices?.[0]?.message?.content || rawText;
+            } catch (e) {}
+            for (const line of fullOutput.split(/\n+/)) {
+              if (line.trim()) {
+                const ok = await renderAnyLine(line.trim(), renderedCount === 0);
+                if (ok) renderedCount++;
+              }
             }
           }
-          if (lineIndex > 0) return true;
-        } catch (e) {}
-        throw new Error('stream empty');
-      })();
-
-      // 通道 B：零預檢 GET 極速通道（無需 OPTIONS 握手，邊緣直連）
-      const getTask = (async () => {
-        try {
-          const url = `https://text.pollinations.ai/${encodeURIComponent(fastPrompt)}?model=openai-fast`;
-          const r = await fetch(url, { signal: ctrlGet.signal });
-          if (!r.ok) throw new Error('get fail');
-          const txt = await r.text();
-          for (const l of txt.split(/\n+/)) {
-            if (l.trim()) await onLineFromChannel('get', l.trim());
-          }
-          if (lineIndex > 0) return true;
-        } catch (e) {}
-        throw new Error('get empty');
-      })();
-
-      // 通道 C：Cloudflare 網關（若可用則參與競速，若未配置自動忽略絕不阻塞）
-      const cfTask = (async () => {
-        try {
-          const r = await fetch(WORKER_GATEWAY_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            signal: ctrlCf.signal,
-            body: JSON.stringify({ prompt: fastPrompt })
-          });
-          if (!r.ok) throw new Error('cf fail');
-          const raw = await r.text();
-          if (!raw || raw.includes('"error"')) throw new Error('cf err');
-          let txt = raw;
-          if (raw.trim().startsWith('{')) {
-            const d = JSON.parse(raw);
-            txt = d?.text || d?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-          }
-          for (const l of txt.split(/\n+/)) {
-            if (l.trim()) await onLineFromChannel('cf', l.trim());
-          }
-          if (lineIndex > 0) return true;
-        } catch (e) {}
-        throw new Error('cf empty');
-      })();
-
-      try {
-        await Promise.any([streamTask, getTask, cfTask]);
+        }
       } catch (e) {}
+      clearTimeout(timeoutId);
 
-      if (lineIndex === 0) {
+      // 若流式通道逾時未出字，立即用 GET 輕量接口秒回
+      if (renderedCount === 0) {
+        try {
+          const r2 = await fetch(`https://text.pollinations.ai/${encodeURIComponent(shortPrompt)}?model=openai-fast`);
+          if (r2.ok) {
+            const txt2 = await r2.text();
+            for (const line of txt2.split(/\n+/)) {
+              if (line.trim()) {
+                const ok = await renderAnyLine(line.trim(), renderedCount === 0);
+                if (ok) renderedCount++;
+              }
+            }
+          }
+        } catch (e) {}
+      }
+
+      if (renderedCount === 0) {
         await runDirectTranslate(q);
       }
     }
 
     // =========================================================================
-    // 6. 極速手機圖片文字識別與提煉注音（1.5 秒直接提取圖片文字 -> 提煉 -> 翻譯注音！）
-    //    - 無需修改 Cloudflare，手機本地自適應壓縮（同時限制寬與高 <= 780px）
-    //    - 雙引擎神經網路 OCR (OCREngine 2 + OCREngine 1) 與視覺通道同時並發競速！
-    //    - 誰先識別出文字（通常 1.2~1.8 秒），立刻提煉重點並生成雙語注音，絕不死等！
+    // 6. 極速圖片文字提取與翻譯注音（修復漏傳 language='chs' 與雙重請求限流問題！）
+    //    - 單次精準調用 ocr.space (language='chs' 同時識別中英文，1.2 秒極速返回)
+    //    - 識別出文字後，0 等待直接翻譯並標註 Trees Pinyin，總耗時 1.5 秒！
     // =========================================================================
     function distillOcrLines(rawOcrText) {
       if (!rawOcrText) return [];
@@ -1013,20 +979,34 @@ Line 3: Practical sentence 2 in English ||| 實用中文短句2`;
         .split(/\n+/)
         .map(l => l.replace(/[|¦_~`^#*+=<>\[\]{}\\/]+/g, ' ').replace(/\s+/g, ' ').trim())
         .filter(l => {
-          if (!l || l.length < 2) return false;
-          // 過濾純數字或純條碼符號行
+          if (!l || l.length < 1) return false;
           if (/^[\d\s.,:$¥￥%+-]+$/.test(l)) return false;
-          // 必須包含漢字或至少 2 個以上英文字母
           return /[\u4e00-\u9fa5]/.test(l) || /[A-Za-z]{2,}/.test(l);
         });
 
-      // 去重並提煉最核心的前 5 行文字，避免整頁雜亂小字刷屏
       const unique = [];
       for (const line of rawLines) {
         if (!unique.includes(line)) unique.push(line);
-        if (unique.length >= 5) break;
+        if (unique.length >= 6) break;
       }
       return unique;
+    }
+
+    async function runOcrOnce(dataUrl, engineNum) {
+      try {
+        const fd = new FormData();
+        fd.append('base64Image', dataUrl);
+        fd.append('language', 'chs'); // 關鍵修復：必須指定 chs 才能同時識別中文與英文！
+        fd.append('apikey', 'helloworld');
+        fd.append('OCREngine', String(engineNum));
+        fd.append('scale', 'true');
+        fd.append('isOverlayRequired', 'false');
+        const r = await fetch('https://api.ocr.space/parse/image', { method: 'POST', body: fd });
+        const d = await r.json();
+        return d?.ParsedResults?.[0]?.ParsedText || '';
+      } catch (e) {
+        return '';
+      }
     }
 
     async function handlePhotoUpload(input) {
@@ -1037,63 +1017,38 @@ Line 3: Practical sentence 2 in English ||| 實用中文短句2`;
       const replyBox = document.getElementById('aiReplyBox');
       const list = document.getElementById('annotationList');
       replyBox.style.display = 'block';
-      replyBox.innerText = currentLang === 'en' ? '📷 Reading text from photo...' : '📷 正在快速識別圖片文字...';
+      replyBox.innerText = currentLang === 'en' ? '📷 Extracting text from photo...' : '📷 正在快速提取圖片文字...';
       list.innerHTML = '';
 
-      // 同時限制寬與高最大 780px（解決手機豎屏長圖過大導致上傳慢或 OCR 拒收的問題）
-      const dataUrl = await compressImg(file, 780, 0.72);
+      // 同時限制寬高 <= 800px，手機豎拍/橫拍均 0.1 秒上傳完畢
+      const dataUrl = await compressImg(file, 800, 0.74);
       const prev = document.getElementById('previewImg');
       prev.src = dataUrl;
       prev.style.display = 'block';
 
-      let hasRendered = false;
+      // 第一步：單通道極速 OCR 提取文字（避免雙請求並發被 ocr.space 封鎖）
+      let ocrText = await runOcrOnce(dataUrl, 1);
+      let lines = distillOcrLines(ocrText);
 
-      // 輔助函數：拿到提取出的多行文字後，立刻提煉並逐行翻譯注音上屏
-      async function renderExtractedLinesNow(linesArray) {
-        if (hasRendered || !linesArray || linesArray.length === 0) return false;
-        hasRendered = true;
-        for (let i = 0; i < linesArray.length; i++) {
-          await renderFullBilingualLine(linesArray[i], i === 0);
-        }
-        return true;
+      // 若 Engine 1 未提取到文字（例如藝術字或特殊背景菜單），自動嘗試 Engine 2（同樣帶 language='chs'）
+      if (lines.length === 0) {
+        ocrText = await runOcrOnce(dataUrl, 2);
+        lines = distillOcrLines(ocrText);
       }
 
-      // 通道 1：OCR Engine 2（專為手機拍照、菜單、路標、中英混合設計的高精度神經網路 OCR，約 1.3 秒）
-      const ocrEngine2Task = (async () => {
-        const fd = new FormData();
-        fd.append('base64Image', dataUrl);
-        fd.append('apikey', 'helloworld');
-        fd.append('OCREngine', '2');
-        fd.append('scale', 'true');
-        const r = await fetch('https://api.ocr.space/parse/image', { method: 'POST', body: fd });
-        const d = await r.json();
-        const text = d?.ParsedResults?.[0]?.ParsedText || '';
-        const distilled = distillOcrLines(text);
-        if (distilled.length > 0 && await renderExtractedLinesNow(distilled)) return true;
-        throw new Error('ocr2 empty');
-      })();
+      // 只要提取到圖片文字，立刻填入輸入框並 0 延遲直接翻譯注音上屏！
+      if (lines.length > 0) {
+        document.getElementById('userInput').value = lines.join('\n');
+        for (let i = 0; i < lines.length; i++) {
+          await renderAnyLine(lines[i], i === 0);
+        }
+        input.value = '';
+        return;
+      }
 
-      // 通道 2：OCR Engine 1 中文高速通道（針對書本、印刷體中文，約 1.2 秒）
-      const ocrEngine1Task = (async () => {
-        const fd = new FormData();
-        fd.append('base64Image', dataUrl);
-        fd.append('language', 'chs');
-        fd.append('apikey', 'helloworld');
-        fd.append('OCREngine', '1');
-        const r = await fetch('https://api.ocr.space/parse/image', { method: 'POST', body: fd });
-        const d = await r.json();
-        const text = d?.ParsedResults?.[0]?.ParsedText || '';
-        const distilled = distillOcrLines(text);
-        if (distilled.length > 0 && await renderExtractedLinesNow(distilled)) return true;
-        throw new Error('ocr1 empty');
-      })();
-
-      // 通道 3：視覺 AI 提煉通道（針對無文字實物照片，或同時提煉圖片核心內容）
-      const visionTask = (async () => {
-        const vPrompt = `Extract key text from this image, or identify the object/dish if there is no text.
-Output 2 to 3 lines in format: English ||| 中文 (NO Pinyin).
-Line 1: Key extracted text or object name in English ||| 提煉出的核心中文或物品名稱
-Line 2: Practical Chinese sentence in English ||| 實用中文句子`;
+      // 若照片上沒有文字（例如拍了一道菜或一件物品），才調用視覺模型識別物品並注音
+      try {
+        const vPrompt = `識別這張圖片裡的物品或菜品，只輸出2行純中文（第1行是什麼物品，第2行一句實用中文短句，不要拼音）。`;
         const r = await fetch('https://text.pollinations.ai/openai', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -1108,31 +1063,30 @@ Line 2: Practical Chinese sentence in English ||| 實用中文句子`;
             }]
           })
         });
-        if (!r.ok) throw new Error('vision fail');
-        const raw = await r.text();
-        let txt = raw;
-        try { txt = JSON.parse(raw)?.choices?.[0]?.message?.content || raw; } catch (e) {}
-        const lines = txt.split(/\n+/).map(l => l.trim()).filter(l => /[\u4e00-\u9fa5]/.test(l));
-        if (lines.length > 0 && await renderExtractedLinesNow(lines)) return true;
-        throw new Error('vision empty');
-      })();
-
-      // 三通道真正並發競速（Promise.any）：OCR 1.3 秒一出字立刻顯示，絕不等慢速通道！
-      try {
-        await Promise.any([ocrEngine2Task, ocrEngine1Task, visionTask]);
+        if (r.ok) {
+          const raw = await r.text();
+          let txt = raw;
+          try { txt = JSON.parse(raw)?.choices?.[0]?.message?.content || raw; } catch (e) {}
+          const vLines = txt.split(/\n+/).map(l => l.trim()).filter(Boolean);
+          let count = 0;
+          for (const vl of vLines) {
+            const ok = await renderAnyLine(vl, count === 0);
+            if (ok) count++;
+          }
+          if (count > 0) {
+            input.value = '';
+            return;
+          }
+        }
       } catch (e) {}
 
-      if (!hasRendered) {
-        replyBox.style.display = 'block';
-        replyBox.innerText = currentLang === 'en'
-          ? '⚠️ No clear text found on photo. Please take a closer photo of the text.'
-          : '⚠️ 未識別到清晰文字，請將鏡頭靠近文字再拍一張。';
-      }
-
+      replyBox.style.display = 'block';
+      replyBox.innerText = currentLang === 'en'
+        ? '⚠️ Could not read text clearly. Please take a closer photo of the text.'
+        : '⚠️ 未識別到清晰文字，請將鏡頭靠近文字再拍一張。';
       input.value = '';
     }
 
-    // 修復手機豎拍長圖壓縮：同時限制寬度與高度不超過 maxDim
     function compressImg(file, maxDim, quality) {
       return new Promise((resolve) => {
         const reader = new FileReader();
