@@ -1,4 +1,4 @@
-const CACHE_NAME = 'trees-pinyin-v22-commercial-v24';
+const CACHE_NAME = 'trees-pinyin-v22-commercial-v25';
 const ASSETS_TO_CACHE = [
   './',
   './app.html',
