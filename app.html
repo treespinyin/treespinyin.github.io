@@ -12,7 +12,6 @@
   <link rel="icon" type="image/png" href="icon.png">
   <link id="appleTouchIcon" rel="apple-touch-icon" href="icon.png">
 
-  <!-- 僅保留極速輕量核心庫，徹底移除拖慢速度的龐大視覺庫 -->
   <script src="https://cdn.jsdelivr.net/npm/pinyin-pro@3.19.6/dist/index.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
@@ -39,7 +38,6 @@
       min-height: 100vh;
     }
 
-    /* 頂部極簡導航 */
     .header {
       width: 100%;
       max-width: 540px;
@@ -71,7 +69,6 @@
       background: #e8f5e9;
     }
 
-    /* Google 風格極簡輸入控制區 */
     .panel {
       width: 100%;
       max-width: 540px;
@@ -104,7 +101,6 @@
       padding: 4px 0;
       background: transparent;
     }
-    /* 類似 Google 拍照翻譯與語音的圓形圖標按鈕 */
     .icon-action {
       width: 40px;
       height: 40px;
@@ -148,7 +144,6 @@
     .btn-soft { background: var(--accent-soft); color: var(--accent); border: 1px solid #c8e6c9; }
     .btn-dark { background: #222; color: #fff; font-size: 0.78rem; padding: 7px 11px; flex: unset; }
 
-    /* 輸出卡片區（初始隱藏，居中美觀留白） */
     .card-wrap {
       width: 100%;
       max-width: 540px;
@@ -189,10 +184,10 @@
       background: #f9fbe7;
       border: 1px solid #dce775;
       border-radius: 12px;
-      padding: 12px 16px;
-      font-size: 0.96rem;
-      color: #111;
-      line-height: 1.5;
+      padding: 10px 14px;
+      font-size: 0.92rem;
+      color: #333;
+      line-height: 1.4;
       text-align: center;
       display: none;
     }
@@ -211,6 +206,13 @@
       gap: 8px;
       padding-bottom: 16px;
       border-bottom: 1px dashed #eee;
+    }
+    /* 第一段（AI 直接回答或照片識別結論）加淡綠底色突顯，且同樣具備完整英文 + Trees Pinyin + 漢字 */
+    .sentence-block.first-answer-block {
+      background: #f9fbe7;
+      border: 1px solid #dce775;
+      border-radius: 14px;
+      padding: 14px 12px;
     }
     .sentence-block:last-child { border-bottom: none; padding-bottom: 0; }
     .en-line {
@@ -256,7 +258,6 @@
       min-height: 1.25em;
     }
 
-    /* 橫屏/全螢幕大字模式 */
     body.big-mode {
       position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
       background: #fff; padding: 0; z-index: 99999; overflow-y: auto;
@@ -273,7 +274,6 @@
     body.big-mode .tp-py { font-size: 1.95rem; }
     body.big-mode .tp-zh { font-size: 2.6rem; }
     body.big-mode .en-line { font-size: 1.55rem; }
-    body.big-mode .ai-reply-box { font-size: 1.25rem; }
     .exit-big-btn {
       display: none; position: fixed; top: 14px; right: 14px;
       background: #111; color: #fff; border: none; border-radius: 20px;
@@ -281,7 +281,6 @@
     }
     body.big-mode .exit-big-btn { display: block; }
 
-    /* 彈窗 */
     .modal {
       display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
       background: rgba(0,0,0,0.6); z-index: 9999; justify-content: center; align-items: center; padding: 16px;
@@ -311,19 +310,16 @@
     </div>
   </div>
 
-  <!-- 極簡操作面板：Google 相機圖標（含拍照與圖庫兩個系統選項）+ 單一語音按鈕 -->
   <div class="panel">
     <div class="search-box">
       <textarea id="userInput" rows="2" placeholder="Ask AI, or enter text to translate..."></textarea>
       
-      <!-- 語音輸入按鈕 -->
       <button class="icon-action" id="micBtn" onclick="toggleVoice()" title="Voice Input">
         <svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.91-3c-.49 0-.9.36-.98.85C16.52 14.2 14.47 16 12 16s-4.52-1.8-4.93-4.15c-.08-.49-.49-.85-.98-.85-.61 0-1.09.54-1 1.14.49 3 2.89 5.35 5.91 5.78V20c0 .55.45 1 1 1s1-.45 1-1v-2.08c3.02-.43 5.42-2.78 5.91-5.78.1-.6-.39-1.14-1-1.14z"/></svg>
       </button>
 
-      <!-- Google Lens 風格相機圖標（點擊自動彈出「拍照」與「圖庫」兩個選項） -->
       <label class="icon-action" title="Camera or Photo Library">
-        <svg viewBox="0 0 24 24"><path d="M12 10.9c-.61 0-1.1.49-1.1 1.1s.49 1.1 1.1 1.1c.61 0 1.1-.49 1.1-1.1s-.49-1.1-1.1-1.1zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8 0-1.85.63-3.55 1.69-4.9L16.9 18.31C15.55 19.37 13.85 20 12 20zm6.31-3.1L7.1 5.69C8.45 4.63 10.15 4 12 4c4.41 0 8 3.59 8 8 0 1.85-.63 3.55-1.69 4.9z" opacity="0"/><path d="M9 3L7.17 5H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2h-3.17L15 3H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.65 0-3 1.35-3 3s1.35 3 3 3 3-1.35 3-3-1.35-3-3-3z"/></svg>
+        <svg viewBox="0 0 24 24"><path d="M9 3L7.17 5H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2h-3.17L15 3H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.65 0-3 1.35-3 3s1.35 3 3 3 3-1.35 3-3-1.35-3-3-3z"/></svg>
         <input type="file" id="photoInput" accept="image/*" style="display:none" onchange="handlePhotoUpload(this)">
       </label>
     </div>
@@ -335,7 +331,6 @@
     </div>
   </div>
 
-  <!-- 輸出卡片區（預設隱藏，先出對話框回答 -> 再一句一句出翻譯與注音） -->
   <div class="card-wrap" id="cardWrap">
     <div class="toolbar">
       <span style="font-size:0.75rem; color:#666;" id="uiHint">💡 Tap any Chinese character to edit pinyin</span>
@@ -353,7 +348,6 @@
     </div>
   </div>
 
-  <!-- 保存圖片彈窗 -->
   <div class="modal" id="imgModal">
     <div class="modal-box" style="align-items:center; text-align:center;">
       <h3 style="margin:0; font-size:0.98rem;" id="uiSaveModalTitle">Long-Press Image to Save</h3>
@@ -362,7 +356,6 @@
     </div>
   </div>
 
-  <!-- 桌面圖標說明彈窗（明確告知使用 Safari） -->
   <div class="modal" id="installModal">
     <div class="modal-box">
       <h3 style="margin:0; font-size:1.02rem;" id="uiInstallTitle">📲 Add Icon to Home Screen</h3>
@@ -376,15 +369,14 @@
     </div>
   </div>
 
-  <!-- 備用 API Key 彈窗（已內置 Cloudflare 商業網關，此處僅供重度用戶自選備用） -->
   <div class="modal" id="keyModal">
     <div class="modal-box">
       <h3 style="margin:0; font-size:1.02rem;" id="uiKeyTitle">🔑 Backup Gemini API Key</h3>
       <div id="uiKeyDesc" style="font-size:0.85rem; line-height:1.55; background:#f8f9fa; padding:12px; border-radius:8px;">
-        <b>Cloudflare Edge Gateway &amp; V22 High-Speed Mode are active by default!</b><br>
+        <b>Cloudflare Edge Gateway & V22 High-Speed Mode are active by default!</b><br>
         Optionally, you can also bind your own free Google Gemini Key:<br><br>
         1. <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:#1565c0; font-weight:700;">👉 Get Free Key at Google AI Studio</a><br>
-        2. Tap <b>"Create API key"</b> &amp; paste below:
+        2. Tap <b>"Create API key"</b> & paste below:
       </div>
       <input type="password" id="apiKeyInput" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;font-size:0.9rem;" placeholder="AQ.Ab8... or AIzaSy... (Optional)">
       <div class="row">
@@ -396,18 +388,11 @@
   </div>
 
   <script>
-    // =========================================================================
-    // 0. 雲端 Cloudflare 商業網關地址 + 純英文/純中文介面切換
-    // =========================================================================
     const WORKER_GATEWAY_URL = "https://treespinyin-api.treespinyin.workers.dev";
-
-    // 自動清理舊版可能拖慢速度的緩存變數
-    localStorage.removeItem('tp_gemini_key');
-    localStorage.removeItem('tp_gemini_model');
 
     let currentLang = 'en';
     let backupKey = (localStorage.getItem('tp_v22_backup_key') || '').trim();
-    let backupModel = localStorage.getItem('tp_v22_backup_model') || 'gemini-flash-latest';
+    let backupModel = localStorage.getItem('tp_v22_backup_model') || 'gemini-2.5-flash';
 
     const UI_TEXT = {
       en: {
@@ -431,7 +416,7 @@
         installSteps: "<b>⚠️ Please open <span style=\"color:#1b5e20;\">treespinyin.com/app</span> in Safari (not Chrome):</b><br><br>1. Tap the <b>Share button [📤]</b> at the bottom center of Safari.<br>2. Scroll down and tap <b>\"Add to Home Screen [➕]\"</b>.<br>3. Tap <b>\"Add\"</b> at the top right.",
         gotItBtn: "OK",
         keyTitle: "🔑 Backup Gemini API Key",
-        keyDesc: "<b>Cloudflare Edge Gateway &amp; V22 High-Speed Mode are active by default!</b><br>Optionally, you can also bind your own free Google Gemini Key:<br><br>1. <a href=\"https://aistudio.google.com/app/apikey\" target=\"_blank\" style=\"color:#1565c0; font-weight:700;\">👉 Get Free Key at Google AI Studio</a><br>2. Tap <b>\"Create API key\"</b> &amp; paste below:",
+        keyDesc: "<b>Cloudflare Edge Gateway & V22 High-Speed Mode are active by default!</b><br>Optionally, you can also bind your own free Google Gemini Key:<br><br>1. <a href=\"https://aistudio.google.com/app/apikey\" target=\"_blank\" style=\"color:#1565c0; font-weight:700;\">👉 Get Free Key at Google AI Studio</a><br>2. Tap <b>\"Create API key\"</b> & paste below:",
         keySave: "Save",
         keyClear: "Clear",
         keyClose: "Close"
@@ -481,23 +466,6 @@
       localStorage.setItem('tp_v22_backup_key', backupKey);
       refreshKeyBtnStyle();
       document.getElementById('keyModal').style.display = 'none';
-      if (backupKey) {
-        fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(backupKey)}`)
-          .then(r => r.json())
-          .then(d => {
-            const list = d.models || [];
-            if (list.some(m => m.name === 'models/gemini-flash-latest')) {
-              backupModel = 'gemini-flash-latest';
-            } else {
-              const flash = list.filter(m => {
-                const n = (m.name || '').toLowerCase();
-                return n.includes('gemini') && n.includes('flash') && !n.includes('thinking') && !n.includes('preview') && (m.supportedGenerationMethods || []).includes('generateContent');
-              });
-              if (flash.length) backupModel = flash[flash.length - 1].name.replace('models/', '');
-            }
-            localStorage.setItem('tp_v22_backup_model', backupModel);
-          }).catch(() => {});
-      }
     }
 
     function clearBackupKey() {
@@ -505,89 +473,6 @@
       localStorage.removeItem('tp_v22_backup_key');
       document.getElementById('apiKeyInput').value = '';
       refreshKeyBtnStyle();
-    }
-
-    // 調用您的 Cloudflare Worker 商業網關（支持 SSE 逐行流式與 JSON 自動解析）
-    async function streamFromCloudflareGateway(promptText, onLine, dataUrl = null, signal = undefined) {
-      let count = 0;
-      try {
-        const r = await fetch(WORKER_GATEWAY_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          signal: signal,
-          body: JSON.stringify({ prompt: promptText, image: dataUrl })
-        });
-        if (!r.ok || !r.body) return 0;
-
-        const cType = (r.headers.get('content-type') || '').toLowerCase();
-        if (cType.includes('event-stream')) {
-          const reader = r.body.getReader();
-          const decoder = new TextDecoder('utf-8');
-          let sseBuf = '';
-          let textBuf = '';
-
-          while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
-            sseBuf += decoder.decode(value, { stream: true });
-            let lines = sseBuf.split('\n');
-            sseBuf = lines.pop() || '';
-
-            for (const line of lines) {
-              const tr = line.trim();
-              if (tr.startsWith('data:')) {
-                const dataStr = tr.slice(5).trim();
-                if (!dataStr || dataStr === '[DONE]') continue;
-                try {
-                  const j = JSON.parse(dataStr);
-                  const delta = j?.candidates?.[0]?.content?.parts?.[0]?.text || j?.choices?.[0]?.delta?.content || '';
-                  if (delta) {
-                    textBuf += delta;
-                    let nl;
-                    while ((nl = textBuf.indexOf('\n')) !== -1) {
-                      const readyLine = textBuf.slice(0, nl).trim();
-                      textBuf = textBuf.slice(nl + 1);
-                      if (readyLine) { count++; await onLine(readyLine); }
-                    }
-                  }
-                } catch (e) {}
-              }
-            }
-          }
-          if (textBuf.trim()) { count++; await onLine(textBuf.trim()); }
-        } else {
-          const rawText = await r.text();
-          let fullOutput = '';
-          try {
-            const d = JSON.parse(rawText);
-            fullOutput = d?.candidates?.[0]?.content?.parts?.[0]?.text || d?.choices?.[0]?.message?.content || d?.text || '';
-          } catch (e) {}
-          if (fullOutput) {
-            for (const line of fullOutput.split(/\n+/)) {
-              if (line.trim()) { count++; await onLine(line.trim()); }
-            }
-          }
-        }
-      } catch (e) {}
-      return count;
-    }
-
-    async function fetchGeminiFallback(promptText, dataUrl = null) {
-      if (!backupKey) return '';
-      try {
-        const parts = [{ text: promptText }];
-        if (dataUrl && dataUrl.includes(',')) {
-          const mime = dataUrl.substring(dataUrl.indexOf(':') + 1, dataUrl.indexOf(';'));
-          parts.push({ inline_data: { mime_type: mime, data: dataUrl.split(',')[1] } });
-        }
-        const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${backupModel}:generateContent?key=${encodeURIComponent(backupKey)}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ contents: [{ parts }] })
-        });
-        const d = await r.json();
-        return d?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-      } catch (e) { return ''; }
     }
 
     function toggleLang() {
@@ -794,7 +679,7 @@
     }
 
     // =========================================================================
-    // 3. 漸進式極速渲染：做好一句就立刻顯示一句，非同步補齊翻譯
+    // 3. 漸進式極速渲染：每一段（包含第一段回答）都 100% 呈現「全英文 + Trees Pinyin + 漢字」
     // =========================================================================
     function showCardWrap() {
       document.getElementById('cardWrap').classList.add('visible');
@@ -804,14 +689,26 @@
       return new Promise(resolve => requestAnimationFrame(resolve));
     }
 
-    function appendSentenceProgressive(rawZhText, enTranslation = '') {
+    // 徹底剔除任何夾雜的普通漢語拼音與括號注音，只提取純正中文與純正英文
+    function extractPureZh(line) {
+      let s = line.replace(/^[-*•\d.)、]+\s*/, '').trim();
+      // 移除括號內的拼音或英文
+      s = s.replace(/\([^)\u4e00-\u9fa5]*\)/g, '').replace(/（[^）\u4e00-\u9fa5]*）/g, '');
+      // 只保留漢字與中文常用標點、數字
+      let zhOnly = s.replace(/[A-Za-zāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ/|-]+/g, ' ').replace(/\s+/g, '').trim();
+      return zhOnly;
+    }
+
+    function appendSentenceProgressive(rawZhText, enTranslation = '', isFirstAnswer = false) {
       showCardWrap();
+      const replyBox = document.getElementById('aiReplyBox');
+      replyBox.style.display = 'none'; // 隱藏純文本黃色框，所有段落統一用完整雙語注音卡片展示
+
       const list = document.getElementById('annotationList');
       const block = document.createElement('div');
-      block.className = 'sentence-block';
+      block.className = isFirstAnswer ? 'sentence-block first-answer-block' : 'sentence-block';
 
-      // 自動過濾夾雜的帶調拼音字符（如 ǐ ǎ à ě），杜絕亂碼
-      const cleanRaw = rawZhText.replace(/[āáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ]+/gi, '').trim();
+      const cleanRaw = extractPureZh(rawZhText) || rawZhText.replace(/[āáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ]+/gi, '').trim();
       const zhText = expandNumbersAndSymbolsToZh(cleanRaw);
       block.dataset.zh = zhText;
 
@@ -861,20 +758,46 @@
       return block;
     }
 
+    // 將 AI 輸出的一行（無論是純中文、純英文還是中英混合）統一渲染為「全英文 + Trees Pinyin + 全中文」
+    async function renderFullBilingualLine(rawLine, isFirstAnswer = false) {
+      let line = rawLine.replace(/^[-*•\d.)、]+\s*/, '').trim();
+      if (!line || line.startsWith('{"error"')) return false;
+
+      // 若以 ||| 分隔英中雙語
+      if (line.includes('|||')) {
+        const parts = line.split('|||').map(x => x.trim());
+        const enPart = parts[0].replace(/[\u4e00-\u9fa5āáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ()（）]+/g, '').trim();
+        const zhPart = extractPureZh(parts[1] || '');
+        if (zhPart) {
+          appendSentenceProgressive(zhPart, enPart, isFirstAnswer);
+          await nextPaintTick();
+          return true;
+        }
+      }
+
+      const zhPart = extractPureZh(line);
+      if (zhPart && /[\u4e00-\u9fa5]/.test(zhPart)) {
+        appendSentenceProgressive(zhPart, '', isFirstAnswer);
+        await nextPaintTick();
+        return true;
+      } else if (/[A-Za-z]/.test(line)) {
+        const cleanEn = line.replace(/[āáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ]+/gi, '').trim();
+        const zhTrans = await translateFast(cleanEn, 'en', 'zh');
+        if (zhTrans && /[\u4e00-\u9fa5]/.test(zhTrans)) {
+          appendSentenceProgressive(zhTrans, cleanEn, isFirstAnswer);
+          await nextPaintTick();
+          return true;
+        }
+      }
+      return false;
+    }
+
     // =========================================================================
-    // 4. 多重競速翻譯引擎（Promise.any 誰最快用誰，0.3秒出結果）
+    // 4. 多重競速翻譯引擎（Promise.any 0.3秒出結果）
     // =========================================================================
     async function translateFast(text, fromLang, toLang) {
       const src = fromLang.startsWith('zh') ? 'zh-CN' : 'en';
       const tgt = toLang.startsWith('zh') ? 'zh-CN' : 'en';
-
-      try {
-        if (window.Translator && typeof window.Translator.create === 'function') {
-          const t = await window.Translator.create({ sourceLanguage: src.slice(0,2), targetLanguage: tgt.slice(0,2) });
-          const r = await t.translate(text);
-          if (r && r !== text) return r;
-        }
-      } catch (e) {}
 
       const tasks = [
         fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=${src}&tl=${tgt}&dt=t&q=${encodeURIComponent(text)}`)
@@ -915,122 +838,127 @@
       for (let line of lines) {
         const hasChinese = /[\u4e00-\u9fa5]/.test(line);
         if (hasChinese) {
-          appendSentenceProgressive(line, '');
+          appendSentenceProgressive(line, '', false);
           await nextPaintTick();
         } else {
-          const tempBlock = document.createElement('div');
-          tempBlock.className = 'sentence-block';
-          tempBlock.innerHTML = `<div class="en-line">${line}</div><div style="font-size:0.85rem;color:#666;">⚡ Translating...</div>`;
-          list.appendChild(tempBlock);
-
           const zhTrans = await translateFast(line, 'en', 'zh');
-          tempBlock.remove();
-          appendSentenceProgressive(zhTrans, line);
+          appendSentenceProgressive(zhTrans, line, false);
           await nextPaintTick();
         }
       }
     }
 
     // =========================================================================
-    // 5. 極速雙擎競速 AI 引擎（Cloudflare 商業網關 + V22 同時競速，誰先出字立刻渲染誰！）
+    // 5. 雲端網關調用（嚴格校驗返回有效性，絕不讓報錯流搶鎖）
     // =========================================================================
-    let chromeAISession = null;
+    async function callCloudflareGateway(promptText, dataUrl = null, signal = undefined) {
+      try {
+        const r = await fetch(WORKER_GATEWAY_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          signal: signal,
+          body: JSON.stringify({ prompt: promptText, image: dataUrl })
+        });
+        if (!r.ok) return '';
+        const rawText = await r.text();
+        if (!rawText || rawText.includes('"error"')) return '';
 
+        // 兼容 JSON 與 SSE 兩種返回格式
+        if (rawText.trim().startsWith('{')) {
+          const d = JSON.parse(rawText);
+          return (d?.text || d?.candidates?.[0]?.content?.parts?.[0]?.text || d?.choices?.[0]?.message?.content || '').trim();
+        }
+        let out = '';
+        for (const line of rawText.split('\n')) {
+          const tr = line.trim();
+          if (tr.startsWith('data:')) {
+            const dStr = tr.slice(5).trim();
+            if (!dStr || dStr === '[DONE]') continue;
+            try {
+              const j = JSON.parse(dStr);
+              out += (j?.candidates?.[0]?.content?.parts?.[0]?.text || j?.choices?.[0]?.delta?.content || '');
+            } catch (e) {}
+          }
+        }
+        return out.trim();
+      } catch (e) {
+        return '';
+      }
+    }
+
+    // =========================================================================
+    // 6. AI 提問：第一段回答與後續例句 100% 呈現「全英文 + Trees Pinyin + 漢字」
+    // =========================================================================
     async function runSmartAI(overrideInput) {
       const q = (overrideInput !== undefined ? overrideInput : document.getElementById('userInput').value).trim();
       if (!q) return;
 
       showCardWrap();
+      document.getElementById('previewImg').style.display = 'none';
       const replyBox = document.getElementById('aiReplyBox');
       const list = document.getElementById('annotationList');
       replyBox.style.display = 'block';
       replyBox.innerText = '⚡ ...';
       list.innerHTML = '';
 
-      const fastPrompt = `User: "${q}".
-Reply concisely:
-Line 1: Brief helpful answer or dish/place intro in English & Chinese.
-From Line 2 onwards: Practical Chinese sentences for this situation (output the exact number of sentences the user asked for, or 2-3 sentences if not specified; if food/dish, include 微辣 mild spicy, 少鹽 less salt). Only output Chinese on lines 2+, one sentence per line.`;
+      // 要求 AI 每一行都只輸出純正中文句子（包含第一行直接回答問題），由前端統一秒配英文與 Trees Pinyin 注音，徹底杜絕漢語拼音亂碼！
+      const fastPrompt = `User question: "${q}"
+Output 3 to 4 lines in pure Chinese characters ONLY (NO Pinyin, NO English letters):
+Line 1: A concise 1-sentence direct Chinese answer or explanation to the user's question.
+Line 2 to 4: 2 or 3 practical everyday Chinese sentences related to this topic (if about food/ordering, include 微辣少鹽).
+Strict rule: Output ONLY Chinese characters, one sentence per line, no numbering, no Pinyin.`;
 
-      let activeWinner = null;
-      let renderedLineCount = 0;
-      const cfCtrl = new AbortController();
-      const v22Ctrl = new AbortController();
+      let renderedCount = 0;
+      let won = false;
 
-      async function renderOneLineFrom(source, rawLine) {
-        const cleanLine = rawLine.replace(/^[-*•\d.)、]+\s*/, '').trim();
-        if (!cleanLine || cleanLine.startsWith('{"error"')) return;
-
-        if (!activeWinner) {
-          activeWinner = source;
-          if (source === 'cf') v22Ctrl.abort();
-          if (source === 'v22') cfCtrl.abort();
+      async function processOutputText(fullText) {
+        if (won || !fullText) return false;
+        const lines = fullText.split(/\n+/).map(l => l.trim()).filter(l => /[\u4e00-\u9fa5]/.test(l));
+        if (lines.length === 0) return false;
+        won = true;
+        for (let i = 0; i < lines.length; i++) {
+          const ok = await renderFullBilingualLine(lines[i], i === 0);
+          if (ok) renderedCount++;
         }
-        if (activeWinner !== source) return;
-
-        renderedLineCount++;
-        if (renderedLineCount === 1) {
-          replyBox.innerHTML = `<b>${cleanLine}</b>`;
-          await nextPaintTick();
-        } else if (/[\u4e00-\u9fa5]/.test(cleanLine)) {
-          const pureZh = cleanLine.replace(/[A-Za-zāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ()（）/]+/g, '').trim() || cleanLine;
-          appendSentenceProgressive(pureZh, '');
-          await nextPaintTick();
-        }
+        return renderedCount > 0;
       }
 
-      // 同時發起 (A) 您的 Cloudflare Worker 網關 與 (B) V22 openai-fast，誰最快用誰！
-      const cfTask = streamFromCloudflareGateway(
-        fastPrompt,
-        (line) => renderOneLineFrom('cf', line),
-        null,
-        cfCtrl.signal
-      );
-
-      const v22Task = (async () => {
+      const v22Promise = (async () => {
         try {
           const r = await fetch('https://text.pollinations.ai/openai', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            signal: v22Ctrl.signal,
             body: JSON.stringify({
               model: 'openai-fast',
               messages: [{ role: 'user', content: fastPrompt }]
             })
           });
-          if (!r.ok) return;
-          const rawText = await r.text();
-          let fullOutput = rawText;
-          try {
-            const d = JSON.parse(rawText);
-            fullOutput = d?.choices?.[0]?.message?.content || '';
-          } catch (e) {}
-          if (fullOutput) {
-            for (const line of fullOutput.split(/\n+/)) {
-              if (line.trim()) await renderOneLineFrom('v22', line.trim());
-            }
-          }
+          if (!r.ok) throw new Error('v22 fail');
+          const raw = await r.text();
+          let txt = raw;
+          try { txt = JSON.parse(raw)?.choices?.[0]?.message?.content || raw; } catch (e) {}
+          if (await processOutputText(txt)) return true;
         } catch (e) {}
+        throw new Error('empty');
       })();
 
-      await Promise.allSettled([cfTask, v22Task]);
+      const cfPromise = (async () => {
+        const txt = await callCloudflareGateway(fastPrompt, null);
+        if (await processOutputText(txt)) return true;
+        throw new Error('empty');
+      })();
 
-      if (renderedLineCount === 0 && backupKey) {
-        const fb = await fetchGeminiFallback(fastPrompt);
-        if (fb) {
-          for (const line of fb.split(/\n+/)) {
-            await renderOneLineFrom('backup', line);
-          }
-        }
-      }
+      try {
+        await Promise.any([v22Promise, cfPromise]);
+      } catch (e) {}
 
-      if (renderedLineCount === 0) {
+      if (renderedCount === 0) {
         await runDirectTranslate(q);
       }
     }
 
     // =========================================================================
-    // 6. 極速圖片識別（砍掉雙重上傳與無效請求，448px 18KB 單通道秒傳秒出！）
+    // 7. 極速照片識別（多通道自動保障 + 第一段與例句全部「全英文 + Trees Pinyin + 漢字」）
     // =========================================================================
     async function handlePhotoUpload(input) {
       if (!input.files || !input.files[0]) return;
@@ -1040,92 +968,103 @@ From Line 2 onwards: Practical Chinese sentences for this situation (output the 
       const replyBox = document.getElementById('aiReplyBox');
       const list = document.getElementById('annotationList');
       replyBox.style.display = 'block';
-      replyBox.innerText = currentLang === 'en' ? '📷 Analyzing photo...' : '📷 正在識別照片...';
+      replyBox.innerText = currentLang === 'en' ? '📷 Identifying photo...' : '📷 正在識別照片...';
       list.innerHTML = '';
 
-      // 448px 極速輕量壓縮（僅 ~18KB），手機 0.1 秒瞬間上傳完畢，絕不堵塞頻寬
-      const dataUrl = await compressImg(file, 448, 0.58);
+      // 600px 清晰壓縮（兼顧菜品細節與文字清晰度，僅 ~35KB）
+      const dataUrl = await compressImg(file, 600, 0.68);
       const prev = document.getElementById('previewImg');
       prev.src = dataUrl;
       prev.style.display = 'block';
 
-      const vPrompt = `Look at this image:
-Line 1: Identify what dish, object, landmark, or text it is, with a 1-sentence intro (in English & Chinese).
-Line 2-3: 2 practical Chinese phrases for it (if food, include 微辣 mild spicy, 少鹽 less salt; if English text, translate it into Chinese). Only output Chinese on lines 2+, one sentence per line.`;
+      const vPrompt = `Look at this image carefully. Output 3 lines in pure Chinese characters ONLY (NO Pinyin, NO English):
+Line 1: Identify what dish, object, landmark, or text is in this photo in 1 concise Chinese sentence.
+Line 2 to 3: 2 practical Chinese sentences for ordering or talking about it (if food, include 微辣少鹽; if text in photo, translate it into Chinese).
+Strict rule: Output ONLY Chinese characters, one sentence per line, no Pinyin.`;
 
-      let activeWinner = null;
-      let visionLineCount = 0;
-      const cfCtrl = new AbortController();
-      const directCtrl = new AbortController();
+      let renderedCount = 0;
+      let won = false;
 
-      async function renderVisionLineFrom(source, rawLine) {
-        const cleanLine = rawLine.replace(/^[-*•\d.)、]+\s*/, '').trim();
-        if (!cleanLine || cleanLine.startsWith('{"error"')) return;
-
-        if (!activeWinner) {
-          activeWinner = source;
-          if (source === 'cf') directCtrl.abort();
-          if (source === 'direct') cfCtrl.abort();
+      async function processVisionText(fullText) {
+        if (won || !fullText) return false;
+        const lines = fullText.split(/\n+/).map(l => l.trim()).filter(l => /[\u4e00-\u9fa5]/.test(l));
+        if (lines.length === 0) return false;
+        won = true;
+        for (let i = 0; i < lines.length; i++) {
+          const ok = await renderFullBilingualLine(lines[i], i === 0);
+          if (ok) renderedCount++;
         }
-        if (activeWinner !== source) return;
-
-        visionLineCount++;
-        if (visionLineCount === 1) {
-          replyBox.innerHTML = `<b>${cleanLine}</b>`;
-          await nextPaintTick();
-        } else if (/[\u4e00-\u9fa5]/.test(cleanLine)) {
-          const pureZh = cleanLine.replace(/[A-Za-zāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ()（）/]+/g, '').trim() || cleanLine;
-          appendSentenceProgressive(pureZh, '');
-          await nextPaintTick();
-        }
+        return renderedCount > 0;
       }
 
-      // 第一時間單通道發給您的 Cloudflare 商業網關（18KB 秒傳）
-      const cfPromise = streamFromCloudflareGateway(
-        vPrompt,
-        (line) => renderVisionLineFrom('cf', line),
-        dataUrl,
-        cfCtrl.signal
-      );
+      // 通道 1：Cloudflare Worker 網關
+      const cfVisionTask = (async () => {
+        const txt = await callCloudflareGateway(vPrompt, dataUrl);
+        if (await processVisionText(txt)) return true;
+        throw new Error('cf vision empty');
+      })();
 
-      // 1.5 秒智能對沖保護：若網關在 1.5 秒內尚未返回，自動併發啟動備用視覺通道
-      const hedgePromise = new Promise(resolve => setTimeout(resolve, 1500)).then(async () => {
-        if (activeWinner) return;
+      // 通道 2：Pollinations 視覺通道（相容 JSON 與純文本返回）
+      const directVisionTask = (async () => {
+        for (const mdl of ['openai', 'openai-large']) {
+          if (won) return true;
+          try {
+            const r = await fetch('https://text.pollinations.ai/openai', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                model: mdl,
+                messages: [{
+                  role: 'user',
+                  content: [
+                    { type: 'text', text: vPrompt },
+                    { type: 'image_url', image_url: { url: dataUrl } }
+                  ]
+                }]
+              })
+            });
+            if (!r.ok) continue;
+            const raw = await r.text();
+            let txt = raw;
+            try { txt = JSON.parse(raw)?.choices?.[0]?.message?.content || raw; } catch (e) {}
+            if (await processVisionText(txt)) return true;
+          } catch (e) {}
+        }
+        throw new Error('direct vision empty');
+      })();
+
+      // 通道 3：OCR 文字提取保底（針對拍書本、菜單、路標文字）
+      const ocrTask = (async () => {
         try {
-          const r = await fetch('https://text.pollinations.ai/openai', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            signal: directCtrl.signal,
-            body: JSON.stringify({
-              model: 'openai',
-              messages: [{
-                role: 'user',
-                content: [
-                  { type: 'text', text: vPrompt },
-                  { type: 'image_url', image_url: { url: dataUrl } }
-                ]
-              }]
-            })
-          });
-          if (!r.ok) return;
+          const fd = new FormData();
+          fd.append('base64Image', dataUrl);
+          fd.append('language', 'chs');
+          fd.append('apikey', 'helloworld');
+          const r = await fetch('https://api.ocr.space/parse/image', { method: 'POST', body: fd });
           const d = await r.json();
-          const vText = d?.choices?.[0]?.message?.content || '';
-          if (vText) {
-            for (const line of vText.split(/\n+/)) {
-              if (line.trim()) await renderVisionLineFrom('direct', line.trim());
-            }
+          const ocrText = d?.ParsedResults?.[0]?.ParsedText?.trim() || '';
+          if (ocrText && ocrText.length >= 2) {
+            return ocrText.replace(/\r\n/g, '\n').trim();
           }
         } catch (e) {}
-      });
+        return '';
+      })();
 
-      await Promise.allSettled([cfPromise, hedgePromise]);
+      try {
+        await Promise.any([cfVisionTask, directVisionTask]);
+      } catch (e) {}
 
-      if (!activeWinner && visionLineCount === 0 && backupKey) {
-        const fb = await fetchGeminiFallback(vPrompt, dataUrl);
-        if (fb) {
-          for (const line of fb.split(/\n+/)) {
-            await renderVisionLineFrom('key-fallback', line);
-          }
+      // 若視覺模型均未返回，立刻用 OCR 提取出的文字進行雙語注音
+      if (renderedCount === 0) {
+        const ocrRes = await ocrTask;
+        if (ocrRes) {
+          document.getElementById('userInput').value = ocrRes;
+          await runDirectTranslate(ocrRes);
+        } else {
+          replyBox.style.display = 'block';
+          replyBox.innerText = currentLang === 'en'
+            ? '⚠️ Could not recognize photo. Please try a clearer photo.'
+            : '⚠️ 暫無法識別該照片，請重試或拍攝更清晰的照片。';
         }
       }
 
@@ -1152,7 +1091,7 @@ Line 2-3: 2 practical Chinese phrases for it (if food, include 微辣 mild spicy
     }
 
     // =========================================================================
-    // 7. 語音輸入（說完停頓立即先顯示回答 -> 再逐句翻譯注音）
+    // 8. 語音輸入與語音朗讀
     // =========================================================================
     let activeRec = null;
 
@@ -1187,9 +1126,7 @@ Line 2-3: 2 practical Chinese phrases for it (if food, include 微辣 mild spicy
         btn.classList.remove('recording');
         activeRec = null;
         const spoken = document.getElementById('userInput').value.trim();
-        if (spoken) {
-          runSmartAI(spoken);
-        }
+        if (spoken) runSmartAI(spoken);
       };
 
       activeRec.onerror = () => {
@@ -1200,9 +1137,6 @@ Line 2-3: 2 practical Chinese phrases for it (if food, include 微辣 mild spicy
       activeRec.start();
     }
 
-    // =========================================================================
-    // 8. 語音朗讀 Speak（點一下播放，再點一下立刻停止）
-    // =========================================================================
     let isSpeakingNow = false;
 
     function toggleSpeak() {
@@ -1242,9 +1176,6 @@ Line 2-3: 2 practical Chinese phrases for it (if food, include 微辣 mild spicy
       window.speechSynthesis.speak(utter);
     }
 
-    // =========================================================================
-    // 9. 全螢幕大字、保存圖片、Safari 桌面圖標與 Service Worker 註冊
-    // =========================================================================
     function toggleBigFont() {
       document.body.classList.toggle('big-mode');
     }
