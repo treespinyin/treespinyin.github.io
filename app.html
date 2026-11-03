@@ -9,11 +9,11 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Trees Pinyin">
-  <!-- 直接使用您已上傳到 GitHub 的 icon.png -->
-  <link rel="icon" type="image/png" href="icon.png">
-  <link rel="shortcut icon" type="image/png" href="icon.png">
-  <link id="appleTouchIcon" rel="apple-touch-icon" href="icon.png">
-  <link rel="apple-touch-icon-precomposed" href="icon.png">
+  <!-- 直接引用您放在 GitHub 根目錄的 /icon.png?v=3（加 ?v=3 強制手機刷新舊圖標緩存） -->
+  <link rel="icon" type="image/png" href="/icon.png?v=3">
+  <link rel="shortcut icon" type="image/png" href="/icon.png?v=3">
+  <link id="appleTouchIcon" rel="apple-touch-icon" href="/icon.png?v=3">
+  <link rel="apple-touch-icon-precomposed" href="/icon.png?v=3">
 
   <!-- 僅保留極速輕量核心庫（PDF與Word解析庫僅在用戶上傳對應文件時才按需秒載，0毫秒影響首屏速度！） -->
   <script src="https://cdn.jsdelivr.net/npm/pinyin-pro@3.19.6/dist/index.js"></script>
@@ -42,7 +42,7 @@
       min-height: 100vh;
     }
 
-    /* 頂部極簡導航（帶 icon.png 顯示） */
+    /* 頂部極簡導航（帶 /icon.png?v=3 顯示） */
     .header {
       width: 100%;
       max-width: 540px;
@@ -356,13 +356,13 @@
 
   <div class="header">
     <div class="brand-wrap">
-      <img src="icon.png" alt="Logo" class="brand-logo" onerror="this.style.display='none'">
+      <img src="/icon.png?v=3" alt="Logo" class="brand-logo" onerror="this.src='icon.png'">
       <h1 id="uiTitle">Trees Pinyin</h1>
     </div>
     <div class="header-btns">
       <button class="top-btn" onclick="openKeyModal()" id="uiKeyBtn">🔑 API Key</button>
       <button class="top-btn" onclick="openInstallModal()" id="uiInstallBtn">
-        <img src="icon.png" alt="" class="btn-mini-icon" onerror="this.style.display='none'">
+        <img src="/icon.png?v=3" alt="" class="btn-mini-icon" onerror="this.src='icon.png'">
         <span id="uiInstallBtnText">Safari Icon</span>
       </button>
       <button class="top-btn" onclick="toggleLang()" id="uiLangBtn">中文</button>
@@ -479,18 +479,18 @@
     </div>
   </div>
 
-  <!-- 桌面圖標說明彈窗（展示 icon.png 並明確告知使用 Safari） -->
+  <!-- 桌面圖標說明彈窗（展示 /icon.png?v=3 並明確告知使用 Safari） -->
   <div class="modal" id="installModal">
     <div class="modal-box">
       <div style="display:flex; align-items:center; gap:10px;">
-        <img src="icon.png" alt="App Icon" style="width:44px; height:44px; border-radius:10px; border:1px solid #ddd;" onerror="this.style.display='none'">
+        <img src="/icon.png?v=3" alt="App Icon" style="width:44px; height:44px; border-radius:10px; border:1px solid #ddd;" onerror="this.src='icon.png'">
         <h3 style="margin:0; font-size:1.02rem;" id="uiInstallTitle">Add Icon to Home Screen</h3>
       </div>
       <div id="uiInstallSteps" style="font-size:0.88rem; line-height:1.6; background:#f8f9fa; padding:12px; border-radius:8px;">
         <b>⚠️ Please open <span style="color:#1b5e20;">treespinyin.com/app</span> in Safari (not Chrome):</b><br><br>
         1. Tap the <b>Share button [📤]</b> at the bottom center of Safari.<br>
         2. Scroll down and tap <b>"Add to Home Screen [➕]"</b>.<br>
-        3. Tap <b>"Add"</b> at the top right (uses <code>icon.png</code>).
+        3. Tap <b>"Add"</b> at the top right (uses <code>/icon.png</code>).
       </div>
       <button class="btn btn-green" onclick="document.getElementById('installModal').style.display='none'" id="uiGotItBtn">OK</button>
     </div>
@@ -501,8 +501,8 @@
     <div class="modal-box">
       <h3 style="margin:0; font-size:1.02rem;" id="uiKeyTitle">🔑 Backup Gemini API Key</h3>
       <div id="uiKeyDesc" style="font-size:0.85rem; line-height:1.55; background:#f8f9fa; padding:12px; border-radius:8px;">
-        <b>Default V22 high-speed mode works for free!</b><br>
-        If public servers are busy, your personal Google Gemini Key will automatically step in:<br><br>
+        <b>Default high-speed mode + Cloudflare Dual-Key Backup active!</b><br>
+        You can also add a personal Google Gemini Key below:<br><br>
         1. <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:#1565c0; font-weight:700;">👉 Get Free Key at Google AI Studio</a><br>
         2. Tap <b>"Create API key"</b> & paste below:
       </div>
@@ -517,15 +517,21 @@
 
   <script>
     // =========================================================================
-    // 0. 純英文 / 純中文介面切換 + 備用 Key 存取 + Web Manifest 綁定 icon.png
+    // 0. 根目錄 /icon.png?v=3 綁定 + Cloudflare Worker 雙 Key 安全輪詢後備地址
     // =========================================================================
+    // 您的 Cloudflare Worker 接口地址（支援同域路由 /api 與 workers.dev 自動回退，Key 加密存於 Cloudflare 後台絕不外洩）
+    const CF_WORKER_ENDPOINTS = [
+      'https://treespinyin.com/api',
+      'https://treespinyin-api.treespinyin.workers.dev'
+    ];
+
     (function injectManifestWithIconPng() {
       try {
-        const iconUrl = new URL('icon.png', window.location.href).href;
+        const iconUrl = window.location.origin + '/icon.png?v=3';
         const manifest = {
           name: "Trees Pinyin",
           short_name: "Trees Pinyin",
-          start_url: window.location.pathname || "./",
+          start_url: window.location.pathname || "/app",
           display: "standalone",
           background_color: "#f5f7f9",
           theme_color: "#1b5e20",
@@ -568,10 +574,10 @@
         saveModalTitle: "Long-Press Image to Save",
         doneBtn: "Done",
         installTitle: "Add Icon to Home Screen",
-        installSteps: "<b>⚠️ Please open <span style=\"color:#1b5e20;\">treespinyin.com/app</span> in Safari (not Chrome):</b><br><br>1. Tap the <b>Share button [📤]</b> at the bottom center of Safari.<br>2. Scroll down and tap <b>\"Add to Home Screen [➕]\"</b>.<br>3. Tap <b>\"Add\"</b> at the top right (uses <code>icon.png</code>).",
+        installSteps: "<b>⚠️ Please open <span style=\"color:#1b5e20;\">treespinyin.com/app</span> in Safari (not Chrome):</b><br><br>1. Tap the <b>Share button [📤]</b> at the bottom center of Safari.<br>2. Scroll down and tap <b>\"Add to Home Screen [➕]\"</b>.<br>3. Tap <b>\"Add\"</b> at the top right (uses <code>/icon.png</code>).",
         gotItBtn: "OK",
         keyTitle: "🔑 Backup Gemini API Key",
-        keyDesc: "<b>Default V22 high-speed mode works for free!</b><br>If public servers are busy, your personal Google Gemini Key will automatically step in:<br><br>1. <a href=\"https://aistudio.google.com/app/apikey\" target=\"_blank\" style=\"color:#1565c0; font-weight:700;\">👉 Get Free Key at Google AI Studio</a><br>2. Tap <b>\"Create API key\"</b> & paste below:",
+        keyDesc: "<b>Default high-speed mode + Cloudflare Dual-Key Backup active!</b><br>You can also add a personal Google Gemini Key below:<br><br>1. <a href=\"https://aistudio.google.com/app/apikey\" target=\"_blank\" style=\"color:#1565c0; font-weight:700;\">👉 Get Free Key at Google AI Studio</a><br>2. Tap <b>\"Create API key\"</b> & paste below:",
         keySave: "Save",
         keyClear: "Clear",
         keyClose: "Close",
@@ -606,10 +612,10 @@
         saveModalTitle: "請長按下方圖片保存到手機相冊",
         doneBtn: "完成",
         installTitle: "添加桌面圖標（請使用 Safari）",
-        installSteps: "<b>⚠️ 請使用手機自帶的 Safari 瀏覽器打開本頁（Chrome 無法直接生成桌面圖標）：</b><br><br>1. 點擊 Safari 底部正中間的 <b>「分享按鈕 [📤]」</b>。<br>2. 往下滑動選單，點擊 <b>「加入主畫面 [➕]」</b>。<br>3. 點擊右上角「新增」即可（自動使用 <code>icon.png</code> 圖標）。",
+        installSteps: "<b>⚠️ 請使用手機自帶的 Safari 瀏覽器打開本頁（Chrome 無法直接生成桌面圖標）：</b><br><br>1. 點擊 Safari 底部正中間的 <b>「分享按鈕 [📤]」</b>。<br>2. 往下滑動選單，點擊 <b>「加入主畫面 [➕]」</b>。<br>3. 點擊右上角「新增」即可（自動使用根目錄 <code>/icon.png</code> 圖標）。",
         gotItBtn: "知道了",
         keyTitle: "🔑 備用 Google Gemini Key",
-        keyDesc: "<b>預設 100% 走 V22 極速免費通道！</b><br>當未來人數眾多、免費通道擁擠時，系統才會自動啟用您的個人 Key：<br><br>1. <a href=\"https://aistudio.google.com/app/apikey\" target=\"_blank\" style=\"color:#1565c0; font-weight:700;\">👉 點此打開 Google AI Studio 免費領取</a><br>2. 點擊 <b>\"Create API key\"</b> 並貼到下方：",
+        keyDesc: "<b>預設極速免費通道 + Cloudflare 雙 Key 保底已啟用！</b><br>您也可以在下方填入個人 Key 作為額外加速：<br><br>1. <a href=\"https://aistudio.google.com/app/apikey\" target=\"_blank\" style=\"color:#1565c0; font-weight:700;\">👉 點此打開 Google AI Studio 免費領取</a><br>2. 點擊 <b>\"Create API key\"</b> 並貼到下方：",
         keySave: "保存",
         keyClear: "清除",
         keyClose: "關閉",
@@ -671,22 +677,41 @@
       refreshKeyBtnStyle();
     }
 
+    // 三重保底機制：1. 用戶自填 Key -> 2. 您的 Cloudflare Worker (treespinyin-api 雙 Key 輪詢，Key 安全存於後台絕不外洩)
     async function fetchGeminiFallback(promptText, dataUrl = null) {
-      if (!backupKey) return '';
-      try {
-        const parts = [{ text: promptText }];
-        if (dataUrl && dataUrl.includes(',')) {
-          const mime = dataUrl.substring(dataUrl.indexOf(':') + 1, dataUrl.indexOf(';'));
-          parts.push({ inline_data: { mime_type: mime, data: dataUrl.split(',')[1] } });
-        }
-        const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${backupModel}:generateContent?key=${encodeURIComponent(backupKey)}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ contents: [{ parts }] })
-        });
-        const d = await r.json();
-        return d?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-      } catch (e) { return ''; }
+      if (backupKey) {
+        try {
+          const parts = [{ text: promptText }];
+          if (dataUrl && dataUrl.includes(',')) {
+            const mime = dataUrl.substring(dataUrl.indexOf(':') + 1, dataUrl.indexOf(';'));
+            parts.push({ inline_data: { mime_type: mime, data: dataUrl.split(',')[1] } });
+          }
+          const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${backupModel}:generateContent?key=${encodeURIComponent(backupKey)}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ contents: [{ parts }] })
+          });
+          const d = await r.json();
+          const t = d?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+          if (t) return t;
+        } catch (e) {}
+      }
+
+      for (const endpoint of CF_WORKER_ENDPOINTS) {
+        try {
+          const r = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt: promptText, image: dataUrl })
+          });
+          if (r.ok) {
+            const d = await r.json();
+            const text = d?.text || d?.reply || d?.choices?.[0]?.message?.content || '';
+            if (text) return text;
+          }
+        } catch (e) {}
+      }
+      return '';
     }
 
     function toggleLang() {
@@ -773,7 +798,7 @@
       const buf = await file.arrayBuffer();
       const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
       let out = [];
-      const maxPages = Math.min(pdf.numPages, 15); // 手機端極速讀取前15頁
+      const maxPages = Math.min(pdf.numPages, 15);
       for (let i = 1; i <= maxPages; i++) {
         const page = await pdf.getPage(i);
         const tc = await page.getTextContent();
@@ -790,7 +815,6 @@
       return (res.value || '').trim();
     }
 
-    // 本地讀取 TXT / PDF / Word (.docx) / Docs 導出文件（像 TXT 一樣秒速讀取並逐句翻譯注音！）
     async function handleDocFileUpload(input) {
       if (!input.files || !input.files[0]) return;
       const file = input.files[0];
@@ -810,7 +834,6 @@
           extractedText = await extractWordTextFast(file);
         } else {
           extractedText = await file.text();
-          // 若是 HTML 或 Google Docs 網頁導出格式，自動剝離標籤保留純文字
           if (name.endsWith('.html') || name.endsWith('.htm')) {
             const tmp = document.createElement('div');
             tmp.innerHTML = extractedText;
@@ -1148,7 +1171,7 @@
     }
 
     // =========================================================================
-    // 5. 極速分階段瀑布式 AI 問答引擎（逐段、逐句實時上屏）
+    // 5. 極速分階段瀑布式 AI 問答引擎（逐段、逐句實時上屏 + Cloudflare 雙 Key 保底）
     // =========================================================================
     let chromeAISession = null;
 
@@ -1284,21 +1307,20 @@ From Line 2 onwards: Practical Chinese sentences for this situation (output the 
         }
       } catch (e) {}
 
-      if (backupKey) {
-        const fb = await fetchGeminiFallback(fastPrompt);
-        if (fb) {
-          for (const line of fb.split(/\n+/)) {
-            await renderOneLineStaged(line);
-          }
-          if (renderedLineCount > 0) return;
+      // 無論用戶是否填寫個人 Key，只要公共通道繁忙，自動調用您的 Cloudflare (treespinyin-api) 雙 Key 保底通道
+      const fb = await fetchGeminiFallback(fastPrompt);
+      if (fb) {
+        for (const line of fb.split(/\n+/)) {
+          await renderOneLineStaged(line);
         }
+        if (renderedLineCount > 0) return;
       }
 
       await runDirectTranslate(q);
     }
 
     // =========================================================================
-    // 6. 少量文字/物品極速圖片識別
+    // 6. 少量文字/物品極速圖片識別（含 Cloudflare 雙 Key 保底）
     // =========================================================================
     async function handlePhotoUpload(input) {
       if (!input.files || !input.files[0]) return;
@@ -1454,7 +1476,7 @@ Line 2-3: 2 practical Chinese phrases for it (if food, include 微辣 mild spicy
         } catch (e) {}
       }
 
-      if (visionLineCount === 0 && !hasRenderedPhotoResult && backupKey) {
+      if (visionLineCount === 0 && !hasRenderedPhotoResult) {
         const fb = await fetchGeminiFallback(vPrompt, dataUrl);
         if (fb) {
           for (const line of fb.split(/\n+/)) {
