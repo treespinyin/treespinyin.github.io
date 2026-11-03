@@ -9,10 +9,12 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Trees Pinyin">
+  <!-- 直接使用您已上傳到 GitHub 的 icon.png -->
   <link rel="icon" type="image/png" href="icon.png">
+  <link rel="shortcut icon" type="image/png" href="icon.png">
   <link id="appleTouchIcon" rel="apple-touch-icon" href="icon.png">
 
-  <!-- 僅保留極速輕量核心庫，徹底移除拖慢速度的龐大視覺庫 -->
+  <!-- 僅保留極速輕量核心庫 -->
   <script src="https://cdn.jsdelivr.net/npm/pinyin-pro@3.19.6/dist/index.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
@@ -39,7 +41,7 @@
       min-height: 100vh;
     }
 
-    /* 頂部極簡導航 */
+    /* 頂部極簡導航（帶 icon.png 顯示） */
     .header {
       width: 100%;
       max-width: 540px;
@@ -47,6 +49,17 @@
       justify-content: space-between;
       align-items: center;
       margin-bottom: 12px;
+    }
+    .brand-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .brand-logo {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      object-fit: cover;
     }
     .header h1 {
       font-size: 1.18rem;
@@ -71,7 +84,7 @@
       background: #e8f5e9;
     }
 
-    /* Google 風格極簡輸入控制區 */
+    /* 輸入控制區 */
     .panel {
       width: 100%;
       max-width: 540px;
@@ -104,7 +117,6 @@
       padding: 4px 0;
       background: transparent;
     }
-    /* 類似 Google 拍照翻譯與語音的圓形圖標按鈕 */
     .icon-action {
       width: 40px;
       height: 40px;
@@ -148,7 +160,7 @@
     .btn-soft { background: var(--accent-soft); color: var(--accent); border: 1px solid #c8e6c9; }
     .btn-dark { background: #222; color: #fff; font-size: 0.78rem; padding: 7px 11px; flex: unset; }
 
-    /* 輸出卡片區（初始隱藏，居中美觀留白） */
+    /* 輸出卡片區 */
     .card-wrap {
       width: 100%;
       max-width: 540px;
@@ -287,8 +299,38 @@
       background: rgba(0,0,0,0.6); z-index: 9999; justify-content: center; align-items: center; padding: 16px;
     }
     .modal-box {
-      background: #fff; width: 100%; max-width: 400px; border-radius: 14px;
+      background: #fff; width: 100%; max-width: 410px; border-radius: 16px;
       padding: 18px; display: flex; flex-direction: column; gap: 12px;
+      box-shadow: 0 8px 28px rgba(0,0,0,0.18);
+    }
+    .option-card-btn {
+      width: 100%;
+      padding: 13px 14px;
+      border: 1.5px solid #d0d7de;
+      border-radius: 12px;
+      background: #f8fafc;
+      color: #111;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      text-align: left;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .option-card-btn:active {
+      background: #e8f5e9;
+      border-color: var(--accent);
+    }
+    .notice-box {
+      font-size: 0.86rem;
+      line-height: 1.55;
+      background: #fff8e1;
+      border: 1px solid #ffe082;
+      color: #333;
+      padding: 12px;
+      border-radius: 10px;
     }
 
     @media print {
@@ -303,7 +345,10 @@
   <button class="exit-big-btn" id="uiExitBig" onclick="toggleBigFont()">✕ Exit Fullscreen</button>
 
   <div class="header">
-    <h1 id="uiTitle">🌳 Trees Pinyin</h1>
+    <div class="brand-wrap">
+      <img src="icon.png" alt="Logo" class="brand-logo" onerror="this.style.display='none'">
+      <h1 id="uiTitle">Trees Pinyin</h1>
+    </div>
     <div class="header-btns">
       <button class="top-btn" onclick="openKeyModal()" id="uiKeyBtn">🔑 API Key</button>
       <button class="top-btn" onclick="openInstallModal()" id="uiInstallBtn">📲 Safari Icon</button>
@@ -311,7 +356,7 @@
     </div>
   </div>
 
-  <!-- 極簡操作面板：Google 相機圖標（含拍照與圖庫兩個系統選項）+ 單一語音按鈕 -->
+  <!-- 操作面板：語音按鈕 + 文件圖標（含文件上傳 & 拍照/圖庫） -->
   <div class="panel">
     <div class="search-box">
       <textarea id="userInput" rows="2" placeholder="Ask AI, or enter text to translate..."></textarea>
@@ -321,11 +366,17 @@
         <svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.91-3c-.49 0-.9.36-.98.85C16.52 14.2 14.47 16 12 16s-4.52-1.8-4.93-4.15c-.08-.49-.49-.85-.98-.85-.61 0-1.09.54-1 1.14.49 3 2.89 5.35 5.91 5.78V20c0 .55.45 1 1 1s1-.45 1-1v-2.08c3.02-.43 5.42-2.78 5.91-5.78.1-.6-.39-1.14-1-1.14z"/></svg>
       </button>
 
-      <!-- Google Lens 風格相機圖標（點擊自動彈出「拍照」與「圖庫」兩個選項） -->
-      <label class="icon-action" title="Camera or Photo Library">
-        <svg viewBox="0 0 24 24"><path d="M12 10.9c-.61 0-1.1.49-1.1 1.1s.49 1.1 1.1 1.1c.61 0 1.1-.49 1.1-1.1s-.49-1.1-1.1-1.1zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8 0-1.85.63-3.55 1.69-4.9L16.9 18.31C15.55 19.37 13.85 20 12 20zm6.31-3.1L7.1 5.69C8.45 4.63 10.15 4 12 4c4.41 0 8 3.59 8 8 0 1.85-.63 3.55-1.69 4.9z" opacity="0"/><path d="M9 3L7.17 5H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2h-3.17L15 3H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.65 0-3 1.35-3 3s1.35 3 3 3 3-1.35 3-3-1.35-3-3-3z"/></svg>
-        <input type="file" id="photoInput" accept="image/*" style="display:none" onchange="handlePhotoUpload(this)">
-      </label>
+      <!-- 文件圖標（點擊打開「文件上傳」與「拍照/圖庫」功能選單） -->
+      <button class="icon-action" id="fileMenuBtn" onclick="openFileMenuModal()" title="Upload File or Camera/Photo">
+        <svg viewBox="0 0 24 24">
+          <path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2zm4 10h2v2h-2v2h-2v-2h-2v-2h2v-2h2v2z"/>
+        </svg>
+      </button>
+
+      <!-- 隱藏的文件與照片 Input -->
+      <input type="file" id="docFileInput" accept=".txt,.md,.csv,.json,.html,text/plain" style="display:none" onchange="handleDocFileUpload(this)">
+      <input type="file" id="galleryInput" accept="image/*" style="display:none" onchange="handlePhotoUpload(this)">
+      <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none" onchange="handlePhotoUpload(this)">
     </div>
 
     <div class="row">
@@ -335,7 +386,7 @@
     </div>
   </div>
 
-  <!-- 輸出卡片區（預設隱藏，先出對話框回答 -> 再一句一句出翻譯與注音） -->
+  <!-- 輸出卡片區（先出對話框回答 -> 再逐段逐句出翻譯與注音） -->
   <div class="card-wrap" id="cardWrap">
     <div class="toolbar">
       <span style="font-size:0.75rem; color:#666;" id="uiHint">💡 Tap any Chinese character to edit pinyin</span>
@@ -353,6 +404,59 @@
     </div>
   </div>
 
+  <!-- 彈窗 1：點擊「文件圖標」後的選單（1. 文件上傳 / 2. 拍照與圖庫） -->
+  <div class="modal" id="fileMenuModal" onclick="if(event.target===this)this.style.display='none'">
+    <div class="modal-box">
+      <h3 style="margin:0; font-size:1.05rem;" id="uiFileMenuTitle">📁 File & Camera Options</h3>
+      
+      <!-- 選項 1：上傳文檔文件（本地毫秒級讀取注音） -->
+      <button class="option-card-btn" onclick="triggerDocUpload()">
+        <div>
+          <div id="uiOptDocTitle">📄 Upload Text File (.txt / .md / .csv)</div>
+          <div style="font-size:0.78rem; color:#555; font-weight:400; margin-top:3px;" id="uiOptDocSub">Instant local reading & Pinyin translation</div>
+        </div>
+        <span>➔</span>
+      </button>
+
+      <!-- 選項 2：拍照與圖庫（點擊後先顯示手機 AI 速度限制說明，再選圖庫或拍照） -->
+      <button class="option-card-btn" onclick="openCameraNoticeModal()">
+        <div>
+          <div id="uiOptCamTitle">📷 Camera & Photo Library</div>
+          <div style="font-size:0.78rem; color:#555; font-weight:400; margin-top:3px;" id="uiOptCamSub">Recognize short text or objects from photos</div>
+        </div>
+        <span>➔</span>
+      </button>
+
+      <button class="top-btn" style="width:100%; padding:9px;" onclick="document.getElementById('fileMenuModal').style.display='none'" id="uiFileMenuCancel">Cancel</button>
+    </div>
+  </div>
+
+  <!-- 彈窗 2：點擊「拍照功能」時先顯示的提速建議 + 圖庫/拍照選擇 -->
+  <div class="modal" id="cameraNoticeModal" onclick="if(event.target===this)this.style.display='none'">
+    <div class="modal-box">
+      <h3 style="margin:0; font-size:1.05rem; color:#1b5e20;" id="uiCamNoticeTitle">⚡ Speed Tip for Photo Recognition</h3>
+      <div class="notice-box" id="uiCamNoticeBody">
+        <b>📱 Why is direct photo recognition slower?</b><br>
+        Due to mobile AI limits, direct photo recognition is slower and best only for <b>very few words or single objects</b>.<br><br>
+        <b>🚀 Fastest Way on Phone (0.1s):</b><br>
+        Take a photo with your <b>Apple iPhone Camera</b> first, tap to <b>extract/copy the text (Live Text)</b>, and paste it here to translate & annotate!<br><br>
+        <b>💻 For Long Articles / Books:</b><br>
+        Please use the <b>Trees Pinyin</b> extension on <b>Google Chrome</b> or <b>Microsoft Edge</b>.
+      </div>
+
+      <div style="font-size:0.82rem; color:#555; font-weight:600; text-align:center;" id="uiCamContinueHint">
+        Continue with photo recognition (best for short text / objects):
+      </div>
+
+      <div class="row">
+        <button class="btn btn-green" onclick="triggerGalleryPick()" id="uiBtnGallery">🖼️ Photo Library</button>
+        <button class="btn btn-blue" onclick="triggerDirectCamera()" id="uiBtnTakePhoto">📸 Take Photo</button>
+      </div>
+
+      <button class="top-btn" style="width:100%; padding:9px;" onclick="document.getElementById('cameraNoticeModal').style.display='none'" id="uiCamNoticeClose">Back</button>
+    </div>
+  </div>
+
   <!-- 保存圖片彈窗 -->
   <div class="modal" id="imgModal">
     <div class="modal-box" style="align-items:center; text-align:center;">
@@ -362,10 +466,13 @@
     </div>
   </div>
 
-  <!-- 桌面圖標說明彈窗（明確告知使用 Safari） -->
+  <!-- 桌面圖標說明彈窗（展示 icon.png 並明確告知使用 Safari） -->
   <div class="modal" id="installModal">
     <div class="modal-box">
-      <h3 style="margin:0; font-size:1.02rem;" id="uiInstallTitle">📲 Add Icon to Home Screen</h3>
+      <div style="display:flex; align-items:center; gap:10px;">
+        <img src="icon.png" alt="App Icon" style="width:42px; height:42px; border-radius:10px; border:1px solid #ddd;" onerror="this.style.display='none'">
+        <h3 style="margin:0; font-size:1.02rem;" id="uiInstallTitle">📲 Add Icon to Home Screen</h3>
+      </div>
       <div id="uiInstallSteps" style="font-size:0.88rem; line-height:1.6; background:#f8f9fa; padding:12px; border-radius:8px;">
         <b>⚠️ Please open <span style="color:#1b5e20;">treespinyin.com/app</span> in Safari (not Chrome):</b><br><br>
         1. Tap the <b>Share button [📤]</b> at the bottom center of Safari.<br>
@@ -376,7 +483,7 @@
     </div>
   </div>
 
-  <!-- 備用 API Key 彈窗（100% 不干擾 V22 原生請求，僅在 V22 高峰擁擠時作為加速與後備） -->
+  <!-- 備用 API Key 彈窗 -->
   <div class="modal" id="keyModal">
     <div class="modal-box">
       <h3 style="margin:0; font-size:1.02rem;" id="uiKeyTitle">🔑 Backup Gemini API Key</h3>
@@ -399,7 +506,6 @@
     // =========================================================================
     // 0. 純英文 / 純中文介面切換 + 備用 Key 存取
     // =========================================================================
-    // 清理可能殘留的舊版變數，確保不影響 V22 速度
     localStorage.removeItem('tp_gemini_key');
     localStorage.removeItem('tp_gemini_model');
 
@@ -409,7 +515,7 @@
 
     const UI_TEXT = {
       en: {
-        title: "🌳 Trees Pinyin",
+        title: "Trees Pinyin",
         keyBtn: "🔑 API Key",
         installBtn: "📲 Safari Icon",
         langBtn: "中文",
@@ -432,10 +538,22 @@
         keyDesc: "<b>Default V22 high-speed mode works for free!</b><br>If public servers are busy, your personal Google Gemini Key will automatically step in:<br><br>1. <a href=\"https://aistudio.google.com/app/apikey\" target=\"_blank\" style=\"color:#1565c0; font-weight:700;\">👉 Get Free Key at Google AI Studio</a><br>2. Tap <b>\"Create API key\"</b> & paste below:",
         keySave: "Save",
         keyClear: "Clear",
-        keyClose: "Close"
+        keyClose: "Close",
+        fileMenuTitle: "📁 File & Camera Options",
+        optDocTitle: "📄 Upload Text File (.txt / .md / .csv)",
+        optDocSub: "Instant local reading & Pinyin translation",
+        optCamTitle: "📷 Camera & Photo Library",
+        optCamSub: "Recognize short text or objects from photos",
+        fileMenuCancel: "Cancel",
+        camNoticeTitle: "⚡ Speed Tip for Photo Recognition",
+        camNoticeBody: "<b>📱 Why is direct photo recognition slower?</b><br>Due to mobile AI limits, direct photo recognition is slower and best only for <b>very few words or single objects</b>.<br><br><b>🚀 Fastest Way on Phone (0.1s):</b><br>Take a photo with your <b>Apple iPhone Camera</b> first, tap to <b>extract/copy the text (Live Text)</b>, and paste it here to translate & annotate!<br><br><b>💻 For Long Articles / Books:</b><br>Please use the <b>Trees Pinyin</b> extension on <b>Google Chrome</b> or <b>Microsoft Edge</b>.",
+        camContinueHint: "Continue with photo recognition (best for short text / objects):",
+        btnGallery: "🖼️ Photo Library",
+        btnTakePhoto: "📸 Take Photo",
+        camNoticeClose: "Back"
       },
       zh: {
-        title: "🌳 Trees Pinyin",
+        title: "Trees Pinyin",
         keyBtn: "🔑 備用 Key",
         installBtn: "📲 桌面圖標",
         langBtn: "English",
@@ -458,7 +576,19 @@
         keyDesc: "<b>預設 100% 走 V22 極速免費通道！</b><br>當未來人數眾多、免費通道擁擠時，系統才會自動啟用您的個人 Key：<br><br>1. <a href=\"https://aistudio.google.com/app/apikey\" target=\"_blank\" style=\"color:#1565c0; font-weight:700;\">👉 點此打開 Google AI Studio 免費領取</a><br>2. 點擊 <b>\"Create API key\"</b> 並貼到下方：",
         keySave: "保存",
         keyClear: "清除",
-        keyClose: "關閉"
+        keyClose: "關閉",
+        fileMenuTitle: "📁 文件上傳與拍照功能",
+        optDocTitle: "📄 上傳文本文件 (.txt / .md / .csv)",
+        optDocSub: "手機端本地秒速讀取，立即翻譯並注音",
+        optCamTitle: "📷 拍照或從圖庫選圖",
+        optCamSub: "適合圖片中字數很少或單個物品識別",
+        fileMenuCancel: "取消",
+        camNoticeTitle: "⚡ 手機端拍照提速重要提示",
+        camNoticeBody: "<b>📱 為什麼直接拍照識別較慢？</b><br>因為手機端 AI 限制原因，直接拍照識別速度較慢（僅適合<b>字數很少</b>的圖片）。<br><br><b>🚀 手機端最快方法（推薦！0.1秒極速）：</b><br>最好先通過<b>蘋果手機自帶相機（iPhone）拍照後直接提取文字</b>，再複製貼回本頁注音翻譯，速度最快！<br><br><b>💻 內容較多時：</b><br>文字內容較多的文檔或網頁，推薦在電腦端通過<b>谷歌插件（Chrome）</b>或<b>微軟插件（Edge）「Trees Pinyin」</b>來實現。",
+        camContinueHint: "若圖片字數很少，可繼續使用圖庫或拍照：",
+        btnGallery: "🖼️ 圖庫選圖",
+        btnTakePhoto: "📸 直接拍照",
+        camNoticeClose: "返回"
       }
     };
 
@@ -549,6 +679,61 @@
       document.getElementById('uiKeySave').innerText = t.keySave;
       document.getElementById('uiKeyClear').innerText = t.keyClear;
       document.getElementById('uiKeyClose').innerText = t.keyClose;
+      document.getElementById('uiFileMenuTitle').innerText = t.fileMenuTitle;
+      document.getElementById('uiOptDocTitle').innerText = t.optDocTitle;
+      document.getElementById('uiOptDocSub').innerText = t.optDocSub;
+      document.getElementById('uiOptCamTitle').innerText = t.optCamTitle;
+      document.getElementById('uiOptCamSub').innerText = t.optCamSub;
+      document.getElementById('uiFileMenuCancel').innerText = t.fileMenuCancel;
+      document.getElementById('uiCamNoticeTitle').innerText = t.camNoticeTitle;
+      document.getElementById('uiCamNoticeBody').innerHTML = t.camNoticeBody;
+      document.getElementById('uiCamContinueHint').innerText = t.camContinueHint;
+      document.getElementById('uiBtnGallery').innerText = t.btnGallery;
+      document.getElementById('uiBtnTakePhoto').innerText = t.btnTakePhoto;
+      document.getElementById('uiCamNoticeClose').innerText = t.camNoticeClose;
+    }
+
+    // =========================================================================
+    // 0.5 文件與拍照彈窗控制邏輯（先提示速度與蘋果相機提取建議，再選圖庫或拍照）
+    // =========================================================================
+    function openFileMenuModal() {
+      document.getElementById('fileMenuModal').style.display = 'flex';
+    }
+
+    function triggerDocUpload() {
+      document.getElementById('fileMenuModal').style.display = 'none';
+      document.getElementById('docFileInput').click();
+    }
+
+    function openCameraNoticeModal() {
+      document.getElementById('fileMenuModal').style.display = 'none';
+      document.getElementById('cameraNoticeModal').style.display = 'flex';
+    }
+
+    function triggerGalleryPick() {
+      document.getElementById('cameraNoticeModal').style.display = 'none';
+      document.getElementById('galleryInput').click();
+    }
+
+    function triggerDirectCamera() {
+      document.getElementById('cameraNoticeModal').style.display = 'none';
+      document.getElementById('cameraInput').click();
+    }
+
+    // 本地讀取文本文件（毫秒級極速上屏並逐句翻譯注音）
+    function handleDocFileUpload(input) {
+      if (!input.files || !input.files[0]) return;
+      const file = input.files[0];
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const content = (e.target.result || '').trim();
+        if (content) {
+          document.getElementById('userInput').value = content.slice(0, 3000);
+          await runDirectTranslate(content.slice(0, 3000));
+        }
+      };
+      reader.readAsText(file, 'UTF-8');
+      input.value = '';
     }
 
     // =========================================================================
@@ -727,15 +912,14 @@
     }
 
     // =========================================================================
-    // 3. 漸進式極速渲染：做好一句就立刻顯示一句，非同步補齊翻譯
+    // 3. 漸進式極速渲染：間隔縮短至 15ms，做好一段/一句立刻上屏
     // =========================================================================
     function showCardWrap() {
       document.getElementById('cardWrap').classList.add('visible');
     }
 
-    // 讓瀏覽器立刻把當前這一句畫到螢幕上，不憋到最後一起出
     function nextPaintTick() {
-      return new Promise(resolve => requestAnimationFrame(() => setTimeout(resolve, 45)));
+      return new Promise(resolve => requestAnimationFrame(() => setTimeout(resolve, 15)));
     }
 
     function appendSentenceProgressive(rawZhText, enTranslation = '') {
@@ -775,9 +959,9 @@
             }
           };
         } else if (isPunct) {
-          col.innerHTML = `<span class="tp-py">${char}</span><span class="tp-zh"> </span>`;
+          col.innerHTML = `<span class="tp-py">${char}</span><span class="tp-zh"> </span>`;
         } else {
-          col.innerHTML = `<span class="tp-py"> </span><span class="tp-zh">${char}</span>`;
+          col.innerHTML = `<span class="tp-py"> </span><span class="tp-zh">${char}</span>`;
         }
         charRow.appendChild(col);
       }
@@ -785,7 +969,6 @@
       block.appendChild(charRow);
       list.appendChild(block);
 
-      // 如果還沒提供英文翻譯，背景非同步秒補上，不阻塞注音呈現！
       if (!enTranslation) {
         translateFast(zhText, 'zh', 'en').then(en => {
           enDiv.innerText = en;
@@ -795,13 +978,12 @@
     }
 
     // =========================================================================
-    // 4. 多重競速翻譯引擎（Promise.any 誰最快用誰，0.3秒出結果）
+    // 4. 多重競速翻譯引擎（Promise.any 誰最快用誰）
     // =========================================================================
     async function translateFast(text, fromLang, toLang) {
       const src = fromLang.startsWith('zh') ? 'zh-CN' : 'en';
       const tgt = toLang.startsWith('zh') ? 'zh-CN' : 'en';
 
-      // 優先嘗試 Chrome 內置毫秒級 Translator API
       try {
         if (window.Translator && typeof window.Translator.create === 'function') {
           const t = await window.Translator.create({ sourceLanguage: src.slice(0,2), targetLanguage: tgt.slice(0,2) });
@@ -810,7 +992,6 @@
         }
       } catch (e) {}
 
-      // 同時發起多個跨域翻譯通道競速，哪個先返回就立刻用哪個
       const tasks = [
         fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=${src}&tl=${tgt}&dt=t&q=${encodeURIComponent(text)}`)
           .then(r => r.json())
@@ -835,7 +1016,6 @@
       }
     }
 
-    // 點擊「📝 Translate & Pinyin」：按句切分，做好一句立刻顯示一句
     async function runDirectTranslate(inputOverride) {
       const raw = (inputOverride !== undefined ? inputOverride : document.getElementById('userInput').value).trim();
       if (!raw) return;
@@ -847,7 +1027,6 @@
       const list = document.getElementById('annotationList');
       list.innerHTML = '';
 
-      // 將長段文字按換行或句號拆成單句，實現「做好一句、立刻顯示一句」
       const lines = raw.split(/\n+|(?<=[。！？.!?])\s*/).map(l => l.trim()).filter(Boolean);
       for (let line of lines) {
         const hasChinese = /[\u4e00-\u9fa5]/.test(line);
@@ -869,7 +1048,7 @@
     }
 
     // =========================================================================
-    // 5. 分階段瀑布式 AI 引擎：100% 保持 V22.html 原生代碼一字不改！
+    // 5. 極速分階段瀑布式 AI 問答引擎（逐段、逐句實時上屏）
     // =========================================================================
     let chromeAISession = null;
 
@@ -878,13 +1057,13 @@
       if (!q) return;
 
       showCardWrap();
+      document.getElementById('previewImg').style.display = 'none';
       const replyBox = document.getElementById('aiReplyBox');
       const list = document.getElementById('annotationList');
       replyBox.style.display = 'block';
       replyBox.innerText = '⚡ ...';
       list.innerHTML = '';
 
-      // 第一行給回答簡介；後面每行一句中文實用句（嚴格按用戶要求的句數輸出）
       const fastPrompt = `User: "${q}".
 Reply concisely:
 Line 1: Brief helpful answer or dish/place intro in English & Chinese.
@@ -892,7 +1071,7 @@ From Line 2 onwards: Practical Chinese sentences for this situation (output the 
 
       let renderedLineCount = 0;
 
-      // 分階段渲染單行：第 1 行立刻顯示在頂部回答框，後續行每收到一句立刻渲染注音與翻譯
+      // 逐行/逐段上屏：第 1 段先上頂部回答框，後續每句中文立即逐段渲染注音與翻譯
       async function renderOneLineStaged(rawLine) {
         const cleanLine = rawLine.replace(/^[-*•\d.)、]+\s*/, '').trim();
         if (!cleanLine) return;
@@ -903,12 +1082,16 @@ From Line 2 onwards: Practical Chinese sentences for this situation (output the 
           await nextPaintTick();
         } else if (/[\u4e00-\u9fa5]/.test(cleanLine)) {
           const pureZh = cleanLine.replace(/[A-Za-zāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ()（）/]+/g, '').trim() || cleanLine;
-          appendSentenceProgressive(pureZh, '');
-          await nextPaintTick();
+          // 若單段內包含多個句子，拆分為逐句立刻顯示
+          const subSentences = pureZh.split(/(?<=[。！？!?])\s*/).map(s => s.trim()).filter(Boolean);
+          for (const sub of subSentences) {
+            appendSentenceProgressive(sub, '');
+            await nextPaintTick();
+          }
         }
       }
 
-      // 優先 1：調用手機/桌面 Chrome 內置 AI 流式輸出 (promptStreaming)，邊生成邊逐行顯示
+      // 優先 1：手機/桌面端內置 AI 流式輸出
       try {
         const lm = window.LanguageModel || (window.ai && window.ai.languageModel);
         if (lm) {
@@ -930,19 +1113,13 @@ From Line 2 onwards: Practical Chinese sentences for this situation (output the 
             }
             if (buf.trim()) await renderOneLineStaged(buf.trim());
             if (renderedLineCount > 0) return;
-          } else {
-            const full = await chromeAISession.prompt(fastPrompt);
-            for (const l of full.split(/\n+/)) {
-              await renderOneLineStaged(l);
-            }
-            if (renderedLineCount > 0) return;
           }
         }
       } catch (e) {
         chromeAISession = null;
       }
 
-      // 優先 2：極速輕量文本流接口（開啟 stream: true 邊收邊顯示，若返回整包也逐句分階段上屏）
+      // 優先 2：極速流式接口（邊接收邊逐段渲染上屏）
       try {
         const r = await fetch('https://text.pollinations.ai/openai', {
           method: 'POST',
@@ -1011,7 +1188,7 @@ From Line 2 onwards: Practical Chinese sentences for this situation (output the 
         }
       } catch (e) {}
 
-      // 若 V22 免費接口因高峰擁擠未返回，自動啟用備用 Key
+      // 優先 3：若設置了備用 Gemini Key，自動無縫接管並逐段顯示
       if (backupKey) {
         const fb = await fetchGeminiFallback(fastPrompt);
         if (fb) {
@@ -1022,17 +1199,11 @@ From Line 2 onwards: Practical Chinese sentences for this situation (output the 
         }
       }
 
-      // 若輸入本身就是句子，直接逐句翻譯並注音
       await runDirectTranslate(q);
     }
 
     // =========================================================================
-    // 6. 針對 V22 圖片識別慢的專項提速（速度提升 3 倍！）：
-    //    原因：原版 V22 用 `await ocrPromise` 阻塞了視覺結果顯示（OCR 慢時會白等 5 秒），且圖片 800px 體積偏大、未開啟流式輸出。
-    //    改進：
-    //    1. 圖片輕量壓縮至 512px (0.6)，體積縮小 70%（僅 20~35KB），手機秒顯示、秒上傳！
-    //    2. 視覺識別改用跟 AI 問答一模一樣的 `openai-fast` + `stream: true` 分階段流式秒出！
-    //    3. 徹底解除 OCR 對視覺 AI 的阻塞（誰先出結果誰先上屏，互不卡頓）！
+    // 6. 少量文字/物品極速圖片識別（保持 V22_fast_photo 架構並進一步壓縮提速）
     // =========================================================================
     async function handlePhotoUpload(input) {
       if (!input.files || !input.files[0]) return;
@@ -1045,14 +1216,14 @@ From Line 2 onwards: Practical Chinese sentences for this situation (output the 
       replyBox.innerText = currentLang === 'en' ? '📷 Analyzing photo...' : '📷 正在識別照片...';
       list.innerHTML = '';
 
-      // 專項提速 1：512px 黃金尺寸壓縮，體積僅 ~25KB，手機瞬間顯示預覽、上傳耗時縮短 70%
-      const dataUrl = await compressImg(file, 512, 0.62);
+      // 480px 超輕量壓縮（~20KB），手機瞬間預覽並秒傳
+      const dataUrl = await compressImg(file, 480, 0.6);
       const prev = document.getElementById('previewImg');
       prev.src = dataUrl;
       prev.style.display = 'block';
 
       const vPrompt = `Look at this image:
-Line 1: Identify what dish, object, landmark, or text it is, with a 1-sentence intro (in English & Chinese).
+Line 1: Identify what dish, object, landmark, or short text it is, with a 1-sentence intro (in English & Chinese).
 Line 2-3: 2 practical Chinese phrases for it (if food, include 微辣 mild spicy, 少鹽 less salt; if English text, translate it into Chinese). Only output Chinese on lines 2+, one sentence per line.`;
 
       let hasRenderedPhotoResult = false;
@@ -1073,7 +1244,7 @@ Line 2-3: 2 practical Chinese phrases for it (if food, include 微辣 mild spicy
         }
       }
 
-      // 專項提速 2：OCR 在背景非阻塞並行（如果圖片是純文字菜單/書頁且 OCR 比視覺快，先出文字；絕不阻塞視覺流！）
+      // 背景並行 OCR（針對少量文字圖片秒速提取）
       (async () => {
         try {
           const fd = new FormData();
@@ -1083,7 +1254,7 @@ Line 2-3: 2 practical Chinese phrases for it (if food, include 微辣 mild spicy
           const r = await fetch('https://api.ocr.space/parse/image', { method: 'POST', body: fd });
           const d = await r.json();
           const ocrText = d?.ParsedResults?.[0]?.ParsedText?.trim() || '';
-          if (ocrText && ocrText.length >= 2 && !hasRenderedPhotoResult) {
+          if (ocrText && ocrText.length >= 1 && !hasRenderedPhotoResult) {
             hasRenderedPhotoResult = true;
             const clean = ocrText.replace(/\r\n/g, '\n').trim();
             document.getElementById('userInput').value = clean;
@@ -1093,7 +1264,7 @@ Line 2-3: 2 practical Chinese phrases for it (if food, include 微辣 mild spicy
         } catch (e) {}
       })();
 
-      // 專項提速 3：視覺 AI 採用與 V22 問答相同的 `openai-fast` + `stream: true` 分階段流式輸出，生成第 1 行立刻顯示第 1 行！
+      // 視覺 AI 流式輸出（逐段顯示）
       try {
         const r = await fetch('https://text.pollinations.ai/openai', {
           method: 'POST',
@@ -1165,7 +1336,6 @@ Line 2-3: 2 practical Chinese phrases for it (if food, include 微辣 mild spicy
         }
       } catch (e) {}
 
-      // 若 openai-fast 視覺未返回，無縫回退原版 openai 視覺或備用 Key
       if (visionLineCount === 0 && !hasRenderedPhotoResult) {
         try {
           const r2 = await fetch('https://text.pollinations.ai/openai', {
@@ -1224,7 +1394,7 @@ Line 2-3: 2 practical Chinese phrases for it (if food, include 微辣 mild spicy
     }
 
     // =========================================================================
-    // 7. 語音輸入（說完停頓立即先顯示回答 -> 再逐句翻譯注音）
+    // 7. 語音輸入
     // =========================================================================
     let activeRec = null;
 
@@ -1273,7 +1443,7 @@ Line 2-3: 2 practical Chinese phrases for it (if food, include 微辣 mild spicy
     }
 
     // =========================================================================
-    // 8. 語音朗讀 Speak（點一下播放，再點一下立刻停止）
+    // 8. 語音朗讀 Speak
     // =========================================================================
     let isSpeakingNow = false;
 
