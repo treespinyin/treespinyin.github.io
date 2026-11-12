@@ -35,7 +35,7 @@
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     body {
       margin: 0;
-      padding: 0 0 48px;
+      padding: 0 0 36px;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       background: var(--bg);
       color: var(--text);
@@ -50,7 +50,7 @@
       width: 100%;
       background: #ffffff;
       border-bottom: 1px solid #e5e7eb;
-      padding: 10px 24px;
+      padding: 8px 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -58,7 +58,7 @@
       top: 0;
       z-index: 1000;
       box-shadow: 0 1px 4px rgba(0,0,0,0.03);
-      gap: 12px;
+      gap: 10px;
     }
     .nav-left {
       display: flex;
@@ -68,8 +68,8 @@
       color: inherit;
     }
     .brand-logo {
-      width: 38px;
-      height: 38px;
+      width: 34px;
+      height: 34px;
       border-radius: 8px;
       object-fit: cover;
       flex-shrink: 0;
@@ -79,13 +79,13 @@
       flex-direction: column;
     }
     .brand-title {
-      font-size: 1.2rem;
+      font-size: 1.15rem;
       font-weight: 800;
       color: var(--accent);
       line-height: 1.2;
     }
     .brand-sub {
-      font-size: 0.74rem;
+      font-size: 0.72rem;
       color: #666;
       font-weight: 500;
     }
@@ -93,7 +93,7 @@
     .nav-center {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
     }
     .dropdown {
       position: relative;
@@ -103,8 +103,8 @@
       background: #fff;
       border: 1px solid #d0d7de;
       border-radius: 10px;
-      padding: 7px 13px;
-      font-size: 0.85rem;
+      padding: 6px 12px;
+      font-size: 0.84rem;
       font-weight: 700;
       color: #222;
       cursor: pointer;
@@ -133,8 +133,8 @@
       background: var(--accent-hover);
     }
     .btn-mini-icon {
-      width: 17px;
-      height: 17px;
+      width: 16px;
+      height: 16px;
       border-radius: 4px;
       object-fit: cover;
     }
@@ -164,10 +164,10 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      padding: 10px 12px;
+      padding: 9px 12px;
       color: #222;
       text-decoration: none;
-      font-size: 0.88rem;
+      font-size: 0.86rem;
       font-weight: 600;
       border-radius: 8px;
       transition: background 0.15s;
@@ -183,33 +183,33 @@
       gap: 8px;
     }
 
-    /* ================= 主容器 ================= */
+    /* ================= 主容器（更緊湊，確保下方提示完整露出） ================= */
     .main-wrap {
       width: 100%;
       max-width: 920px;
-      padding: 20px 16px 0;
+      padding: 12px 16px 0;
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 10px;
     }
 
     .panel {
       width: 100%;
       background: var(--card);
-      padding: 16px;
-      border-radius: 18px;
-      box-shadow: 0 3px 14px rgba(0,0,0,0.04);
+      padding: 12px 14px;
+      border-radius: 16px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.03);
       border: 1px solid var(--border);
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 10px;
     }
     .search-box {
       display: flex;
       align-items: center;
       border: 1.5px solid #cbd5e1;
-      border-radius: 16px;
-      padding: 8px 10px 8px 14px;
+      border-radius: 14px;
+      padding: 6px 8px 6px 12px;
       background: #fff;
       gap: 8px;
       transition: border-color 0.2s, box-shadow 0.2s;
@@ -221,18 +221,18 @@
     textarea {
       flex: 1;
       border: none;
-      font-size: 1rem;
-      line-height: 1.45;
+      font-size: 0.96rem;
+      line-height: 1.4;
       resize: vertical;
       outline: none;
       font-family: inherit;
-      padding: 4px 0;
+      padding: 2px 0;
       background: transparent;
-      min-height: 54px;
+      min-height: 42px;
     }
     .icon-action {
-      width: 42px;
-      height: 42px;
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
       border: none;
       background: #f1f3f4;
@@ -246,7 +246,7 @@
     }
     .icon-action:hover { background: #e2e8f0; }
     .icon-action:active { background: #cbd5e1; }
-    .icon-action svg { width: 22px; height: 22px; fill: currentColor; }
+    .icon-action svg { width: 21px; height: 21px; fill: currentColor; }
     .icon-action.recording {
       background: #d32f2f;
       color: #fff;
@@ -256,15 +256,15 @@
 
     .action-row {
       display: flex;
-      gap: 10px;
+      gap: 8px;
       align-items: center;
     }
     .btn {
       flex: 1;
-      padding: 12px 16px;
+      padding: 10px 14px;
       border: none;
-      border-radius: 12px;
-      font-size: 0.96rem;
+      border-radius: 10px;
+      font-size: 0.92rem;
       font-weight: 700;
       cursor: pointer;
       display: inline-flex;
@@ -279,29 +279,29 @@
     .btn-blue { background: var(--blue); color: #fff; }
     .btn-green { background: var(--accent); color: #fff; }
     .btn-soft { background: var(--accent-soft); color: var(--accent); border: 1px solid #c8e6c9; }
-    .btn-dark { background: #222; color: #fff; font-size: 0.82rem; padding: 8px 13px; border-radius: 8px; flex: unset; }
+    .btn-dark { background: #222; color: #fff; font-size: 0.8rem; padding: 7px 12px; border-radius: 8px; flex: unset; }
 
-    /* 免責聲明橫幅 */
+    /* 免責聲明橫幅（緊湊清晰） */
     .disclaimer-banner {
       background: #fffdf5;
       border: 1px solid #fde68a;
       border-left: 4px solid #f59e0b;
-      border-radius: 12px;
-      padding: 12px 16px;
-      font-size: 0.84rem;
+      border-radius: 10px;
+      padding: 9px 14px;
+      font-size: 0.82rem;
       color: #4b5563;
-      line-height: 1.55;
+      line-height: 1.45;
     }
 
     /* 控制工具箱 */
     .controls-panel {
       background: #ffffff;
       border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 14px 18px;
+      border-radius: 14px;
+      padding: 11px 16px;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 9px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.02);
     }
     .controls-row {
@@ -309,13 +309,13 @@
       align-items: center;
       justify-content: space-between;
       flex-wrap: wrap;
-      gap: 12px;
+      gap: 10px;
     }
     .hint-group {
       display: flex;
       align-items: center;
-      gap: 10px;
-      font-size: 0.85rem;
+      gap: 8px;
+      font-size: 0.83rem;
       font-weight: 700;
       color: var(--accent);
       flex-wrap: wrap;
@@ -323,68 +323,68 @@
     .checkbox-group {
       display: flex;
       align-items: center;
-      gap: 14px;
+      gap: 12px;
       flex-wrap: wrap;
-      font-size: 0.88rem;
+      font-size: 0.85rem;
       font-weight: 600;
       color: #222;
     }
     .checkbox-group label {
       display: inline-flex;
       align-items: center;
-      gap: 5px;
+      gap: 4px;
       cursor: pointer;
       user-select: none;
     }
     .checkbox-group input[type="checkbox"] {
-      width: 16px;
-      height: 16px;
+      width: 15px;
+      height: 15px;
       accent-color: var(--accent);
       cursor: pointer;
     }
     .layout-bar {
       border-top: 1px solid #f1f5f9;
-      padding-top: 10px;
+      padding-top: 8px;
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       flex-wrap: wrap;
-      font-size: 0.86rem;
+      font-size: 0.84rem;
       color: #444;
       font-weight: 600;
     }
     .layout-select {
-      padding: 6px 10px;
+      padding: 5px 9px;
       border-radius: 8px;
       border: 1px solid #cbd5e1;
-      font-size: 0.85rem;
+      font-size: 0.83rem;
       background: #fff;
     }
     .print-title-input {
       margin-left: auto;
-      padding: 7px 12px;
+      padding: 6px 10px;
       border: 1px solid #cbd5e1;
       border-radius: 8px;
-      font-size: 0.85rem;
-      min-width: 210px;
+      font-size: 0.83rem;
+      min-width: 190px;
       outline: none;
     }
     .print-title-input:focus { border-color: var(--accent); }
 
-    /* ================= 輸出結果卡片區 ================= */
+    /* ================= 輸出結果卡片區（已縮短高度，不擋下方提示） ================= */
     .sheet-card {
       width: 100%;
       background: #ffffff;
-      padding: 32px 24px;
-      border-radius: 18px;
+      padding: 14px 18px;
+      border-radius: 16px;
       border: 1px solid var(--border);
-      box-shadow: 0 4px 16px rgba(0,0,0,0.04);
-      min-height: 220px;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.03);
+      min-height: 82px;
       display: flex;
       flex-direction: column;
       align-items: center;
       text-align: center;
-      gap: 20px;
+      gap: 12px;
       --user-font-size: 20px;
     }
     .sheet-card.align-left {
@@ -398,15 +398,15 @@
       align-items: flex-start;
     }
     .print-header-title {
-      font-size: 1.5rem;
+      font-size: 1.4rem;
       font-weight: 800;
       color: #111;
-      margin-bottom: 4px;
+      margin-bottom: 2px;
       display: none;
     }
     .preview-img {
-      max-width: 82%;
-      max-height: 180px;
+      max-width: 80%;
+      max-height: 150px;
       border-radius: 10px;
       object-fit: contain;
       display: none;
@@ -415,19 +415,19 @@
       width: 100%;
       background: #f9fbe7;
       border: 1px solid #dce775;
-      border-radius: 12px;
-      padding: 12px 16px;
-      font-size: 0.98rem;
+      border-radius: 10px;
+      padding: 9px 14px;
+      font-size: 0.94rem;
       color: #111;
-      line-height: 1.55;
+      line-height: 1.45;
       text-align: center;
       display: none;
     }
     .empty-placeholder {
       color: #9ca3af;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       margin: auto 0;
-      padding: 40px 16px;
+      padding: 10px 12px;
       user-select: none;
     }
     .annotation-list {
@@ -435,15 +435,15 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 24px;
+      gap: 16px;
     }
     .sentence-block {
       width: 100%;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 10px;
-      padding-bottom: 18px;
+      gap: 6px;
+      padding-bottom: 12px;
       border-bottom: 1px dashed #e5e7eb;
     }
     .sentence-block:last-child { border-bottom: none; padding-bottom: 0; }
@@ -451,7 +451,7 @@
       font-size: calc(var(--user-font-size) * 0.92);
       font-weight: 600;
       color: #111;
-      line-height: 1.45;
+      line-height: 1.4;
       word-break: normal;
       overflow-wrap: break-word;
       max-width: 95%;
@@ -460,7 +460,7 @@
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      gap: 10px 0;
+      gap: 8px 0;
       align-items: flex-end;
     }
     .tp-col {
@@ -470,7 +470,7 @@
       justify-content: flex-end;
       margin: 0 0.28ch;
       cursor: pointer;
-      padding: 3px 2px;
+      padding: 2px 2px;
       border-radius: 6px;
       transition: background 0.12s;
     }
@@ -481,7 +481,7 @@
       font-weight: 700;
       font-style: italic;
       color: #1b5e20;
-      line-height: 1.18;
+      line-height: 1.16;
       white-space: nowrap;
     }
     .tp-std {
@@ -495,8 +495,8 @@
       font-size: calc(var(--user-font-size) * 1.25);
       font-weight: 600;
       color: #000;
-      line-height: 1.25;
-      min-height: 1.25em;
+      line-height: 1.22;
+      min-height: 1.22em;
     }
 
     /* 四排動態隱藏控制 */
@@ -569,7 +569,7 @@
     }
 
     @media (max-width: 768px) {
-      .navbar { padding: 10px 12px; flex-wrap: wrap; }
+      .navbar { padding: 8px 12px; flex-wrap: wrap; }
       .brand-sub { display: none; }
       .action-row { flex-wrap: wrap; }
       .action-row .btn { min-width: 45%; }
@@ -645,8 +645,8 @@
         <textarea id="userInput" rows="2"
           placeholder="Ask AI any question, or enter/paste/drag text, PDF, Word, Google Docs link, or photo to translate..."></textarea>
 
-        <!-- 語音輸入（中英自動識別） -->
-        <button class="icon-action" id="micBtn" onclick="toggleVoice()" title="Voice Input (Auto Chinese & English)">
+        <!-- 語音輸入（預設英文持續錄音，不早斷；切換中文時識別中文） -->
+        <button class="icon-action" id="micBtn" onclick="toggleVoice()" title="Voice Input (Speak English or Chinese)">
           <svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.91-3c-.49 0-.9.36-.98.85C16.52 14.2 14.47 16 12 16s-4.52-1.8-4.93-4.15c-.08-.49-.49-.85-.98-.85-.61 0-1.09.54-1 1.14.49 3 2.89 5.35 5.91 5.78V20c0 .55.45 1 1 1s1-.45 1-1v-2.08c3.02-.43 5.42-2.78 5.91-5.78.1-.6-.39-1.14-1-1.14z"/></svg>
         </button>
 
@@ -667,7 +667,7 @@
       </div>
     </section>
 
-    <!-- 2. 輸出畫布區 -->
+    <!-- 2. 輸出畫布區（緊湊高度，下方提示一覽無遺） -->
     <section class="sheet-card hide-std" id="sheetCard">
       <div class="print-header-title" id="printHeaderTitle"></div>
       <img id="previewImg" class="preview-img" alt="Preview">
@@ -1208,7 +1208,6 @@
       return text;
     }
 
-    // 雙軌極速通道：Cloudflare Worker (含 KV 全網共享快取) + 個人 Key 多模型賽跑
     async function fetchFastAccurateAI(promptText, dataUrl = null, rawQuestionForCache = '') {
       const cleanCacheKey = normalizeCacheKey(rawQuestionForCache);
 
@@ -1860,14 +1859,12 @@ ${raw}`;
       replyBox.innerText = currentLang === 'en' ? '⚡ AI Thinking...' : '⚡ AI 正在極速思考...';
       list.innerHTML = '';
 
-      // 第 1 & 2 級快取：先查內建經典題庫與瀏覽器本地快取
       const localHit = getLocalCachedAnswer(q);
       if (localHit) {
         const ok = await renderBilingualAIOutput(localHit);
         if (ok) return;
       }
 
-      // 第 3 級快取 & 雙軌雲端：呼叫 Cloudflare Worker (含 KV 全網共享快取) + 個人 Key 多模型賽跑
       const directPrompt = `You are an authoritative bilingual scholar and assistant.
 User question/request: "${q}"
 
@@ -1973,40 +1970,67 @@ Pure_Chinese_Sentence ||| Authentic_English_Sentence`;
     }
 
     // =========================================================================
-    // 7. 語音輸入（中英文雙語自動識別）與全文朗讀
+    // 7. 專為外國人優化的語音輸入（英文優先 en-US + 持續錄音不早斷 + 2.8秒停頓自動送出）
     // =========================================================================
     let activeRec = null;
+    let voiceSilenceTimer = null;
+    let manualVoiceStop = false;
 
     function toggleVoice() {
       const btn = document.getElementById('micBtn');
       const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!SR) return alert(currentLang === 'en' ? 'Voice input is not supported in this browser.' : '當前瀏覽器不支援語音輸入。');
 
+      // 若正在錄音，再次點擊麥克風則立即結束並送出
       if (activeRec) {
+        manualVoiceStop = true;
+        clearTimeout(voiceSilenceTimer);
         activeRec.stop();
         return;
       }
 
+      manualVoiceStop = false;
       activeRec = new SR();
-      activeRec.lang = 'zh-CN';
+      // 外國人使用英文介面時 100% 鎖定高精準度美式英語 en-US；切換為中文介面時才用 zh-CN
+      activeRec.lang = currentLang === 'zh' ? 'zh-CN' : 'en-US';
       activeRec.interimResults = true;
-      activeRec.maxAlternatives = 5;
-      activeRec.continuous = false;
+      activeRec.maxAlternatives = 3;
+      activeRec.continuous = true; // 關鍵：允許外國人說話中間自然停頓換氣，絕不提前斷開！
       btn.classList.add('recording');
 
       let finalTranscript = '';
+
+      function resetSilenceTimer() {
+        clearTimeout(voiceSilenceTimer);
+        // 給予充足的 2.8 秒思考/停頓緩衝，講完話停頓滿 2.8 秒才自動停止並發送
+        voiceSilenceTimer = setTimeout(() => {
+          if (activeRec) {
+            manualVoiceStop = true;
+            activeRec.stop();
+          }
+        }, 2800);
+      }
+
+      resetSilenceTimer();
+
       activeRec.onresult = (e) => {
+        resetSilenceTimer();
         let interim = '';
         for (let i = e.resultIndex; i < e.results.length; i++) {
           const res = e.results[i];
-          const bestText = res[0].transcript;
-          if (res.isFinal) finalTranscript += bestText;
-          else interim += bestText;
+          const seg = res[0].transcript;
+          if (res.isFinal) {
+            finalTranscript += (finalTranscript && !finalTranscript.endsWith(' ') ? ' ' : '') + seg.trim();
+          } else {
+            interim += seg;
+          }
         }
-        document.getElementById('userInput').value = (finalTranscript || interim).trim();
+        const combined = (finalTranscript + (interim ? ' ' + interim : '')).trim();
+        document.getElementById('userInput').value = combined;
       };
 
       activeRec.onend = () => {
+        clearTimeout(voiceSilenceTimer);
         btn.classList.remove('recording');
         activeRec = null;
         const spoken = document.getElementById('userInput').value.trim();
@@ -2014,6 +2038,7 @@ Pure_Chinese_Sentence ||| Authentic_English_Sentence`;
       };
 
       activeRec.onerror = () => {
+        clearTimeout(voiceSilenceTimer);
         btn.classList.remove('recording');
         activeRec = null;
       };
