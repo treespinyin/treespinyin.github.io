@@ -120,6 +120,11 @@
       background: #f3f4f6;
       border-color: #adb5bd;
     }
+    .nav-btn.has-key {
+      border-color: #2e7d32;
+      color: #1b5e20;
+      background: #e8f5e9;
+    }
     .nav-btn.login-btn {
       background: var(--accent);
       color: #fff;
@@ -173,7 +178,7 @@
       color: var(--accent);
     }
 
-    /* 右側區域：Install | Login */
+    /* 右側區域：API Key | Install | Login */
     .nav-right {
       display: flex;
       align-items: center;
@@ -373,7 +378,7 @@
     .sheet-card {
       width: 100%;
       background: #ffffff;
-      padding: 32px 24px;
+      padding: 36px 24px 32px;
       border-radius: 18px;
       border: 1px solid var(--border);
       box-shadow: 0 4px 16px rgba(0,0,0,0.04);
@@ -390,14 +395,16 @@
       position: absolute;
       top: 10px;
       right: 14px;
-      font-size: 0.72rem;
-      font-weight: 700;
-      padding: 3px 9px;
+      font-size: 0.76rem;
+      font-weight: 800;
+      padding: 4px 11px;
       border-radius: 12px;
       background: #e8f5e9;
       color: #1b5e20;
-      border: 1px solid #c8e6c9;
+      border: 1.5px solid #81c784;
+      box-shadow: 0 2px 6px rgba(27,94,32,0.12);
       display: none;
+      z-index: 10;
     }
     .sheet-card.align-left {
       align-items: flex-start;
@@ -547,7 +554,7 @@
     }
     .modal-box {
       background: #fff; width: 100%; max-width: 460px; border-radius: 16px;
-      padding: 22px; display: flex; flex-direction: column; gap: 14px;
+      padding: 22px; display: flex; flex-direction: column; gap: 13px;
       box-shadow: 0 10px 30px rgba(0,0,0,0.22);
     }
     .option-card-btn {
@@ -571,12 +578,12 @@
       border-color: var(--accent);
     }
     .notice-box {
-      font-size: 0.88rem;
-      line-height: 1.6;
+      font-size: 0.86rem;
+      line-height: 1.58;
       background: #fff8e1;
       border: 1px solid #ffe082;
       color: #333;
-      padding: 14px;
+      padding: 13px;
       border-radius: 10px;
     }
 
@@ -603,7 +610,7 @@
 
   <button class="exit-big-btn" id="uiExitBig" onclick="toggleBigFont()">✕ Exit Fullscreen</button>
 
-  <!-- ================= 頂部導覽列：左 Trees Pinyin | 中 More Resources & 中文 | 右 Install / Login ================= -->
+  <!-- ================= 頂部導覽列：左 Trees Pinyin | 中 More Resources & 中文 | 右 API Key / Install / Login ================= -->
   <header class="navbar">
     <a href="index.html" class="nav-left">
       <img src="/icon.png?v=3" alt="Trees Pinyin" class="brand-logo" onerror="this.src='icon.png'">
@@ -630,6 +637,8 @@
     </div>
 
     <div class="nav-right">
+      <button class="nav-btn" onclick="openKeyModal()" id="uiKeyBtn">🔑 API Key</button>
+
       <button class="nav-btn" onclick="openInstallModal()" id="uiInstallBtn">
         <img src="/icon.png?v=3" alt="" class="btn-mini-icon" onerror="this.src='icon.png'">
         <span id="uiInstallBtnText">Install</span>
@@ -656,7 +665,7 @@
         <textarea id="userInput" rows="2"
           onfocus="prewarmBrowserAI()"
           oninput="prewarmBrowserAI()"
-          placeholder="Ask your Browser AI, or enter/paste/drag text, PDF, Word, Google Docs link, or photo to translate & annotate..."></textarea>
+          placeholder="Ask AI any question, or enter/paste/drag text, PDF, Word, Google Docs link, or photo to translate..."></textarea>
 
         <!-- 語音輸入（中英自動識別） -->
         <button class="icon-action" id="micBtn" onclick="toggleVoice()" title="Voice Input (Auto Chinese & English)">
@@ -733,7 +742,7 @@
       <img id="previewImg" class="preview-img" alt="Preview">
       <div class="ai-reply-box" id="aiReplyBox"></div>
       <div class="empty-placeholder" id="emptyPlaceholder">
-        🌲 Enter or paste text, upload a PDF/Word/Photo, and click "📝 Translate & Pinyin" or "✨ AI Reply & Pinyin" above.
+        🌲 Enter text, upload a PDF/Word/Photo, or click "✨ AI Reply & Pinyin" above to see instant Trees Pinyin annotations here.
       </div>
       <div class="annotation-list" id="annotationList"></div>
     </section>
@@ -756,7 +765,7 @@
       <button class="option-card-btn" onclick="openCameraNoticeModal()">
         <div>
           <div id="uiOptCamTitle">📷 Camera & Photo Library</div>
-          <div style="font-size:0.78rem; color:#555; font-weight:400; margin-top:3px;" id="uiOptCamSub">Recognize text from photos</div>
+          <div style="font-size:0.78rem; color:#555; font-weight:400; margin-top:3px;" id="uiOptCamSub">Recognize text or objects from photos</div>
         </div>
         <span>➔</span>
       </button>
@@ -773,7 +782,7 @@
         <b>📱 Fastest Way on iPhone / iPad (0.1s):</b><br>
         Take a photo with your <b>Apple Camera</b> first, tap to <b>Copy Text (Live Text)</b>, and paste it here for instant 0-delay annotation!<br><br>
         <b>📷 Direct Photo Upload:</b><br>
-        Best for <b>short text, menus, or signs</b>.
+        Best for <b>short text, menus, signs, or single objects</b>.
       </div>
 
       <div class="action-row">
@@ -814,26 +823,32 @@
     </div>
   </div>
 
-  <!-- ================= 彈窗 5：當瀏覽器內建 AI 未開啟時的「請在瀏覽器問好再貼回注音」提示彈窗 ================= -->
-  <div class="modal" id="browserNoticeModal" onclick="if(event.target===this)this.style.display='none'">
+  <!-- ================= 彈窗 5：Chrome 內建 AI / 個人 Gemini Key / 瀏覽器 AI 剪貼簿自動接力 ================= -->
+  <div class="modal" id="keyModal" onclick="if(event.target===this)this.style.display='none'">
     <div class="modal-box">
-      <h3 style="margin:0; font-size:1.08rem; color:#1b5e20;" id="uiBrowserNoticeTitle">💡 Please Ask Your Browser's AI First for 100% Accuracy</h3>
-      <div class="notice-box" id="uiBrowserNoticeDesc">
-        Your current browser does not have <b>Chrome Built-in Local AI</b> enabled.<br><br>
-        To ensure <b>100% accurate answers</b> (for classical poems, recipes, or complex questions):<br>
-        1. Please ask your question in your own browser's AI (such as <b>Google Gemini</b> or <b>ChatGPT</b>).<br>
-        2. Copy the AI's reply, paste it into the input box here, and click <b>"📝 Translate & Pinyin"</b>!
+      <h3 style="margin:0; font-size:1.05rem; color:#1b5e20;" id="uiKeyTitle">✨ Ask Browser AI or Connect Gemini Key</h3>
+
+      <div class="notice-box" id="uiRelayBox">
+        <b>🚀 Fastest Zero-Setup Way (100% Accurate):</b><br>
+        Ask your browser's AI first, then paste the reply here and click <b>"📝 Translate & Pinyin"</b> (or use the 1-click auto-relay buttons below):
+        <div class="action-row" style="margin-top:9px;">
+          <button class="btn btn-blue" style="font-size:0.84rem; padding:9px;" onclick="launchBrowserAIRelay('gemini')">🚀 Copy & Ask Google Gemini</button>
+          <button class="btn btn-dark" style="font-size:0.84rem; padding:9px; flex:1;" onclick="launchBrowserAIRelay('chatgpt')">💬 Copy & Ask ChatGPT</button>
+        </div>
       </div>
 
-      <div style="font-size:0.82rem; color:#555; font-weight:600;" id="uiQuickCopyHint">
-        👇 Quick Helper (Auto-copies your question & opens your browser AI):
+      <div id="uiKeyDesc" style="font-size:0.83rem; line-height:1.5; background:#f8f9fa; padding:11px; border-radius:10px; border:1px solid #e5e7eb;">
+        <b>🔑 Optional: Personal Google Gemini API Key</b><br>
+        If Chrome Built-in AI (`self.LanguageModel`) is not unlocked on this device, you can paste your own free Gemini Key (stored 100% locally in your browser):<br>
+        • <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:#1565c0; font-weight:700;">👉 Get Free Key at Google AI Studio</a>
       </div>
+      <input type="password" id="apiKeyInput" style="width:100%;padding:9px 12px;border:1.5px solid #cbd5e1;border-radius:10px;font-size:0.9rem;" placeholder="Paste AIzaSy... key here (Optional)">
       <div class="action-row">
-        <button class="btn btn-blue" style="font-size:0.88rem; padding:10px;" onclick="launchBrowserAIRelay('gemini')">🚀 Copy & Open Google Gemini</button>
-        <button class="btn btn-dark" style="font-size:0.88rem; padding:10px; flex:1;" onclick="launchBrowserAIRelay('chatgpt')">💬 Copy & Open ChatGPT</button>
+        <button class="btn btn-green" onclick="saveBackupKey()" id="uiKeySave">Save Key & Run AI</button>
+        <button class="btn btn-soft" style="flex:0.4;" onclick="clearBackupKey()" id="uiKeyClear">Clear</button>
       </div>
 
-      <button class="btn btn-soft" style="width:100%;" onclick="document.getElementById('browserNoticeModal').style.display='none'" id="uiBrowserNoticeClose">Got It</button>
+      <button class="nav-btn" style="width:100%;padding:8px;justify-content:center;" onclick="document.getElementById('keyModal').style.display='none'" id="uiKeyClose">Close</button>
     </div>
   </div>
 
@@ -905,14 +920,14 @@
     }
 
     // =========================================================================
-    // 0.1 Chrome 138+ / Edge 148+ 原生內建 AI 預熱引擎
+    // 0.1 Chrome 138+ / Edge 148+ 原生內建 AI 預熱引擎 (self.LanguageModel)
     // =========================================================================
     let prewarmedLMSession = null;
     let prewarmedTranslatorZhToEn = null;
     let prewarmedTranslatorEnToZh = null;
     let isPrewarming = false;
 
-    const SYSTEM_PROMPT_INSTRUCTION = `You are an accurate, direct knowledge assistant.
+    const SYSTEM_PROMPT_INSTRUCTION = `You are an accurate, direct Mandarin Chinese & English assistant.
 Answer the user's exact request directly in Mandarin Chinese without any unrelated filler.
 - If the user asks for a poem, classic text, or lyrics (e.g., 詠鵝, 靜夜思), output the exact, authentic original Chinese lines only.
 - If the user asks how to cook a dish or do something (e.g., 如何做鍋包肉), output clear, concise step-by-step instructions in Chinese (1 sentence per line).
@@ -928,8 +943,11 @@ Answer the user's exact request directly in Mandarin Chinese without any unrelat
           let avail = 'available';
           if (typeof LM.availability === 'function') {
             avail = await LM.availability();
+          } else if (typeof LM.capabilities === 'function') {
+            const cap = await LM.capabilities();
+            avail = cap?.available || 'available';
           }
-          if (avail === 'available' || avail === 'readily') {
+          if (avail === 'available' || avail === 'readily' || avail === 'after-download') {
             prewarmedLMSession = await LM.create({
               initialPrompts: [{ role: 'system', content: SYSTEM_PROMPT_INSTRUCTION }]
             });
@@ -966,6 +984,7 @@ Answer the user's exact request directly in Mandarin Chinese without any unrelat
     // 0.2 中英文雙語介面字典
     // =========================================================================
     let currentLang = 'en';
+    let backupKey = (localStorage.getItem('tp_v22_backup_key') || '').trim();
 
     const UI_TEXT = {
       en: {
@@ -976,11 +995,12 @@ Answer the user's exact request directly in Mandarin Chinese without any unrelat
         menuGames: "🎮 Mini Games",
         menuContact: "✉️ Contact & Support",
         langBtn: "中文",
+        keyBtn: "🔑 API Key",
         installBtnText: "Install",
         loginBtnText: "👨‍🏫 Login",
         loginStudent: "🌱 Student Login (Class Code)",
         loginTeacher: "👩‍🏫 Teacher / Parent Dashboard",
-        placeholder: "Ask your Browser AI, or enter/paste/drag text, PDF, Word, Google Docs link, or photo to translate & annotate...",
+        placeholder: "Ask AI any question, or enter/paste/drag text, PDF, Word, Google Docs link, or photo to translate...",
         aiBtn: "✨ AI Reply & Pinyin",
         transBtn: "📝 Translate & Pinyin",
         speakBtn: "🔊 Speak",
@@ -992,7 +1012,7 @@ Answer the user's exact request directly in Mandarin Chinese without any unrelat
         saveBtn: "💾 Save Photo",
         printBtn: "🖨️ Print / PDF",
         exitBig: "✕ Exit Fullscreen",
-        emptyPlaceholder: "🌲 Enter or paste text, upload a PDF/Word/Photo, and click \"📝 Translate & Pinyin\" or \"✨ AI Reply & Pinyin\" above.",
+        emptyPlaceholder: "🌲 Enter text, upload a PDF/Word/Photo, or click \"✨ AI Reply & Pinyin\" above to see instant Trees Pinyin annotations here.",
         installTitle: "Install Trees Pinyin to Desktop / Home Screen",
         installSteps: '<b>📱 iPhone & iPad (Safari):</b><br>1. Open <span style="color:#1b5e20; font-weight:700;">treespinyin.com</span> in <b>Safari</b>.<br>2. Tap the <b>Share button [📤]</b> → <b>"Add to Home Screen [➕]"</b>.<br><br><b>💻 Mac (Safari / Chrome / Edge):</b><br>• <b>Mac Safari:</b> Click <b>File</b> in top menu bar → <b>"Add to Dock..."</b><br>• <b>Chrome / Edge:</b> Click the <b>Install icon [⊕]</b> on the right side of the address bar.',
         gotItBtn: "Got It",
@@ -1000,12 +1020,8 @@ Answer the user's exact request directly in Mandarin Chinese without any unrelat
         optDocTitle: "📄 Upload File (PDF / Word / Docs / TXT)",
         optDocSub: "100% Client-side instant extraction & Pinyin",
         optCamTitle: "📷 Camera & Photo Library",
-        optCamSub: "Recognize text from photos",
-        fileMenuCancel: "Cancel",
-        browserNoticeTitle: "💡 Please Ask Your Browser's AI First for 100% Accuracy",
-        browserNoticeDesc: 'Your current browser does not have <b>Chrome Built-in Local AI</b> enabled.<br><br>To ensure <b>100% accurate answers</b> (for classical poems, recipes, or complex questions):<br>1. Please ask your question in your own browser\'s AI (such as <b>Google Gemini</b> or <b>ChatGPT</b>).<br>2. Copy the AI\'s reply, paste it into the input box here, and click <b>"📝 Translate & Pinyin"</b>!',
-        quickCopyHint: "👇 Quick Helper (Auto-copies your question & opens your browser AI):",
-        browserNoticeClose: "Got It"
+        optCamSub: "Recognize text or objects from photos",
+        fileMenuCancel: "Cancel"
       },
       zh: {
         subTitle: "極速 AI 問答 · 文檔/PDF/照片秒速翻譯注音 · 像讀英語一樣開口說中文",
@@ -1015,23 +1031,24 @@ Answer the user's exact request directly in Mandarin Chinese without any unrelat
         menuGames: "🎮 趣味小遊戲 (Mini Games)",
         menuContact: "✉️ 聯絡我們與支持",
         langBtn: "English",
+        keyBtn: "🔑 API Key",
         installBtnText: "安裝桌面",
         loginBtnText: "👨‍🏫 登錄",
         loginStudent: "🌱 學生端入口 (輸入班級碼)",
         loginTeacher: "👩‍🏫 教師 / 家長管理後台",
-        placeholder: "在上方輸入/貼上/拖入文字、PDF、Word、Google Docs 連結或照片直接翻譯注音...",
+        placeholder: "向 AI 提問，或輸入/貼上/拖入文字、PDF、Word、Google Docs 連結或照片直接翻譯注音...",
         aiBtn: "✨ AI 回答並注音",
         transBtn: "📝 翻譯並注音",
         speakBtn: "🔊 朗讀",
         stopSpeakBtn: "⏹️ 停止",
-        disclaimer: '受限於 API 成本，免費 AI 偶有誤差；請點擊或右鍵漢字根據讀音修正多音字。遇到複雜問題請先在您自己的瀏覽器 AI 中提問，將回覆貼到上方並點擊「<b>📝 翻譯並注音</b>」。作者對拼音結果準確性不承擔法律責任。您的支持與分享將幫助作者全職投入改進與編寫記憶字典！',
+        disclaimer: '受限於 API 成本，免費 AI 偶有誤差；請點擊或右鍵漢字根據讀音修正多音字。遇到複雜問題可先詢問瀏覽器 AI，將回覆貼到上方並點擊「<b>📝 翻譯並注音</b>」。作者對拼音結果準確性不承擔法律責任。您的支持與分享將幫助作者全職投入改進與編寫記憶字典！',
         hintSpeak: "🔊 左鍵點擊漢字發音",
         hintEdit: "✍️ 右鍵點擊修改多音字",
         bigBtn: "🖥️ 全屏大字",
         saveBtn: "💾 保存圖片",
         printBtn: "🖨️ 列印 / PDF",
         exitBig: "✕ 退出全螢幕",
-        emptyPlaceholder: "🌲 請在上方輸入或貼上文字、上傳 PDF/Word/照片，並點擊「📝 翻譯並注音」或「✨ AI 回答並注音」。",
+        emptyPlaceholder: "🌲 請在上方輸入文字、上傳 PDF/Word/照片，或點擊「✨ AI 回答並注音」，此處將立即生成雙語自然拼讀注音。",
         installTitle: "安裝 Trees Pinyin 到手機主屏幕 / Mac 桌面",
         installSteps: '<b>📱 iPhone 與 iPad (必須用 Safari 瀏覽器)：</b><br>1. 用 <b>Safari</b> 打開 <span style="color:#1b5e20; font-weight:700;">treespinyin.com</span>。<br>2. 點擊底部 <b>分享按鈕 [📤]</b> → 選擇 <b>「加入主畫面 [➕]」</b>。<br><br><b>💻 Mac 電腦 (Safari / Chrome / Edge)：</b><br>• <b>Mac Safari：</b>點擊頂部選單「檔案 (File)」→ <b>「加入程序塢 (Add to Dock...)」</b><br>• <b>Chrome / Edge：</b>點擊網址列右側的 <b>安裝圖標 [⊕]</b> 即可安裝到桌面。',
         gotItBtn: "知道了",
@@ -1039,12 +1056,8 @@ Answer the user's exact request directly in Mandarin Chinese without any unrelat
         optDocTitle: "📄 上傳文件 (PDF / Word / Docs / TXT)",
         optDocSub: "100% 用戶端本地秒讀提取文字，0 伺服器延遲",
         optCamTitle: "📷 拍照或從圖庫選圖",
-        optCamSub: "識別照片中的文字",
-        fileMenuCancel: "取消",
-        browserNoticeTitle: "💡 請先在您自己的瀏覽器 AI 提問，再拷貝過來翻譯注音",
-        browserNoticeDesc: '檢測到您當前的瀏覽器尚未啟用 <b>Chrome 內建本地 AI</b>。<br><br>為了確保回答 <b>100% 準確無誤</b>（如古詩詞、食譜做法或複雜問題）：<br>1. 請先在您自己的瀏覽器 AI（如 <b>Google Gemini</b> 或 <b>ChatGPT</b>）中提問。<br>2. 複製 AI 的回答，貼回本頁上方輸入框，點擊 <b>「📝 翻譯並注音」</b> 即可瞬間生成精準四排注音！',
-        quickCopyHint: "👇 快捷跳轉（自動幫您複製好問題並打開您的瀏覽器 AI，複製答案切回本頁即可自動注音）：",
-        browserNoticeClose: "知道了"
+        optCamSub: "識別照片中的短文字、菜單或單個物品",
+        fileMenuCancel: "取消"
       }
     };
 
@@ -1058,6 +1071,7 @@ Answer the user's exact request directly in Mandarin Chinese without any unrelat
       document.getElementById('uiMenuGames').innerText = t.menuGames;
       document.getElementById('uiMenuContact').innerText = t.menuContact;
       document.getElementById('uiLangBtn').innerText = t.langBtn;
+      document.getElementById('uiKeyBtn').innerText = t.keyBtn;
       document.getElementById('uiInstallBtnText').innerText = t.installBtnText;
       document.getElementById('uiLoginBtnText').innerText = t.loginBtnText;
       document.getElementById('uiLoginStudent').innerText = t.loginStudent;
@@ -1083,10 +1097,6 @@ Answer the user's exact request directly in Mandarin Chinese without any unrelat
       document.getElementById('uiOptCamTitle').innerText = t.optCamTitle;
       document.getElementById('uiOptCamSub').innerText = t.optCamSub;
       document.getElementById('uiFileMenuCancel').innerText = t.fileMenuCancel;
-      document.getElementById('uiBrowserNoticeTitle').innerText = t.browserNoticeTitle;
-      document.getElementById('uiBrowserNoticeDesc').innerHTML = t.browserNoticeDesc;
-      document.getElementById('uiQuickCopyHint').innerText = t.quickCopyHint;
-      document.getElementById('uiBrowserNoticeClose').innerText = t.browserNoticeClose;
     }
 
     // =========================================================================
@@ -1120,10 +1130,40 @@ Answer the user's exact request directly in Mandarin Chinese without any unrelat
     }
 
     // =========================================================================
-    // 0.5 瀏覽器 AI 提問與剪貼簿自動接力
+    // 0.5 用戶個人 API Key 與「瀏覽器 AI 剪貼簿自動接力」
     // =========================================================================
     let awaitingBrowserAIRelay = false;
     let lastRelayQuestion = '';
+
+    function refreshKeyBtnStyle() {
+      const btn = document.getElementById('uiKeyBtn');
+      if (backupKey) btn.classList.add('has-key');
+      else btn.classList.remove('has-key');
+    }
+    refreshKeyBtnStyle();
+
+    function openKeyModal() {
+      document.getElementById('apiKeyInput').value = backupKey;
+      document.getElementById('keyModal').style.display = 'flex';
+    }
+
+    function saveBackupKey() {
+      backupKey = document.getElementById('apiKeyInput').value.trim();
+      localStorage.setItem('tp_v22_backup_key', backupKey);
+      refreshKeyBtnStyle();
+      document.getElementById('keyModal').style.display = 'none';
+      const pendingQ = document.getElementById('userInput').value.trim();
+      if (backupKey && pendingQ) {
+        runSmartAI(pendingQ);
+      }
+    }
+
+    function clearBackupKey() {
+      backupKey = '';
+      localStorage.removeItem('tp_v22_backup_key');
+      document.getElementById('apiKeyInput').value = '';
+      refreshKeyBtnStyle();
+    }
 
     async function launchBrowserAIRelay(provider) {
       const q = document.getElementById('userInput').value.trim();
@@ -1135,14 +1175,14 @@ Answer the user's exact request directly in Mandarin Chinese without any unrelat
       }
 
       awaitingBrowserAIRelay = true;
-      document.getElementById('browserNoticeModal').style.display = 'none';
+      document.getElementById('keyModal').style.display = 'none';
 
       prepareOutputCanvas();
       const replyBox = document.getElementById('aiReplyBox');
       replyBox.style.display = 'block';
       replyBox.innerHTML = currentLang === 'en'
-        ? `📋 <b>Question copied!</b> Paste (Ctrl+V / Cmd+V) into your browser's AI, copy its answer, and paste it above (or switch back here) to click <b>"📝 Translate & Pinyin"</b>!`
-        : `📋 <b>問題已自動複製！</b>請在您的瀏覽器 AI 中貼上提問，將回答拷貝回來點擊<b>「📝 翻譯並注音」</b>（或直接切回本視窗自動注音）！`;
+        ? `📋 <b>Question copied!</b> Paste (Ctrl+V / Cmd+V) into your opened AI tab, copy its answer, and switch back here (or paste above & click <b>"📝 Translate & Pinyin"</b>)!`
+        : `📋 <b>問題已自動複製！</b>請在彈出的瀏覽器 AI 中貼上提問，複製 AI 回答後切回本頁（或貼到上方點擊<b>「📝 翻譯並注音」</b>）！`;
 
       const targetUrl = provider === 'chatgpt' ? 'https://chatgpt.com/' : 'https://gemini.google.com/app';
       window.open(targetUrl, '_blank');
@@ -1155,13 +1195,13 @@ Answer the user's exact request directly in Mandarin Chinese without any unrelat
         if (clipText && clipText !== lastRelayQuestion) {
           awaitingBrowserAIRelay = false;
           document.getElementById('userInput').value = clipText;
-          setEngineBadge('⚡ Translated from Browser AI');
+          setEngineBadge('⚡ Browser AI Relay');
           await runDirectTranslate(clipText);
         }
       } catch (e) {}
     });
 
-    function fetchWithTimeout(url, options = {}, timeoutMs = 6000) {
+    function fetchWithTimeout(url, options = {}, timeoutMs = 8500) {
       const ctrl = new AbortController();
       const timer = setTimeout(() => ctrl.abort(), timeoutMs);
       return fetch(url, { ...options, signal: ctrl.signal }).finally(() => clearTimeout(timer));
@@ -1661,8 +1701,10 @@ Answer the user's exact request directly in Mandarin Chinese without any unrelat
     }
 
     // =========================================================================
-    // 5. 100% 純粹調用 Chrome 內建本地 AI (`self.LanguageModel`)
-    //    若瀏覽器不支援或未啟用，直接彈出提示請用戶在瀏覽器 AI 問好再拷貝回來注音
+    // 5. 嚴格執行三步 AI 邏輯：
+    //    Step 1: 自動偵測並調用 Chrome 138+ 內建 AI (self.LanguageModel) -> 亮起 ⚡ Chrome Built-in AI
+    //    Step 2: 若本地 AI 失敗/未開啟，自動切換到用戶自填的 Gemini Key -> 亮起 ⚡ Your Google Gemini AI
+    //    Step 3: 若兩者皆無，彈出提示引導用戶去瀏覽器 AI 問完貼回來注音
     // =========================================================================
     function cleanChineseSentence(line) {
       if (!line) return '';
@@ -1679,6 +1721,7 @@ Answer the user's exact request directly in Mandarin Chinese without any unrelat
       return /[\u4e00-\u9fa5]/.test(s) ? s : '';
     }
 
+    // Step 1 函數：調用 Chrome 138+ 內建 AI (Gemini Nano)
     async function streamBrowserLocalAI(promptText, onLineCallback) {
       try {
         const LM = self.LanguageModel || (window.ai && window.ai.languageModel);
@@ -1688,6 +1731,9 @@ Answer the user's exact request directly in Mandarin Chinese without any unrelat
           let avail = 'available';
           if (typeof LM.availability === 'function') {
             avail = await LM.availability();
+          } else if (typeof LM.capabilities === 'function') {
+            const cap = await LM.capabilities();
+            avail = cap?.available || 'available';
           }
           if (avail === 'no' || avail === 'unavailable') return false;
           prewarmedLMSession = await LM.create({
@@ -1702,6 +1748,7 @@ Answer the user's exact request directly in Mandarin Chinese without any unrelat
           let anyOutput = false;
 
           for await (const chunk of stream) {
+            if (!anyOutput) setEngineBadge('⚡ Chrome Built-in AI');
             const delta = chunk.startsWith(buf) ? chunk.slice(prevLen) : chunk;
             prevLen = chunk.length;
             buf += delta;
@@ -1717,12 +1764,14 @@ Answer the user's exact request directly in Mandarin Chinese without any unrelat
           }
           if (buf.trim()) {
             anyOutput = true;
+            setEngineBadge('⚡ Chrome Built-in AI');
             await onLineCallback(buf.trim());
           }
           return anyOutput;
         } else if (prewarmedLMSession.prompt) {
           const fullReply = await prewarmedLMSession.prompt(promptText);
           if (fullReply && fullReply.trim()) {
+            setEngineBadge('⚡ Chrome Built-in AI');
             for (const l of fullReply.split(/\n+/)) {
               if (l.trim()) await onLineCallback(l.trim());
             }
@@ -1735,10 +1784,108 @@ Answer the user's exact request directly in Mandarin Chinese without any unrelat
       return false;
     }
 
+    // Step 2 函數：若本地 AI 未開啟，調用用戶自填的個人 Google Gemini API Key
+    async function streamUserGeminiAPI(promptText, onLineCallback, dataUrl = null) {
+      if (!backupKey) return false;
+      const modelsToTry = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-flash-latest'];
+
+      for (const mName of modelsToTry) {
+        try {
+          const parts = [{ text: promptText }];
+          if (dataUrl && dataUrl.includes(',')) {
+            const mime = dataUrl.substring(dataUrl.indexOf(':') + 1, dataUrl.indexOf(';'));
+            parts.push({ inline_data: { mime_type: mime, data: dataUrl.split(',')[1] } });
+          }
+
+          // 先嘗試 SSE 流式極速輸出
+          const sseUrl = `https://generativelanguage.googleapis.com/v1beta/models/${mName}:streamGenerateContent?alt=sse&key=${encodeURIComponent(backupKey)}`;
+          const r = await fetchWithTimeout(sseUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              systemInstruction: { parts: [{ text: SYSTEM_PROMPT_INSTRUCTION }] },
+              contents: [{ parts }],
+              generationConfig: { temperature: 0.2 }
+            })
+          }, 8500);
+
+          if (r.ok && r.body) {
+            const reader = r.body.getReader();
+            const decoder = new TextDecoder('utf-8');
+            let sseBuf = '';
+            let textBuf = '';
+            let anyOutput = false;
+
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) break;
+              sseBuf += decoder.decode(value, { stream: true });
+              const sseLines = sseBuf.split('\n');
+              sseBuf = sseLines.pop() || '';
+
+              for (const rawLine of sseLines) {
+                const tr = rawLine.trim();
+                if (!tr.startsWith('data:')) continue;
+                const jsonStr = tr.slice(5).trim();
+                if (!jsonStr || jsonStr === '[DONE]') continue;
+                try {
+                  const parsed = JSON.parse(jsonStr);
+                  const chunkText = parsed?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+                  if (chunkText) {
+                    if (!anyOutput) setEngineBadge('⚡ Your Google Gemini AI');
+                    textBuf += chunkText;
+                    let nlIdx;
+                    while ((nlIdx = textBuf.indexOf('\n')) !== -1) {
+                      const readyLine = textBuf.slice(0, nlIdx).trim();
+                      textBuf = textBuf.slice(nlIdx + 1);
+                      if (readyLine) {
+                        anyOutput = true;
+                        await onLineCallback(readyLine);
+                      }
+                    }
+                  }
+                } catch (e) {}
+              }
+            }
+
+            if (textBuf.trim()) {
+              anyOutput = true;
+              setEngineBadge('⚡ Your Google Gemini AI');
+              await onLineCallback(textBuf.trim());
+            }
+            if (anyOutput) return true;
+          }
+
+          // 若流式被網路環境阻擋，自動回退標準單次請求
+          const stdUrl = `https://generativelanguage.googleapis.com/v1beta/models/${mName}:generateContent?key=${encodeURIComponent(backupKey)}`;
+          const rStd = await fetchWithTimeout(stdUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [{ parts: [{ text: SYSTEM_PROMPT_INSTRUCTION + "\n\n" + promptText }, ...(parts.slice(1))] }]
+            })
+          }, 8500);
+
+          if (rStd.ok) {
+            const dStd = await rStd.json();
+            const fullText = dStd?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+            if (fullText && fullText.trim()) {
+              setEngineBadge('⚡ Your Google Gemini AI');
+              for (const l of fullText.split(/\n+/)) {
+                if (l.trim()) await onLineCallback(l.trim());
+              }
+              return true;
+            }
+          }
+        } catch (e) {}
+      }
+      return false;
+    }
+
     async function runSmartAI(overrideInput) {
       const q = (overrideInput !== undefined ? overrideInput : document.getElementById('userInput').value).trim();
       if (!q) {
-        document.getElementById('browserNoticeModal').style.display = 'flex';
+        openKeyModal();
         return;
       }
 
@@ -1747,7 +1894,7 @@ Answer the user's exact request directly in Mandarin Chinese without any unrelat
       const replyBox = document.getElementById('aiReplyBox');
       const list = document.getElementById('annotationList');
       replyBox.style.display = 'block';
-      replyBox.innerText = currentLang === 'en' ? '⚡ Checking your Chrome Built-in AI...' : '⚡ 正在調用您的瀏覽器內建 AI...';
+      replyBox.innerText = currentLang === 'en' ? '⚡ Checking Chrome Built-in AI...' : '⚡ 正在偵測並調用 Chrome 內建 AI...';
       list.innerHTML = '';
       setEngineBadge('');
 
@@ -1766,6 +1913,11 @@ Answer directly and accurately in Mandarin Chinese:
         if (lineCounter === 1) {
           replyBox.innerHTML = `<b>${trimmed}</b>`;
           await nextPaintTick();
+          const firstLinePure = cleanChineseSentence(trimmed);
+          if (firstLinePure && firstLinePure.length >= 4 && !/[A-Za-z]/.test(trimmed)) {
+            appendSentenceProgressive(firstLinePure, '');
+            await nextPaintTick();
+          }
           return;
         }
 
@@ -1779,23 +1931,33 @@ Answer directly and accurately in Mandarin Chinese:
         }
       }
 
-      // 唯一通道：調用用戶自己的 Chrome 內建本地 AI (`self.LanguageModel`)
+      // 第一順位：自動偵測並調用 Chrome 138+ 內建 AI (Gemini Nano)
       const localOk = await streamBrowserLocalAI(directPrompt, handleStreamedLine);
       if (localOk && lineCounter > 0) {
         setEngineBadge('⚡ Chrome Built-in AI');
         return;
       }
 
-      // 若瀏覽器內建 AI 不可用，立即跳出提示，請用戶在自己瀏覽器先問好，再拷貝過來點擊「📝 翻譯並注音」
+      // 第二順位：若本地 AI 失敗/未開啟，自動切換到用戶自填的 Gemini Key
+      if (backupKey) {
+        replyBox.innerText = currentLang === 'en' ? '⚡ Calling your Google Gemini API...' : '⚡ 正在調用您的 Google Gemini API...';
+        const keyOk = await streamUserGeminiAPI(directPrompt, handleStreamedLine);
+        if (keyOk && lineCounter > 0) {
+          setEngineBadge('⚡ Your Google Gemini AI');
+          return;
+        }
+      }
+
+      // 第三順位：若兩者皆無，彈出提示引導用戶在自己的瀏覽器 AI 問完再貼回來注音
       setEngineBadge('');
       replyBox.innerHTML = currentLang === 'en'
-        ? `💡 <b>Browser Built-in AI is not enabled on this device.</b><br>For 100% accuracy, please ask your question in your own browser's AI first, then copy & paste the reply above and click <b>"📝 Translate & Pinyin"</b>!`
-        : `💡 <b>您的瀏覽器尚未啟用內建本地 AI。</b><br>為確保 100% 準確，請先在您自己的瀏覽器 AI 中提問，再將回答拷貝到上方輸入框，點擊<b>「📝 翻譯並注音」</b>！`;
-      document.getElementById('browserNoticeModal').style.display = 'flex';
+        ? `💡 <b>Chrome Built-in AI is not enabled on this browser yet.</b><br>Please ask your browser's AI first, then paste the reply above and click <b>"📝 Translate & Pinyin"</b>!`
+        : `💡 <b>當前瀏覽器尚未啟用 Chrome 內建本地 AI。</b><br>請先在您自己的瀏覽器 AI 提問，再將回答拷貝到上方並點擊<b>「📝 翻譯並注音」</b>！`;
+      openKeyModal();
     }
 
     // =========================================================================
-    // 6. 照片文字極速識別 (OCR)
+    // 6. 照片與圖片極速識別
     // =========================================================================
     async function handlePhotoUpload(input) {
       if (!input.files || !input.files[0]) return;
@@ -1805,13 +1967,39 @@ Answer directly and accurately in Mandarin Chinese:
       const replyBox = document.getElementById('aiReplyBox');
       const list = document.getElementById('annotationList');
       replyBox.style.display = 'block';
-      replyBox.innerText = currentLang === 'en' ? '📷 Extracting text from photo...' : '📷 正在識別照片中的文字...';
+      replyBox.innerText = currentLang === 'en' ? '📷 Analyzing photo...' : '📷 正在極速識別照片...';
       list.innerHTML = '';
 
       const dataUrl = await compressImg(file, 560, 0.68);
       const prev = document.getElementById('previewImg');
       prev.src = dataUrl;
       prev.style.display = 'block';
+
+      const vPrompt = `Look at this image:
+Line 1: Identify what text, object, dish, or landmark is in the image (in English & Chinese).
+Line 2+: If there is text in the image, output the Chinese text or its Chinese translation directly; if it is an object or dish, output 1-2 brief descriptive sentences in pure Chinese characters. No Pinyin on lines 2+.`;
+
+      let hasRenderedPhotoResult = false;
+
+      if (backupKey) {
+        let vLine = 0;
+        const ok = await streamUserGeminiAPI(vPrompt, async (rawLine) => {
+          hasRenderedPhotoResult = true;
+          vLine++;
+          const tr = rawLine.replace(/^[-*•\d.)、]+\s*/, '').trim();
+          if (vLine === 1) {
+            replyBox.innerHTML = `<b>${tr}</b>`;
+          } else {
+            const cz = cleanChineseSentence(tr);
+            if (cz) appendSentenceProgressive(cz, '');
+          }
+          await nextPaintTick();
+        }, dataUrl);
+        if (ok) {
+          input.value = '';
+          return;
+        }
+      }
 
       try {
         const fd = new FormData();
@@ -1821,15 +2009,16 @@ Answer directly and accurately in Mandarin Chinese:
         const r = await fetchWithTimeout('https://api.ocr.space/parse/image', { method: 'POST', body: fd }, 6500);
         const d = await r.json();
         const ocrText = d?.ParsedResults?.[0]?.ParsedText?.trim() || '';
-        if (ocrText && ocrText.length >= 1) {
+        if (ocrText && ocrText.length >= 1 && !hasRenderedPhotoResult) {
+          hasRenderedPhotoResult = true;
           const clean = ocrText.replace(/\r\n/g, '\n').trim();
           document.getElementById('userInput').value = clean;
           replyBox.innerText = `📄 ${clean.slice(0, 65)}`;
           await runDirectTranslate(clean);
-        } else {
+        } else if (!hasRenderedPhotoResult) {
           replyBox.innerText = currentLang === 'en'
-            ? '💡 No clear text found. On iPhone/iPad, use Apple Camera Live Text to copy text in 0.1s and paste here!'
-            : '💡 未識別到清晰文字。若使用 iPhone/iPad，建議直接用蘋果相機拍照提取文字貼上！';
+            ? '💡 No clear text found. For AI object recognition, add your free Google Gemini Key in [🔑 API Key].'
+            : '💡 未識別到清晰文字。如需識別照片物品，請在右上角 [🔑 API Key] 填入免費 Gemini Key。';
         }
       } catch (e) {}
 
@@ -1893,7 +2082,7 @@ Answer directly and accurately in Mandarin Chinese:
         btn.classList.remove('recording');
         activeRec = null;
         const spoken = document.getElementById('userInput').value.trim();
-        if (spoken) runDirectTranslate(spoken);
+        if (spoken) runSmartAI(spoken);
       };
 
       activeRec.onerror = () => {
