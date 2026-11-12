@@ -666,10 +666,19 @@
         <button class="btn btn-soft" style="flex:0.45;" id="speakBtn" onclick="toggleSpeak()">🔊 Speak</button>
       </div>
     </section>
-
-    <!-- 2. 免責聲明 -->
+ <!-- 2. 輸出畫布區 -->
+    <section class="sheet-card hide-std" id="sheetCard">
+      <div class="print-header-title" id="printHeaderTitle"></div>
+      <img id="previewImg" class="preview-img" alt="Preview">
+      <div class="ai-reply-box" id="aiReplyBox"></div>
+      <div class="empty-placeholder" id="emptyPlaceholder">
+        Enter text, upload a PDF/Word/Photo, or click " AI Reply & Pinyin" above to see instant Trees Pinyin annotations here.
+      </div>
+      <div class="annotation-list" id="annotationList"></div>
+    </section>
+    <!-- 3. 免責聲明 -->
     <section class="disclaimer-banner" id="uiDisclaimer">
-      Due to API costs, free AI may make occasional errors; please right-click (or tap) any character to correct according to the sound. For complex questions, please ask your browser's AI first, paste the reply above, and click "<b>📝 Translate & Pinyin</b>". The author assumes no liability for the accuracy of the pinyin results. Your support and shares will help the author go full-time to make improvements and write a memory dictionary in the future!
+     For optimal results, use your own free Gemini API Key or paste text directly. Or switch to keyless PWA web app at www.treespinyin.com/app (may be slower and limits). The author assumes no liability for the accuracy. Your support and shares will help me go full-time to make improvements and write a memory dictionary in the future!
     </section>
 
     <!-- 3. 四排顯示與列印排版控制面板 -->
@@ -712,16 +721,7 @@
       </div>
     </section>
 
-    <!-- 4. 輸出畫布區 -->
-    <section class="sheet-card hide-std" id="sheetCard">
-      <div class="print-header-title" id="printHeaderTitle"></div>
-      <img id="previewImg" class="preview-img" alt="Preview">
-      <div class="ai-reply-box" id="aiReplyBox"></div>
-      <div class="empty-placeholder" id="emptyPlaceholder">
-        🌲 Enter text, upload a PDF/Word/Photo, or click "✨ AI Reply & Pinyin" above to see instant Trees Pinyin annotations here.
-      </div>
-      <div class="annotation-list" id="annotationList"></div>
-    </section>
+   
 
   </main>
 
