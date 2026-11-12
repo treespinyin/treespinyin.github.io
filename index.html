@@ -1,323 +1,1141 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI 0.5s 極速競速測試台</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Trees Pinyin - Fast AI Q&A & Instant Translator</title>
+  <meta name="theme-color" content="#1b5e20">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Trees Pinyin">
+
+  <!-- 強制綁定根目錄的 /icon.png?v=3 -->
+  <link rel="icon" type="image/png" href="/icon.png?v=3">
+  <link rel="shortcut icon" type="image/png" href="/icon.png?v=3">
+  <link id="appleTouchIcon" rel="apple-touch-icon" href="/icon.png?v=3">
+  <link rel="apple-touch-icon-precomposed" href="/icon.png?v=3">
+
+  <!-- 核心拼音與截圖庫（PDF與Word解析庫按需動態秒載） -->
+  <script src="https://cdn.jsdelivr.net/npm/pinyin-pro@3.19.6/dist/index.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
   <style>
     :root {
-      --bg: #0f172a;
-      --card: #1e293b;
-      --text: #f8fafc;
-      --accent: #22c55e;
-      --blue: #3b82f6;
-      --border: #334155;
+      --bg: #f5f7f9;
+      --card: #ffffff;
+      --text: #111111;
+      --muted: #555555;
+      --accent: #1b5e20;
+      --accent-hover: #2e7d32;
+      --accent-soft: #e8f5e9;
+      --blue: #1565c0;
+      --border: #dcdcdc;
     }
-    * { box-sizing: border-box; }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     body {
       margin: 0;
-      padding: 28px 16px;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      padding: 0 0 48px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       background: var(--bg);
       color: var(--text);
       display: flex;
       flex-direction: column;
       align-items: center;
+      min-height: 100vh;
     }
-    .container {
+
+    /* ================= 頂部導覽列 Navbar ================= */
+    .navbar {
       width: 100%;
-      max-width: 760px;
+      background: #ffffff;
+      border-bottom: 1px solid #e5e7eb;
+      padding: 10px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+      gap: 12px;
+    }
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: inherit;
+    }
+    .brand-logo {
+      width: 38px;
+      height: 38px;
+      border-radius: 8px;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+    .brand-text-wrap {
       display: flex;
       flex-direction: column;
-      gap: 16px;
     }
-    .status-bar {
+    .brand-title {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: var(--accent);
+      line-height: 1.2;
+    }
+    .brand-sub {
+      font-size: 0.74rem;
+      color: #666;
+      font-weight: 500;
+    }
+
+    .nav-center {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .dropdown {
+      position: relative;
+      display: inline-block;
+    }
+    .nav-btn {
+      background: #fff;
+      border: 1px solid #d0d7de;
+      border-radius: 10px;
+      padding: 7px 13px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #222;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .nav-btn:hover {
+      background: #f3f4f6;
+      border-color: #adb5bd;
+    }
+    .nav-btn.has-key {
+      border-color: #2e7d32;
+      color: #1b5e20;
+      background: #e8f5e9;
+    }
+    .nav-btn.login-btn {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+    .nav-btn.login-btn:hover {
+      background: var(--accent-hover);
+    }
+    .btn-mini-icon {
+      width: 17px;
+      height: 17px;
+      border-radius: 4px;
+      object-fit: cover;
+    }
+
+    .dropdown-menu {
+      display: none;
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      background: #fff;
+      min-width: 220px;
+      border-radius: 12px;
+      border: 1px solid #e5e7eb;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+      padding: 6px;
+      z-index: 2000;
+    }
+    .dropdown-menu.right-align {
+      left: auto;
+      right: 0;
+    }
+    .dropdown:hover .dropdown-menu,
+    .dropdown.open .dropdown-menu {
+      display: block;
+    }
+    .dropdown-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      color: #222;
+      text-decoration: none;
+      font-size: 0.88rem;
+      font-weight: 600;
+      border-radius: 8px;
+      transition: background 0.15s;
+    }
+    .dropdown-item:hover {
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* ================= 主容器 ================= */
+    .main-wrap {
+      width: 100%;
+      max-width: 920px;
+      padding: 20px 16px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .panel {
+      width: 100%;
       background: var(--card);
+      padding: 16px;
+      border-radius: 18px;
+      box-shadow: 0 3px 14px rgba(0,0,0,0.04);
       border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 16px 18px;
       display: flex;
       flex-direction: column;
       gap: 12px;
     }
-    .status-row {
+    .search-box {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 10px;
-      font-size: 0.9rem;
-    }
-    .badge {
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-weight: 700;
-      font-size: 0.82rem;
-    }
-    .badge-ok { background: rgba(34,197,94,0.2); color: #4ade80; border: 1px solid #22c55e; }
-    .badge-warn { background: rgba(245,158,11,0.2); color: #fbbf24; border: 1px solid #f59e0b; }
-    .badge-err { background: rgba(239,68,68,0.2); color: #f87171; border: 1px solid #ef4444; }
-
-    .key-box {
-      display: flex;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 16px;
+      padding: 8px 10px 8px 14px;
+      background: #fff;
       gap: 8px;
-      align-items: center;
-      width: 100%;
-      flex-wrap: wrap;
+      transition: border-color 0.2s, box-shadow 0.2s;
     }
-    .key-input, .model-select {
-      padding: 9px 12px;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      background: #0f172a;
-      color: #fff;
-      font-size: 0.9rem;
+    .search-box:focus-within {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(27, 94, 32, 0.1);
+    }
+    textarea {
+      flex: 1;
+      border: none;
+      font-size: 1rem;
+      line-height: 1.45;
+      resize: vertical;
       outline: none;
+      font-family: inherit;
+      padding: 4px 0;
+      background: transparent;
+      min-height: 54px;
     }
-    .key-input { flex: 1; min-width: 200px; }
-    .model-select { min-width: 210px; cursor: pointer; }
+    .icon-action {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      border: none;
+      background: #f1f3f4;
+      color: #333;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: background 0.15s;
+    }
+    .icon-action:hover { background: #e2e8f0; }
+    .icon-action:active { background: #cbd5e1; }
+    .icon-action svg { width: 22px; height: 22px; fill: currentColor; }
+    .icon-action.recording {
+      background: #d32f2f;
+      color: #fff;
+      animation: pulse 1s infinite;
+    }
+    @keyframes pulse { 50% { opacity: 0.45; } }
 
-    .search-card {
-      background: var(--card);
-      border: 1.5px solid var(--border);
-      border-radius: 18px;
+    .action-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .btn {
+      flex: 1;
+      padding: 12px 16px;
+      border: none;
+      border-radius: 12px;
+      font-size: 0.96rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      white-space: nowrap;
+      transition: filter 0.15s, transform 0.1s;
+    }
+    .btn:hover { filter: brightness(1.06); }
+    .btn:active { transform: translateY(1px); }
+    .btn-blue { background: var(--blue); color: #fff; }
+    .btn-green { background: var(--accent); color: #fff; }
+    .btn-soft { background: var(--accent-soft); color: var(--accent); border: 1px solid #c8e6c9; }
+    .btn-dark { background: #222; color: #fff; font-size: 0.82rem; padding: 8px 13px; border-radius: 8px; flex: unset; }
+
+    /* 免責聲明橫幅 */
+    .disclaimer-banner {
+      background: #fffdf5;
+      border: 1px solid #fde68a;
+      border-left: 4px solid #f59e0b;
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-size: 0.84rem;
+      color: #4b5563;
+      line-height: 1.55;
+    }
+
+    /* 控制工具箱 */
+    .controls-panel {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 16px;
       padding: 14px 18px;
       display: flex;
       flex-direction: column;
       gap: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.02);
     }
-    .search-card:focus-within { border-color: var(--blue); }
-    textarea {
-      width: 100%;
-      border: none;
-      outline: none;
-      resize: none;
-      font-size: 1.08rem;
-      line-height: 1.5;
-      font-family: inherit;
-      background: transparent;
-      color: #fff;
-      min-height: 58px;
-    }
-    .btn-row {
+    .controls-row {
       display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .hint-group {
+      display: flex;
+      align-items: center;
       gap: 10px;
-      justify-content: flex-end;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--accent);
       flex-wrap: wrap;
     }
-    button {
-      border: none;
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: #222;
+    }
+    .checkbox-group label {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .checkbox-group input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+    .layout-bar {
+      border-top: 1px solid #f1f5f9;
+      padding-top: 10px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      font-size: 0.86rem;
+      color: #444;
+      font-weight: 600;
+    }
+    .layout-select {
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+      font-size: 0.85rem;
+      background: #fff;
+    }
+    .print-title-input {
+      margin-left: auto;
+      padding: 7px 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      min-width: 210px;
+      outline: none;
+    }
+    .print-title-input:focus { border-color: var(--accent); }
+
+    /* ================= 輸出結果卡片區 ================= */
+    .sheet-card {
+      width: 100%;
+      background: #ffffff;
+      padding: 32px 24px;
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+      min-height: 220px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 20px;
+      --user-font-size: 20px;
+    }
+    .sheet-card.align-left {
+      align-items: flex-start;
+      text-align: left;
+    }
+    .sheet-card.align-left .char-row {
+      justify-content: flex-start;
+    }
+    .sheet-card.align-left .sentence-block {
+      align-items: flex-start;
+    }
+    .print-header-title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #111;
+      margin-bottom: 4px;
+      display: none;
+    }
+    .preview-img {
+      max-width: 82%;
+      max-height: 180px;
+      border-radius: 10px;
+      object-fit: contain;
+      display: none;
+    }
+    .ai-reply-box {
+      width: 100%;
+      background: #f9fbe7;
+      border: 1px solid #dce775;
       border-radius: 12px;
-      padding: 10px 18px;
-      font-size: 0.94rem;
+      padding: 12px 16px;
+      font-size: 0.98rem;
+      color: #111;
+      line-height: 1.55;
+      text-align: center;
+      display: none;
+    }
+    .empty-placeholder {
+      color: #9ca3af;
+      font-size: 0.95rem;
+      margin: auto 0;
+      padding: 40px 16px;
+      user-select: none;
+    }
+    .annotation-list {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+    }
+    .sentence-block {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      padding-bottom: 18px;
+      border-bottom: 1px dashed #e5e7eb;
+    }
+    .sentence-block:last-child { border-bottom: none; padding-bottom: 0; }
+    .en-line {
+      font-size: calc(var(--user-font-size) * 0.92);
+      font-weight: 600;
+      color: #111;
+      line-height: 1.45;
+      word-break: normal;
+      overflow-wrap: break-word;
+      max-width: 95%;
+    }
+    .char-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px 0;
+      align-items: flex-end;
+    }
+    .tp-col {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      margin: 0 0.28ch;
+      cursor: pointer;
+      padding: 3px 2px;
+      border-radius: 6px;
+      transition: background 0.12s;
+    }
+    .tp-col:hover { background: #f1f8e9; }
+    .tp-col:active { background: #c8e6c9; }
+    .tp-py {
+      font-size: calc(var(--user-font-size) * 0.96);
+      font-weight: 700;
+      font-style: italic;
+      color: #1b5e20;
+      line-height: 1.18;
+      white-space: nowrap;
+    }
+    .tp-std {
+      font-size: calc(var(--user-font-size) * 0.78);
+      font-weight: 500;
+      color: #6b7280;
+      line-height: 1.15;
+      white-space: nowrap;
+    }
+    .tp-zh {
+      font-size: calc(var(--user-font-size) * 1.25);
+      font-weight: 600;
+      color: #000;
+      line-height: 1.25;
+      min-height: 1.25em;
+    }
+
+    /* 四排動態隱藏控制 */
+    .sheet-card.hide-en .en-line { display: none !important; }
+    .sheet-card.hide-tp .tp-py { display: none !important; }
+    .sheet-card.hide-std .tp-std { display: none !important; }
+    .sheet-card.hide-zh .tp-zh { display: none !important; }
+
+    /* 全屏大字模式 */
+    body.big-mode {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background: #fff; padding: 0; z-index: 99999; overflow-y: auto;
+    }
+    body.big-mode .navbar,
+    body.big-mode .panel,
+    body.big-mode .disclaimer-banner,
+    body.big-mode .controls-panel,
+    body.big-mode .preview-img { display: none !important; }
+    body.big-mode .main-wrap { max-width: 100%; width: 100%; min-height: 100vh; padding: 0; }
+    body.big-mode .sheet-card {
+      border: none; box-shadow: none; border-radius: 0;
+      min-height: 100vh; justify-content: center; padding: 48px 24px;
+      --user-font-size: 36px !important;
+    }
+    .exit-big-btn {
+      display: none; position: fixed; top: 16px; right: 16px;
+      background: #111; color: #fff; border: none; border-radius: 20px;
+      padding: 10px 18px; font-size: 0.92rem; font-weight: 700; z-index: 100000; cursor: pointer;
+    }
+    body.big-mode .exit-big-btn { display: block; }
+
+    /* 彈窗樣式 */
+    .modal {
+      display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.55); z-index: 9999; justify-content: center; align-items: center; padding: 16px;
+    }
+    .modal-box {
+      background: #fff; width: 100%; max-width: 420px; border-radius: 16px;
+      padding: 20px; display: flex; flex-direction: column; gap: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+    .option-card-btn {
+      width: 100%;
+      padding: 13px 14px;
+      border: 1.5px solid #d0d7de;
+      border-radius: 12px;
+      background: #f8fafc;
+      color: #111;
+      font-size: 0.95rem;
       font-weight: 700;
       cursor: pointer;
-      transition: filter 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      text-align: left;
+      transition: background 0.15s, border-color 0.15s;
     }
-    button:hover { filter: brightness(1.1); }
-    .btn-primary { background: var(--blue); color: #fff; }
-    .btn-green { background: #16a34a; color: #fff; }
-    .btn-outline { background: #334155; color: #e2e8f0; }
-
-    .output-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 22px;
-      min-height: 170px;
+    .option-card-btn:hover, .option-card-btn:active {
+      background: #e8f5e9;
+      border-color: var(--accent);
     }
-    .engine-tag {
-      display: inline-block;
-      font-size: 0.82rem;
-      font-weight: 800;
-      padding: 5px 12px;
-      border-radius: 8px;
-      background: rgba(34,197,94,0.18);
-      color: #4ade80;
-      border: 1px solid #22c55e;
-      margin-bottom: 14px;
-    }
-    .answer-text {
-      font-size: 1.12rem;
-      line-height: 1.75;
-      white-space: pre-wrap;
-      color: #f1f5f9;
-    }
-    .log-box {
-      font-family: monospace;
-      font-size: 0.82rem;
-      background: #020617;
-      color: #38bdf8;
-      padding: 12px 14px;
+    .notice-box {
+      font-size: 0.86rem;
+      line-height: 1.55;
+      background: #fff8e1;
+      border: 1px solid #ffe082;
+      color: #333;
+      padding: 12px;
       border-radius: 10px;
-      border: 1px solid #1e293b;
-      max-height: 170px;
-      overflow-y: auto;
-      line-height: 1.5;
-      white-space: pre-wrap;
+    }
+
+    @media (max-width: 768px) {
+      .navbar { padding: 10px 12px; flex-wrap: wrap; }
+      .brand-sub { display: none; }
+      .action-row { flex-wrap: wrap; }
+      .action-row .btn { min-width: 45%; }
+      .print-title-input { width: 100%; margin-left: 0; }
+    }
+    @media print {
+      .navbar, .panel, .disclaimer-banner, .controls-panel, .exit-big-btn, .preview-img, .empty-placeholder {
+        display: none !important;
+      }
+      body { background: #fff; padding: 0; }
+      .main-wrap { max-width: 100%; padding: 0; }
+      .sheet-card { border: none; box-shadow: none; padding: 8mm; }
+      .print-header-title.has-title { display: block !important; }
     }
   </style>
 </head>
 <body>
 
-  <div class="container">
-    <h2 style="margin:0;">⚡ 純 AI 極速競速測試台（強制關閉思考延遲 · 多模型賽跑）</h2>
+  <button class="exit-big-btn" id="uiExitBig" onclick="toggleBigFont()">✕ Exit Fullscreen</button>
 
-    <div class="status-bar">
-      <div class="status-row">
-        <span>🔑 <b>Google Gemini 雲端狀態：</b></span>
-        <span id="geminiKeyStatus" class="badge badge-warn">檢測中...</span>
+  <!-- ================= 頂部導覽列 ================= -->
+  <header class="navbar">
+    <a href="index.html" class="nav-left">
+      <img src="/icon.png?v=3" alt="Trees Pinyin" class="brand-logo" onerror="this.src='icon.png'">
+      <div class="brand-text-wrap">
+        <span class="brand-title" id="uiTitle">Trees Pinyin</span>
+        <span class="brand-sub" id="uiSubTitle">Fast AI Q&A · Instant Docs/PDF/Photo Translator · Read English, Speak Chinese</span>
+      </div>
+    </a>
+
+    <div class="nav-center">
+      <div class="dropdown" id="resDropdown">
+        <button class="nav-btn" onclick="toggleDropdown('resDropdown', event)">
+          <span id="uiMoreRes">📚 More Resources</span> ▾
+        </button>
+        <div class="dropdown-menu">
+          <a href="about.html" class="dropdown-item" id="uiMenuAbout">📖 About & 63 Rules Guide</a>
+          <a href="about.html#mnemonic" class="dropdown-item" id="uiMenuCards">🗂️ Book Mnemonic Cards</a>
+          <a href="arcade.html" class="dropdown-item" id="uiMenuGames">🎮 Mini Games</a>
+          <a href="about.html#contact" class="dropdown-item" id="uiMenuContact">✉️ Contact & Support</a>
+        </div>
       </div>
 
-      <div class="key-box">
-        <input type="password" id="apiKeyInput" class="key-input" placeholder="貼入您的 Google Gemini API Key (AIzaSy...)">
-        <select id="modelSelect" class="model-select">
-          <option value="AUTO_RACE">🔥 自動多模型極速賽跑 (最快)</option>
+      <button class="nav-btn" onclick="toggleLang()" id="uiLangBtn">中文</button>
+    </div>
+
+    <div class="nav-right">
+      <button class="nav-btn" onclick="openKeyModal()" id="uiKeyBtn">🔑 API Key</button>
+
+      <button class="nav-btn" onclick="openInstallModal()" id="uiInstallBtn">
+        <img src="/icon.png?v=3" alt="" class="btn-mini-icon" onerror="this.src='icon.png'">
+        <span id="uiInstallBtnText">Install</span>
+      </button>
+
+      <div class="dropdown" id="loginDropdown">
+        <button class="nav-btn login-btn" onclick="toggleDropdown('loginDropdown', event)">
+          <span id="uiLoginBtnText">👨‍🏫 Login</span> ▾
+        </button>
+        <div class="dropdown-menu right-align">
+          <a href="student.html" class="dropdown-item" id="uiLoginStudent">🌱 Student Login (Class Code)</a>
+          <a href="dashboard.html" class="dropdown-item" id="uiLoginTeacher">👩‍🏫 Teacher / Parent Dashboard</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= 核心主工作區 ================= -->
+  <main class="main-wrap">
+
+    <!-- 1. 膠囊輸入面板 -->
+    <section class="panel">
+      <div class="search-box" id="dropZone">
+        <textarea id="userInput" rows="2"
+          placeholder="Ask AI any question, or enter/paste/drag text, PDF, Word, Google Docs link, or photo to translate..."></textarea>
+
+        <!-- 語音輸入（中英自動識別） -->
+        <button class="icon-action" id="micBtn" onclick="toggleVoice()" title="Voice Input (Auto Chinese & English)">
+          <svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.91-3c-.49 0-.9.36-.98.85C16.52 14.2 14.47 16 12 16s-4.52-1.8-4.93-4.15c-.08-.49-.49-.85-.98-.85-.61 0-1.09.54-1 1.14.49 3 2.89 5.35 5.91 5.78V20c0 .55.45 1 1 1s1-.45 1-1v-2.08c3.02-.43 5.42-2.78 5.91-5.78.1-.6-.39-1.14-1-1.14z"/></svg>
+        </button>
+
+        <!-- 文件與拍照選單 -->
+        <button class="icon-action" id="fileMenuBtn" onclick="openFileMenuModal()" title="Upload PDF, Word, TXT or Photo">
+          <svg viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2zm4 10h2v2h-2v2h-2v-2h-2v-2h2v-2h2v2z"/></svg>
+        </button>
+
+        <input type="file" id="docFileInput" accept=".txt,.md,.csv,.json,.html,.rtf,.pdf,.docx,.doc,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword,text/plain" style="display:none" onchange="handleDocFileUpload(this)">
+        <input type="file" id="galleryInput" accept="image/*" style="display:none" onchange="handlePhotoUpload(this)">
+        <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none" onchange="handlePhotoUpload(this)">
+      </div>
+
+      <div class="action-row">
+        <button class="btn btn-blue" onclick="runSmartAI()" id="uiAIBtn">✨ AI Reply & Pinyin</button>
+        <button class="btn btn-green" onclick="runDirectTranslate()" id="uiTransBtn">📝 Translate & Pinyin</button>
+        <button class="btn btn-soft" style="flex:0.45;" id="speakBtn" onclick="toggleSpeak()">🔊 Speak</button>
+      </div>
+    </section>
+
+    <!-- 2. 免責聲明 -->
+    <section class="disclaimer-banner" id="uiDisclaimer">
+      Due to API costs, free AI may make occasional errors; please right-click (or tap) any character to correct according to the sound. For complex questions, please ask your browser's AI first, paste the reply above, and click "<b>📝 Translate & Pinyin</b>". The author assumes no liability for the accuracy of the pinyin results. Your support and shares will help the author go full-time to make improvements and write a memory dictionary in the future!
+    </section>
+
+    <!-- 3. 四排顯示與列印排版控制面板 -->
+    <section class="controls-panel">
+      <div class="controls-row">
+        <div class="hint-group">
+          <span id="uiHintSpeak">🔊 Left-click character to speak</span>
+          <span>·</span>
+          <span id="uiHintEdit">✍️ Right-click to edit polyphone</span>
+        </div>
+
+        <div class="checkbox-group">
+          <label><input type="checkbox" id="chkEn" checked onchange="updateRowVisibility()"> <span id="uiChkEn">English</span></label>
+          <label><input type="checkbox" id="chkTp" checked onchange="updateRowVisibility()"> <span id="uiChkTp">Trees Pinyin</span></label>
+          <label><input type="checkbox" id="chkStd" onchange="updateRowVisibility()"> <span id="uiChkStd">Standard Pinyin (ā á ǎ à)</span></label>
+          <label><input type="checkbox" id="chkZh" checked onchange="updateRowVisibility()"> <span id="uiChkZh">漢字</span></label>
+        </div>
+      </div>
+
+      <div class="controls-row">
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button class="btn btn-dark" onclick="toggleBigFont()" id="uiBigBtn">🖥️ Big Screen</button>
+          <button class="btn btn-dark" onclick="exportCardImage()" id="uiSaveBtn">💾 Save Photo</button>
+          <button class="btn btn-dark" onclick="window.print()" id="uiPrintBtn">🖨️ Print / PDF</button>
+        </div>
+      </div>
+
+      <div class="layout-bar">
+        <span id="uiLayoutLabel">📐 Layout:</span>
+        <select class="layout-select" id="layoutSelect" onchange="updateLayoutMode()">
+          <option value="center" id="uiLayoutAuto">✨ Auto-Fit (Centered)</option>
+          <option value="left" id="uiLayoutLeft">📄 Left-Aligned Book Mode</option>
         </select>
-        <button class="btn-green" onclick="saveAndVerifyKey()">儲存並測試</button>
+
+        <span id="uiFontLabel">Font:</span>
+        <input type="range" id="fontSlider" min="14" max="36" value="20" oninput="updateFontSize(this.value)" style="accent-color:var(--accent); cursor:pointer;">
+        <span id="fontValDisplay">20px</span>
+
+        <input type="text" class="print-title-input" id="printTitleInput" placeholder="Optional Print Title (選填標題)" oninput="updatePrintTitle(this.value)">
       </div>
-    </div>
+    </section>
 
-    <div class="search-card">
-      <textarea id="promptInput">請背誦唐詩《詠鵝》，並給出簡短解釋。</textarea>
-      <div class="btn-row">
-        <button class="btn-outline" onclick="askViaBrowserTab()">🚀 免 Key：一鍵跳轉瀏覽器 Gemini 提問</button>
-        <button class="btn-primary" onclick="runFastAI()">✨ 立即極速回答 (0思考延遲)</button>
+    <!-- 4. 輸出畫布區 -->
+    <section class="sheet-card hide-std" id="sheetCard">
+      <div class="print-header-title" id="printHeaderTitle"></div>
+      <img id="previewImg" class="preview-img" alt="Preview">
+      <div class="ai-reply-box" id="aiReplyBox"></div>
+      <div class="empty-placeholder" id="emptyPlaceholder">
+        🌲 Enter text, upload a PDF/Word/Photo, or click "✨ AI Reply & Pinyin" above to see instant Trees Pinyin annotations here.
       </div>
-    </div>
+      <div class="annotation-list" id="annotationList"></div>
+    </section>
 
-    <div class="output-card">
-      <div id="activeEngineTag" class="engine-tag" style="display:none;"></div>
-      <div id="answerOutput" class="answer-text">點擊上方「✨ 立即極速回答」開始測試...</div>
-    </div>
+  </main>
 
-    <div class="log-box" id="debugLog">▶ 系統就緒...</div>
+  <!-- ================= 彈窗 1：文件上傳與拍照選單 ================= -->
+  <div class="modal" id="fileMenuModal" onclick="if(event.target===this)this.style.display='none'">
+    <div class="modal-box">
+      <h3 style="margin:0; font-size:1.05rem;" id="uiFileMenuTitle">📁 File & Camera Options</h3>
+
+      <button class="option-card-btn" onclick="triggerDocUpload()">
+        <div>
+          <div id="uiOptDocTitle">📄 Upload File (PDF / Word / Docs / TXT)</div>
+          <div style="font-size:0.78rem; color:#555; font-weight:400; margin-top:3px;" id="uiOptDocSub">100% Client-side instant extraction & Pinyin</div>
+        </div>
+        <span>➔</span>
+      </button>
+
+      <button class="option-card-btn" onclick="openCameraNoticeModal()">
+        <div>
+          <div id="uiOptCamTitle">📷 Camera & Photo Library</div>
+          <div style="font-size:0.78rem; color:#555; font-weight:400; margin-top:3px;" id="uiOptCamSub">Recognize text or objects from photos</div>
+        </div>
+        <span>➔</span>
+      </button>
+
+      <button class="nav-btn" style="width:100%; padding:9px; justify-content:center;" onclick="document.getElementById('fileMenuModal').style.display='none'" id="uiFileMenuCancel">Cancel</button>
+    </div>
+  </div>
+
+  <!-- ================= 彈窗 2：拍照提速提示 ================= -->
+  <div class="modal" id="cameraNoticeModal" onclick="if(event.target===this)this.style.display='none'">
+    <div class="modal-box">
+      <h3 style="margin:0; font-size:1.05rem; color:#1b5e20;" id="uiCamNoticeTitle">⚡ Speed Tip for Photo Recognition</h3>
+      <div class="notice-box" id="uiCamNoticeBody">
+        <b>📱 Fastest Way on iPhone / iPad (0.1s):</b><br>
+        Take a photo with your <b>Apple Camera</b> first, tap to <b>Copy Text (Live Text)</b>, and paste it here for instant 0-delay annotation!<br><br>
+        <b>📷 Direct Photo Upload:</b><br>
+        Best for <b>short text, menus, signs, or single objects</b>.
+      </div>
+
+      <div class="action-row">
+        <button class="btn btn-green" onclick="triggerGalleryPick()" id="uiBtnGallery">🖼️ Photo Library</button>
+        <button class="btn btn-blue" onclick="triggerDirectCamera()" id="uiBtnTakePhoto">📸 Take Photo</button>
+      </div>
+
+      <button class="nav-btn" style="width:100%; padding:9px; justify-content:center;" onclick="document.getElementById('cameraNoticeModal').style.display='none'" id="uiCamNoticeClose">Back</button>
+    </div>
+  </div>
+
+  <!-- ================= 彈窗 3：安裝到手機/iPad/Mac桌面說明 ================= -->
+  <div class="modal" id="installModal" onclick="if(event.target===this)this.style.display='none'">
+    <div class="modal-box">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <img src="/icon.png?v=3" alt="App Icon" style="width:44px; height:44px; border-radius:10px; border:1px solid #ddd;" onerror="this.src='icon.png'">
+        <h3 style="margin:0; font-size:1.05rem;" id="uiInstallTitle">Install Trees Pinyin to Desktop / Home Screen</h3>
+      </div>
+      <div id="uiInstallSteps" style="font-size:0.86rem; line-height:1.6; background:#f8f9fa; padding:14px; border-radius:10px;">
+        <b>📱 iPhone & iPad (Safari):</b><br>
+        1. Open <span style="color:#1b5e20; font-weight:700;">treespinyin.com</span> in <b>Safari</b>.<br>
+        2. Tap the <b>Share button [📤]</b> → <b>"Add to Home Screen [➕]"</b>.<br><br>
+        <b>💻 Mac (Safari / Chrome / Edge):</b><br>
+        • <b>Mac Safari:</b> Click <b>File</b> in top menu bar → <b>"Add to Dock..."</b><br>
+        • <b>Chrome / Edge:</b> Click the <b>Install icon [⊕]</b> on the right side of the address bar.
+      </div>
+      <button class="btn btn-green" id="pwaDirectInstallBtn" style="display:none;" onclick="triggerNativePWAInstall()">⚡ Install App Now</button>
+      <button class="btn btn-soft" onclick="document.getElementById('installModal').style.display='none'" id="uiGotItBtn">Got It</button>
+    </div>
+  </div>
+
+  <!-- ================= 彈窗 4：保存圖片預覽 ================= -->
+  <div class="modal" id="imgModal" onclick="if(event.target===this)this.style.display='none'">
+    <div class="modal-box" style="align-items:center; text-align:center;">
+      <h3 style="margin:0; font-size:0.98rem;" id="uiSaveModalTitle">Right-Click or Long-Press Image to Save</h3>
+      <img id="generatedImg" style="width:100%; max-height:60vh; object-fit:contain; border:1px solid #ccc; border-radius:8px;">
+      <button class="btn btn-green" style="width:100%;" onclick="document.getElementById('imgModal').style.display='none'" id="uiDoneBtn">Done</button>
+    </div>
+  </div>
+
+  <!-- ================= 彈窗 5：極簡 API Key 設置 ================= -->
+  <div class="modal" id="keyModal" onclick="if(event.target===this)this.style.display='none'">
+    <div class="modal-box">
+      <h3 style="margin:0; font-size:1.02rem;" id="uiKeyTitle">🔑 Google Gemini API Key</h3>
+      <div id="uiKeyDesc" style="font-size:0.85rem; line-height:1.55; background:#f8f9fa; padding:12px; border-radius:8px;">
+        Enter your Google Gemini API Key (stored locally in your browser):<br>
+        <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:#1565c0; font-weight:700;">Get Free Key at Google AI Studio ↗</a>
+      </div>
+      <input type="password" id="apiKeyInput" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;font-size:0.9rem;" placeholder="AIzaSy...">
+      <div class="action-row">
+        <button class="btn btn-green" onclick="saveBackupKey()" id="uiKeySave">Save</button>
+        <button class="btn btn-soft" style="flex:0.45;" onclick="clearBackupKey()" id="uiKeyClear">Clear</button>
+      </div>
+      <button class="nav-btn" style="width:100%;padding:8px;justify-content:center;" onclick="document.getElementById('keyModal').style.display='none'" id="uiKeyClose">Close</button>
+    </div>
   </div>
 
   <script>
-    let savedApiKey = (localStorage.getItem('tp_test_gemini_key') || '').trim();
-    let availableFlashModels = [];
-    let waitingRelay = false;
+    // =========================================================================
+    // 0. PWA 桌面安裝支持 & Cloudflare Worker 端點
+    // =========================================================================
+    const IS_LOCAL_FILE = window.location.protocol === 'file:';
+    const CF_WORKER_ENDPOINTS = IS_LOCAL_FILE
+      ? ['https://treespinyin-api.treespinyin.workers.dev', 'https://treespinyin.com/api']
+      : ['/api', 'https://treespinyin-api.treespinyin.workers.dev'];
 
-    function logMsg(msg) {
-      const box = document.getElementById('debugLog');
-      const time = new Date().toLocaleTimeString();
-      box.textContent += `\n[${time}] ${msg}`;
-      box.scrollTop = box.scrollHeight;
-    }
-
-    window.addEventListener('DOMContentLoaded', async () => {
-      if (savedApiKey) {
-        document.getElementById('apiKeyInput').value = savedApiKey;
-        await loadAvailableModels(savedApiKey);
-      } else {
-        document.getElementById('geminiKeyStatus').innerText = '未填入 API Key';
-      }
+    let deferredPrompt = null;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      const btn = document.getElementById('pwaDirectInstallBtn');
+      if (btn) btn.style.display = 'inline-flex';
     });
 
-    // 1. 獲取所有支援 generateContent 的模型，並把最快的不帶深度思考延遲的模型排在最前面
-    async function loadAvailableModels(key) {
-      const statusEl = document.getElementById('geminiKeyStatus');
-      statusEl.className = 'badge badge-warn';
-      statusEl.innerText = '正在探測最快模型...';
+    async function triggerNativePWAInstall() {
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt();
+      await deferredPrompt.userChoice;
+      deferredPrompt = null;
+      document.getElementById('installModal').style.display = 'none';
+    }
 
+    (function injectManifestWithIconPng() {
+      try {
+        if (IS_LOCAL_FILE) return;
+        const iconUrl = window.location.origin + '/icon.png?v=3';
+        const manifest = {
+          name: "Trees Pinyin",
+          short_name: "Trees Pinyin",
+          start_url: window.location.pathname || "/",
+          display: "standalone",
+          background_color: "#f5f7f9",
+          theme_color: "#1b5e20",
+          icons: [
+            { src: iconUrl, sizes: "192x192", type: "image/png" },
+            { src: iconUrl, sizes: "512x512", type: "image/png" }
+          ]
+        };
+        const blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+        const link = document.createElement('link');
+        link.rel = 'manifest';
+        link.href = URL.createObjectURL(blob);
+        document.head.appendChild(link);
+      } catch (e) {}
+    })();
+
+    function toggleDropdown(id, e) {
+      e.stopPropagation();
+      document.querySelectorAll('.dropdown').forEach(d => {
+        if (d.id !== id) d.classList.remove('open');
+      });
+      document.getElementById(id).classList.toggle('open');
+    }
+    document.addEventListener('click', () => {
+      document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('open'));
+    });
+
+    // =========================================================================
+    // 0.2 中英文雙語介面字典
+    // =========================================================================
+    let currentLang = 'en';
+    let backupKey = (localStorage.getItem('tp_v22_backup_key') || localStorage.getItem('tp_test_gemini_key') || '').trim();
+    let availableFastModels = [
+      'gemini-flash-lite-latest',
+      'gemini-3.5-flash-lite',
+      'gemini-flash-latest'
+    ];
+
+    const UI_TEXT = {
+      en: {
+        subTitle: "Fast AI Q&A · Instant Docs/PDF/Photo Translator · Read English, Speak Chinese",
+        moreRes: "📚 More Resources",
+        menuAbout: "📖 About & 63 Rules Guide",
+        menuCards: "🗂️ Book Mnemonic Cards",
+        menuGames: "🎮 Mini Games",
+        menuContact: "✉️ Contact & Support",
+        langBtn: "中文",
+        keyBtn: "🔑 API Key",
+        installBtnText: "Install",
+        loginBtnText: "👨‍🏫 Login",
+        loginStudent: "🌱 Student Login (Class Code)",
+        loginTeacher: "👩‍🏫 Teacher / Parent Dashboard",
+        placeholder: "Ask AI any question, or enter/paste/drag text, PDF, Word, Google Docs link, or photo to translate...",
+        aiBtn: "✨ AI Reply & Pinyin",
+        transBtn: "📝 Translate & Pinyin",
+        speakBtn: "🔊 Speak",
+        stopSpeakBtn: "⏹️ Stop",
+        disclaimer: 'Due to API costs, free AI may make occasional errors; please right-click (or tap) any character to correct according to the sound. For complex questions, please ask your browser\'s AI first, paste the reply above, and click "<b>📝 Translate & Pinyin</b>". The author assumes no liability for the accuracy of the pinyin results. Your support and shares will help the author go full-time to make improvements and write a memory dictionary in the future!',
+        hintSpeak: "🔊 Left-click character to speak",
+        hintEdit: "✍️ Right-click to edit polyphone",
+        bigBtn: "🖥️ Big Screen",
+        saveBtn: "💾 Save Photo",
+        printBtn: "🖨️ Print / PDF",
+        exitBig: "✕ Exit Fullscreen",
+        emptyPlaceholder: "🌲 Enter text, upload a PDF/Word/Photo, or click \"✨ AI Reply & Pinyin\" above to see instant Trees Pinyin annotations here.",
+        installTitle: "Install Trees Pinyin to Desktop / Home Screen",
+        installSteps: '<b>📱 iPhone & iPad (Safari):</b><br>1. Open <span style="color:#1b5e20; font-weight:700;">treespinyin.com</span> in <b>Safari</b>.<br>2. Tap the <b>Share button [📤]</b> → <b>"Add to Home Screen [➕]"</b>.<br><br><b>💻 Mac (Safari / Chrome / Edge):</b><br>• <b>Mac Safari:</b> Click <b>File</b> in top menu bar → <b>"Add to Dock..."</b><br>• <b>Chrome / Edge:</b> Click the <b>Install icon [⊕]</b> on the right side of the address bar.',
+        gotItBtn: "Got It",
+        fileMenuTitle: "📁 File & Camera Options",
+        optDocTitle: "📄 Upload File (PDF / Word / Docs / TXT)",
+        optDocSub: "100% Client-side instant extraction & Pinyin",
+        optCamTitle: "📷 Camera & Photo Library",
+        optCamSub: "Recognize text or objects from photos",
+        fileMenuCancel: "Cancel"
+      },
+      zh: {
+        subTitle: "極速 AI 問答 · 文檔/PDF/照片秒速翻譯注音 · 像讀英語一樣開口說中文",
+        moreRes: "📚 更多資源",
+        menuAbout: "📖 關於我們與 63 條拼讀規則",
+        menuCards: "🗂️ 記憶閃卡 (Mnemonic Cards)",
+        menuGames: "🎮 趣味小遊戲 (Mini Games)",
+        menuContact: "✉️ 聯絡我們與支持",
+        langBtn: "English",
+        keyBtn: "🔑 API Key",
+        installBtnText: "安裝桌面",
+        loginBtnText: "👨‍🏫 登錄",
+        loginStudent: "🌱 學生端入口 (輸入班級碼)",
+        loginTeacher: "👩‍🏫 教師 / 家長管理後台",
+        placeholder: "向 AI 提問，或輸入/貼上/拖入文字、PDF、Word、Google Docs 連結或照片直接翻譯注音...",
+        aiBtn: "✨ AI 回答並注音",
+        transBtn: "📝 翻譯並注音",
+        speakBtn: "🔊 朗讀",
+        stopSpeakBtn: "⏹️ 停止",
+        disclaimer: '受限於 API 成本，免費 AI 偶有誤差；請點擊或右鍵漢字根據讀音修正多音字。遇到複雜問題可先詢問瀏覽器 AI，將回覆貼到上方並點擊「<b>📝 翻譯並注音</b>」。作者對拼音結果準確性不承擔法律責任。您的支持與分享將幫助作者全職投入改進與編寫記憶字典！',
+        hintSpeak: "🔊 左鍵點擊漢字發音",
+        hintEdit: "✍️ 右鍵點擊修改多音字",
+        bigBtn: "🖥️ 全屏大字",
+        saveBtn: "💾 保存圖片",
+        printBtn: "🖨️ 列印 / PDF",
+        exitBig: "✕ 退出全螢幕",
+        emptyPlaceholder: "🌲 請在上方輸入文字、上傳 PDF/Word/照片，或點擊「✨ AI 回答並注音」，此處將立即生成雙語自然拼讀注音。",
+        installTitle: "安裝 Trees Pinyin 到手機主屏幕 / Mac 桌面",
+        installSteps: '<b>📱 iPhone 與 iPad (必須用 Safari 瀏覽器)：</b><br>1. 用 <b>Safari</b> 打開 <span style="color:#1b5e20; font-weight:700;">treespinyin.com</span>。<br>2. 點擊底部 <b>分享按鈕 [📤]</b> → 選擇 <b>「加入主畫面 [➕]」</b>。<br><br><b>💻 Mac 電腦 (Safari / Chrome / Edge)：</b><br>• <b>Mac Safari：</b>點擊頂部選單「檔案 (File)」→ <b>「加入程序塢 (Add to Dock...)」</b><br>• <b>Chrome / Edge：</b>點擊網址列右側的 <b>安裝圖標 [⊕]</b> 即可安裝到桌面。',
+        gotItBtn: "知道了",
+        fileMenuTitle: "📁 文件上傳與拍照識別",
+        optDocTitle: "📄 上傳文件 (PDF / Word / Docs / TXT)",
+        optDocSub: "100% 用戶端本地秒讀提取文字，0 伺服器延遲",
+        optCamTitle: "📷 拍照或從圖庫選圖",
+        optCamSub: "識別照片中的短文字、菜單或單個物品",
+        fileMenuCancel: "取消"
+      }
+    };
+
+    function toggleLang() {
+      currentLang = currentLang === 'en' ? 'zh' : 'en';
+      const t = UI_TEXT[currentLang];
+      document.getElementById('uiSubTitle').innerText = t.subTitle;
+      document.getElementById('uiMoreRes').innerText = t.moreRes;
+      document.getElementById('uiMenuAbout').innerText = t.menuAbout;
+      document.getElementById('uiMenuCards').innerText = t.menuCards;
+      document.getElementById('uiMenuGames').innerText = t.menuGames;
+      document.getElementById('uiMenuContact').innerText = t.menuContact;
+      document.getElementById('uiLangBtn').innerText = t.langBtn;
+      document.getElementById('uiKeyBtn').innerText = t.keyBtn;
+      document.getElementById('uiInstallBtnText').innerText = t.installBtnText;
+      document.getElementById('uiLoginBtnText').innerText = t.loginBtnText;
+      document.getElementById('uiLoginStudent').innerText = t.loginStudent;
+      document.getElementById('uiLoginTeacher').innerText = t.loginTeacher;
+      document.getElementById('userInput').placeholder = t.placeholder;
+      document.getElementById('uiAIBtn').innerText = t.aiBtn;
+      document.getElementById('uiTransBtn').innerText = t.transBtn;
+      if (!isSpeakingNow) document.getElementById('speakBtn').innerText = t.speakBtn;
+      document.getElementById('uiDisclaimer').innerHTML = t.disclaimer;
+      document.getElementById('uiHintSpeak').innerText = t.hintSpeak;
+      document.getElementById('uiHintEdit').innerText = t.hintEdit;
+      document.getElementById('uiBigBtn').innerText = t.bigBtn;
+      document.getElementById('uiSaveBtn').innerText = t.saveBtn;
+      document.getElementById('uiPrintBtn').innerText = t.printBtn;
+      document.getElementById('uiExitBig').innerText = t.exitBig;
+      document.getElementById('emptyPlaceholder').innerText = t.emptyPlaceholder;
+      document.getElementById('uiInstallTitle').innerText = t.installTitle;
+      document.getElementById('uiInstallSteps').innerHTML = t.installSteps;
+      document.getElementById('uiGotItBtn').innerText = t.gotItBtn;
+      document.getElementById('uiFileMenuTitle').innerText = t.fileMenuTitle;
+      document.getElementById('uiOptDocTitle').innerText = t.optDocTitle;
+      document.getElementById('uiOptDocSub').innerText = t.optDocSub;
+      document.getElementById('uiOptCamTitle').innerText = t.optCamTitle;
+      document.getElementById('uiOptCamSub').innerText = t.optCamSub;
+      document.getElementById('uiFileMenuCancel').innerText = t.fileMenuCancel;
+    }
+
+    // =========================================================================
+    // 0.4 四排顯示控制、字體滑塊、版面與列印標題
+    // =========================================================================
+    function updateRowVisibility() {
+      const card = document.getElementById('sheetCard');
+      card.classList.toggle('hide-en', !document.getElementById('chkEn').checked);
+      card.classList.toggle('hide-tp', !document.getElementById('chkTp').checked);
+      card.classList.toggle('hide-std', !document.getElementById('chkStd').checked);
+      card.classList.toggle('hide-zh', !document.getElementById('chkZh').checked);
+    }
+
+    function updateFontSize(val) {
+      document.getElementById('fontValDisplay').innerText = val + 'px';
+      document.getElementById('sheetCard').style.setProperty('--user-font-size', val + 'px');
+    }
+
+    function updateLayoutMode() {
+      const mode = document.getElementById('layoutSelect').value;
+      const card = document.getElementById('sheetCard');
+      card.classList.toggle('align-left', mode === 'left');
+    }
+
+    function updatePrintTitle(val) {
+      const el = document.getElementById('printHeaderTitle');
+      const v = (val || '').trim();
+      el.innerText = v;
+      el.classList.toggle('has-title', Boolean(v));
+      el.style.display = v ? 'block' : 'none';
+    }
+
+    // =========================================================================
+    // 0.5 極速多模型自動探測與 0 思考延遲競速引擎
+    // =========================================================================
+    function refreshKeyBtnStyle() {
+      const btn = document.getElementById('uiKeyBtn');
+      if (backupKey) btn.classList.add('has-key');
+      else btn.classList.remove('has-key');
+    }
+    refreshKeyBtnStyle();
+
+    async function discoverFastModels(key) {
+      if (!key) return;
       try {
         const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(key)}`);
+        if (!r.ok) return;
         const data = await r.json();
-        if (!r.ok) {
-          throw new Error(data?.error?.message || `HTTP ${r.status}`);
-        }
-
-        const allModels = (data.models || [])
+        const all = (data.models || [])
           .filter(m => (m.supportedGenerationMethods || []).includes('generateContent'))
           .map(m => m.name.replace('models/', ''))
-          // 排除純圖片/TTS/嵌入模型
-          .filter(name => !name.includes('tts') && !name.includes('image') && !name.includes('embedding') && !name.includes('veo') && !name.includes('robotics'));
+          .filter(n => !n.includes('tts') && !n.includes('image') && !n.includes('embedding') && !n.includes('veo') && !n.includes('robotics'));
 
-        // 速度優先排序：lite 與 flash 優先（避免 pro 模型長考 10 秒）
-        const fastOrder = [
-          'gemini-2.0-flash',
-          'gemini-2.0-flash-lite',
-          'gemini-2.5-flash-lite',
-          'gemini-3.5-flash-lite',
+        // 以實測最快獲勝的 gemini-flash-lite-latest 與 gemini-3.5-flash-lite 為第一優先
+        const priority = [
           'gemini-flash-lite-latest',
+          'gemini-3.5-flash-lite',
           'gemini-flash-latest',
-          'gemini-2.5-flash',
           'gemini-3.5-flash',
+          'gemini-2.5-flash',
           'gemini-3.8-flash'
         ];
-
-        availableFlashModels = [];
-        for (const f of fastOrder) {
-          if (allModels.includes(f)) availableFlashModels.push(f);
+        const sorted = [];
+        for (const p of priority) {
+          if (all.includes(p)) sorted.push(p);
         }
-        for (const m of allModels) {
-          if (m.includes('flash') && !availableFlashModels.includes(m)) {
-            availableFlashModels.push(m);
-          }
+        for (const m of all) {
+          if (m.includes('flash') && !sorted.includes(m)) sorted.push(m);
         }
-        if (availableFlashModels.length === 0) {
-          availableFlashModels = allModels.slice(0, 4);
+        if (sorted.length > 0) {
+          availableFastModels = sorted;
         }
+      } catch (e) {}
+    }
 
-        // 填充下拉選單
-        const sel = document.getElementById('modelSelect');
-        sel.innerHTML = `<option value="AUTO_RACE">🔥 自動多模型極速賽跑 (前3名並發)</option>`;
-        availableFlashModels.forEach(m => {
-          const opt = document.createElement('option');
-          opt.value = m;
-          opt.textContent = `⚡ 單獨鎖定: ${m}`;
-          sel.appendChild(opt);
-        });
+    if (backupKey) {
+      discoverFastModels(backupKey);
+    }
 
-        statusEl.className = 'badge badge-ok';
-        statusEl.innerText = `已就緒 (共 ${availableFlashModels.length} 個高速模型可用)`;
-        logMsg(`✅ 可用高速模型排序: ${availableFlashModels.slice(0, 5).join(' -> ')}`);
-        return true;
-      } catch (e) {
-        statusEl.className = 'badge badge-err';
-        statusEl.innerText = `驗證失敗: ${e.message}`;
-        logMsg(`❌ 探測模型失敗: ${e.message}`);
-        return false;
+    function openKeyModal() {
+      document.getElementById('apiKeyInput').value = backupKey;
+      document.getElementById('keyModal').style.display = 'flex';
+    }
+
+    async function saveBackupKey() {
+      backupKey = document.getElementById('apiKeyInput').value.trim();
+      localStorage.setItem('tp_v22_backup_key', backupKey);
+      localStorage.setItem('tp_test_gemini_key', backupKey);
+      refreshKeyBtnStyle();
+      document.getElementById('keyModal').style.display = 'none';
+      if (backupKey) {
+        await discoverFastModels(backupKey);
+        const pendingQ = document.getElementById('userInput').value.trim();
+        if (pendingQ) runSmartAI(pendingQ);
       }
     }
 
-    async function saveAndVerifyKey() {
-      const val = document.getElementById('apiKeyInput').value.trim();
-      if (!val) return;
-      savedApiKey = val;
-      localStorage.setItem('tp_test_gemini_key', val);
-      const ok = await loadAvailableModels(val);
-      if (ok) runFastAI();
+    function clearBackupKey() {
+      backupKey = '';
+      localStorage.removeItem('tp_v22_backup_key');
+      localStorage.removeItem('tp_test_gemini_key');
+      document.getElementById('apiKeyInput').value = '';
+      refreshKeyBtnStyle();
     }
 
-    // 2. 針對單一模型發起無思考延遲請求（自動兼容帶/不帶 thinkingConfig）
-    async function callSingleModelFast(modelName, promptText, signal) {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${encodeURIComponent(savedApiKey)}`;
+    function fetchWithTimeout(url, options = {}, timeoutMs = 7000) {
+      const ctrl = new AbortController();
+      const timer = setTimeout(() => ctrl.abort(), timeoutMs);
+      return fetch(url, { ...options, signal: ctrl.signal }).finally(() => clearTimeout(timer));
+    }
 
-      // 嘗試關閉 thinkingBudget 以實現 0 思考等待直出；若該模型不支援 thinkingConfig 參數則自動用基礎格式
-      const bodyWithNoThinking = {
-        contents: [{ parts: [{ text: `請直接、準確、精煉地用中文回答，不要多餘客套話：\n${promptText}` }] }],
-        generationConfig: {
-          temperature: 0.2,
-          thinkingConfig: { thinkingBudget: 0 }
-        }
-      };
+    async function callSingleGeminiModelFast(modelName, promptText, dataUrl, signal) {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${encodeURIComponent(backupKey)}`;
+      const parts = [{ text: promptText }];
+      if (dataUrl && dataUrl.includes(',')) {
+        const mime = dataUrl.substring(dataUrl.indexOf(':') + 1, dataUrl.indexOf(';'));
+        parts.push({ inline_data: { mime_type: mime, data: dataUrl.split(',')[1] } });
+      }
 
       let r = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(bodyWithNoThinking),
+        body: JSON.stringify({
+          contents: [{ parts }],
+          generationConfig: {
+            temperature: 0.2,
+            thinkingConfig: { thinkingBudget: 0 }
+          }
+        }),
         signal
       });
 
-      // 如果模型報 400 (不認識 thinkingConfig)，立即回退不帶 thinkingConfig 的純淨請求
       if (r.status === 400) {
         r = await fetch(url, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            contents: [{ parts: [{ text: `請直接、準確、精煉地用中文回答，不要多餘客套話：\n${promptText}` }] }],
+            contents: [{ parts }],
             generationConfig: { temperature: 0.2 }
           }),
           signal
@@ -325,108 +1143,795 @@
       }
 
       const d = await r.json();
-      if (!r.ok) {
-        throw new Error(`${modelName}: ${d?.error?.message || r.status}`);
-      }
+      if (!r.ok) throw new Error(d?.error?.message || `HTTP ${r.status}`);
 
-      // 過濾掉 thought: true 的思考過程碎片，只取真正的回答文字
-      const parts = d?.candidates?.[0]?.content?.parts || [];
-      const answerText = parts
+      const resParts = d?.candidates?.[0]?.content?.parts || [];
+      const text = resParts
         .filter(p => !p.thought && typeof p.text === 'string')
         .map(p => p.text)
         .join('')
         .trim();
 
-      if (!answerText) throw new Error(`${modelName}: 返回內容為空`);
-      return { model: modelName, text: answerText };
+      if (!text) throw new Error('EMPTY');
+      return text;
     }
 
-    // 3. 多模型並發競速：誰先在 0.5 秒內算完，立刻顯示誰，並切斷其他慢的模型！
-    async function runFastAI() {
-      const promptText = document.getElementById('promptInput').value.trim();
-      if (!promptText) return;
+    async function fetchFastAccurateAI(promptText, dataUrl = null) {
+      // 1. 若有填寫 API Key：啟動前 3 名高速模型 0 思考延遲並發賽跑 (Promise.any)
+      if (backupKey) {
+        const modelsToRace = availableFastModels.slice(0, 3);
+        const controllers = modelsToRace.map(() => new AbortController());
 
-      if (!savedApiKey) {
-        document.getElementById('answerOutput').innerText = '⚠️ 請先在上方貼入您的 Google Gemini API Key 並點擊「儲存並測試」。';
+        const raceTasks = modelsToRace.map((mName, idx) =>
+          callSingleGeminiModelFast(mName, promptText, dataUrl, controllers[idx].signal)
+            .then(txt => {
+              controllers.forEach((c, i) => { if (i !== idx) c.abort(); });
+              return txt;
+            })
+        );
+
+        try {
+          return await Promise.any(raceTasks);
+        } catch (e) {}
+      }
+
+      // 2. 若未填 Key：嘗試呼叫您的 Cloudflare Worker (正宗 Google Gemini 端點)
+      const workerTasks = CF_WORKER_ENDPOINTS.map(async (ep) => {
+        const r = await fetchWithTimeout(ep, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt: promptText, image: dataUrl })
+        }, 6500);
+        if (!r.ok) throw new Error('worker_err');
+        const d = await r.json();
+        const t = (d?.text || d?.reply || d?.choices?.[0]?.message?.content || '').trim();
+        if (!t) throw new Error('empty');
+        return t;
+      });
+
+      try {
+        return await Promise.any(workerTasks);
+      } catch (e) {
+        return '';
+      }
+    }
+
+    // =========================================================================
+    // 0.6 客戶端本地讀取 PDF / Word / TXT / 拖拽文件
+    // =========================================================================
+    function openFileMenuModal() {
+      document.getElementById('fileMenuModal').style.display = 'flex';
+    }
+    function triggerDocUpload() {
+      document.getElementById('fileMenuModal').style.display = 'none';
+      document.getElementById('docFileInput').click();
+    }
+    function openCameraNoticeModal() {
+      document.getElementById('fileMenuModal').style.display = 'none';
+      document.getElementById('cameraNoticeModal').style.display = 'flex';
+    }
+    function triggerGalleryPick() {
+      document.getElementById('cameraNoticeModal').style.display = 'none';
+      document.getElementById('galleryInput').click();
+    }
+    function triggerDirectCamera() {
+      document.getElementById('cameraNoticeModal').style.display = 'none';
+      document.getElementById('cameraInput').click();
+    }
+
+    const dropZone = document.getElementById('dropZone');
+    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.style.borderColor = '#1b5e20'; });
+    dropZone.addEventListener('dragleave', () => { dropZone.style.borderColor = ''; });
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.style.borderColor = '';
+      if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+        const f = e.dataTransfer.files[0];
+        if (f.type.startsWith('image/')) {
+          handlePhotoUpload({ files: [f], value: '' });
+        } else {
+          handleDocFileUpload({ files: [f], value: '' });
+        }
+      }
+    });
+
+    function loadScriptDynamic(src) {
+      return new Promise((resolve, reject) => {
+        if (document.querySelector(`script[src="${src}"]`)) return resolve();
+        const s = document.createElement('script');
+        s.src = src;
+        s.onload = resolve;
+        s.onerror = reject;
+        document.head.appendChild(s);
+      });
+    }
+
+    async function extractPdfTextFast(file) {
+      await loadScriptDynamic('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js');
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+      const buf = await file.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+      let out = [];
+      const maxPages = Math.min(pdf.numPages, 20);
+      for (let i = 1; i <= maxPages; i++) {
+        const page = await pdf.getPage(i);
+        const tc = await page.getTextContent();
+        const pageStr = tc.items.map(item => item.str).join(' ');
+        if (pageStr.trim()) out.push(pageStr.trim());
+      }
+      return out.join('\n');
+    }
+
+    async function extractWordTextFast(file) {
+      await loadScriptDynamic('https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js');
+      const buf = await file.arrayBuffer();
+      const res = await mammoth.extractRawText({ arrayBuffer: buf });
+      return (res.value || '').trim();
+    }
+
+    async function handleDocFileUpload(input) {
+      if (!input.files || !input.files[0]) return;
+      const file = input.files[0];
+      const name = (file.name || '').toLowerCase();
+      input.value = '';
+
+      prepareOutputCanvas();
+      const replyBox = document.getElementById('aiReplyBox');
+      replyBox.style.display = 'block';
+      replyBox.innerText = currentLang === 'en' ? `📄 Reading ${file.name} locally...` : `📄 正在本地極速讀取 ${file.name}...`;
+
+      try {
+        let extractedText = '';
+        if (name.endsWith('.pdf') || file.type === 'application/pdf') {
+          extractedText = await extractPdfTextFast(file);
+        } else if (name.endsWith('.docx') || file.type.includes('wordprocessingml')) {
+          extractedText = await extractWordTextFast(file);
+        } else {
+          extractedText = await file.text();
+          if (name.endsWith('.html') || name.endsWith('.htm')) {
+            const tmp = document.createElement('div');
+            tmp.innerHTML = extractedText;
+            extractedText = tmp.innerText || tmp.textContent || '';
+          }
+        }
+
+        const clean = (extractedText || '').trim();
+        if (!clean) {
+          replyBox.innerText = currentLang === 'en'
+            ? '⚠️ No selectable text found in this file (it may be a scanned image PDF).'
+            : '⚠️ 未能從該文件中提取到文字（可能是純圖片掃描版 PDF）。';
+          return;
+        }
+
+        const clipped = clean.slice(0, 3500);
+        document.getElementById('userInput').value = clipped;
+        await runDirectTranslate(clipped);
+      } catch (err) {
+        replyBox.innerText = currentLang === 'en'
+          ? '⚠️ Failed to read file. Please upload standard .txt, .docx, or text-based .pdf.'
+          : '⚠️ 讀取文件失敗，請確認為標準 .txt、.docx 或文字版 .pdf 文件。';
+      }
+    }
+
+    // =========================================================================
+    // 1. 數字、時間、百分比與化學符號自動轉中文口語
+    // =========================================================================
+    const DIGITS_ZH = ['零','一','二','三','四','五','六','七','八','九'];
+
+    function intToChinese(numStr) {
+      let n = parseInt(numStr, 10);
+      if (isNaN(n)) return numStr;
+      if (n === 0) return '零';
+      if (n < 0) return '負' + intToChinese(String(-n));
+      if (numStr.length === 4 && n >= 1900 && n <= 2099) {
+        return numStr.split('').map(d => DIGITS_ZH[parseInt(d, 10)]).join('');
+      }
+      if (n < 10) return DIGITS_ZH[n];
+      if (n < 100) {
+        let ten = Math.floor(n / 10), rem = n % 10;
+        return (ten === 1 ? '十' : DIGITS_ZH[ten] + '十') + (rem > 0 ? DIGITS_ZH[rem] : '');
+      }
+      if (n < 1000) {
+        let hun = Math.floor(n / 100), rem = n % 100;
+        if (rem === 0) return DIGITS_ZH[hun] + '百';
+        if (rem < 10) return DIGITS_ZH[hun] + '百零' + DIGITS_ZH[rem];
+        return DIGITS_ZH[hun] + '百' + intToChinese(String(rem));
+      }
+      if (n < 10000) {
+        let th = Math.floor(n / 1000), rem = n % 1000;
+        if (rem === 0) return DIGITS_ZH[th] + '千';
+        if (rem < 100) return DIGITS_ZH[th] + '千零' + intToChinese(String(rem));
+        return DIGITS_ZH[th] + '千' + intToChinese(String(rem));
+      }
+      return numStr.split('').map(d => DIGITS_ZH[parseInt(d, 10)] || d).join('');
+    }
+
+    function numberToChinese(str) {
+      if (str.includes('.')) {
+        let parts = str.split('.');
+        let intPart = intToChinese(parts[0] || '0');
+        let decPart = parts[1].split('').map(d => DIGITS_ZH[parseInt(d, 10)]).join('');
+        return intPart + '點' + decPart;
+      }
+      return intToChinese(str);
+    }
+
+    function expandNumbersAndSymbolsToZh(text) {
+      if (!text) return '';
+      let s = text;
+      s = s.replace(/\bH2O\b/gi, '水').replace(/\bCO2\b/gi, '二氧化碳').replace(/\bO2\b/gi, '氧氣');
+      s = s.replace(/°C|℃/g, '攝氏度').replace(/°F|℉/g, '華氏度');
+      s = s.replace(/\b(\d{1,2}):(\d{2})\b/g, (_, h, m) => intToChinese(h) + '點' + (m === '00' ? '整' : intToChinese(m) + '分'));
+      s = s.replace(/(\d+(?:\.\d+)?)\s*%/g, (_, num) => '百分之' + numberToChinese(num));
+      s = s.replace(/\$\s*(\d+(?:\.\d+)?)/g, (_, num) => numberToChinese(num) + '美元');
+      s = s.replace(/[¥￥]\s*(\d+(?:\.\d+)?)/g, (_, num) => numberToChinese(num) + '元');
+      s = s.replace(/\+/g, '加').replace(/=/g, '等於').replace(/&/g, '和');
+      s = s.replace(/\d+(?:\.\d+)?/g, (match) => numberToChinese(match));
+      return s;
+    }
+
+    // =========================================================================
+    // 2. 100% 嚴格校準 Trees Pinyin (v25) 編譯器 + 聲調符號轉換器
+    // =========================================================================
+    const OVERALL_16 = {
+      'zhi': '(r)ds', 'chi': '(r)ts', 'shi': '(r)s', 'ri': '(r)th',
+      'zi': 'ds', 'ci': 'ts', 'si': 's', 'yi': 'yee',
+      'wu': 'woo', 'yu': 'yee(oo)', 'ye': 'yer', 'yue': 'yee(oo)er',
+      'yuan': 'yee(oo)an', 'yin': 'yeen', 'yun': 'yee(oo)n', 'ying': 'ying'
+    };
+
+    const LOCKED_MAP = {
+      'wo': 'wer', 'de': 'der', 'le': 'Ler',
+      'ren': '(r)ther-n', 'wen': 'wer-n', 'shun': 'soon', 'zun': 'dsoon',
+      'guo': 'gooer', 'o': 'oh',
+      'qi': 'tsee', 'qing': 'tsing', 'qie': 'tseer', 'qian': 'tseean', 'qiao': 'tseeaw',
+      'qiang': 'tseeang', 'qiong': 'tseer-oong', 'qu': 'tsee(oo)', 'que': 'tsee(oo)er',
+      'quan': 'tsee(oo)an', 'qun': 'tsee(oo)n', 'qin': 'tseen', 'qia': 'tseeah',
+      'xi': 'see', 'xing': 'sing', 'xie': 'seer', 'xian': 'seean', 'xiao': 'seeaw',
+      'xiang': 'seeang', 'xiong': 'seer-oong', 'xu': 'see(oo)', 'xue': 'see(oo)er',
+      'xuan': 'see(oo)an', 'xun': 'see(oo)n', 'xin': 'seen', 'xia': 'seeah',
+      'ji': 'jee', 'jing': 'jing', 'jie': 'jeer', 'jian': 'jeean', 'jiao': 'jeeaw',
+      'jiang': 'jeeang', 'jiong': 'jeer-oong', 'ju': 'jee(oo)', 'jue': 'jee(oo)er',
+      'juan': 'jee(oo)an', 'jun': 'jee(oo)n', 'jin': 'jeen', 'jia': 'jeeah',
+      'lv': 'Lee(oo)', 'lü': 'Lee(oo)', 'lve': 'Lee(oo)er', 'lüe': 'Lee(oo)er',
+      'nv': 'nee(oo)', 'nü': 'nee(oo)', 'nve': 'nee(oo)er', 'nüe': 'nee(oo)er'
+    };
+
+    const INITIALS = {
+      'b':'b', 'p':'p', 'm':'m', 'f':'f',
+      'd':'d', 't':'t', 'n':'n', 'l':'L',
+      'g':'g', 'k':'k', 'h':'h', 'j':'j',
+      'q':'tsee', 'x':'see',
+      'zh':'(r)ds', 'ch':'(r)ts', 'sh':'(r)s', 'r':'(r)th',
+      'z':'ds', 'c':'ts', 's':'s', 'y':'y', 'w':'w'
+    };
+
+    const FINALS = {
+      'a':'ah', 'o':'ooer', 'e':'er', 'i':'ee', 'u':'oo', 'v':'ee(oo)', 'ü':'ee(oo)',
+      'ai':'ie', 'ei':'ay', 'ui':'ooay', 'ao':'aw', 'ou':'oh', 'iu':'eeoh',
+      'ie':'eer', 've':'ee(oo)er', 'üe':'ee(oo)er', 'er':'(uh)-er',
+      'an':'an', 'en':'er-n', 'in':'een', 'un':'oon', 'vn':'ee(oo)n', 'ün':'ee(oo)n',
+      'ang':'ang', 'eng':'er-ng', 'ing':'ing', 'ong':'er-oong',
+      'ia':'eeah', 'ian':'eean', 'iao':'eeaw', 'iang':'eeang', 'iong':'eer-oong',
+      'ua':'ooah', 'uai':'ooie', 'uan':'ooan', 'uang':'ooang', 'uo':'ooer',
+      'van':'ee(oo)an', 'üan':'ee(oo)an'
+    };
+
+    function compileToTreesPinyin(pyNum) {
+      if (!pyNum) return '';
+      let m = pyNum.trim().match(/^([a-züv:]+)([0-5]?)$/i);
+      if (!m) return pyNum;
+      let syl = m[1].toLowerCase().replace('ü', 'v').replace('u:', 'v');
+      let tone = m[2] || '';
+
+      let mapped = '';
+      if (syl === 'er') {
+        mapped = (tone === '4') ? 'uh-er' : '(uh)-er';
+      } else if (OVERALL_16[syl]) {
+        mapped = OVERALL_16[syl];
+      } else if (LOCKED_MAP[syl]) {
+        mapped = LOCKED_MAP[syl];
+      } else {
+        let init = '', fin = syl;
+        for (let l of ['zh', 'ch', 'sh']) {
+          if (syl.startsWith(l)) { init = l; fin = syl.slice(2); break; }
+        }
+        if (!init && syl.length > 1 && 'bpmfdtnlgkhjqxzcsryw'.includes(syl[0])) {
+          init = syl[0]; fin = syl.slice(1);
+        }
+        let mappedInit = INITIALS[init] || init;
+        let mappedFin = FINALS[fin] || fin;
+
+        if (mappedInit.endsWith('ee') && mappedFin.startsWith('ee')) {
+          mapped = mappedInit + mappedFin.slice(2);
+        } else if (mappedInit.endsWith('ee') && mappedFin.startsWith('i')) {
+          mapped = mappedInit.slice(0, -2) + mappedFin;
+        } else if (init === 'y' && mappedFin.startsWith('ee')) {
+          mapped = 'y' + mappedFin;
+        } else if (init === 'w' && mappedFin.startsWith('oo')) {
+          mapped = 'w' + mappedFin;
+        } else {
+          mapped = mappedInit + mappedFin;
+        }
+      }
+
+      let toneSuffix = (tone === '2' || tone === '3' || tone === '4') ? tone : '';
+      return mapped + toneSuffix;
+    }
+
+    function numPinyinToToneMark(pyNum) {
+      if (!pyNum) return '';
+      const m = pyNum.trim().match(/^([a-züv:]+)([1-5]?)$/i);
+      if (!m) return pyNum;
+      let s = m[1].toLowerCase().replace('v', 'ü').replace('u:', 'ü');
+      const t = parseInt(m[2] || '5', 10);
+      if (t < 1 || t > 4) return s;
+      const marks = {
+        a: ['ā','á','ǎ','à'], e: ['ē','é','ě','è'], i: ['ī','í','ǐ','ì'],
+        o: ['ō','ó','ǒ','ò'], u: ['ū','ú','ǔ','ù'], ü: ['ǖ','ǘ','ǚ','ǜ']
+      };
+      if (s.includes('a')) return s.replace('a', marks.a[t-1]);
+      if (s.includes('e')) return s.replace('e', marks.e[t-1]);
+      if (s.includes('ou')) return s.replace('o', marks.o[t-1]);
+      for (let i = s.length - 1; i >= 0; i--) {
+        if (marks[s[i]]) return s.slice(0, i) + marks[s[i]][t-1] + s.slice(i + 1);
+      }
+      return s;
+    }
+
+    const CUSTOM_POLYPHONES = {
+      "銀行": "yin2 hang2", "银行": "yin2 hang2", "行業": "hang2 ye4", "行业": "hang2 ye4", "一行": "yi4 hang2",
+      "便宜": "pian2 yi5", "方便": "fang1 bian4",
+      "音樂": "yin1 yue4", "音乐": "yin1 yue4", "快樂": "kuai4 le4", "快乐": "kuai4 le4",
+      "看著": "kan4 zhe5", "看着": "kan4 zhe5", "著急": "zhao2 ji2", "着急": "zhao2 ji2", "睡著": "shui4 zhao2", "睡着": "shui4 zhao2",
+      "長大": "zhang3 da4", "长大": "zhang3 da4", "長城": "chang2 cheng2", "长城": "chang2 cheng2", "多長": "duo1 chang2", "多长": "duo1 chang2",
+      "了解": "liao3 jie3", "好了": "hao3 le5", "太好了": "tai4 hao3 le5",
+      "覺得": "jue2 de5", "觉得": "jue2 de5", "睡覺": "shui4 jiao4", "睡觉": "shui4 jiao4",
+      "重慶": "chong2 qing4", "重庆": "chong2 qing4", "重要": "zhong4 yao4",
+      "還錢": "huan2 qian2", "还钱": "huan2 qian2", "還有": "hai2 you3", "还有": "hai2 you3",
+      "食物": "shi2 wu4", "美食": "mei3 shi2",
+      "我的": "wo3 de5", "你的": "ni3 de5", "好的": "hao3 de5",
+      "曲項": "qu1 xiang4", "曲项": "qu1 xiang4", "朝辭": "zhao1 ci2", "朝辞": "zhao1 ci2",
+      "水調歌頭": "shui3 diao4 ge1 tou2", "水调歌头": "shui3 diao4 ge1 tou2"
+    };
+
+    const userPolyphoneMemory = JSON.parse(localStorage.getItem('tp_polyphone_mem') || '{}');
+
+    function getAccuratePinyinArray(zhText) {
+      let pyArr = pinyinPro.pinyin(zhText, { type: 'array', toneType: 'num' });
+      for (let i = 0; i < zhText.length; i++) {
+        if (userPolyphoneMemory[zhText[i]]) pyArr[i] = userPolyphoneMemory[zhText[i]];
+      }
+      for (let word in CUSTOM_POLYPHONES) {
+        let idx = zhText.indexOf(word);
+        while (idx !== -1) {
+          let fixedPys = CUSTOM_POLYPHONES[word].split(' ');
+          for (let k = 0; k < fixedPys.length; k++) {
+            pyArr[idx + k] = fixedPys[k];
+          }
+          idx = zhText.indexOf(word, idx + 1);
+        }
+      }
+      return pyArr;
+    }
+
+    // =========================================================================
+    // 3. 漸進式極速四排渲染（左鍵朗讀單字，右鍵修改多音字）
+    // =========================================================================
+    function prepareOutputCanvas() {
+      document.getElementById('emptyPlaceholder').style.display = 'none';
+    }
+
+    function nextPaintTick() {
+      return new Promise(resolve => requestAnimationFrame(() => setTimeout(resolve, 10)));
+    }
+
+    function speakSingleChar(char) {
+      if (!('speechSynthesis' in window)) return;
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(char);
+      u.lang = 'zh-CN';
+      u.rate = 0.85;
+      window.speechSynthesis.speak(u);
+    }
+
+    function appendSentenceProgressive(rawZhText, enTranslation = '') {
+      prepareOutputCanvas();
+      const list = document.getElementById('annotationList');
+      const block = document.createElement('div');
+      block.className = 'sentence-block';
+
+      const zhText = expandNumbersAndSymbolsToZh(rawZhText);
+      block.dataset.zh = zhText;
+
+      const enDiv = document.createElement('div');
+      enDiv.className = 'en-line';
+      enDiv.innerText = enTranslation || '...';
+      block.appendChild(enDiv);
+
+      const charRow = document.createElement('div');
+      charRow.className = 'char-row';
+      const pinyinList = getAccuratePinyinArray(zhText);
+
+      for (let i = 0; i < zhText.length; i++) {
+        const char = zhText[i];
+        const isChinese = /[\u4e00-\u9fa5]/.test(char);
+        const isPunct = /[，。！？；：、,.!?;:"'“”‘’（）()《》【】]/.test(char);
+        const col = document.createElement('div');
+        col.className = 'tp-col';
+
+        if (isChinese) {
+          let pyNum = pinyinList[i] || '';
+          let tp = compileToTreesPinyin(pyNum);
+          let stdTone = numPinyinToToneMark(pyNum);
+          col.innerHTML = `<span class="tp-py">${tp}</span><span class="tp-std">${stdTone}</span><span class="tp-zh">${char}</span>`;
+
+          col.onclick = function() {
+            speakSingleChar(char);
+          };
+
+          col.oncontextmenu = function(e) {
+            e.preventDefault();
+            let edited = prompt(currentLang === 'en' ? `Edit Pinyin for "${char}" (e.g. hang2, le5):` : `修改「${char}」的拼音（如 hang2, le5）：`, pyNum);
+            if (edited && edited.trim()) {
+              pyNum = edited.trim();
+              userPolyphoneMemory[char] = pyNum;
+              localStorage.setItem('tp_polyphone_mem', JSON.stringify(userPolyphoneMemory));
+              col.querySelector('.tp-py').innerText = compileToTreesPinyin(pyNum);
+              col.querySelector('.tp-std').innerText = numPinyinToToneMark(pyNum);
+            }
+          };
+        } else if (isPunct) {
+          col.innerHTML = `<span class="tp-py">${char}</span><span class="tp-std"> </span><span class="tp-zh"> </span>`;
+        } else {
+          col.innerHTML = `<span class="tp-py"> </span><span class="tp-std"> </span><span class="tp-zh">${char}</span>`;
+        }
+        charRow.appendChild(col);
+      }
+
+      block.appendChild(charRow);
+      list.appendChild(block);
+
+      if (!enTranslation) {
+        translateFast(zhText, 'zh', 'en').then(en => {
+          enDiv.innerText = en;
+        });
+      }
+      return block;
+    }
+
+    // =========================================================================
+    // 4. 多通道極速競速翻譯引擎 (Google GTX + MyMemory)
+    // =========================================================================
+    async function translateFast(text, fromLang, toLang) {
+      const isZhToEn = fromLang.startsWith('zh');
+      const src = isZhToEn ? 'zh-CN' : 'en';
+      const tgt = isZhToEn ? 'en' : 'zh-CN';
+
+      const tasks = [
+        fetchWithTimeout(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=${src}&tl=${tgt}&dt=t&q=${encodeURIComponent(text)}`, {}, 4000)
+          .then(r => r.json())
+          .then(d => {
+            const j = d?.[0]?.map(x => x[0]).join('');
+            if (j && j.trim() && j.trim() !== text) return j.trim();
+            throw new Error('empty');
+          }),
+        fetchWithTimeout(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${src}|${tgt}`, {}, 4500)
+          .then(r => r.json())
+          .then(d => {
+            const t = d?.responseData?.translatedText;
+            if (t && !t.includes('MYMEMORY WARNING') && t.toLowerCase() !== text.toLowerCase()) return t.trim();
+            throw new Error('empty');
+          })
+      ];
+
+      try {
+        return await Promise.any(tasks);
+      } catch (e) {
+        return text;
+      }
+    }
+
+    async function runDirectTranslate(inputOverride) {
+      let raw = (inputOverride !== undefined ? inputOverride : document.getElementById('userInput').value).trim();
+      if (!raw) return;
+
+      prepareOutputCanvas();
+      document.getElementById('previewImg').style.display = 'none';
+      const replyBox = document.getElementById('aiReplyBox');
+      replyBox.style.display = 'none';
+      const list = document.getElementById('annotationList');
+      list.innerHTML = '';
+
+      const gdocMatch = raw.match(/https:\/\/docs\.google\.com\/document\/d\/([a-zA-Z0-9_-]+)/);
+      if (gdocMatch) {
+        replyBox.style.display = 'block';
+        replyBox.innerText = '📄 Fetching Google Doc text...';
+        try {
+          const docId = gdocMatch[1];
+          const r = await fetch(`https://docs.google.com/document/d/${docId}/export?format=txt`);
+          if (r.ok) {
+            raw = (await r.text()).slice(0, 3500).trim();
+            replyBox.style.display = 'none';
+          }
+        } catch (e) {
+          replyBox.innerText = '⚠️ Please make sure the Google Doc is shared as "Anyone with the link can view", or copy & paste the text directly.';
+          return;
+        }
+      }
+
+      const lines = raw.split(/\n+|(?<=[。！？.!?])\s*/).map(l => l.trim()).filter(Boolean);
+      for (let line of lines) {
+        const hasChinese = /[\u4e00-\u9fa5]/.test(line);
+        if (hasChinese) {
+          appendSentenceProgressive(line, '');
+          await nextPaintTick();
+        } else {
+          const tempBlock = document.createElement('div');
+          tempBlock.className = 'sentence-block';
+          tempBlock.innerHTML = `<div class="en-line">${line}</div><div style="font-size:0.85rem;color:#666;">⚡ Translating...</div>`;
+          list.appendChild(tempBlock);
+
+          const zhTrans = await translateFast(line, 'en', 'zh');
+          tempBlock.remove();
+          appendSentenceProgressive(zhTrans, line);
+          await nextPaintTick();
+        }
+      }
+    }
+
+    // =========================================================================
+    // 5. 極速、0 思考延遲、多模型競速 AI 問答並轉四排注音
+    // =========================================================================
+    function cleanChineseSentence(line) {
+      if (!line) return '';
+      let s = line
+        .replace(/^[-*•\d.)、]+\s*/, '')
+        .replace(/\*+/g, '')
+        .replace(/\([^)]*[A-Za-zāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ][^)]*\)/g, '')
+        .replace(/（[^）]*[A-Za-zāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ][^）]*）/g, '')
+        .replace(/[A-Za-zāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ]{2,}/g, '')
+        .replace(/([，。！？；：、,.!?;:])\s*[，。！？；：、,.!?;:]+/g, '$1')
+        .replace(/^[，。！？；：、,.!?;:\s]+/, '')
+        .replace(/\s+/g, '')
+        .trim();
+      return /[\u4e00-\u9fa5]/.test(s) ? s : '';
+    }
+
+    async function runSmartAI(overrideInput) {
+      const q = (overrideInput !== undefined ? overrideInput : document.getElementById('userInput').value).trim();
+      if (!q) return;
+
+      prepareOutputCanvas();
+      document.getElementById('previewImg').style.display = 'none';
+      const replyBox = document.getElementById('aiReplyBox');
+      const list = document.getElementById('annotationList');
+      replyBox.style.display = 'block';
+      replyBox.innerText = currentLang === 'en' ? '⚡ AI Thinking...' : '⚡ AI 正在極速思考...';
+      list.innerHTML = '';
+
+      const directPrompt = `請直接、準確、精煉地用中文回答以下問題，不要說多餘的客套話：
+用戶問題：「${q}」
+格式要求：
+第一行：簡短的一句話標題或雙語說明。
+第二行起：直接輸出用戶要求的準確中文內容（如問古詩詞《詠鵝》《水調歌頭》，請直接輸出準確原詩句；如問做菜食譜，請分條輸出清晰步驟）。第二行起每行只輸出純中文句子，不要夾雜拼音或英文。`;
+
+      const aiText = await fetchFastAccurateAI(directPrompt);
+      if (aiText) {
+        const lines = aiText.split(/\n+/).map(l => l.replace(/^[-*•\d.)、]+\s*/, '').replace(/\*+/g, '').trim()).filter(Boolean);
+        if (lines.length > 0) {
+          replyBox.innerHTML = `<b>${lines[0]}</b>`;
+          await nextPaintTick();
+
+          const bodyLines = lines.length > 1 ? lines.slice(1) : lines;
+          for (const rawL of bodyLines) {
+            const cleanedZh = cleanChineseSentence(rawL);
+            if (cleanedZh) {
+              const subSentences = cleanedZh.split(/(?<=[。！？!?])\s*/).map(s => cleanChineseSentence(s)).filter(Boolean);
+              for (const sub of subSentences) {
+                appendSentenceProgressive(sub, '');
+                await nextPaintTick();
+              }
+            }
+          }
+          return;
+        }
+      }
+
+      // 若未填寫 API Key 且無法連上 Worker，給出簡單乾淨提示並打開 Key 輸入框
+      replyBox.innerHTML = currentLang === 'en'
+        ? `💡 Please enter your Google Gemini API Key in <b>[🔑 API Key]</b>, or ask your browser's AI first, paste the reply above, and click <b>"📝 Translate & Pinyin"</b>.`
+        : `💡 請在右上角 <b>[🔑 API Key]</b> 填入您的 Google Gemini Key，或先詢問您的瀏覽器 AI，將回覆貼到上方點擊<b>「📝 翻譯並注音」</b>。`;
+      openKeyModal();
+    }
+
+    // =========================================================================
+    // 6. 照片與圖片極速識別
+    // =========================================================================
+    async function handlePhotoUpload(input) {
+      if (!input.files || !input.files[0]) return;
+      const file = input.files[0];
+
+      prepareOutputCanvas();
+      const replyBox = document.getElementById('aiReplyBox');
+      const list = document.getElementById('annotationList');
+      replyBox.style.display = 'block';
+      replyBox.innerText = currentLang === 'en' ? '📷 Analyzing photo...' : '📷 正在極速識別照片...';
+      list.innerHTML = '';
+
+      const dataUrl = await compressImg(file, 560, 0.68);
+      const prev = document.getElementById('previewImg');
+      prev.src = dataUrl;
+      prev.style.display = 'block';
+
+      const vPrompt = `請識別這張圖片：
+第一行：簡短說明圖片中的文字、菜品或物品名稱（中英對照）。
+第二行起：若圖片中有文字，直接輸出對應的中文；若是物品或菜品，輸出1至2句純中文介紹。第二行起只輸出純中文字，不要拼音。`;
+
+      const aiRes = await fetchFastAccurateAI(vPrompt, dataUrl);
+      if (aiRes) {
+        const lines = aiRes.split(/\n+/).map(l => l.replace(/^[-*•\d.)、]+\s*/, '').replace(/\*+/g, '').trim()).filter(Boolean);
+        if (lines.length > 0) {
+          replyBox.innerHTML = `<b>${lines[0]}</b>`;
+          for (const rawL of lines.slice(1)) {
+            const cz = cleanChineseSentence(rawL);
+            if (cz) appendSentenceProgressive(cz, '');
+          }
+          input.value = '';
+          return;
+        }
+      }
+
+      try {
+        const fd = new FormData();
+        fd.append('base64Image', dataUrl);
+        fd.append('language', 'chs');
+        fd.append('apikey', 'helloworld');
+        const r = await fetchWithTimeout('https://api.ocr.space/parse/image', { method: 'POST', body: fd }, 6500);
+        const d = await r.json();
+        const ocrText = d?.ParsedResults?.[0]?.ParsedText?.trim() || '';
+        if (ocrText && ocrText.length >= 1) {
+          const clean = ocrText.replace(/\r\n/g, '\n').trim();
+          document.getElementById('userInput').value = clean;
+          replyBox.innerText = `📄 ${clean.slice(0, 65)}`;
+          await runDirectTranslate(clean);
+        } else {
+          replyBox.innerText = currentLang === 'en'
+            ? '💡 No clear text found. On iPhone/iPad, use Apple Camera Live Text to copy text in 0.1s and paste here!'
+            : '💡 未識別到清晰文字。若使用 iPhone/iPad，建議直接用蘋果相機拍照提取文字貼上！';
+        }
+      } catch (e) {}
+
+      input.value = '';
+    }
+
+    function compressImg(file, maxW, quality) {
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = () => {
+            const c = document.createElement('canvas');
+            let w = img.width, h = img.height;
+            if (w > maxW) { h = Math.round((h * maxW) / w); w = maxW; }
+            c.width = w; c.height = h;
+            c.getContext('2d').drawImage(img, 0, 0, w, h);
+            resolve(c.toDataURL('image/jpeg', quality));
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // =========================================================================
+    // 7. 語音輸入（中英文雙語自動識別）與全文朗讀
+    // =========================================================================
+    let activeRec = null;
+
+    function toggleVoice() {
+      const btn = document.getElementById('micBtn');
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SR) return alert(currentLang === 'en' ? 'Voice input is not supported in this browser.' : '當前瀏覽器不支援語音輸入。');
+
+      if (activeRec) {
+        activeRec.stop();
         return;
       }
 
-      if (availableFlashModels.length === 0) {
-        await loadAvailableModels(savedApiKey);
-      }
+      activeRec = new SR();
+      activeRec.lang = 'zh-CN';
+      activeRec.interimResults = true;
+      activeRec.maxAlternatives = 5;
+      activeRec.continuous = false;
+      btn.classList.add('recording');
 
-      const outEl = document.getElementById('answerOutput');
-      const tagEl = document.getElementById('activeEngineTag');
-      tagEl.style.display = 'none';
-      outEl.innerText = '⚡ 多模型極速競速中...';
-
-      const selectedMode = document.getElementById('modelSelect').value;
-      const modelsToRace = selectedMode === 'AUTO_RACE'
-        ? availableFlashModels.slice(0, 3)
-        : [selectedMode];
-
-      const t0 = performance.now();
-      logMsg(`🏁 同時向 [${modelsToRace.join(', ')}] 發起極速競速請求...`);
-
-      const controllers = modelsToRace.map(() => new AbortController());
-
-      const racePromises = modelsToRace.map((mName, idx) =>
-        callSingleModelFast(mName, promptText, controllers[idx].signal)
-          .then(res => {
-            // 一旦有一個模型獲勝，立即中止其他還在跑的慢模型
-            controllers.forEach((c, i) => { if (i !== idx) c.abort(); });
-            return res;
-          })
-          .catch(err => {
-            if (err.name !== 'AbortError') {
-              logMsg(`⚠️ ${err.message}`);
-            }
-            throw err;
-          })
-      );
-
-      try {
-        const winner = await Promise.any(racePromises);
-        const elapsed = Math.round(performance.now() - t0);
-        tagEl.style.display = 'inline-block';
-        tagEl.innerText = `🏆 獲勝模型: ${winner.model} · 總耗時 ${elapsed} ms`;
-        outEl.innerText = winner.text;
-        logMsg(`🏆 [${winner.model}] 率先返回結果！總耗時: ${elapsed} ms`);
-      } catch (aggErr) {
-        outEl.innerText = '❌ 所有模型請求皆失敗，請查看下方黑色日誌框的具体報錯原因。';
-        logMsg('❌ 競速全部失敗，請檢查 API Key 額度或網路連線。');
-      }
-    }
-
-    // 4. 免 Key 跳轉瀏覽器 Gemini（加上防抖鎖，避免重複觸發 4 次）
-    async function askViaBrowserTab() {
-      const q = document.getElementById('promptInput').value.trim();
-      if (!q) return;
-      try { await navigator.clipboard.writeText(q); } catch (e) {}
-      waitingRelay = true;
-      document.getElementById('answerOutput').innerText =
-        '📋 問題已複製！請在彈出的 Google Gemini 視窗貼上提問，複製回答後切回本頁即可。';
-      logMsg('等待從瀏覽器 Gemini 複製回答切回...');
-      window.open('https://gemini.google.com/app', '_blank');
-    }
-
-    window.addEventListener('focus', async () => {
-      if (!waitingRelay) return;
-      waitingRelay = false; // 立即上鎖，防止連續觸發 4 次
-      try {
-        const clip = (await navigator.clipboard.readText() || '').trim();
-        const originalQ = document.getElementById('promptInput').value.trim();
-        if (clip && clip !== originalQ) {
-          const tagEl = document.getElementById('activeEngineTag');
-          tagEl.style.display = 'inline-block';
-          tagEl.innerText = '⚡ 來自瀏覽器 Gemini 剪貼簿接回';
-          document.getElementById('answerOutput').innerText = clip;
-          logMsg('✅ 已成功從剪貼簿接回回答！');
-        } else {
-          waitingRelay = true; // 若還沒複製新答案，保持等待
+      let finalTranscript = '';
+      activeRec.onresult = (e) => {
+        let interim = '';
+        for (let i = e.resultIndex; i < e.results.length; i++) {
+          const res = e.results[i];
+          const bestText = res[0].transcript;
+          if (res.isFinal) finalTranscript += bestText;
+          else interim += bestText;
         }
-      } catch (e) {}
-    });
+        document.getElementById('userInput').value = (finalTranscript || interim).trim();
+      };
+
+      activeRec.onend = () => {
+        btn.classList.remove('recording');
+        activeRec = null;
+        const spoken = document.getElementById('userInput').value.trim();
+        if (spoken) runSmartAI(spoken);
+      };
+
+      activeRec.onerror = () => {
+        btn.classList.remove('recording');
+        activeRec = null;
+      };
+
+      activeRec.start();
+    }
+
+    let isSpeakingNow = false;
+
+    function toggleSpeak() {
+      if (!('speechSynthesis' in window)) return;
+      const btn = document.getElementById('speakBtn');
+      const t = UI_TEXT[currentLang];
+
+      if (window.speechSynthesis.speaking || isSpeakingNow) {
+        window.speechSynthesis.cancel();
+        isSpeakingNow = false;
+        btn.innerText = t.speakBtn;
+        btn.style.background = '';
+        btn.style.color = '';
+        return;
+      }
+
+      const blocks = document.querySelectorAll('.sentence-block');
+      let allZh = Array.from(blocks).map(b => b.dataset.zh).join('。');
+      if (!allZh) allZh = document.getElementById('userInput').value;
+      if (!allZh) return;
+
+      const utter = new SpeechSynthesisUtterance(allZh);
+      utter.lang = 'zh-CN';
+      utter.rate = 0.85;
+      isSpeakingNow = true;
+      btn.innerText = t.stopSpeakBtn;
+      btn.style.background = '#d32f2f';
+      btn.style.color = '#fff';
+
+      utter.onend = () => {
+        isSpeakingNow = false;
+        btn.innerText = UI_TEXT[currentLang].speakBtn;
+        btn.style.background = '';
+        btn.style.color = '';
+      };
+      utter.onerror = utter.onend;
+      window.speechSynthesis.speak(utter);
+    }
+
+    // =========================================================================
+    // 8. 全屏大字、保存長圖與安裝彈窗
+    // =========================================================================
+    function toggleBigFont() {
+      document.body.classList.toggle('big-mode');
+    }
+
+    async function exportCardImage() {
+      const card = document.getElementById('sheetCard');
+      try {
+        const canvas = await html2canvas(card, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
+        const dataUrl = canvas.toDataURL('image/png');
+        document.getElementById('generatedImg').src = dataUrl;
+        document.getElementById('imgModal').style.display = 'flex';
+      } catch (err) {}
+    }
+
+    function openInstallModal() {
+      document.getElementById('installModal').style.display = 'flex';
+    }
   </script>
 </body>
 </html>
