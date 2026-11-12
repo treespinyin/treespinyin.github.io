@@ -1051,7 +1051,6 @@
           .map(m => m.name.replace('models/', ''))
           .filter(n => !n.includes('tts') && !n.includes('image') && !n.includes('embedding') && !n.includes('veo') && !n.includes('robotics'));
 
-        // 以實測最快獲勝的 gemini-flash-lite-latest 與 gemini-3.5-flash-lite 為第一優先
         const priority = [
           'gemini-flash-lite-latest',
           'gemini-3.5-flash-lite',
@@ -1123,7 +1122,7 @@
         body: JSON.stringify({
           contents: [{ parts }],
           generationConfig: {
-            temperature: 0.2,
+            temperature: 0.15,
             thinkingConfig: { thinkingBudget: 0 }
           }
         }),
@@ -1136,7 +1135,7 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             contents: [{ parts }],
-            generationConfig: { temperature: 0.2 }
+            generationConfig: { temperature: 0.15 }
           }),
           signal
         });
@@ -1157,7 +1156,6 @@
     }
 
     async function fetchFastAccurateAI(promptText, dataUrl = null) {
-      // 1. 若有填寫 API Key：啟動前 3 名高速模型 0 思考延遲並發賽跑 (Promise.any)
       if (backupKey) {
         const modelsToRace = availableFastModels.slice(0, 3);
         const controllers = modelsToRace.map(() => new AbortController());
@@ -1175,7 +1173,6 @@
         } catch (e) {}
       }
 
-      // 2. 若未填 Key：嘗試呼叫您的 Cloudflare Worker (正宗 Google Gemini 端點)
       const workerTasks = CF_WORKER_ENDPOINTS.map(async (ep) => {
         const r = await fetchWithTimeout(ep, {
           method: 'POST',
@@ -1516,7 +1513,7 @@
     }
 
     // =========================================================================
-    // 3. 漸進式極速四排渲染（左鍵朗讀單字，右鍵修改多音字）
+    // 3. 漸進式極速四排渲染（若已提供標準雙語對照則直接鎖死，不再回譯！）
     // =========================================================================
     function prepareOutputCanvas() {
       document.getElementById('emptyPlaceholder').style.display = 'none';
@@ -1546,7 +1543,8 @@
 
       const enDiv = document.createElement('div');
       enDiv.className = 'en-line';
-      enDiv.innerText = enTranslation || '...';
+      const hasLockedEn = Boolean(enTranslation && enTranslation.trim());
+      enDiv.innerText = hasLockedEn ? enTranslation.trim() : '...';
       block.appendChild(enDiv);
 
       const charRow = document.createElement('div');
@@ -1592,7 +1590,8 @@
       block.appendChild(charRow);
       list.appendChild(block);
 
-      if (!enTranslation) {
+      // 只有在未傳入標準英文譯文時，才調用單句翻譯保底
+      if (!hasLockedEn) {
         translateFast(zhText, 'zh', 'en').then(en => {
           enDiv.innerText = en;
         });
@@ -1601,7 +1600,7 @@
     }
 
     // =========================================================================
-    // 4. 多通道極速競速翻譯引擎 (Google GTX + MyMemory)
+    // 4. 精準雙向翻譯引擎（鎖死用戶輸入的原文，絕不拿譯文反推回原文！）
     // =========================================================================
     async function translateFast(text, fromLang, toLang) {
       const isZhToEn = fromLang.startsWith('zh');
@@ -1632,6 +1631,43 @@
       }
     }
 
+    function cleanChineseSentence(line) {
+      if (!line) return '';
+      let s = line
+        .replace(/^[-*•\d.)、]+\s*/, '')
+        .replace(/\*+/g, '')
+        .replace(/\([^)]*[A-Za-zāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ][^)]*\)/g, '')
+        .replace(/（[^）]*[A-Za-zāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ][^）]*）/g, '')
+        .replace(/[A-Za-zāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ]{2,}/g, '')
+        .replace(/([，。！？；：、,.!?;:])\s*[，。！？；：、,.!?;:]+/g, '$1')
+        .replace(/^[，。！？；：、,.!?;:\s]+/, '')
+        .replace(/\s+/g, '')
+        .trim();
+      return /[\u4e00-\u9fa5]/.test(s) ? s : '';
+    }
+
+    // 解析 AI 輸出的「中文 ||| 英文」成對格式
+    function parseBilingualPairLine(rawLine) {
+      const cleaned = rawLine.replace(/^[-*•\d.)、]+\s*/, '').replace(/\*+/g, '').trim();
+      if (!cleaned.includes('|||')) return null;
+      const parts = cleaned.split('|||').map(p => p.trim()).filter(Boolean);
+      if (parts.length < 2) return null;
+
+      let zhPart = '', enPart = '';
+      if (/[\u4e00-\u9fa5]/.test(parts[0]) && !/[\u4e00-\u9fa5]/.test(parts[1])) {
+        zhPart = cleanChineseSentence(parts[0]) || parts[0];
+        enPart = parts[1];
+      } else if (/[\u4e00-\u9fa5]/.test(parts[1])) {
+        enPart = parts[0];
+        zhPart = cleanChineseSentence(parts[1]) || parts[1];
+      } else {
+        zhPart = cleanChineseSentence(parts[0]) || parts[0];
+        enPart = parts[1];
+      }
+      if (!/[\u4e00-\u9fa5]/.test(zhPart)) return null;
+      return { zh: zhPart, en: enPart };
+    }
+
     async function runDirectTranslate(inputOverride) {
       let raw = (inputOverride !== undefined ? inputOverride : document.getElementById('userInput').value).trim();
       if (!raw) return;
@@ -1660,13 +1696,51 @@
         }
       }
 
+      // 優先使用 Gemini 大模型做整段「原文鎖死 + 精準語境翻譯」
+      if (backupKey && raw.length <= 1800) {
+        replyBox.style.display = 'block';
+        replyBox.innerText = currentLang === 'en' ? '⚡ Translating accurately...' : '⚡ 正在精準翻譯並注音...';
+
+        const transPrompt = `Translate the following text sentence by sentence between Chinese and English.
+CRITICAL RULES:
+1. NEVER alter or re-translate the user's original text!
+   - If a sentence is in English, keep the EXACT original English sentence on the right side of "|||", and provide its accurate Mandarin Chinese translation on the left side.
+   - If a sentence is in Chinese, keep the EXACT original Chinese sentence on the left side of "|||", and provide its accurate, natural English translation on the right side.
+2. Output strictly one sentence pair per line in this exact format:
+Chinese_Sentence ||| English_Sentence
+Do NOT output any extra intro, numbering, or markdown.
+
+Text to translate:
+${raw}`;
+
+        const aiTrans = await fetchFastAccurateAI(transPrompt);
+        if (aiTrans && aiTrans.includes('|||')) {
+          replyBox.style.display = 'none';
+          const pairLines = aiTrans.split(/\n+/).map(l => l.trim()).filter(Boolean);
+          let renderedCount = 0;
+          for (const pl of pairLines) {
+            const pair = parseBilingualPairLine(pl);
+            if (pair) {
+              renderedCount++;
+              appendSentenceProgressive(pair.zh, pair.en);
+              await nextPaintTick();
+            }
+          }
+          if (renderedCount > 0) return;
+        }
+        replyBox.style.display = 'none';
+      }
+
+      // 無 API Key 或超長文檔時的逐句快速翻譯（同樣嚴格鎖死原文，絕不二次回譯）
       const lines = raw.split(/\n+|(?<=[。！？.!?])\s*/).map(l => l.trim()).filter(Boolean);
       for (let line of lines) {
         const hasChinese = /[\u4e00-\u9fa5]/.test(line);
         if (hasChinese) {
+          // 用戶輸入的是中文原文：鎖死中文原文，只翻譯成英文
           appendSentenceProgressive(line, '');
           await nextPaintTick();
         } else {
+          // 用戶輸入的是英文原文：100% 鎖死英文原文在第一排，只翻譯出中文用於注音
           const tempBlock = document.createElement('div');
           tempBlock.className = 'sentence-block';
           tempBlock.innerHTML = `<div class="en-line">${line}</div><div style="font-size:0.85rem;color:#666;">⚡ Translating...</div>`;
@@ -1681,23 +1755,8 @@
     }
 
     // =========================================================================
-    // 5. 極速、0 思考延遲、多模型競速 AI 問答並轉四排注音
+    // 5. 極速 AI 問答並注音（無論中英文提問：先給出標準原文答案，再精準翻譯，絕不逆向回譯！）
     // =========================================================================
-    function cleanChineseSentence(line) {
-      if (!line) return '';
-      let s = line
-        .replace(/^[-*•\d.)、]+\s*/, '')
-        .replace(/\*+/g, '')
-        .replace(/\([^)]*[A-Za-zāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ][^)]*\)/g, '')
-        .replace(/（[^）]*[A-Za-zāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ][^）]*）/g, '')
-        .replace(/[A-Za-zāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ]{2,}/g, '')
-        .replace(/([，。！？；：、,.!?;:])\s*[，。！？；：、,.!?;:]+/g, '$1')
-        .replace(/^[，。！？；：、,.!?;:\s]+/, '')
-        .replace(/\s+/g, '')
-        .trim();
-      return /[\u4e00-\u9fa5]/.test(s) ? s : '';
-    }
-
     async function runSmartAI(overrideInput) {
       const q = (overrideInput !== undefined ? overrideInput : document.getElementById('userInput').value).trim();
       if (!q) return;
@@ -1710,35 +1769,57 @@
       replyBox.innerText = currentLang === 'en' ? '⚡ AI Thinking...' : '⚡ AI 正在極速思考...';
       list.innerHTML = '';
 
-      const directPrompt = `請直接、準確、精煉地用中文回答以下問題，不要說多餘的客套話：
-用戶問題：「${q}」
-格式要求：
-第一行：簡短的一句話標題或雙語說明。
-第二行起：直接輸出用戶要求的準確中文內容（如問古詩詞《詠鵝》《水調歌頭》，請直接輸出準確原詩句；如問做菜食譜，請分條輸出清晰步驟）。第二行起每行只輸出純中文句子，不要夾雜拼音或英文。`;
+      // 強制 AI 先確立標準權威回答（英文名篇先確立英文原句再翻中文；中文古詩/食譜先確立中文原句再翻英文），並以「中文 ||| 英文」成對輸出
+      const directPrompt = `You are an authoritative bilingual scholar and assistant.
+User question/request: "${q}"
+
+CRITICAL ACCURACY RULES:
+1. First, determine the authoritative standard answer or authentic classic text:
+   - If the user asks about an English poem, quote, speech, or asks a question in English: First formulate the exact, authentic English original lines or standard English answer, and then translate each sentence into natural Mandarin Chinese.
+   - If the user asks about a Chinese poem/classic (e.g., 詠鵝, 水調歌頭) or Chinese recipe/question: First formulate the exact, authentic Chinese original lines or standard Chinese answer, and then translate each sentence into accurate, poetic/natural English.
+   - NEVER back-translate from a translation! Both the Chinese and English must be direct, authentic, and faithful.
+2. Output Format:
+   - Line 1: A concise 1-line title or summary (in both English & Chinese).
+   - Line 2 onwards: Output each sentence pair strictly on its own line separated by "|||" in this exact order:
+     Pure_Chinese_Sentence ||| Authentic_English_Sentence
+   - IMPORTANT: On Lines 2+, the left side of "|||" must contain ONLY Chinese characters and Chinese punctuation (NO Pinyin, NO English letters on the left side).`;
 
       const aiText = await fetchFastAccurateAI(directPrompt);
       if (aiText) {
-        const lines = aiText.split(/\n+/).map(l => l.replace(/^[-*•\d.)、]+\s*/, '').replace(/\*+/g, '').trim()).filter(Boolean);
-        if (lines.length > 0) {
-          replyBox.innerHTML = `<b>${lines[0]}</b>`;
-          await nextPaintTick();
+        const rawLines = aiText.split(/\n+/).map(l => l.trim()).filter(Boolean);
+        if (rawLines.length > 0) {
+          let startIdx = 0;
+          // 若第一行不是成對內容，作為頂部標題說明顯示
+          if (!rawLines[0].includes('|||')) {
+            const headerLine = rawLines[0].replace(/^[-*•\d.)、]+\s*/, '').replace(/\*+/g, '').trim();
+            replyBox.innerHTML = `<b>${headerLine}</b>`;
+            startIdx = 1;
+            await nextPaintTick();
+          } else {
+            replyBox.style.display = 'none';
+          }
 
-          const bodyLines = lines.length > 1 ? lines.slice(1) : lines;
-          for (const rawL of bodyLines) {
-            const cleanedZh = cleanChineseSentence(rawL);
-            if (cleanedZh) {
-              const subSentences = cleanedZh.split(/(?<=[。！？!?])\s*/).map(s => cleanChineseSentence(s)).filter(Boolean);
-              for (const sub of subSentences) {
-                appendSentenceProgressive(sub, '');
+          let renderedPairs = 0;
+          for (let i = startIdx; i < rawLines.length; i++) {
+            const pair = parseBilingualPairLine(rawLines[i]);
+            if (pair) {
+              renderedPairs++;
+              // 直接傳入 AI 原生配對好的 zh 與 en，徹底跳過機器二次回譯！
+              appendSentenceProgressive(pair.zh, pair.en);
+              await nextPaintTick();
+            } else {
+              const fallbackZh = cleanChineseSentence(rawLines[i]);
+              if (fallbackZh) {
+                renderedPairs++;
+                appendSentenceProgressive(fallbackZh, '');
                 await nextPaintTick();
               }
             }
           }
-          return;
+          if (renderedPairs > 0) return;
         }
       }
 
-      // 若未填寫 API Key 且無法連上 Worker，給出簡單乾淨提示並打開 Key 輸入框
       replyBox.innerHTML = currentLang === 'en'
         ? `💡 Please enter your Google Gemini API Key in <b>[🔑 API Key]</b>, or ask your browser's AI first, paste the reply above, and click <b>"📝 Translate & Pinyin"</b>.`
         : `💡 請在右上角 <b>[🔑 API Key]</b> 填入您的 Google Gemini Key，或先詢問您的瀏覽器 AI，將回覆貼到上方點擊<b>「📝 翻譯並注音」</b>。`;
@@ -1764,18 +1845,24 @@
       prev.src = dataUrl;
       prev.style.display = 'block';
 
-      const vPrompt = `請識別這張圖片：
-第一行：簡短說明圖片中的文字、菜品或物品名稱（中英對照）。
-第二行起：若圖片中有文字，直接輸出對應的中文；若是物品或菜品，輸出1至2句純中文介紹。第二行起只輸出純中文字，不要拼音。`;
+      const vPrompt = `Look at this image:
+Line 1: Briefly identify what text, dish, or object is in the image (in English & Chinese).
+Line 2+: Output the text or 1-2 descriptive sentences strictly in this paired format (one pair per line):
+Pure_Chinese_Sentence ||| Authentic_English_Sentence`;
 
       const aiRes = await fetchFastAccurateAI(vPrompt, dataUrl);
       if (aiRes) {
-        const lines = aiRes.split(/\n+/).map(l => l.replace(/^[-*•\d.)、]+\s*/, '').replace(/\*+/g, '').trim()).filter(Boolean);
+        const lines = aiRes.split(/\n+/).map(l => l.trim()).filter(Boolean);
         if (lines.length > 0) {
-          replyBox.innerHTML = `<b>${lines[0]}</b>`;
+          replyBox.innerHTML = `<b>${lines[0].replace(/\*+/g, '')}</b>`;
           for (const rawL of lines.slice(1)) {
-            const cz = cleanChineseSentence(rawL);
-            if (cz) appendSentenceProgressive(cz, '');
+            const pair = parseBilingualPairLine(rawL);
+            if (pair) {
+              appendSentenceProgressive(pair.zh, pair.en);
+            } else {
+              const cz = cleanChineseSentence(rawL);
+              if (cz) appendSentenceProgressive(cz, '');
+            }
           }
           input.value = '';
           return;
