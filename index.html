@@ -805,7 +805,7 @@
       <h3 style="margin:0; font-size:1.02rem;" id="uiKeyTitle">🔑 Google Gemini API Key</h3>
       <div id="uiKeyDesc" style="font-size:0.85rem; line-height:1.55; background:#f8f9fa; padding:12px; border-radius:8px;">
         <b>Cloudflare High-Speed AI & Global Cache are active by default!</b><br>
-        For heavy use or during peak traffic, enter your own free Google Gemini API Key (stored locally in your browser):<br>
+        Enter your own free Google Gemini API Key (stored locally in your browser) or switch to www.treespinyin.com/app in Safari:<br>
         <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:#1565c0; font-weight:700;">Get Free Key at Google AI Studio ↗</a>
       </div>
       <input type="password" id="apiKeyInput" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;font-size:0.9rem;" placeholder="AIzaSy... (Optional)">
@@ -965,7 +965,7 @@
         installSteps: '<b>📱 iPhone & iPad (Safari):</b><br>1. Open <span style="color:#1b5e20; font-weight:700;">treespinyin.com</span> in <b>Safari</b>.<br>2. Tap the <b>Share button [📤]</b> → <b>"Add to Home Screen [➕]"</b>.<br><br><b>💻 Mac (Safari / Chrome / Edge):</b><br>• <b>Mac Safari:</b> Click <b>File</b> in top menu bar → <b>"Add to Dock..."</b><br>• <b>Chrome / Edge:</b> Click the <b>Install icon [⊕]</b> on the right side of the address bar.',
         gotItBtn: "Got It",
         keyTitle: "🔑 Google Gemini API Key",
-        keyDesc: '<b>Cloudflare High-Speed AI & Global Cache are active by default!</b><br>For heavy use or during peak traffic, enter your own free Google Gemini API Key (stored locally in your browser):<br><a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:#1565c0; font-weight:700;">Get Free Key at Google AI Studio ↗</a>',
+        keyDesc: '<b>Cloudflare High-Speed AI & Global Cache are active by default!</b><br>Enter your own free Google Gemini API Key (stored locally in your browser) or switch to www.treespinyin.com/app in Safari:<br><a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:#1565c0; font-weight:700;">Get Free Key at Google AI Studio ↗</a>',
         fileMenuTitle: "📁 File & Camera Options",
         optDocTitle: "📄 Upload File (PDF / Word / Docs / TXT)",
         optDocSub: "100% Client-side instant extraction & Pinyin",
@@ -1791,7 +1791,6 @@
         }
       }
 
-      // 若用戶已填入個人 Key 且文本適中，優先用 Gemini 做整段語境精準翻譯（並嚴格鎖死原文）
       if (backupKey && raw.length <= 1800) {
         replyBox.style.display = 'block';
         replyBox.innerText = currentLang === 'en' ? '⚡ Translating accurately...' : '⚡ 正在精準翻譯並注音...';
@@ -1826,7 +1825,6 @@ ${raw}`;
         replyBox.style.display = 'none';
       }
 
-      // 逐句極速翻譯（100% 鎖死原文，絕不二次回譯）
       const lines = raw.split(/\n+|(?<=[。！？.!?])\s*/).map(l => l.trim()).filter(Boolean);
       for (let line of lines) {
         const hasChinese = /[\u4e00-\u9fa5]/.test(line);
@@ -1848,7 +1846,7 @@ ${raw}`;
     }
 
     // =========================================================================
-    // 5. 極速 AI 問答並注音（三級快取 + Cloudflare 免 Key 雲端 + 個人 Key 雙軌競速 + 流量高峰提示）
+    // 5. 極速 AI 問答並注音（三級快取 + Cloudflare 免 Key 雲端 + 個人 Key 雙軌競速）
     // =========================================================================
     async function runSmartAI(overrideInput) {
       const q = (overrideInput !== undefined ? overrideInput : document.getElementById('userInput').value).trim();
@@ -1862,7 +1860,7 @@ ${raw}`;
       replyBox.innerText = currentLang === 'en' ? '⚡ AI Thinking...' : '⚡ AI 正在極速思考...';
       list.innerHTML = '';
 
-      // 第 1 & 2 級快取：先查內建經典題庫與瀏覽器本地快取，命中則 0.001 秒直接顯示！
+      // 第 1 & 2 級快取：先查內建經典題庫與瀏覽器本地快取
       const localHit = getLocalCachedAnswer(q);
       if (localHit) {
         const ok = await renderBilingualAIOutput(localHit);
@@ -1893,7 +1891,6 @@ CRITICAL ACCURACY RULES:
         }
       }
 
-      // 當公共通道遇流量高峰或未配置個人 Key 時，彈出溫和提示引導用戶填入免費個人 Key
       replyBox.innerHTML = currentLang === 'en'
         ? `💡 High traffic on the free public channel! Please enter your own free Google Gemini API Key in <b>[🔑 API Key]</b> for unlimited instant responses, or ask your browser's AI and paste the reply above.`
         : `💡 當前免費公共通道訪問量較大！請在右上角 <b>[🔑 API Key]</b> 填入您免費的個人 Google Gemini Key 即可享受專屬極速無限通道，或先詢問瀏覽器 AI 並貼回上方點擊「📝 翻譯並注音」。`;
