@@ -505,7 +505,7 @@
       gap: 8px;
     }
 
-    /* ================= 🎬 錄影工坊 (預設 9:16 豎屏，下拉 16:9，半文字半人臉) ================= */
+    /* ================= 🎬 錄影工坊 (預設 9:16 豎屏，可選高清 1080p / 720p / 360p) ================= */
     .studio-overlay {
       display: none;
       position: fixed;
@@ -520,7 +520,7 @@
     }
     .studio-overlay.active { display: flex; }
     .studio-top-bar {
-      width: 100%; max-width: 880px;
+      width: 100%; max-width: 900px;
       display: flex; justify-content: space-between; align-items: center;
       flex-wrap: wrap; gap: 8px;
       background: rgba(255,255,255,0.08);
@@ -562,7 +562,7 @@
     .studio-stage.view-full-cam .studio-bottom-pane { flex: 1; height: 100%; }
 
     .studio-bottom-controls {
-      width: 100%; max-width: 880px; display: flex; justify-content: center;
+      width: 100%; max-width: 900px; display: flex; justify-content: center;
       align-items: center; gap: 10px; flex-wrap: wrap; padding: 6px;
     }
 
@@ -646,13 +646,22 @@
     </div>
   </div>
 
-  <!-- 🎬 3. 錄影工坊 (預設 9:16 豎屏，下拉 16:9，支援 Split / Text / Cam 切換，錄入電腦朗讀聲) -->
+  <!-- 🎬 3. 錄影工坊 (預設 9:16 豎屏，下拉 16:9 + 可選清晰度 1080p HD / 720p / 360p) -->
   <div id="studioOverlay" class="studio-overlay">
     <div class="studio-top-bar">
-      <select id="studioRatioSelect" class="studio-select" onchange="setStudioRatio(this.value)">
-        <option value="9-16" selected>📱 9:16</option>
-        <option value="16-9">🎬 16:9</option>
-      </select>
+      <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+        <select id="studioRatioSelect" class="studio-select" onchange="setStudioRatio(this.value)">
+          <option value="9-16" selected>📱 9:16</option>
+          <option value="16-9">🎬 16:9</option>
+        </select>
+
+        <!-- 新增：清晰度選擇器 (1080p 超清投影與 IG Reels / 720p 標準 / 360p 輕量) -->
+        <select id="studioQualitySelect" class="studio-select" title="Video Resolution & Clarity">
+          <option value="1080" selected>🌟 HD 1080p (IG / Projection)</option>
+          <option value="720">⚖️ 720p Standard</option>
+          <option value="360">⚡ 360p Fast Share</option>
+        </select>
+      </div>
 
       <div style="display:flex; align-items:center; gap:6px;">
         <button class="studio-mode-pill active" id="viewBtnSplit" onclick="setStudioViewMode('split')">🌗 Split</button>
@@ -674,7 +683,7 @@
       <span id="studioTimerBadge" style="font-family:monospace; font-size:0.95rem; font-weight:800; background:#1e293b; padding:6px 10px; border-radius:8px;">⏺️ 00:00</span>
       <button class="btn btn-green" id="studioRecBtn" style="flex:unset; padding:8px 18px;" onclick="toggleStudioRecording()">🔴 Record</button>
       <button class="btn btn-soft" style="flex:unset; padding:8px 14px;" onclick="speakAllStudioText()">🔊 Speak</button>
-      <a id="studioDownloadLink" class="btn btn-blue hidden" style="flex:unset; padding:8px 16px; text-decoration:none;" download="trees-pinyin.webm">💾 Save</a>
+      <a id="studioDownloadLink" class="btn btn-blue hidden" style="flex:unset; padding:8px 16px; text-decoration:none;" download="trees-pinyin-hd.webm">💾 Save</a>
     </div>
   </div>
 
@@ -759,7 +768,7 @@
 
           <input type="file" id="docFileInput" accept=".txt,.md,.csv,.json,.html,.rtf,.pdf,.docx,.doc,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword,text/plain" style="display:none" onchange="handleDocFileUpload(this)">
           <input type="file" id="galleryInput" accept="image/*" style="display:none" onchange="handlePhotoUpload(this)">
-          <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none" onchange="handlePhotoUpload(this)">
+          <input type="file" id="cameraInput" accept="image/*" style="display:none" onchange="handlePhotoUpload(this)">
         </div>
 
         <div class="action-row">
@@ -902,12 +911,11 @@
     </div>
   </div>
 
-  <!-- ================= 彈窗 1：文件夾選單（新增：個人網盤文件打開與修改） ================= -->
+  <!-- ================= 彈窗 1：文件夾選單（含個人網盤文件打開與修改） ================= -->
   <div class="modal" id="fileMenuModal" onclick="if(event.target===this)this.style.display='none'">
     <div class="modal-box">
       <h3 style="margin:0; font-size:1.05rem;" id="uiFileMenuTitle">📁 File & Cloud Drive Options</h3>
 
-      <!-- 新增：打開與修改個人網盤文件 (無需公開分享，直接讀寫本人 Google Drive / iCloud / OneDrive 檔案) -->
       <button class="option-card-btn" onclick="openPersonalCloudDriveFile()">
         <div>
           <div id="uiOptCloudTitle">☁️ Open & Edit My Cloud Drive File</div>
@@ -936,7 +944,7 @@
     </div>
   </div>
 
-  <!-- ================= 彈窗 2：拍照提速提示 (原版保留) ================= -->
+  <!-- ================= 彈窗 2：拍照提速提示 ================= -->
   <div class="modal" id="cameraNoticeModal" onclick="if(event.target===this)this.style.display='none'">
     <div class="modal-box">
       <h3 style="margin:0; font-size:1.05rem; color:#1b5e20;">⚡ Speed Tip for Photo Recognition</h3>
@@ -1016,7 +1024,7 @@
 
   <script>
     // =========================================================================
-    // 0. 全域唯一配置與 PWA 桌面安裝支持 (無任何重複宣告)
+    // 0. 全域唯一配置與 PWA 桌面安裝支持
     // =========================================================================
     const IS_LOCAL_FILE = window.location.protocol === 'file:';
     const CF_WORKER_ENDPOINTS = IS_LOCAL_FILE
@@ -1078,7 +1086,6 @@
       }
     });
 
-    // 污言穢語勸告攔截
     const PROFANITY_EN_REGEX = /\b(fuck|fucking|fucked|fucker|motherfucker|shit|shitty|bullshit|bitch|bitches|asshole|bastard|dick|cock|pussy|cunt|whore|slut|nigger|nigga|faggot|retard)\b/i;
     const PROFANITY_ZH_LIST = ['他媽的','他妈的','你媽的','你妈的','操你','肏你','草泥馬','草泥马','傻逼','煞筆','傻B','去死吧','王八蛋','賤人','贱人','婊子'];
 
@@ -1176,7 +1183,6 @@
       if (!text) return;
       if (checkAndWarnProfanity(text)) return;
 
-      // 若正在錄影，同步將清晰語音流直接注入錄影混音器，確保電腦朗讀聲 100% 錄進影片
       if (studioRecorder && studioRecorder.state === 'recording' && studioAudioCtx && studioAudioDest) {
         try {
           const ttsAudio = new Audio(`https://translate.googleapis.com/translate_tts?ie=UTF-8&client=tw-ob&tl=zh-TW&q=${encodeURIComponent(text.slice(0, 100))}`);
@@ -1338,20 +1344,18 @@
     }
 
     // =========================================================================
-    // 1. ☁️ 個人網盤文件打開與修改保存 (無需公開分享，直接讀寫本人網盤文件)
+    // 1. ☁️ 個人網盤文件打開與修改保存
     // =========================================================================
     let activeCloudFileHandle = null;
     let activeCloudFileName = '';
 
     async function openPersonalCloudDriveFile() {
       document.getElementById('fileMenuModal').style.display = 'none';
-
-      // 優先使用現代瀏覽器 File System Access API，可直接讀寫用戶掛載的 Google Drive / iCloud / OneDrive 私人資料夾並直接覆寫保存
       if ('showOpenFilePicker' in window) {
         try {
           const [fileHandle] = await window.showOpenFilePicker({
             types: [{
-              description: 'Personal Cloud Drive Documents (Docs, Word, TXT, Markdown, PDF)',
+              description: 'Personal Cloud Drive Documents',
               accept: {
                 'text/plain': ['.txt', '.md', '.csv'],
                 'text/html': ['.html', '.htm'],
@@ -1370,8 +1374,6 @@
           if (err.name === 'AbortError') return;
         }
       }
-
-      // 若瀏覽器不支援直接 File Handle（如部分行動端），降級使用私人檔案選擇器並支援一鍵存回個人網盤
       document.getElementById('docFileInput').click();
     }
 
@@ -1407,7 +1409,6 @@
         const clipped = clean.slice(0, 3500);
         document.getElementById('userInput').value = clipped;
 
-        // 顯示「保存修改回個人網盤」工具列
         const bar = document.getElementById('cloudFileEditBar');
         bar.classList.remove('hidden');
         document.getElementById('cloudFileNameDisplay').innerText = `☁️ Editing: ${activeCloudFileName}`;
@@ -1418,7 +1419,6 @@
       }
     }
 
-    // 收集用戶在畫布上修改過的漢字、英文、Trees Pinyin 與漢語拼音，直接寫回個人網盤原檔案！
     function collectCurrentBoardContentForSave() {
       const blocks = Array.from(document.querySelectorAll('#annotationList .sentence-block'));
       if (blocks.length === 0) return document.getElementById('userInput').value;
@@ -1437,7 +1437,6 @@
       const updatedContent = collectCurrentBoardContentForSave();
       if (!updatedContent) return;
 
-      // 若有原生讀寫權限（桌面端 Google Drive / iCloud / OneDrive 同步資料夾），直接覆寫回原檔案！
       if (activeCloudFileHandle && 'createWritable' in activeCloudFileHandle) {
         try {
           const writable = await activeCloudFileHandle.createWritable();
@@ -1448,7 +1447,6 @@
         } catch (e) {}
       }
 
-      // 或彈出系統「另存至個人網盤」對話框
       if ('showSaveFilePicker' in window) {
         try {
           const saveHandle = await window.showSaveFilePicker({
@@ -1464,7 +1462,6 @@
           if (e.name === 'AbortError') return;
         }
       }
-
       exportEditedBilingualDoc();
     }
 
@@ -1479,7 +1476,7 @@
     }
 
     // =========================================================================
-    // 2. 🟢 劃詞僅顯示 icon.png ➔ 點擊彈出獨立小顯示框 (含朗讀與列印)
+    // 2. 🟢 劃詞僅顯示 icon.png ➔ 點擊彈出獨立小顯示框
     // =========================================================================
     let selectedPageText = '';
     let popoverZhText = '';
@@ -1563,7 +1560,7 @@
     }
 
     // =========================================================================
-    // 3. 🎬 錄影工坊 (鎖定電腦內建鏡頭不連手機 + 錄入點擊漢字朗讀聲 + 輕量小檔案)
+    // 3. 🎬 錄影工坊 (強制鎖定本機設備不連手機 + 可選 1080p HD / 720p / 360p 畫質)
     // =========================================================================
     let studioStream = null;
     let studioRecorder = null;
@@ -1575,18 +1572,22 @@
     let studioSynthCanvas = null;
     let studioSynthAnimId = null;
 
-    async function getBuiltInComputerStream() {
+    // 強制鎖定當前電腦內建鏡頭與內建麥克風，絕不喚醒 iPhone / iPad Continuity
+    async function getBuiltInComputerStream(withVideo = true) {
       try {
         const devices = await navigator.mediaDevices.enumerateDevices();
         const videoInputs = devices.filter(d => d.kind === 'videoinput');
         const audioInputs = devices.filter(d => d.kind === 'audioinput');
 
-        const builtInCam = videoInputs.find(d => !/iphone|ipad|continuity|desk view/i.test(d.label)) || videoInputs[0];
-        const builtInMic = audioInputs.find(d => !/iphone|ipad|continuity/i.test(d.label)) || audioInputs[0];
+        const isExternalPhone = (label) => /iphone|ipad|continuity|desk view|external|wireless|airpods/i.test(label || '');
+        const builtInCam = videoInputs.find(d => !isExternalPhone(d.label)) || videoInputs[0];
+        const builtInMic = audioInputs.find(d => !isExternalPhone(d.label)) || audioInputs[0];
 
-        const videoConstraint = builtInCam && builtInCam.deviceId
-          ? { deviceId: { exact: builtInCam.deviceId }, width: { ideal: 640 }, height: { ideal: 480 } }
-          : { width: { ideal: 640 }, height: { ideal: 480 } };
+        const videoConstraint = !withVideo ? false : (
+          builtInCam && builtInCam.deviceId
+            ? { deviceId: { exact: builtInCam.deviceId }, width: { ideal: 1280 }, height: { ideal: 720 } }
+            : { width: { ideal: 1280 }, height: { ideal: 720 } }
+        );
 
         const audioConstraint = {
           ...(builtInMic && builtInMic.deviceId ? { deviceId: { exact: builtInMic.deviceId } } : {}),
@@ -1597,7 +1598,7 @@
 
         return await navigator.mediaDevices.getUserMedia({ video: videoConstraint, audio: audioConstraint });
       } catch (e) {
-        return await navigator.mediaDevices.getUserMedia({ video: true, audio: { echoCancellation: false, noiseSuppression: false } });
+        return await navigator.mediaDevices.getUserMedia({ video: withVideo, audio: true });
       }
     }
 
@@ -1622,7 +1623,7 @@
 
       const camVideo = document.getElementById('studioCamVideo');
       try {
-        studioStream = await getBuiltInComputerStream();
+        studioStream = await getBuiltInComputerStream(true);
         camVideo.srcObject = studioStream;
       } catch (e) {
         studioStream = null;
@@ -1704,13 +1705,22 @@
       studioSeconds = 0;
       document.getElementById('studioTimerBadge').innerText = '🔴 00:00';
 
+      // 根據用戶選擇的清晰度 (1080p HD / 720p / 360p) 設定畫布解析度與位元率
+      const quality = document.getElementById('studioQualitySelect').value || '1080';
+      let shortSide = 1080, longSide = 1920, vBitrate = 2500000, fps = 24;
+      if (quality === '720') {
+        shortSide = 720; longSide = 1280; vBitrate = 1200000; fps = 20;
+      } else if (quality === '360') {
+        shortSide = 360; longSide = 640; vBitrate = 380000; fps = 15;
+      }
+
       studioSynthCanvas = document.createElement('canvas');
       if (studioCurrentRatio === '9-16') {
-        studioSynthCanvas.width = 360;
-        studioSynthCanvas.height = 640;
+        studioSynthCanvas.width = shortSide;
+        studioSynthCanvas.height = longSide;
       } else {
-        studioSynthCanvas.width = 640;
-        studioSynthCanvas.height = 360;
+        studioSynthCanvas.width = longSide;
+        studioSynthCanvas.height = shortSide;
       }
 
       const ctx = studioSynthCanvas.getContext('2d');
@@ -1742,7 +1752,7 @@
                 const x = (r.left - paneRect.left + r.width / 2) * scale;
                 const y = targetY + (r.top - paneRect.top + 10) * scale;
                 ctx.fillStyle = '#111111';
-                ctx.font = `600 ${Math.max(11, Math.round(16 * scale))}px -apple-system, sans-serif`;
+                ctx.font = `600 ${Math.max(11, Math.round(16 * scale))}px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'top';
                 drawWrappedEnglishLine(ctx, enEl.innerText, x, y, (paneRect.width - 20) * scale, Math.max(14, Math.round(20 * scale)));
@@ -1761,7 +1771,7 @@
                 const r = pyEl.getBoundingClientRect();
                 const cy = targetY + (r.top - paneRect.top + r.height / 2) * scale;
                 ctx.fillStyle = '#1b5e20';
-                ctx.font = `italic 700 ${Math.max(11, Math.round(17 * scale))}px -apple-system, sans-serif`;
+                ctx.font = `italic 700 ${Math.max(11, Math.round(17 * scale))}px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
                 ctx.fillText(pyEl.innerText, centerX, cy);
               }
 
@@ -1770,7 +1780,7 @@
                 const r = stdEl.getBoundingClientRect();
                 const cy = targetY + (r.top - paneRect.top + r.height / 2) * scale;
                 ctx.fillStyle = '#6b7280';
-                ctx.font = `500 ${Math.max(9, Math.round(13.5 * scale))}px -apple-system, sans-serif`;
+                ctx.font = `500 ${Math.max(9, Math.round(13.5 * scale))}px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
                 ctx.fillText(stdEl.innerText, centerX, cy);
               }
 
@@ -1780,7 +1790,7 @@
                 const r = zhEl.getBoundingClientRect();
                 const cy = targetY + (r.top - paneRect.top + r.height / 2) * scale;
                 ctx.fillStyle = '#000000';
-                ctx.font = `700 ${Math.max(14, Math.round(22 * scale))}px -apple-system, sans-serif`;
+                ctx.font = `700 ${Math.max(14, Math.round(22 * scale))}px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
                 ctx.fillText(zhEl.innerText, centerX, cy);
               }
             });
@@ -1792,7 +1802,7 @@
           drawWysiwygTextPane(0, H / 2);
           drawVideoCover(ctx, camVideo, 0, H / 2, W, H / 2);
           ctx.strokeStyle = '#1b5e20';
-          ctx.lineWidth = 2;
+          ctx.lineWidth = Math.max(2, Math.round(W / 180));
           ctx.beginPath();
           ctx.moveTo(0, H / 2);
           ctx.lineTo(W, H / 2);
@@ -1807,7 +1817,7 @@
       }
       drawStudioFrame();
 
-      const stream = studioSynthCanvas.captureStream(15);
+      const stream = studioSynthCanvas.captureStream(fps);
 
       try {
         const AudioCtx = window.AudioContext || window.webkitAudioContext;
@@ -1822,7 +1832,7 @@
         if (studioStream) studioStream.getAudioTracks().forEach(t => stream.addTrack(t));
       }
 
-      const recOptions = { videoBitsPerSecond: 380000, audioBitsPerSecond: 48000 };
+      const recOptions = { videoBitsPerSecond: vBitrate, audioBitsPerSecond: 96000 };
       try {
         studioRecorder = new MediaRecorder(stream, recOptions);
       } catch (e) {
@@ -1868,13 +1878,34 @@
     }
 
     // =========================================================================
-    // 4. 智慧兩段式語音輸入 (跟隨主頁面語言 + 說話停頓 1.0 秒即停)
+    // 4. 🎙️ 智慧語音輸入：強制鎖定本機麥克風(不連手機) + 模糊發音同音糾錯 + 不重複重組
     // =========================================================================
     let activeRec = null;
     let voiceSilenceTimer = null;
     let isVoiceSessionActive = false;
     let hasSpokenInSession = false;
-    let accumulatedVoiceText = '';
+    let localMicStreamLock = null;
+
+    // 常見模糊語音與同音詞秒速修正表（例如說「詠鵝」被瀏覽器誤聽成「永和 / 泳鵝 / 勇鵝」）
+    const FUZZY_VOICE_CORRECTIONS = [
+      [/永和|泳鵝|泳鹅|勇鵝|勇鹅|擁鵝|拥鹅|用鵝|用鹅|詠俄|咏俄/g, '詠鵝'],
+      [/今夜思|敬業思|敬业思|進夜思|进夜思|淨夜思|净夜思/g, '靜夜思'],
+      [/春小|春笑|春校|純曉|纯晓/g, '春曉'],
+      [/登貫雀樓|登贯雀楼|登觀雀樓|登观雀楼/g, '登鸛雀樓'],
+      [/水調歌頭|水调歌头|水掉歌頭/g, '水調歌頭']
+    ];
+
+    function applyFuzzyVoiceCorrection(rawTranscript, alternativesList = []) {
+      // 1. 若前 5 個候選詞中有直接命中經典名篇的，優先採用該候選詞
+      for (const alt of alternativesList) {
+        if (/詠鵝|咏鹅|靜夜思|静夜思|春曉|春晓|登鸛雀樓/.test(alt)) return alt;
+      }
+      let fixed = rawTranscript || '';
+      for (const [pattern, replacement] of FUZZY_VOICE_CORRECTIONS) {
+        fixed = fixed.replace(pattern, replacement);
+      }
+      return fixed.trim();
+    }
 
     function stopVoiceSessionAndSubmit() {
       isVoiceSessionActive = false;
@@ -1885,14 +1916,19 @@
         try { activeRec.onend = null; activeRec.stop(); } catch (e) {}
         activeRec = null;
       }
+      if (localMicStreamLock) {
+        try { localMicStreamLock.getTracks().forEach(t => t.stop()); } catch (e) {}
+        localMicStreamLock = null;
+      }
       const spoken = document.getElementById('userInput').value.trim();
       if (spoken && hasSpokenInSession) {
         if (checkAndWarnProfanity(spoken)) return;
-        runSmartAI(spoken);
+        // 標記此次為語音輸入，讓 AI 自動根據前後文修正模糊發音！
+        runSmartAI(spoken, true);
       }
     }
 
-    function toggleVoice() {
+    async function toggleVoice() {
       const btn = document.getElementById('micBtn');
       const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!SR) return alert('Voice input requires Chrome, Edge, or Safari.');
@@ -1904,8 +1940,12 @@
 
       isVoiceSessionActive = true;
       hasSpokenInSession = false;
-      accumulatedVoiceText = '';
       btn.classList.add('recording');
+
+      // 關鍵步驟：先強制綁定當前電腦內建麥克風，阻止 macOS 去喚醒 iPhone 接力麥克風！
+      try {
+        localMicStreamLock = await getBuiltInComputerStream(false);
+      } catch (e) {}
 
       clearTimeout(voiceSilenceTimer);
       voiceSilenceTimer = setTimeout(() => {
@@ -1917,6 +1957,7 @@
         activeRec = new SR();
         activeRec.lang = currentLang === 'zh' ? 'zh-CN' : 'en-US';
         activeRec.interimResults = true;
+        activeRec.maxAlternatives = 5; // 同時獲取前 5 個發音候選詞以糾正模糊發音
         activeRec.continuous = true;
 
         activeRec.onresult = (e) => {
@@ -1926,13 +1967,21 @@
             stopVoiceSessionAndSubmit();
           }, 1000);
 
-          let interim = '';
-          for (let i = e.resultIndex; i < e.results.length; i++) {
-            const seg = e.results[i][0].transcript;
-            if (e.results[i].isFinal) accumulatedVoiceText += ' ' + seg.trim();
-            else interim += seg;
+          // 全量重組 0 ~ e.results.length-1，徹底杜絕句子重複兩遍的 Bug！
+          const pieces = [];
+          const allAlts = [];
+          for (let i = 0; i < e.results.length; i++) {
+            const res = e.results[i];
+            for (let k = 0; k < res.length; k++) {
+              if (res[k]?.transcript) allAlts.push(res[k].transcript.trim());
+            }
+            const topSeg = (res[0]?.transcript || '').trim();
+            if (topSeg) pieces.push(topSeg);
           }
-          document.getElementById('userInput').value = (accumulatedVoiceText + ' ' + interim).trim();
+
+          const joinedRaw = pieces.join(' ').replace(/\s+/g, ' ').trim();
+          const corrected = applyFuzzyVoiceCorrection(joinedRaw, allAlts);
+          document.getElementById('userInput').value = corrected;
         };
 
         activeRec.onend = () => {
@@ -2227,7 +2276,7 @@
     }
 
     // =========================================================================
-    // 6. 原版三級極速快取 + Gemini 多模型自動探測與競速 AI 引擎
+    // 6. 嚴格去重 + 上下文模糊語音糾偏 AI 引擎
     // =========================================================================
     const BUILTIN_QA_CACHE = {
       "咏鹅": "《詠鵝》駱賓王 ||| Ode to the Goose by Luo Binwang\n鵝，鵝，鵝， ||| Goose, goose, goose,\n曲項向天歌。 ||| You bend your neck and sing to the sky.\n白毛浮綠水， ||| Your white feathers float on the emerald water,\n紅掌撥清波。 ||| Your red webbed feet paddle the clear waves.",
@@ -2238,7 +2287,8 @@
 
     function normalizeCacheKey(rawQ) {
       if (!rawQ) return '';
-      return rawQ.toLowerCase()
+      const fixedQ = applyFuzzyVoiceCorrection(rawQ);
+      return fixedQ.toLowerCase()
         .replace(/請背誦|请背诵|背誦|背诵|唐詩|唐诗|古詩|古诗|並給出簡短解釋|并给出简短解释|是什麼|是什么/g, '')
         .replace(/[\s,.?!，。？！、：:；;《》〈〉"“”'‘’()（）]/g, '')
         .replace(/詠/g, '咏').replace(/鵝/g, '鹅').replace(/靜/g, '静').replace(/曉/g, '晓')
@@ -2251,7 +2301,7 @@
       if (!k) return '';
       if (BUILTIN_QA_CACHE[k]) return BUILTIN_QA_CACHE[k];
       try {
-        const store = JSON.parse(localStorage.getItem('tp_local_qa_cache_v5') || '{}');
+        const store = JSON.parse(localStorage.getItem('tp_local_qa_cache_v6') || '{}');
         return store[k] || '';
       } catch (e) { return ''; }
     }
@@ -2260,11 +2310,11 @@
       const k = normalizeCacheKey(q);
       if (!k || !ans) return;
       try {
-        const store = JSON.parse(localStorage.getItem('tp_local_qa_cache_v5') || '{}');
+        const store = JSON.parse(localStorage.getItem('tp_local_qa_cache_v6') || '{}');
         const keys = Object.keys(store);
         if (keys.length > 150) delete store[keys[0]];
         store[k] = ans;
-        localStorage.setItem('tp_local_qa_cache_v5', JSON.stringify(store));
+        localStorage.setItem('tp_local_qa_cache_v6', JSON.stringify(store));
       } catch (e) {}
     }
 
@@ -2336,7 +2386,7 @@
     }
 
     async function fetchFastAccurateAI(promptText, dataUrl = null, rawQuestionForCache = '') {
-      const cleanCacheKey = 'v5_' + normalizeCacheKey(rawQuestionForCache);
+      const cleanCacheKey = 'v6_' + normalizeCacheKey(rawQuestionForCache);
       const workerTasks = CF_WORKER_ENDPOINTS.map(async (ep) => {
         const r = await fetchWithTimeout(ep, {
           method: 'POST',
@@ -2365,7 +2415,6 @@
       try { return await Promise.any(workerTasks); } catch (e) { return ''; }
     }
 
-    // 恢復原版雙通道極速翻譯 (Google GTX + MyMemory 競速)
     async function translateFast(text, fromLang, toLang) {
       const isZhToEn = fromLang.startsWith('zh');
       const src = isZhToEn ? 'zh-CN' : 'en';
@@ -2423,32 +2472,47 @@
       return { zh: zhPart, en: enPart };
     }
 
+    // 嚴格雙向去重渲染器 (防止標題或任何句子重複出現兩次)
     async function renderBilingualAIOutput(aiText) {
       const replyBox = document.getElementById('aiReplyBox');
       replyBox.style.display = 'none';
       const rawLines = aiText.split(/\n+/).map(l => l.trim()).filter(Boolean);
       if (rawLines.length === 0) return false;
 
-      const seenZh = new Set();
+      const seenZhList = [];
+      const seenEnSet = new Set();
       let renderedPairs = 0;
+
+      function isDuplicateLine(zhStr, enStr) {
+        const normZh = convertScript(zhStr, 'trad').replace(/[^\u4e00-\u9fa5]/g, '');
+        if (!normZh) return true;
+        // 檢查是否與已渲染的句子完全相同或高度包含重疊
+        for (const prevZh of seenZhList) {
+          if (prevZh === normZh || (normZh.length >= 4 && (prevZh.includes(normZh) || normZh.includes(prevZh)))) {
+            return true;
+          }
+        }
+        const normEn = (enStr || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+        if (normEn && normEn.length > 6 && seenEnSet.has(normEn)) return true;
+
+        seenZhList.push(normZh);
+        if (normEn) seenEnSet.add(normEn);
+        return false;
+      }
 
       for (let i = 0; i < rawLines.length; i++) {
         const pair = parseBilingualPairLine(rawLines[i]);
         if (pair) {
-          const normZh = pair.zh.replace(/[^\u4e00-\u9fa5]/g, '');
-          if (!normZh || seenZh.has(normZh)) continue;
-          seenZh.add(normZh);
+          if (isDuplicateLine(pair.zh, pair.en)) continue;
           renderedPairs++;
           appendSentenceProgressive(pair.zh, pair.en);
           await nextPaintTick();
         } else {
           const fallbackZh = cleanChineseSentence(rawLines[i]);
           if (fallbackZh) {
-            const normZh = fallbackZh.replace(/[^\u4e00-\u9fa5]/g, '');
-            if (!normZh || seenZh.has(normZh)) continue;
-            seenZh.add(normZh);
             const enMatch = rawLines[i].match(/[A-Za-z][A-Za-z0-9\s,'".!?-]+/);
             const enStr = enMatch ? enMatch[0].trim() : '';
+            if (isDuplicateLine(fallbackZh, enStr)) continue;
             renderedPairs++;
             appendSentenceProgressive(fallbackZh, enStr);
             await nextPaintTick();
@@ -2458,9 +2522,11 @@
       return renderedPairs > 0;
     }
 
-    async function runSmartAI(overrideInput) {
-      const q = (overrideInput !== undefined ? overrideInput : document.getElementById('userInput').value).trim();
+    async function runSmartAI(overrideInput, isFromVoice = false) {
+      let q = (overrideInput !== undefined ? overrideInput : document.getElementById('userInput').value).trim();
       if (!q) return;
+      q = applyFuzzyVoiceCorrection(q);
+      document.getElementById('userInput').value = q;
       if (checkAndWarnProfanity(q)) return;
 
       document.getElementById('previewImg').style.display = 'none';
@@ -2477,19 +2543,20 @@
       }
 
       const directPrompt = `You are a concise, authoritative bilingual Mandarin scholar.
-User request: "${q}"
+User input: "${q}"
 
-STRICT OUTPUT RULES:
-1. Be 100% clean, direct, and non-repetitive. NO filler, NO intro, NO commentary, NO explanations.
-2. If the user asks for a poem (e.g. 唐詩/古詩) or story:
+CRITICAL RULES:
+1. PHONETIC & CONTEXT AUTO-CORRECTION: The user input may come from a microphone with slight homophone or fuzzy pronunciation errors in Chinese or English (for example, saying "永和" when they clearly meant the Tang poem "詠鵝", or homophones in English). Always infer the user's true intended meaning from context and answer the intended topic directly!
+2. ZERO REPETITION & ZERO FILLER: Output each sentence ONCE only. Never repeat the title, never repeat verses, and never include intro/outro commentary.
+3. If the user asks for a poem (e.g. 唐詩/古詩):
    - Line 1 MUST be ONLY the Title and Author in this exact paired format:
      《詩名》作者 ||| English Title by Author
    - Line 2+ MUST be ONLY the verses of the poem, one verse per line:
      Chinese_Verse ||| English_Translation
-3. For any other question:
-   - Output ONLY the direct answer in 1 to 4 lines, every single line formatted as:
+4. For any other question:
+   - Output ONLY the direct answer in 1 to 4 unique lines, formatted strictly as:
      Pure_Chinese_Sentence ||| Authentic_English_Sentence
-4. NEVER repeat any line. Left side of "|||" must contain ONLY Chinese characters and punctuation (NO Pinyin).`;
+5. Left side of "|||" must contain ONLY Chinese characters and punctuation (NO Pinyin).`;
 
       const aiText = await fetchFastAccurateAI(directPrompt, null, q);
       if (aiText) {
@@ -2518,7 +2585,10 @@ STRICT OUTPUT RULES:
       list.innerHTML = '';
 
       const lines = raw.split(/\n+|(?<=[。！？.!?])\s*/).map(l => l.trim()).filter(Boolean);
+      const seenSet = new Set();
       for (let line of lines) {
+        if (seenSet.has(line)) continue;
+        seenSet.add(line);
         if (line.includes('|||')) {
           const [zh, en] = line.split('|||').map(s => s.trim());
           appendSentenceProgressive(zh, en);
@@ -2535,7 +2605,7 @@ STRICT OUTPUT RULES:
     }
 
     // =========================================================================
-    // 7. 恢復原版拖拽文件上傳、PDF/Word 提取、圖片壓縮與 Vision AI + OCR 雙軌識別
+    // 7. 拖拽文件上傳、PDF/Word 提取、圖片壓縮與 Vision AI + OCR 雙軌識別
     // =========================================================================
     const dropZone = document.getElementById('dropZone');
     dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.style.borderColor = '#1b5e20'; });
@@ -2626,7 +2696,7 @@ STRICT OUTPUT RULES:
       prev.style.display = 'block';
 
       const vPrompt = `Look at this image:
-Output the text or 1-2 descriptive sentences strictly in this paired format (one pair per line):
+Output the text or 1-2 unique descriptive sentences strictly in this paired format (one pair per line, NO duplicates):
 Pure_Chinese_Sentence ||| Authentic_English_Sentence`;
 
       const aiRes = await fetchFastAccurateAI(vPrompt, dataUrl);
