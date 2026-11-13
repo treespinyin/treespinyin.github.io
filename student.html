@@ -93,9 +93,32 @@
     .score-pill.high { background: #2e7d32; color: #fff; }
     .score-pill.mid { background: #f59e0b; color: #fff; }
     .score-pill.low { background: #d32f2f; color: #fff; }
+
+    .modal {
+      display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.55); z-index: 9999; justify-content: center; align-items: center; padding: 16px;
+    }
+    .modal-box {
+      background: #fff; width: 100%; max-width: 420px; border-radius: 16px;
+      padding: 20px; display: flex; flex-direction: column; gap: 12px;
+    }
   </style>
 </head>
 <body>
+
+  <!-- 🛡️ Profanity / Inappropriate Language Gentle Advisory Modal -->
+  <div class="modal" id="profanityModal" onclick="if(event.target===this)this.style.display='none'">
+    <div class="modal-box" style="border-top: 6px solid #f59e0b; text-align: center; align-items: center;">
+      <div style="font-size: 2.4rem;">🌱</div>
+      <h3 style="margin: 0; color: #b45309; font-size: 1.15rem;">Mindful & Respectful Language Reminder</h3>
+      <p style="margin: 0; font-size: 0.92rem; color: #374151; line-height: 1.55;">
+        Please use polite and respectful language in the Student Portal. Let's keep our learning environment positive!
+      </p>
+      <button class="btn btn-green" style="width: 100%;" onclick="document.getElementById('profanityModal').style.display='none'">
+        🤝 Got It!
+      </button>
+    </div>
+  </div>
 
   <header class="navbar">
     <a href="index.html" class="nav-left">
@@ -137,8 +160,8 @@
           <label><input type="checkbox" id="chkEn" checked onchange="updateVisibility()"> English</label>
           <label><input type="checkbox" id="chkTp" checked onchange="updateVisibility()"> Trees Pinyin</label>
           <label><input type="checkbox" id="chkStd" checked onchange="updateVisibility()"> Standard Pinyin</label>
-          <label><input type="checkbox" id="chkTrad" checked onchange="toggleHanziScript('trad')"> Traditional</label>
-          <label><input type="checkbox" id="chkSimp" onchange="toggleHanziScript('simp')"> Simplified</label>
+          <label><input type="checkbox" id="chkTrad" checked onchange="toggleHanziScript('trad')"> Traditional Chinese</label>
+          <label><input type="checkbox" id="chkSimp" onchange="toggleHanziScript('simp')"> Simplified Chinese</label>
         </div>
         <span style="font-size:0.78rem; color:#555;">🟢 Green = 100% · 🟡 Orange = Tone Needs Adjustment (75%) · 🔴 Red = Missed</span>
       </div>
@@ -156,7 +179,18 @@
   </main>
 
   <script>
-    // ================= 1. 過濾男聲，鎖定高清女聲 =================
+    const PROFANITY_EN_REGEX = /\b(fuck|fucking|fucked|fucker|motherfucker|shit|shitty|bullshit|bitch|bitches|asshole|bastard|dick|cock|pussy|cunt|whore|slut|nigger|nigga|faggot|retard)\b/i;
+    const PROFANITY_ZH_LIST = ['他媽的','他妈的','你媽的','你妈的','操你','肏你','草泥馬','草泥马','傻逼','煞筆','傻B','去死吧','王八蛋','賤人','贱人','婊子'];
+
+    function checkAndWarnProfanity(text) {
+      if (!text) return false;
+      if (PROFANITY_EN_REGEX.test(text) || PROFANITY_ZH_LIST.some(w => text.includes(w))) {
+        document.getElementById('profanityModal').style.display = 'flex';
+        return true;
+      }
+      return false;
+    }
+
     let femaleVoices = [];
     let activeFemaleVoice = null;
 
@@ -210,7 +244,6 @@
       window.speechSynthesis.speak(u);
     }
 
-    // ================= 2. 繁簡轉換與 Trees Pinyin v25 編譯器 =================
     const TRAD_TO_SIMP = {
       '請':'请','問':'问','謝':'谢','見':'见','對':'对','氣':'气','沒':'没','關':'关','係':'系',
       '醫':'医','國':'国','們':'们','個':'个','來':'来','裡':'里','麼':'么','買':'买','單':'单',
@@ -350,6 +383,8 @@
     function startAssignment() {
       const code = (document.getElementById('classCodeInput').value || 'CLS-101').trim().toUpperCase();
       const alias = (document.getElementById('seatAliasInput').value || 'Panda 01').trim();
+      if (checkAndWarnProfanity(code + ' ' + alias)) return;
+
       const custom = JSON.parse(localStorage.getItem('tp_teacher_assignments_v1') || '{}');
       const store = { ...DEFAULT_ASSIGNMENTS, ...custom };
       const hw = store[code] || store['CLS-101'];
@@ -422,7 +457,6 @@
       document.getElementById('overallProgressPill').innerText = `Completed: ${Object.keys(currentSession.scores).length} / ${currentSession.assignment.items.length}`;
     }
 
-    // ================= 3. 聲調準確度三級評分引擎 (100% 滿分 / 75% 聲調偏差提示 / 0% 讀錯) =================
     let activeRec = null;
     function scoreStudentReading(idx) {
       const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -437,7 +471,9 @@
       btn.innerText = '🎙️ Listening...';
 
       activeRec.onresult = (e) => {
-        evaluateReadingWithToneCheck(idx, e.results[0][0].transcript || '');
+        const spoken = e.results[0][0].transcript || '';
+        if (checkAndWarnProfanity(spoken)) return;
+        evaluateReadingWithToneCheck(idx, spoken);
       };
       activeRec.onend = () => {
         btn.classList.remove('recording');
@@ -471,7 +507,7 @@
         const tipEl = document.getElementById(`tonetip-${idx}-${i}`);
         if (tipEl) tipEl.innerText = '';
 
-        let matchType = 'none'; // 'exact' | 'tone_mismatch' | 'none'
+        let matchType = 'none';
         let detectedTone = '';
 
         for (let k = cursor; k <= Math.min(cursor + 1, spokenZh.length - 1); k++) {
@@ -491,7 +527,7 @@
           points += 1.0;
           if (colEl) colEl.className = 'tp-col correct-hit';
         } else if (matchType === 'tone_mismatch') {
-          points += 0.75; // 聲母韻母對，聲調不準得 75% 分
+          points += 0.75;
           if (colEl) colEl.className = 'tp-col tone-warn';
           if (tipEl) tipEl.innerText = `⚠️ T${detectedTone}→T${tTone}`;
           missedOrToneList.push(tChar);
