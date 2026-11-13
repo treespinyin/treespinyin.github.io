@@ -505,7 +505,7 @@
       gap: 8px;
     }
 
-    /* ================= 🎬 錄影工坊 (預設 9:16 豎屏，可選高清 1080p / 720p / 360p) ================= */
+    /* ================= 🎬 錄影工坊 (預設手機高清 1080p，支援 MP4 輸出) ================= */
     .studio-overlay {
       display: none;
       position: fixed;
@@ -646,7 +646,7 @@
     </div>
   </div>
 
-  <!-- 🎬 3. 錄影工坊 (預設 9:16 豎屏，下拉 16:9 + 可選清晰度 1080p HD / 720p / 360p) -->
+  <!-- 🎬 3. 錄影工坊 (預設 9:16 豎屏 + 預設手機高清 1080p HD 分辨率選單 + MP4 輸出) -->
   <div id="studioOverlay" class="studio-overlay">
     <div class="studio-top-bar">
       <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
@@ -655,11 +655,11 @@
           <option value="16-9">🎬 16:9</option>
         </select>
 
-        <!-- 新增：清晰度選擇器 (1080p 超清投影與 IG Reels / 720p 標準 / 360p 輕量) -->
-        <select id="studioQualitySelect" class="studio-select" title="Video Resolution & Clarity">
-          <option value="1080" selected>🌟 HD 1080p (IG / Projection)</option>
-          <option value="720">⚖️ 720p Standard</option>
-          <option value="360">⚡ 360p Fast Share</option>
+        <!-- 分辨率選單：預設就是手機高清晰度 1080p Full HD (1080x1920) -->
+        <select id="studioQualitySelect" class="studio-select" title="Resolution">
+          <option value="1080" selected>🌟 1080p HD (Default High Clarity)</option>
+          <option value="720">⚖️ 720p HD</option>
+          <option value="480">⚡ 480p Compact</option>
         </select>
       </div>
 
@@ -683,7 +683,7 @@
       <span id="studioTimerBadge" style="font-family:monospace; font-size:0.95rem; font-weight:800; background:#1e293b; padding:6px 10px; border-radius:8px;">⏺️ 00:00</span>
       <button class="btn btn-green" id="studioRecBtn" style="flex:unset; padding:8px 18px;" onclick="toggleStudioRecording()">🔴 Record</button>
       <button class="btn btn-soft" style="flex:unset; padding:8px 14px;" onclick="speakAllStudioText()">🔊 Speak</button>
-      <a id="studioDownloadLink" class="btn btn-blue hidden" style="flex:unset; padding:8px 16px; text-decoration:none;" download="trees-pinyin-hd.webm">💾 Save</a>
+      <a id="studioDownloadLink" class="btn btn-blue hidden" style="flex:unset; padding:8px 16px; text-decoration:none;" download="trees-pinyin-video.mp4">💾 Save MP4</a>
     </div>
   </div>
 
@@ -1024,7 +1024,7 @@
 
   <script>
     // =========================================================================
-    // 0. 全域唯一配置與 PWA 桌面安裝支持
+    // 0. 全域唯一配置與 Cloudflare Worker 端點 (與原版 index.html 100% 一致)
     // =========================================================================
     const IS_LOCAL_FILE = window.location.protocol === 'file:';
     const CF_WORKER_ENDPOINTS = IS_LOCAL_FILE
@@ -1560,7 +1560,7 @@
     }
 
     // =========================================================================
-    // 3. 🎬 錄影工坊 (強制鎖定本機設備不連手機 + 可選 1080p HD / 720p / 360p 畫質)
+    // 3. 🎬 錄影工坊 (預設手機高清 1080p HD + MP4 原生格式輸出 + 不喚醒外部手機)
     // =========================================================================
     let studioStream = null;
     let studioRecorder = null;
@@ -1572,22 +1572,37 @@
     let studioSynthCanvas = null;
     let studioSynthAnimId = null;
 
-    // 強制鎖定當前電腦內建鏡頭與內建麥克風，絕不喚醒 iPhone / iPad Continuity
-    async function getBuiltInComputerStream(withVideo = true) {
+    // 自動偵測並優先返回瀏覽器支援的原生 MP4 (H.264 + AAC) 封裝格式
+    function getPreferredMp4MimeType() {
+      const mp4Types = [
+        'video/mp4;codecs=avc1.42E01E,mp4a.40.2',
+        'video/mp4;codecs=avc1,mp4a.40.2',
+        'video/mp4;codecs=h264,aac',
+        'video/mp4',
+        'video/webm;codecs=h264',
+        'video/webm'
+      ];
+      for (const t of mp4Types) {
+        if (window.MediaRecorder && MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(t)) {
+          return t;
+        }
+      }
+      return '';
+    }
+
+    async function getBuiltInComputerStream() {
       try {
         const devices = await navigator.mediaDevices.enumerateDevices();
         const videoInputs = devices.filter(d => d.kind === 'videoinput');
         const audioInputs = devices.filter(d => d.kind === 'audioinput');
 
-        const isExternalPhone = (label) => /iphone|ipad|continuity|desk view|external|wireless|airpods/i.test(label || '');
+        const isExternalPhone = (label) => /iphone|ipad|continuity|desk view/i.test(label || '');
         const builtInCam = videoInputs.find(d => !isExternalPhone(d.label)) || videoInputs[0];
         const builtInMic = audioInputs.find(d => !isExternalPhone(d.label)) || audioInputs[0];
 
-        const videoConstraint = !withVideo ? false : (
-          builtInCam && builtInCam.deviceId
-            ? { deviceId: { exact: builtInCam.deviceId }, width: { ideal: 1280 }, height: { ideal: 720 } }
-            : { width: { ideal: 1280 }, height: { ideal: 720 } }
-        );
+        const videoConstraint = builtInCam && builtInCam.deviceId
+          ? { deviceId: { exact: builtInCam.deviceId }, width: { ideal: 1280 }, height: { ideal: 720 } }
+          : { width: { ideal: 1280 }, height: { ideal: 720 } };
 
         const audioConstraint = {
           ...(builtInMic && builtInMic.deviceId ? { deviceId: { exact: builtInMic.deviceId } } : {}),
@@ -1598,7 +1613,7 @@
 
         return await navigator.mediaDevices.getUserMedia({ video: videoConstraint, audio: audioConstraint });
       } catch (e) {
-        return await navigator.mediaDevices.getUserMedia({ video: withVideo, audio: true });
+        return await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
       }
     }
 
@@ -1623,7 +1638,7 @@
 
       const camVideo = document.getElementById('studioCamVideo');
       try {
-        studioStream = await getBuiltInComputerStream(true);
+        studioStream = await getBuiltInComputerStream();
         camVideo.srcObject = studioStream;
       } catch (e) {
         studioStream = null;
@@ -1705,13 +1720,13 @@
       studioSeconds = 0;
       document.getElementById('studioTimerBadge').innerText = '🔴 00:00';
 
-      // 根據用戶選擇的清晰度 (1080p HD / 720p / 360p) 設定畫布解析度與位元率
+      // 預設就是手機高清 1080p Full HD (1080x1920)，支援 IG Reels / TikTok / 投影
       const quality = document.getElementById('studioQualitySelect').value || '1080';
-      let shortSide = 1080, longSide = 1920, vBitrate = 2500000, fps = 24;
+      let shortSide = 1080, longSide = 1920, vBitrate = 3500000, fps = 24;
       if (quality === '720') {
-        shortSide = 720; longSide = 1280; vBitrate = 1200000; fps = 20;
-      } else if (quality === '360') {
-        shortSide = 360; longSide = 640; vBitrate = 380000; fps = 15;
+        shortSide = 720; longSide = 1280; vBitrate = 1600000; fps = 24;
+      } else if (quality === '480') {
+        shortSide = 480; longSide = 854; vBitrate = 650000; fps = 20;
       }
 
       studioSynthCanvas = document.createElement('canvas');
@@ -1752,10 +1767,10 @@
                 const x = (r.left - paneRect.left + r.width / 2) * scale;
                 const y = targetY + (r.top - paneRect.top + 10) * scale;
                 ctx.fillStyle = '#111111';
-                ctx.font = `600 ${Math.max(11, Math.round(16 * scale))}px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
+                ctx.font = `600 ${Math.max(12, Math.round(16 * scale))}px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'top';
-                drawWrappedEnglishLine(ctx, enEl.innerText, x, y, (paneRect.width - 20) * scale, Math.max(14, Math.round(20 * scale)));
+                drawWrappedEnglishLine(ctx, enEl.innerText, x, y, (paneRect.width - 20) * scale, Math.max(15, Math.round(20 * scale)));
               });
             }
 
@@ -1771,7 +1786,7 @@
                 const r = pyEl.getBoundingClientRect();
                 const cy = targetY + (r.top - paneRect.top + r.height / 2) * scale;
                 ctx.fillStyle = '#1b5e20';
-                ctx.font = `italic 700 ${Math.max(11, Math.round(17 * scale))}px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
+                ctx.font = `italic 700 ${Math.max(12, Math.round(17 * scale))}px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
                 ctx.fillText(pyEl.innerText, centerX, cy);
               }
 
@@ -1780,7 +1795,7 @@
                 const r = stdEl.getBoundingClientRect();
                 const cy = targetY + (r.top - paneRect.top + r.height / 2) * scale;
                 ctx.fillStyle = '#6b7280';
-                ctx.font = `500 ${Math.max(9, Math.round(13.5 * scale))}px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
+                ctx.font = `500 ${Math.max(10, Math.round(13.5 * scale))}px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
                 ctx.fillText(stdEl.innerText, centerX, cy);
               }
 
@@ -1790,7 +1805,7 @@
                 const r = zhEl.getBoundingClientRect();
                 const cy = targetY + (r.top - paneRect.top + r.height / 2) * scale;
                 ctx.fillStyle = '#000000';
-                ctx.font = `700 ${Math.max(14, Math.round(22 * scale))}px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
+                ctx.font = `700 ${Math.max(15, Math.round(22 * scale))}px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
                 ctx.fillText(zhEl.innerText, centerX, cy);
               }
             });
@@ -1832,7 +1847,13 @@
         if (studioStream) studioStream.getAudioTracks().forEach(t => stream.addTrack(t));
       }
 
-      const recOptions = { videoBitsPerSecond: vBitrate, audioBitsPerSecond: 96000 };
+      const preferredMime = getPreferredMp4MimeType();
+      const recOptions = {
+        ...(preferredMime ? { mimeType: preferredMime } : {}),
+        videoBitsPerSecond: vBitrate,
+        audioBitsPerSecond: 128000
+      };
+
       try {
         studioRecorder = new MediaRecorder(stream, recOptions);
       } catch (e) {
@@ -1843,8 +1864,10 @@
       studioRecorder.onstop = () => {
         cancelAnimationFrame(studioSynthAnimId);
         clearInterval(studioTimerInterval);
-        const blob = new Blob(studioChunks, { type: 'video/webm' });
+        // 強制輸出為 video/mp4 並以 .mp4 副檔名下載
+        const blob = new Blob(studioChunks, { type: 'video/mp4' });
         dlLink.href = URL.createObjectURL(blob);
+        dlLink.download = `trees-pinyin-${quality}p.mp4`;
         dlLink.classList.remove('hidden');
         recBtn.innerText = '🔴 Record';
         recBtn.style.background = '';
@@ -1878,15 +1901,12 @@
     }
 
     // =========================================================================
-    // 4. 🎙️ 智慧語音輸入：強制鎖定本機麥克風(不連手機) + 模糊發音同音糾錯 + 不重複重組
+    // 4. 🎙️ 穩定不斷線語音輸入：零 getUserMedia 衝突 + 自動續接防早斷 + 模糊諧音糾錯
     // =========================================================================
     let activeRec = null;
     let voiceSilenceTimer = null;
-    let isVoiceSessionActive = false;
-    let hasSpokenInSession = false;
-    let localMicStreamLock = null;
+    let isVoiceListening = false;
 
-    // 常見模糊語音與同音詞秒速修正表（例如說「詠鵝」被瀏覽器誤聽成「永和 / 泳鵝 / 勇鵝」）
     const FUZZY_VOICE_CORRECTIONS = [
       [/永和|泳鵝|泳鹅|勇鵝|勇鹅|擁鵝|拥鹅|用鵝|用鹅|詠俄|咏俄/g, '詠鵝'],
       [/今夜思|敬業思|敬业思|進夜思|进夜思|淨夜思|净夜思/g, '靜夜思'],
@@ -1896,7 +1916,6 @@
     ];
 
     function applyFuzzyVoiceCorrection(rawTranscript, alternativesList = []) {
-      // 1. 若前 5 個候選詞中有直接命中經典名篇的，優先採用該候選詞
       for (const alt of alternativesList) {
         if (/詠鵝|咏鹅|靜夜思|静夜思|春曉|春晓|登鸛雀樓/.test(alt)) return alt;
       }
@@ -1907,100 +1926,98 @@
       return fixed.trim();
     }
 
-    function stopVoiceSessionAndSubmit() {
-      isVoiceSessionActive = false;
+    function finishVoiceAndSubmit() {
+      isVoiceListening = false;
       clearTimeout(voiceSilenceTimer);
       const btn = document.getElementById('micBtn');
       if (btn) btn.classList.remove('recording');
       if (activeRec) {
-        try { activeRec.onend = null; activeRec.stop(); } catch (e) {}
+        try {
+          activeRec.onend = null;
+          activeRec.stop();
+        } catch (e) {}
         activeRec = null;
       }
-      if (localMicStreamLock) {
-        try { localMicStreamLock.getTracks().forEach(t => t.stop()); } catch (e) {}
-        localMicStreamLock = null;
-      }
       const spoken = document.getElementById('userInput').value.trim();
-      if (spoken && hasSpokenInSession) {
+      if (spoken) {
         if (checkAndWarnProfanity(spoken)) return;
-        // 標記此次為語音輸入，讓 AI 自動根據前後文修正模糊發音！
-        runSmartAI(spoken, true);
+        runSmartAI(spoken);
       }
     }
 
-    async function toggleVoice() {
+    function toggleVoice() {
       const btn = document.getElementById('micBtn');
       const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!SR) return alert('Voice input requires Chrome, Edge, or Safari.');
 
-      if (isVoiceSessionActive) {
-        stopVoiceSessionAndSubmit();
+      if (isVoiceListening) {
+        finishVoiceAndSubmit();
         return;
       }
 
-      isVoiceSessionActive = true;
-      hasSpokenInSession = false;
+      isVoiceListening = true;
       btn.classList.add('recording');
+      let savedCompletedSegments = '';
 
-      // 關鍵步驟：先強制綁定當前電腦內建麥克風，阻止 macOS 去喚醒 iPhone 接力麥克風！
-      try {
-        localMicStreamLock = await getBuiltInComputerStream(false);
-      } catch (e) {}
+      function resetSilenceTimer(ms = 2200) {
+        clearTimeout(voiceSilenceTimer);
+        voiceSilenceTimer = setTimeout(() => {
+          finishVoiceAndSubmit();
+        }, ms);
+      }
 
-      clearTimeout(voiceSilenceTimer);
-      voiceSilenceTimer = setTimeout(() => {
-        if (!hasSpokenInSession) stopVoiceSessionAndSubmit();
-      }, 6000);
+      // 初次啟動給 7 秒寬限期等待開口，開口後停頓 2.2 秒自動完成
+      resetSilenceTimer(7000);
 
-      function startRecognitionInstance() {
-        if (!isVoiceSessionActive) return;
+      function startPureSpeechRec() {
+        if (!isVoiceListening) return;
         activeRec = new SR();
         activeRec.lang = currentLang === 'zh' ? 'zh-CN' : 'en-US';
         activeRec.interimResults = true;
-        activeRec.maxAlternatives = 5; // 同時獲取前 5 個發音候選詞以糾正模糊發音
+        activeRec.maxAlternatives = 5;
         activeRec.continuous = true;
 
-        activeRec.onresult = (e) => {
-          hasSpokenInSession = true;
-          clearTimeout(voiceSilenceTimer);
-          voiceSilenceTimer = setTimeout(() => {
-            stopVoiceSessionAndSubmit();
-          }, 1000);
+        let currentInstanceFinal = '';
 
-          // 全量重組 0 ~ e.results.length-1，徹底杜絕句子重複兩遍的 Bug！
-          const pieces = [];
-          const allAlts = [];
+        activeRec.onresult = (e) => {
+          resetSilenceTimer(2200);
+          let interim = '';
+          let fin = '';
+          const alts = [];
           for (let i = 0; i < e.results.length; i++) {
             const res = e.results[i];
             for (let k = 0; k < res.length; k++) {
-              if (res[k]?.transcript) allAlts.push(res[k].transcript.trim());
+              if (res[k]?.transcript) alts.push(res[k].transcript.trim());
             }
-            const topSeg = (res[0]?.transcript || '').trim();
-            if (topSeg) pieces.push(topSeg);
+            const seg = (res[0]?.transcript || '').trim();
+            if (res.isFinal) fin += (fin ? ' ' : '') + seg;
+            else interim += (interim ? ' ' : '') + seg;
           }
-
-          const joinedRaw = pieces.join(' ').replace(/\s+/g, ' ').trim();
-          const corrected = applyFuzzyVoiceCorrection(joinedRaw, allAlts);
-          document.getElementById('userInput').value = corrected;
+          currentInstanceFinal = fin;
+          const combined = [savedCompletedSegments, currentInstanceFinal, interim].filter(Boolean).join(' ').trim();
+          document.getElementById('userInput').value = applyFuzzyVoiceCorrection(combined, alts);
         };
 
         activeRec.onend = () => {
-          if (isVoiceSessionActive) {
-            if (hasSpokenInSession) stopVoiceSessionAndSubmit();
-            else {
-              try { startRecognitionInstance(); } catch (e) { stopVoiceSessionAndSubmit(); }
-            }
+          if (currentInstanceFinal) {
+            savedCompletedSegments = [savedCompletedSegments, currentInstanceFinal].filter(Boolean).join(' ').trim();
+          }
+          // 如果還沒到 2.2 秒停頓時間但瀏覽器自動斷開，立即無感重連，絕不早斷！
+          if (isVoiceListening) {
+            try { startPureSpeechRec(); } catch (e) { finishVoiceAndSubmit(); }
           }
         };
 
         activeRec.onerror = (e) => {
-          if (e.error === 'not-allowed' || e.error === 'service-not-allowed') stopVoiceSessionAndSubmit();
+          if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
+            finishVoiceAndSubmit();
+          }
         };
 
         try { activeRec.start(); } catch (e) {}
       }
 
-      startRecognitionInstance();
+      startPureSpeechRec();
     }
 
     // =========================================================================
@@ -2276,7 +2293,7 @@
     }
 
     // =========================================================================
-    // 6. 嚴格去重 + 上下文模糊語音糾偏 AI 引擎
+    // 6. 100% 符合 Cloudflare Worker 要求的雙軌快取與完整精準 AI 引擎
     // =========================================================================
     const BUILTIN_QA_CACHE = {
       "咏鹅": "《詠鵝》駱賓王 ||| Ode to the Goose by Luo Binwang\n鵝，鵝，鵝， ||| Goose, goose, goose,\n曲項向天歌。 ||| You bend your neck and sing to the sky.\n白毛浮綠水， ||| Your white feathers float on the emerald water,\n紅掌撥清波。 ||| Your red webbed feet paddle the clear waves.",
@@ -2285,14 +2302,18 @@
       "登鹳雀楼": "《登鸛雀樓》王之渙 ||| On the Stork Tower by Wang Zhihuan\n白日依山盡， ||| The white sun sets behind the mountains,\n黃河入海流。 ||| And the Yellow River flows into the sea.\n欲窮千里目， ||| To see a thousand miles further,\n更上一層樓。 ||| Climb one more story higher."
     };
 
+    // 100% 保持原版 index (1).html 的 normalizeCacheKey 格式（不加任何前綴，完美匹配 Cloudflare KV 快取）
     function normalizeCacheKey(rawQ) {
       if (!rawQ) return '';
       const fixedQ = applyFuzzyVoiceCorrection(rawQ);
-      return fixedQ.toLowerCase()
+      return fixedQ
+        .toLowerCase()
         .replace(/請背誦|请背诵|背誦|背诵|唐詩|唐诗|古詩|古诗|並給出簡短解釋|并给出简短解释|是什麼|是什么/g, '')
         .replace(/[\s,.?!，。？！、：:；;《》〈〉"“”'‘’()（）]/g, '')
-        .replace(/詠/g, '咏').replace(/鵝/g, '鹅').replace(/靜/g, '静').replace(/曉/g, '晓')
-        .replace(/鸛/g, '鹳').replace(/樓/g, '楼')
+        .replace(/詠/g, '咏')
+        .replace(/鵝/g, '鹅')
+        .replace(/靜/g, '静')
+        .replace(/曉/g, '晓')
         .slice(0, 100);
     }
 
@@ -2301,7 +2322,7 @@
       if (!k) return '';
       if (BUILTIN_QA_CACHE[k]) return BUILTIN_QA_CACHE[k];
       try {
-        const store = JSON.parse(localStorage.getItem('tp_local_qa_cache_v6') || '{}');
+        const store = JSON.parse(localStorage.getItem('tp_local_qa_cache_v2') || '{}');
         return store[k] || '';
       } catch (e) { return ''; }
     }
@@ -2310,11 +2331,11 @@
       const k = normalizeCacheKey(q);
       if (!k || !ans) return;
       try {
-        const store = JSON.parse(localStorage.getItem('tp_local_qa_cache_v6') || '{}');
+        const store = JSON.parse(localStorage.getItem('tp_local_qa_cache_v2') || '{}');
         const keys = Object.keys(store);
         if (keys.length > 150) delete store[keys[0]];
         store[k] = ans;
-        localStorage.setItem('tp_local_qa_cache_v6', JSON.stringify(store));
+        localStorage.setItem('tp_local_qa_cache_v2', JSON.stringify(store));
       } catch (e) {}
     }
 
@@ -2365,7 +2386,7 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents: [{ parts }],
-          generationConfig: { temperature: 0.1, thinkingConfig: { thinkingBudget: 0 } }
+          generationConfig: { temperature: 0.15, thinkingConfig: { thinkingBudget: 0 } }
         }),
         signal
       });
@@ -2373,7 +2394,7 @@
         r = await fetch(url, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ contents: [{ parts }], generationConfig: { temperature: 0.1 } }),
+          body: JSON.stringify({ contents: [{ parts }], generationConfig: { temperature: 0.15 } }),
           signal
         });
       }
@@ -2385,13 +2406,18 @@
       return text;
     }
 
+    // 100% 遵循原版 Cloudflare Worker JSON 結構 ({ prompt, image, cacheKey })
     async function fetchFastAccurateAI(promptText, dataUrl = null, rawQuestionForCache = '') {
-      const cleanCacheKey = 'v6_' + normalizeCacheKey(rawQuestionForCache);
+      const cleanCacheKey = normalizeCacheKey(rawQuestionForCache);
       const workerTasks = CF_WORKER_ENDPOINTS.map(async (ep) => {
         const r = await fetchWithTimeout(ep, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ prompt: promptText, image: dataUrl, cacheKey: cleanCacheKey })
+          body: JSON.stringify({
+            prompt: promptText,
+            image: dataUrl,
+            cacheKey: cleanCacheKey
+          })
         }, 8500);
         if (!r.ok) throw new Error('worker_err');
         const d = await r.json();
@@ -2449,6 +2475,8 @@
         .replace(/\([^)]*[A-Za-zāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ][^)]*\)/g, '')
         .replace(/（[^）]*[A-Za-zāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ][^）]*）/g, '')
         .replace(/[A-Za-zāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ]{2,}/g, '')
+        .replace(/([，。！？；：、,.!?;:])\s*[，。！？；：、,.!?;:]+/g, '$1')
+        .replace(/^[，。！？；：、,.!?;:\s]+/, '')
         .replace(/\s+/g, '')
         .trim();
       return /[\u4e00-\u9fa5]/.test(s) ? s : '';
@@ -2461,58 +2489,55 @@
       if (parts.length < 2) return null;
 
       let zhPart = '', enPart = '';
-      if (/[\u4e00-\u9fa5]/.test(parts[0])) {
+      if (/[\u4e00-\u9fa5]/.test(parts[0]) && !/[\u4e00-\u9fa5]/.test(parts[1])) {
         zhPart = cleanChineseSentence(parts[0]) || parts[0];
         enPart = parts[1];
       } else if (/[\u4e00-\u9fa5]/.test(parts[1])) {
         enPart = parts[0];
         zhPart = cleanChineseSentence(parts[1]) || parts[1];
+      } else {
+        zhPart = cleanChineseSentence(parts[0]) || parts[0];
+        enPart = parts[1];
       }
       if (!/[\u4e00-\u9fa5]/.test(zhPart)) return null;
       return { zh: zhPart, en: enPart };
     }
 
-    // 嚴格雙向去重渲染器 (防止標題或任何句子重複出現兩次)
+    // 完整保留每一句（包含第 1 行標題與作者也進行四排注音），僅過濾完全相同的重複行
     async function renderBilingualAIOutput(aiText) {
       const replyBox = document.getElementById('aiReplyBox');
       replyBox.style.display = 'none';
       const rawLines = aiText.split(/\n+/).map(l => l.trim()).filter(Boolean);
       if (rawLines.length === 0) return false;
 
-      const seenZhList = [];
-      const seenEnSet = new Set();
+      const exactSeenZh = new Set();
       let renderedPairs = 0;
-
-      function isDuplicateLine(zhStr, enStr) {
-        const normZh = convertScript(zhStr, 'trad').replace(/[^\u4e00-\u9fa5]/g, '');
-        if (!normZh) return true;
-        // 檢查是否與已渲染的句子完全相同或高度包含重疊
-        for (const prevZh of seenZhList) {
-          if (prevZh === normZh || (normZh.length >= 4 && (prevZh.includes(normZh) || normZh.includes(prevZh)))) {
-            return true;
-          }
-        }
-        const normEn = (enStr || '').toLowerCase().replace(/[^a-z0-9]/g, '');
-        if (normEn && normEn.length > 6 && seenEnSet.has(normEn)) return true;
-
-        seenZhList.push(normZh);
-        if (normEn) seenEnSet.add(normEn);
-        return false;
-      }
 
       for (let i = 0; i < rawLines.length; i++) {
         const pair = parseBilingualPairLine(rawLines[i]);
         if (pair) {
-          if (isDuplicateLine(pair.zh, pair.en)) continue;
+          const normZh = convertScript(pair.zh, 'trad').replace(/[^\u4e00-\u9fa5]/g, '');
+          if (!normZh || exactSeenZh.has(normZh)) continue;
+          exactSeenZh.add(normZh);
           renderedPairs++;
           appendSentenceProgressive(pair.zh, pair.en);
           await nextPaintTick();
         } else {
-          const fallbackZh = cleanChineseSentence(rawLines[i]);
+          // 處理第 1 行標題或未帶 ||| 的行（例如：《詠鵝》駱賓王 (Ode to the Goose by Luo Binwang)）
+          const lineStr = rawLines[i].replace(/^[-*•\d.)、]+\s*/, '').replace(/\*+/g, '').trim();
+          const parenMatch = lineStr.match(/^(.+?)\s*[(（]([A-Za-z][^）)]+)[)）]$/);
+          let fallbackZh = '', enStr = '';
+          if (parenMatch && /[\u4e00-\u9fa5]/.test(parenMatch[1])) {
+            fallbackZh = cleanChineseSentence(parenMatch[1]) || parenMatch[1].trim();
+            enStr = parenMatch[2].trim();
+          } else {
+            fallbackZh = cleanChineseSentence(lineStr);
+          }
+
           if (fallbackZh) {
-            const enMatch = rawLines[i].match(/[A-Za-z][A-Za-z0-9\s,'".!?-]+/);
-            const enStr = enMatch ? enMatch[0].trim() : '';
-            if (isDuplicateLine(fallbackZh, enStr)) continue;
+            const normZh = convertScript(fallbackZh, 'trad').replace(/[^\u4e00-\u9fa5]/g, '');
+            if (!normZh || exactSeenZh.has(normZh)) continue;
+            exactSeenZh.add(normZh);
             renderedPairs++;
             appendSentenceProgressive(fallbackZh, enStr);
             await nextPaintTick();
@@ -2522,7 +2547,7 @@
       return renderedPairs > 0;
     }
 
-    async function runSmartAI(overrideInput, isFromVoice = false) {
+    async function runSmartAI(overrideInput) {
       let q = (overrideInput !== undefined ? overrideInput : document.getElementById('userInput').value).trim();
       if (!q) return;
       q = applyFuzzyVoiceCorrection(q);
@@ -2533,7 +2558,7 @@
       const replyBox = document.getElementById('aiReplyBox');
       const list = document.getElementById('annotationList');
       replyBox.style.display = 'block';
-      replyBox.innerText = currentLang === 'en' ? '⚡ AI Thinking...' : '⚡ AI 正在思考...';
+      replyBox.innerText = currentLang === 'en' ? '⚡ AI Thinking...' : '⚡ AI 正在極速思考...';
       list.innerHTML = '';
 
       const localHit = getLocalCachedAnswer(q);
@@ -2542,21 +2567,22 @@
         if (ok) return;
       }
 
-      const directPrompt = `You are a concise, authoritative bilingual Mandarin scholar.
-User input: "${q}"
+      // 恢復原版權威學者完整 Prompt（不限制行數，確保長詩與問答 100% 完整），並加入語音同音字糾偏與第1行標題雙語格式
+      const directPrompt = `You are an authoritative bilingual scholar and assistant.
+User question/request: "${q}"
 
-CRITICAL RULES:
-1. PHONETIC & CONTEXT AUTO-CORRECTION: The user input may come from a microphone with slight homophone or fuzzy pronunciation errors in Chinese or English (for example, saying "永和" when they clearly meant the Tang poem "詠鵝", or homophones in English). Always infer the user's true intended meaning from context and answer the intended topic directly!
-2. ZERO REPETITION & ZERO FILLER: Output each sentence ONCE only. Never repeat the title, never repeat verses, and never include intro/outro commentary.
-3. If the user asks for a poem (e.g. 唐詩/古詩):
-   - Line 1 MUST be ONLY the Title and Author in this exact paired format:
-     《詩名》作者 ||| English Title by Author
-   - Line 2+ MUST be ONLY the verses of the poem, one verse per line:
-     Chinese_Verse ||| English_Translation
-4. For any other question:
-   - Output ONLY the direct answer in 1 to 4 unique lines, formatted strictly as:
+CRITICAL ACCURACY RULES:
+1. First, if the user's input contains a speech-recognition homophone error (e.g. "永和" instead of the poem "詠鵝"), automatically infer the intended meaning from context.
+2. Determine the complete, authoritative standard answer or authentic classic text:
+   - If the user asks about a Chinese poem/classic (e.g., 詠鵝, 靜夜思, 水調歌頭) or Chinese recipe/question: Output the COMPLETE, authentic Chinese original lines and accurate English translations without omitting any verse.
+   - If the user asks in English: Formulate the complete, authentic English answer and natural Mandarin Chinese translation.
+   - NEVER repeat any line!
+3. Output Format:
+   - Line 1: Concise title and author/summary separated by "|||":
+     Chinese_Title_And_Author ||| English_Title_And_Author
+   - Line 2 onwards: Output each sentence pair strictly on its own line separated by "|||" in this exact order:
      Pure_Chinese_Sentence ||| Authentic_English_Sentence
-5. Left side of "|||" must contain ONLY Chinese characters and punctuation (NO Pinyin).`;
+   - IMPORTANT: The left side of "|||" must contain ONLY Chinese characters and Chinese punctuation (NO Pinyin, NO English letters on the left side).`;
 
       const aiText = await fetchFastAccurateAI(directPrompt, null, q);
       if (aiText) {
@@ -2568,8 +2594,8 @@ CRITICAL RULES:
       }
 
       replyBox.innerHTML = currentLang === 'en'
-        ? `💡 High traffic! Please enter your free Google Gemini API Key in <b>[🔑 API Key]</b>.`
-        : `💡 免費通道繁忙！請在右上角 <b>[🔑 API Key]</b> 填入個人免費 Gemini Key。`;
+        ? `💡 High traffic on the free public channel! Please enter your own free Google Gemini API Key in <b>[🔑 API Key]</b> for unlimited instant responses.`
+        : `💡 當前免費公共通道訪問量較大！請在右上角 <b>[🔑 API Key]</b> 填入您免費的個人 Google Gemini Key 即可享受專屬極速無限通道。`;
       openKeyModal();
     }
 
