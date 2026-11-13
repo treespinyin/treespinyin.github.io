@@ -198,10 +198,11 @@
       width: 100%; min-height: 480px; max-height: 78vh; overflow: auto;
       background: #ffffff; border: 1px solid var(--border); border-radius: 16px;
       padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.03);
-      line-height: 1.65; color: #111;
+      line-height: 1.7; font-size: 1.02rem; color: #111;
     }
-    .web-visual-viewport img { max-width: 100%; height: auto; border-radius: 8px; }
+    .web-visual-viewport img { max-width: 100%; height: auto; border-radius: 8px; margin: 8px 0; }
     .web-visual-viewport a { color: var(--blue); text-decoration: underline; cursor: pointer; }
+    .web-visual-viewport p { margin: 0 0 12px; }
 
     /* ================= 🟢 Floating icon.png + Mini Popover ================= */
     .selection-icon-only {
@@ -352,7 +353,7 @@
     </div>
   </div>
 
-  <!-- 🎬 3. Video Studio Overlay -->
+  <!-- 🎬 3. Video Studio Overlay (Records Both Mic & Clicked Computer TTS Audio!) -->
   <div id="studioOverlay" class="studio-overlay">
     <div class="studio-top-bar">
       <select id="studioRatioSelect" class="studio-select" onchange="setStudioRatio(this.value)">
@@ -474,7 +475,7 @@
         </div>
       </section>
 
-      <!-- Clean Output Canvas Card (All lines including Line 1 Title/Author get 4-in-1 Pinyin!) -->
+      <!-- Clean Output Canvas Card -->
       <section class="sheet-card" id="sheetCard">
         <div class="print-header-title" id="printHeaderTitle"></div>
         <img id="previewImg" class="preview-img" alt="Preview">
@@ -525,7 +526,7 @@
     <div id="panel-webreader" class="tab-panel hidden">
       <section class="panel">
         <div class="action-row">
-          <input type="text" id="webReaderUrlInput" placeholder="https://..." onkeydown="if(event.key==='Enter')loadWebOrDriveUrl()" style="flex:1; padding:9px 12px; border:1.5px solid #cbd5e1; border-radius:10px; font-size:0.9rem;">
+          <input type="text" id="webReaderUrlInput" placeholder="https://docs.google.com/... or https://..." onkeydown="if(event.key==='Enter')loadWebOrDriveUrl()" style="flex:1; padding:9px 12px; border:1.5px solid #cbd5e1; border-radius:10px; font-size:0.9rem;">
           <button class="btn btn-blue" style="flex:unset;" onclick="loadWebOrDriveUrl()" id="uiOpenUrlBtn">🌐 Open URL</button>
           <button class="btn btn-soft" style="flex:unset;" onclick="document.getElementById('docFileInput').click()" id="uiOpenFileBtn">📂 Local File</button>
         </div>
@@ -676,12 +677,17 @@
 
   <script>
     // =========================================================================
-    // 0. Enter Key -> AI Reply & Profanity Check
+    // 0. Enter Key -> AI Reply (or Direct Translate if Google Docs URL!)
     // =========================================================================
     document.getElementById('userInput').addEventListener('keydown', function(e) {
       if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) {
         e.preventDefault();
-        runSmartAI();
+        const val = (this.value || '').trim();
+        if (/docs\.google\.com\/document\/d\/|drive\.google\.com\/file\/d\//i.test(val)) {
+          runDirectTranslate(val);
+        } else {
+          runSmartAI();
+        }
       }
     });
 
@@ -750,9 +756,11 @@
     }
 
     // =========================================================================
-    // 0.2 Silent Auto-Selected Clear Female Mandarin Voice
+    // 0.2 Clear Female Mandarin Voice + Direct Studio Audio Mixer (Records TTS into Video!)
     // =========================================================================
     let selectedVoiceObj = null;
+    let studioAudioCtx = null;
+    let studioAudioDest = null;
 
     function initSilentFemaleVoice() {
       if (!('speechSynthesis' in window)) return;
@@ -776,9 +784,30 @@
       setTimeout(initSilentFemaleVoice, 200);
     }
 
+    // Plays clear female voice AND routes TTS audio directly into the video recording mixer if recording is active!
     function speakSingleChar(text) {
-      if (!('speechSynthesis' in window) || !text) return;
+      if (!text) return;
       if (checkAndWarnProfanity(text)) return;
+
+      // If video recording is active, also route cloud TTS stream directly into WebAudio mixer so 100% digital audio is captured
+      if (studioRecorder && studioRecorder.state === 'recording' && studioAudioCtx && studioAudioDest) {
+        try {
+          const ttsAudio = new Audio(`https://translate.googleapis.com/translate_tts?ie=UTF-8&client=tw-ob&tl=zh-TW&q=${encodeURIComponent(text.slice(0, 100))}`);
+          ttsAudio.crossOrigin = 'anonymous';
+          const srcNode = studioAudioCtx.createMediaElementSource(ttsAudio);
+          srcNode.connect(studioAudioDest);
+          srcNode.connect(studioAudioCtx.destination);
+          ttsAudio.play().catch(() => {
+            speakNativeBrowserTTS(text);
+          });
+          return;
+        } catch (e) {}
+      }
+      speakNativeBrowserTTS(text);
+    }
+
+    function speakNativeBrowserTTS(text) {
+      if (!('speechSynthesis' in window)) return;
       window.speechSynthesis.cancel();
       if (!selectedVoiceObj) initSilentFemaleVoice();
       const u = new SpeechSynthesisUtterance(text);
@@ -982,48 +1011,84 @@
     }
 
     // =========================================================================
-    // 2. 🌐 True WYSIWYG Visual Webpage & Cloud Drive Reader (No Raw Code!)
+    // 2. 🌐 Restored Google Docs / Drive Loader + Multi-Proxy WYSIWYG Webpage Reader
     // =========================================================================
+    async function fetchGoogleDocOrDriveText(urlStr) {
+      const gdocMatch = urlStr.match(/https:\/\/docs\.google\.com\/document\/d\/([a-zA-Z0-9_-]+)/);
+      if (gdocMatch) {
+        const docId = gdocMatch[1];
+        const urlsToTry = [
+          `https://docs.google.com/document/d/${docId}/export?format=txt`,
+          `https://api.allorigins.win/raw?url=${encodeURIComponent(`https://docs.google.com/document/d/${docId}/export?format=txt`)}`
+        ];
+        for (const u of urlsToTry) {
+          try {
+            const r = await fetchWithTimeout(u, {}, 6500);
+            if (r.ok) {
+              const t = (await r.text()).trim();
+              if (t && !t.startsWith('<!DOCTYPE html>')) return t;
+            }
+          } catch (e) {}
+        }
+      }
+
+      const gdriveMatch = urlStr.match(/https:\/\/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/);
+      if (gdriveMatch) {
+        const fileId = gdriveMatch[1];
+        try {
+          const r = await fetchWithTimeout(`https://api.allorigins.win/raw?url=${encodeURIComponent(`https://drive.google.com/uc?export=download&id=${fileId}`)}`, {}, 6500);
+          if (r.ok) return (await r.text()).trim();
+        } catch (e) {}
+      }
+      return '';
+    }
+
     async function loadWebOrDriveUrl(overrideUrl) {
       const rawUrl = (overrideUrl || document.getElementById('webReaderUrlInput').value || '').trim();
       if (!rawUrl) return;
       document.getElementById('webReaderUrlInput').value = rawUrl;
       const box = document.getElementById('webReaderContentBox');
-      box.innerHTML = `<div style="text-align:center; padding:40px; color:var(--accent); font-weight:700;">🌐 Loading Webpage...</div>`;
+      box.innerHTML = `<div style="text-align:center; padding:40px; color:var(--accent); font-weight:700;">🌐 Loading...</div>`;
 
-      // 1. Google Docs link -> Export as clean visual HTML
-      const gdocMatch = rawUrl.match(/https:\/\/docs\.google\.com\/document\/d\/([a-zA-Z0-9_-]+)/);
-      if (gdocMatch) {
-        try {
-          const r = await fetch(`https://docs.google.com/document/d/${gdocMatch[1]}/export?format=html`);
-          if (r.ok) {
-            renderVisualHtmlIntoReader(await r.text(), rawUrl);
-            return;
-          }
-        } catch (e) {}
+      // 1. Check Google Docs / Drive Link First (Fast & 100% Reliable)
+      if (/docs\.google\.com\/document\/d\/|drive\.google\.com\/file\/d\//i.test(rawUrl)) {
+        const docText = await fetchGoogleDocOrDriveText(rawUrl);
+        if (docText) {
+          const paras = docText.split(/\n+/).map(p => p.trim()).filter(Boolean);
+          box.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:10px; margin-bottom:14px;">
+              <b style="color:var(--accent);">📄 Google Docs / Drive Document</b>
+              <button class="btn btn-green" style="flex:unset; padding:6px 12px; font-size:0.8rem;" onclick="switchMainTab('workspace'); document.getElementById('userInput').value = decodeURIComponent('${encodeURIComponent(docText.slice(0, 2800))}'); runDirectTranslate();">📝 Annotate Full Doc on Main Board</button>
+            </div>
+            ${paras.map(p => `<p style="margin:0 0 12px; cursor:text;">${p.replace(/</g, '<')}</p>`).join('')}
+          `;
+          return;
+        } else {
+          box.innerHTML = `<div style="color:#d32f2f; padding:20px; text-align:center;">⚠️ Please make sure the Google Doc is shared as <b>"Anyone with the link can view"</b>.</div>`;
+          return;
+        }
       }
 
-      // 2. Fetch true HTML DOM via CORS proxy and render WYSIWYG visual webpage
+      // 2. Race 3 CORS Proxies concurrently to fetch visual HTML webpage
       const targetUrl = rawUrl.startsWith('http') ? rawUrl : ('https://' + rawUrl);
-      const proxies = [
-        `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`,
-        `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(targetUrl)}`
+      const proxyTasks = [
+        fetchWithTimeout(`https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`, {}, 7500)
+          .then(r => r.json())
+          .then(d => { if (d && d.contents && d.contents.length > 80) return d.contents; throw new Error('empty'); }),
+        fetchWithTimeout(`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(targetUrl)}`, {}, 7500)
+          .then(r => r.text())
+          .then(t => { if (t && t.length > 80) return t; throw new Error('empty'); }),
+        fetchWithTimeout(`https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`, {}, 7500)
+          .then(r => r.text())
+          .then(t => { if (t && t.length > 80) return t; throw new Error('empty'); })
       ];
 
-      for (const proxyUrl of proxies) {
-        try {
-          const r = await fetchWithTimeout(proxyUrl, {}, 8000);
-          if (r.ok) {
-            const htmlStr = await r.text();
-            if (htmlStr && htmlStr.length > 50) {
-              renderVisualHtmlIntoReader(htmlStr, targetUrl);
-              return;
-            }
-          }
-        } catch (e) {}
+      try {
+        const htmlStr = await Promise.any(proxyTasks);
+        renderVisualHtmlIntoReader(htmlStr, targetUrl);
+      } catch (e) {
+        box.innerHTML = `<div style="color:#d32f2f; padding:20px; text-align:center;">⚠️ Cannot load this webpage directly due to site protection. Please paste text into the main board or use 📂 Local File.</div>`;
       }
-
-      box.innerHTML = `<div style="color:#d32f2f; padding:20px; text-align:center;">⚠️ Cannot load this site directly. Try another webpage or use 📂 Local File.</div>`;
     }
 
     function renderVisualHtmlIntoReader(rawHtml, baseUrl) {
@@ -1031,10 +1096,8 @@
       const parser = new DOMParser();
       const doc = parser.parseFromString(rawHtml, 'text/html');
 
-      // Remove executable scripts & trackers while keeping visual styles and layout
-      doc.querySelectorAll('script, iframe, object, embed, noscript').forEach(el => el.remove());
+      doc.querySelectorAll('script, iframe, object, embed, noscript, svg.icon').forEach(el => el.remove());
 
-      // Fix relative URLs for images, stylesheets, and links so the page looks WYSIWYG
       try {
         const baseObj = new URL(baseUrl);
         doc.querySelectorAll('img[src]').forEach(img => {
@@ -1062,7 +1125,7 @@
     }
 
     // =========================================================================
-    // 3. 🎬 Video Studio (Locks Built-In Computer Camera -> NEVER triggers iPhone Continuity Camera!)
+    // 3. 🎬 Video Studio (Locks Built-In Computer Camera + Records Both Mic & Computer TTS Audio!)
     // =========================================================================
     let studioStream = null;
     let studioRecorder = null;
@@ -1074,28 +1137,31 @@
     let studioSynthCanvas = null;
     let studioSynthAnimId = null;
 
-    // Prevents macOS from waking up the user's iPhone (Continuity Camera)
+    // Prevents macOS from waking up the user's iPhone AND enables speaker loopback capture
     async function getBuiltInComputerStream() {
       try {
         const devices = await navigator.mediaDevices.enumerateDevices();
         const videoInputs = devices.filter(d => d.kind === 'videoinput');
         const audioInputs = devices.filter(d => d.kind === 'audioinput');
 
-        // Exclude iPhone / Continuity / External wireless cameras
         const builtInCam = videoInputs.find(d => !/iphone|ipad|continuity|desk view/i.test(d.label)) || videoInputs[0];
         const builtInMic = audioInputs.find(d => !/iphone|ipad|continuity/i.test(d.label)) || audioInputs[0];
 
         const videoConstraint = builtInCam && builtInCam.deviceId
           ? { deviceId: { exact: builtInCam.deviceId }, width: { ideal: 640 }, height: { ideal: 480 } }
-          : { width: { ideal: 640 }, height: { ideal: 480 } }; // No facingMode so macOS won't trigger iPhone!
+          : { width: { ideal: 640 }, height: { ideal: 480 } };
 
-        const audioConstraint = builtInMic && builtInMic.deviceId
-          ? { deviceId: { exact: builtInMic.deviceId } }
-          : true;
+        // echoCancellation: false & noiseSuppression: false allows the built-in mic to ALSO clearly pick up computer speaker TTS!
+        const audioConstraint = {
+          ...(builtInMic && builtInMic.deviceId ? { deviceId: { exact: builtInMic.deviceId } } : {}),
+          echoCancellation: false,
+          noiseSuppression: false,
+          autoGainControl: true
+        };
 
         return await navigator.mediaDevices.getUserMedia({ video: videoConstraint, audio: audioConstraint });
       } catch (e) {
-        return await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        return await navigator.mediaDevices.getUserMedia({ video: true, audio: { echoCancellation: false, noiseSuppression: false } });
       }
     }
 
@@ -1306,8 +1372,19 @@
       drawStudioFrame();
 
       const stream = studioSynthCanvas.captureStream(15);
-      if (studioStream) {
-        studioStream.getAudioTracks().forEach(t => stream.addTrack(t));
+
+      // Set up WebAudio Mixer combining Mic + Direct Clicked Computer TTS Audio!
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        studioAudioCtx = new AudioCtx();
+        studioAudioDest = studioAudioCtx.createMediaStreamDestination();
+        if (studioStream && studioStream.getAudioTracks().length > 0) {
+          const micSource = studioAudioCtx.createMediaStreamSource(studioStream);
+          micSource.connect(studioAudioDest);
+        }
+        studioAudioDest.stream.getAudioTracks().forEach(t => stream.addTrack(t));
+      } catch (e) {
+        if (studioStream) studioStream.getAudioTracks().forEach(t => stream.addTrack(t));
       }
 
       const recOptions = { videoBitsPerSecond: 380000, audioBitsPerSecond: 48000 };
@@ -1347,6 +1424,10 @@
       if (studioStream) {
         studioStream.getTracks().forEach(t => t.stop());
         studioStream = null;
+      }
+      if (studioAudioCtx) {
+        try { studioAudioCtx.close(); } catch (e) {}
+        studioAudioCtx = null;
       }
       document.getElementById('studioOverlay').classList.remove('active');
     }
@@ -1671,14 +1752,13 @@
     }
 
     // =========================================================================
-    // 6. Clean, Non-Repetitive AI Engine (Line 1 Title & Author ALSO Annotated!)
+    // 6. Clean, Non-Repetitive AI Engine + Restored Google Docs Direct Translate
     // =========================================================================
     const IS_LOCAL_FILE = window.location.protocol === 'file:';
     const CF_WORKER_ENDPOINTS = IS_LOCAL_FILE
       ? ['https://treespinyin-api.treespinyin.workers.dev', 'https://treespinyin.com/api']
       : ['https://treespinyin-api.treespinyin.workers.dev', '/api', 'https://treespinyin.com/api'];
 
-    // Line 1 Title + Author is ALSO paired with "|||" so it gets full 4-in-1 Pinyin annotation!
     const BUILTIN_QA_CACHE = {
       "咏鹅": "《詠鵝》駱賓王 ||| Ode to the Goose by Luo Binwang\n鵝，鵝，鵝， ||| Goose, goose, goose,\n曲項向天歌。 ||| You bend your neck and sing to the sky.\n白毛浮綠水， ||| Your white feathers float on the emerald water,\n紅掌撥清波。 ||| Your red webbed feet paddle the clear waves.",
       "静夜思": "《靜夜思》李白 ||| Quiet Night Thought by Li Bai\n床前明月光， ||| Before my bed, the bright moonlight shines,\n疑是地上霜。 ||| I wonder if it is frost upon the ground.\n舉頭望明月， ||| I raise my head to gaze at the bright moon,\n低頭思故鄉。 ||| And lower my head, longing for my hometown.",
@@ -1840,7 +1920,6 @@
       return { zh: zhPart, en: enPart };
     }
 
-    // Every single line (including Line 1 Title/Author) is rendered as a 4-in-1 block & deduplicated!
     async function renderBilingualAIOutput(aiText) {
       const replyBox = document.getElementById('aiReplyBox');
       replyBox.style.display = 'none';
@@ -1860,7 +1939,6 @@
           appendSentenceProgressive(pair.zh, pair.en);
           await nextPaintTick();
         } else {
-          // If Line 1 or any line didn't use "|||", extract Chinese & English or auto-translate so Line 1 ALSO gets annotated!
           const fallbackZh = cleanChineseSentence(rawLines[i]);
           if (fallbackZh) {
             const normZh = fallbackZh.replace(/[^\u4e00-\u9fa5]/g, '');
@@ -1881,6 +1959,11 @@
       const q = (overrideInput !== undefined ? overrideInput : document.getElementById('userInput').value).trim();
       if (!q) return;
       if (checkAndWarnProfanity(q)) return;
+
+      // If user pasted a Google Docs or Drive URL and clicked AI Reply, automatically extract & annotate the doc!
+      if (/docs\.google\.com\/document\/d\/|drive\.google\.com\/file\/d\//i.test(q)) {
+        return runDirectTranslate(q);
+      }
 
       document.getElementById('previewImg').style.display = 'none';
       const replyBox = document.getElementById('aiReplyBox');
@@ -1931,9 +2014,24 @@ STRICT OUTPUT RULES:
       if (checkAndWarnProfanity(raw)) return;
 
       document.getElementById('previewImg').style.display = 'none';
-      document.getElementById('aiReplyBox').style.display = 'none';
+      const replyBox = document.getElementById('aiReplyBox');
+      replyBox.style.display = 'none';
       const list = document.getElementById('annotationList');
       list.innerHTML = '';
+
+      // Restored Google Docs & Google Drive Direct Extraction in Main Input!
+      if (/docs\.google\.com\/document\/d\/|drive\.google\.com\/file\/d\//i.test(raw)) {
+        replyBox.style.display = 'block';
+        replyBox.innerText = '📄 Fetching Google Doc text...';
+        const docText = await fetchGoogleDocOrDriveText(raw);
+        if (docText) {
+          raw = docText.slice(0, 3500);
+          replyBox.style.display = 'none';
+        } else {
+          replyBox.innerText = '⚠️ Please make sure the Google Doc is shared as "Anyone with the link can view", or copy & paste the text directly.';
+          return;
+        }
+      }
 
       const lines = raw.split(/\n+|(?<=[。！？.!?])\s*/).map(l => l.trim()).filter(Boolean);
       for (let line of lines) {
@@ -2138,21 +2236,7 @@ STRICT OUTPUT RULES:
       if (!allZh) return;
       if (checkAndWarnProfanity(allZh)) return;
 
-      if (!selectedVoiceObj) initSilentFemaleVoice();
-      const utter = new SpeechSynthesisUtterance(allZh);
-      if (selectedVoiceObj) {
-        utter.voice = selectedVoiceObj;
-        utter.lang = selectedVoiceObj.lang;
-      } else {
-        utter.lang = 'zh-TW';
-      }
-      utter.rate = 0.86;
-      utter.pitch = 1.1;
-      isSpeakingNow = true;
-      btn.innerText = t.stopSpeakBtn;
-      utter.onend = () => { isSpeakingNow = false; btn.innerText = UI_TEXT[currentLang].speakBtn; };
-      utter.onerror = utter.onend;
-      window.speechSynthesis.speak(utter);
+      speakSingleChar(allZh);
     }
 
     function loadScriptDynamic(src) {
