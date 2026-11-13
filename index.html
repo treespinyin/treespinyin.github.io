@@ -67,11 +67,10 @@
 
     .dropdown-menu {
       display: none; position: absolute; top: calc(100% + 6px); left: 0;
-      background: #fff; min-width: 210px; border-radius: 12px; border: 1px solid #e5e7eb;
+      background: #fff; min-width: 200px; border-radius: 12px; border: 1px solid #e5e7eb;
       box-shadow: 0 10px 25px rgba(0,0,0,0.12); padding: 6px; z-index: 2000;
     }
     .dropdown-menu.right-align { left: auto; right: 0; }
-    .dropdown-menu.up-align { top: auto; bottom: calc(100% + 6px); }
     .dropdown.open .dropdown-menu { display: block; }
     .dropdown-item {
       display: flex; align-items: center; gap: 8px; padding: 8px 12px;
@@ -140,7 +139,7 @@
       align-items: center; justify-content: flex-start; gap: 10px; flex-wrap: wrap;
     }
     .layout-popover {
-      min-width: 300px; padding: 14px; display: none; flex-direction: column; gap: 10px;
+      min-width: 280px; padding: 14px; display: none; flex-direction: column; gap: 10px;
       position: absolute; bottom: calc(100% + 8px); left: 0; background: #fff;
       border: 1px solid #cbd5e1; border-radius: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.15);
       z-index: 2500; font-size: 0.85rem; font-weight: 600;
@@ -151,7 +150,7 @@
     .chk-row input[type="checkbox"] { width: 15px; height: 15px; accent-color: var(--accent); }
     .layout-select { padding: 6px 9px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 0.83rem; background: #fff; width: 100%; }
 
-    /* ================= Clean 4-in-1 Sheet Card (No clutter boxes underneath) ================= */
+    /* ================= Clean 4-in-1 Sheet Card ================= */
     .sheet-card {
       width: 100%; background: #ffffff; padding: 14px 18px; border-radius: 16px;
       border: 1px solid var(--border); box-shadow: 0 3px 12px rgba(0,0,0,0.03);
@@ -168,7 +167,6 @@
       border-radius: 10px; padding: 8px 14px; font-size: 0.94rem; color: #111;
       line-height: 1.45; text-align: center; display: none;
     }
-    .empty-placeholder { color: #9ca3af; font-size: 0.88rem; margin: auto 0; padding: 8px 12px; user-select: none; }
     .annotation-list { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 16px; }
     .sentence-block {
       width: 100%; display: flex; flex-direction: column; align-items: center;
@@ -195,6 +193,16 @@
     .sheet-card.hide-std .tp-std, .studio-top-pane.hide-std .tp-std { display: none !important; }
     .sheet-card.hide-zh .tp-zh, .studio-top-pane.hide-zh .tp-zh { display: none !important; }
 
+    /* ================= 🌐 WYSIWYG Web & Drive Visual Reader ================= */
+    .web-visual-viewport {
+      width: 100%; min-height: 480px; max-height: 78vh; overflow: auto;
+      background: #ffffff; border: 1px solid var(--border); border-radius: 16px;
+      padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+      line-height: 1.65; color: #111;
+    }
+    .web-visual-viewport img { max-width: 100%; height: auto; border-radius: 8px; }
+    .web-visual-viewport a { color: var(--blue); text-decoration: underline; cursor: pointer; }
+
     /* ================= 🟢 Floating icon.png + Mini Popover ================= */
     .selection-icon-only {
       position: absolute; display: none; z-index: 999998;
@@ -214,7 +222,7 @@
       flex-direction: column; gap: 8px;
     }
 
-    /* ================= 🎬 Compact Mobile-Friendly Video Studio (9:16 default, 16:9 dropdown, 3 screen modes) ================= */
+    /* ================= 🎬 Video Studio Overlay ================= */
     .studio-overlay {
       display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
       background: #0f172a; z-index: 100000; flex-direction: column;
@@ -312,7 +320,7 @@
       .action-row { flex-wrap: wrap; }
     }
     @media print {
-      .navbar, .panel, .disclaimer-banner, .bottom-bar, .preview-img, .empty-placeholder,
+      .navbar, .panel, .disclaimer-banner, .bottom-bar, .preview-img,
       .selection-icon-only, .selection-mini-popover, .studio-overlay { display: none !important; }
       body { background: #fff; padding: 0; }
       .main-wrap { max-width: 100%; padding: 0; }
@@ -344,7 +352,7 @@
     </div>
   </div>
 
-  <!-- 🎬 3. Video Studio Overlay (9:16 default with 16:9 dropdown + 3 screen modes + Small File Size) -->
+  <!-- 🎬 3. Video Studio Overlay -->
   <div id="studioOverlay" class="studio-overlay">
     <div class="studio-top-bar">
       <select id="studioRatioSelect" class="studio-select" onchange="setStudioRatio(this.value)">
@@ -380,15 +388,15 @@
   <div class="modal" id="profanityModal" onclick="if(event.target===this)this.style.display='none'">
     <div class="modal-box" style="border-top: 6px solid #f59e0b; text-align: center; align-items: center;">
       <div style="font-size: 2.2rem;">🌱</div>
-      <h3 style="margin: 0; color: #b45309; font-size: 1.1rem;" id="uiProfanityTitle">Mindful Language Reminder</h3>
-      <p style="margin: 0; font-size: 0.9rem; color: #374151; line-height: 1.5;" id="uiProfanityText">
+      <h3 style="margin: 0; color: #b45309; font-size: 1.1rem;">Mindful Language Reminder</h3>
+      <p style="margin: 0; font-size: 0.9rem; color: #374151; line-height: 1.5;">
         Please use polite and respectful language.
       </p>
       <button class="btn btn-green" style="width: 100%;" onclick="document.getElementById('profanityModal').style.display='none'">OK</button>
     </div>
   </div>
 
-  <!-- ================= Top Navbar (Clean & Concise) ================= -->
+  <!-- ================= Top Navbar ================= -->
   <header class="navbar">
     <a href="index.html" class="nav-left" onclick="switchMainTab('workspace'); return false;">
       <img src="/icon.png?v=3" alt="Trees Pinyin" class="brand-logo" onerror="this.src='icon.png'">
@@ -396,7 +404,6 @@
     </a>
 
     <div class="nav-center">
-      <!-- 📚 More Resources Dropdown (Web, Mnemonic, Study Log at top + other pages) -->
       <div class="dropdown" id="resDropdown">
         <button class="nav-btn" onclick="toggleDropdown('resDropdown', event)">
           <span id="uiMoreRes">📚 More Resources</span> ▾
@@ -442,7 +449,6 @@
     <!-- ==================== PANEL 1: AI & File Translator ==================== -->
     <div id="panel-workspace" class="tab-panel">
 
-      <!-- 1. Capsule Input Panel -->
       <section class="panel">
         <div class="search-box" id="dropZone">
           <textarea id="userInput" rows="2"
@@ -458,7 +464,7 @@
 
           <input type="file" id="docFileInput" accept=".txt,.md,.csv,.json,.html,.rtf,.pdf,.docx,.doc,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword,text/plain" style="display:none" onchange="handleDocFileUpload(this)">
           <input type="file" id="galleryInput" accept="image/*" style="display:none" onchange="handlePhotoUpload(this)">
-          <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none" onchange="handlePhotoUpload(this)">
+          <input type="file" id="cameraInput" accept="image/*" style="display:none" onchange="handlePhotoUpload(this)">
         </div>
 
         <div class="action-row">
@@ -468,23 +474,20 @@
         </div>
       </section>
 
-      <!-- 2. Output Canvas Card (Clean, no extra boxes underneath) -->
+      <!-- Clean Output Canvas Card (All lines including Line 1 Title/Author get 4-in-1 Pinyin!) -->
       <section class="sheet-card" id="sheetCard">
         <div class="print-header-title" id="printHeaderTitle"></div>
         <img id="previewImg" class="preview-img" alt="Preview">
         <div class="ai-reply-box" id="aiReplyBox"></div>
-        <div class="empty-placeholder" id="emptyPlaceholder">
-          Enter text, upload a PDF/Word/Photo, or click "✨ AI Reply & Pinyin" above to see instant Trees Pinyin annotations here.
-        </div>
         <div class="annotation-list" id="annotationList"></div>
       </section>
 
-      <!-- 3. Original Disclaimer Banner Preserved 100% -->
+      <!-- Original Disclaimer Banner Preserved 100% -->
       <section class="disclaimer-banner" id="uiDisclaimer">
         <b>Tip:</b> For optimal results, use your own free Gemini API Key or paste text directly. Or switch to the keyless PWA web app at <a href="https://www.treespinyin.com/app" target="_blank" style="color: var(--accent); font-weight: 700; text-decoration: underline;">www.treespinyin.com/app</a> (may be slower due to API limits). The author assumes no liability for the accuracy. Your support and shares will help me go full-time to make improvements and write a memory dictionary in the future!
       </section>
 
-      <!-- 4. Minimal Bottom Bar: ONLY Layout, Print, Record Video -->
+      <!-- Minimal Bottom Bar: ONLY Layout, Print, Record Video -->
       <section class="bottom-bar">
         <div class="dropdown" id="layoutDropdown">
           <button class="btn btn-dark" onclick="toggleDropdown('layoutDropdown', event)" id="uiLayoutBtn">📐 Layout ▾</button>
@@ -518,20 +521,16 @@
 
     </div>
 
-    <!-- ==================== PANEL 2: 🌐 Web & Drive Reader ==================== -->
+    <!-- ==================== PANEL 2: 🌐 WYSIWYG Web & Drive Visual Reader ==================== -->
     <div id="panel-webreader" class="tab-panel hidden">
       <section class="panel">
         <div class="action-row">
-          <input type="text" id="webReaderUrlInput" placeholder="Paste Webpage or Google Docs / Drive URL..." style="flex:1; padding:9px 12px; border:1.5px solid #cbd5e1; border-radius:10px; font-size:0.9rem;">
+          <input type="text" id="webReaderUrlInput" placeholder="https://..." onkeydown="if(event.key==='Enter')loadWebOrDriveUrl()" style="flex:1; padding:9px 12px; border:1.5px solid #cbd5e1; border-radius:10px; font-size:0.9rem;">
           <button class="btn btn-blue" style="flex:unset;" onclick="loadWebOrDriveUrl()" id="uiOpenUrlBtn">🌐 Open URL</button>
           <button class="btn btn-soft" style="flex:unset;" onclick="document.getElementById('docFileInput').click()" id="uiOpenFileBtn">📂 Local File</button>
         </div>
       </section>
-      <section class="panel" id="webReaderContentBox" style="min-height:240px; line-height:1.75; font-size:1rem; background:#fff; padding:18px;">
-        <div style="color:#888; text-align:center; padding:30px 10px;" id="uiWebPlaceholder">
-          Open a URL or file above, then select any text to pop up the green icon.
-        </div>
-      </section>
+      <div id="webReaderContentBox" class="web-visual-viewport"></div>
     </div>
 
     <!-- ==================== PANEL 3: 🧠 Mnemonics ==================== -->
@@ -572,7 +571,7 @@
     <div id="panel-studylog" class="tab-panel hidden">
       <section class="panel" style="flex-direction:row; justify-content:space-between; align-items:center; flex-wrap:wrap;">
         <div>
-          <b style="color:var(--accent);" id="uiStudyLogTitle">📊 Study Log & Tricky Words</b>
+          <b style="color:var(--accent);" id="uiStudyLogTitle">📊 Study Log</b>
           <span style="font-size:0.83rem; color:#555; margin-left:8px;" id="vipStatusBadge">Free Tier</span>
         </div>
         <div style="display:flex; gap:6px;">
@@ -639,7 +638,7 @@
         <span>➔</span>
       </button>
       <button class="option-card-btn" onclick="triggerGalleryPick()">
-        <span id="uiOptCamTitle">📷 Photo / Camera</span>
+        <span id="uiOptCamTitle">📷 Photo / Image</span>
         <span>➔</span>
       </button>
       <button class="nav-btn" style="width:100%; padding:8px; justify-content:center;" onclick="document.getElementById('fileMenuModal').style.display='none'" id="uiFileMenuCancel">Cancel</button>
@@ -751,7 +750,7 @@
     }
 
     // =========================================================================
-    // 0.2 Silent Auto-Selected Clear Female Mandarin Voice (No UI Clutter)
+    // 0.2 Silent Auto-Selected Clear Female Mandarin Voice
     // =========================================================================
     let selectedVoiceObj = null;
 
@@ -795,7 +794,7 @@
     }
 
     // =========================================================================
-    // 0.3 Bilingual UI Dictionary (Clicking 中文 / English Switches Page & Voice Lang)
+    // 0.3 Bilingual UI Dictionary
     // =========================================================================
     let currentLang = 'en';
 
@@ -820,15 +819,13 @@
         speakBtn: "🔊 Speak",
         stopSpeakBtn: "⏹️ Stop",
         disclaimer: '<b>Tip:</b> For optimal results, use your own free Gemini API Key or paste text directly. Or switch to the keyless PWA web app at <a href="https://www.treespinyin.com/app" target="_blank" style="color: var(--accent); font-weight: 700; text-decoration: underline;">www.treespinyin.com/app</a> (may be slower due to API limits). The author assumes no liability for the accuracy. Your support and shares will help me go full-time to make improvements and write a memory dictionary in the future!',
-        emptyPlaceholder: "Enter text, upload a PDF/Word/Photo, or click \"✨ AI Reply & Pinyin\" above to see instant Trees Pinyin annotations here.",
         layoutBtn: "📐 Layout ▾",
         printBtn: "🖨️ Print",
         recordBtn: "🎬 Record Video",
         chkTrad: "Traditional Chinese",
         chkSimp: "Simplified Chinese",
         openUrlBtn: "🌐 Open URL",
-        openFileBtn: "📂 Local File",
-        webPlaceholder: "Open a URL or file above, then select any text to pop up the green icon."
+        openFileBtn: "📂 Local File"
       },
       zh: {
         moreRes: "📚 更多資源",
@@ -850,15 +847,13 @@
         speakBtn: "🔊 朗讀",
         stopSpeakBtn: "⏹️ 停止",
         disclaimer: '<b>提示：</b>為獲得最佳體驗，建議使用您自己的免費 Gemini API Key 或直接貼上文字。也可切換至免 Key 手機網頁版 <a href="https://www.treespinyin.com/app" target="_blank" style="color: var(--accent); font-weight: 700; text-decoration: underline;">www.treespinyin.com/app</a>（受 API 限制可能較慢）。作者對拼音結果準確性不承擔法律責任。您的支持與分享將幫助作者全職投入改進與編寫記憶字典！',
-        emptyPlaceholder: "請在上方輸入文字、上傳 PDF/Word/照片，或點擊「✨ AI 回答並注音」，此處將立即生成雙語自然拼讀注音。",
         layoutBtn: "📐 排版 ▾",
         printBtn: "🖨️ 列印",
         recordBtn: "🎬 錄製影片",
         chkTrad: "繁體中文",
         chkSimp: "簡體中文",
         openUrlBtn: "🌐 打開網址",
-        openFileBtn: "📂 本地文件",
-        webPlaceholder: "在上方貼上網址或打開文件，用滑鼠反白選取文字即可跳出綠色圖標注音。"
+        openFileBtn: "📂 本地文件"
       }
     };
 
@@ -883,7 +878,6 @@
       document.getElementById('uiTransBtn').innerText = t.transBtn;
       if (!isSpeakingNow) document.getElementById('speakBtn').innerText = t.speakBtn;
       document.getElementById('uiDisclaimer').innerHTML = t.disclaimer;
-      document.getElementById('emptyPlaceholder').innerText = t.emptyPlaceholder;
       document.getElementById('uiLayoutBtn').innerText = t.layoutBtn;
       document.getElementById('uiPrintBtn').innerText = t.printBtn;
       document.getElementById('uiRecordBtn').innerText = t.recordBtn;
@@ -891,7 +885,6 @@
       document.getElementById('uiChkSimp').innerText = t.chkSimp;
       document.getElementById('uiOpenUrlBtn').innerText = t.openUrlBtn;
       document.getElementById('uiOpenFileBtn').innerText = t.openFileBtn;
-      document.getElementById('uiWebPlaceholder').innerText = t.webPlaceholder;
     }
 
     function toggleDropdown(id, e) {
@@ -989,55 +982,87 @@
     }
 
     // =========================================================================
-    // 2. 🌐 Web & Drive Reader
+    // 2. 🌐 True WYSIWYG Visual Webpage & Cloud Drive Reader (No Raw Code!)
     // =========================================================================
-    async function loadWebOrDriveUrl() {
-      const rawUrl = (document.getElementById('webReaderUrlInput').value || '').trim();
+    async function loadWebOrDriveUrl(overrideUrl) {
+      const rawUrl = (overrideUrl || document.getElementById('webReaderUrlInput').value || '').trim();
       if (!rawUrl) return;
+      document.getElementById('webReaderUrlInput').value = rawUrl;
       const box = document.getElementById('webReaderContentBox');
-      box.innerHTML = `<div style="text-align:center; padding:24px; color:var(--accent); font-weight:700;">🌐 Loading...</div>`;
+      box.innerHTML = `<div style="text-align:center; padding:40px; color:var(--accent); font-weight:700;">🌐 Loading Webpage...</div>`;
 
+      // 1. Google Docs link -> Export as clean visual HTML
       const gdocMatch = rawUrl.match(/https:\/\/docs\.google\.com\/document\/d\/([a-zA-Z0-9_-]+)/);
       if (gdocMatch) {
         try {
-          const r = await fetch(`https://docs.google.com/document/d/${gdocMatch[1]}/export?format=txt`);
+          const r = await fetch(`https://docs.google.com/document/d/${gdocMatch[1]}/export?format=html`);
           if (r.ok) {
-            renderInteractiveReaderText(await r.text());
+            renderVisualHtmlIntoReader(await r.text(), rawUrl);
             return;
           }
         } catch (e) {}
       }
 
-      try {
-        const target = rawUrl.startsWith('http') ? rawUrl : ('https://' + rawUrl);
-        const r = await fetch(`https://r.jina.ai/${target}`);
-        if (r.ok) {
-          renderInteractiveReaderText((await r.text()).slice(0, 6000));
-          return;
-        }
-      } catch (e) {}
+      // 2. Fetch true HTML DOM via CORS proxy and render WYSIWYG visual webpage
+      const targetUrl = rawUrl.startsWith('http') ? rawUrl : ('https://' + rawUrl);
+      const proxies = [
+        `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`,
+        `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(targetUrl)}`
+      ];
 
-      try {
-        const target = rawUrl.startsWith('http') ? rawUrl : ('https://' + rawUrl);
-        const r2 = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(target)}`);
-        const d2 = await r2.json();
-        const tmp = document.createElement('div');
-        tmp.innerHTML = d2.contents || '';
-        tmp.querySelectorAll('script, style, nav, footer').forEach(n => n.remove());
-        renderInteractiveReaderText((tmp.innerText || '').slice(0, 6000));
-      } catch (e) {
-        box.innerHTML = `<div style="color:#d32f2f; padding:16px;">⚠️ Cannot fetch URL directly. Please use 📂 Local File.</div>`;
+      for (const proxyUrl of proxies) {
+        try {
+          const r = await fetchWithTimeout(proxyUrl, {}, 8000);
+          if (r.ok) {
+            const htmlStr = await r.text();
+            if (htmlStr && htmlStr.length > 50) {
+              renderVisualHtmlIntoReader(htmlStr, targetUrl);
+              return;
+            }
+          }
+        } catch (e) {}
       }
+
+      box.innerHTML = `<div style="color:#d32f2f; padding:20px; text-align:center;">⚠️ Cannot load this site directly. Try another webpage or use 📂 Local File.</div>`;
     }
 
-    function renderInteractiveReaderText(rawText) {
+    function renderVisualHtmlIntoReader(rawHtml, baseUrl) {
       const box = document.getElementById('webReaderContentBox');
-      const paras = rawText.split(/\n+/).map(p => p.trim()).filter(p => p.length > 1);
-      box.innerHTML = paras.map(p => `<p style="margin:0 0 12px; cursor:text;">${p.replace(/</g, '<')}</p>`).join('');
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(rawHtml, 'text/html');
+
+      // Remove executable scripts & trackers while keeping visual styles and layout
+      doc.querySelectorAll('script, iframe, object, embed, noscript').forEach(el => el.remove());
+
+      // Fix relative URLs for images, stylesheets, and links so the page looks WYSIWYG
+      try {
+        const baseObj = new URL(baseUrl);
+        doc.querySelectorAll('img[src]').forEach(img => {
+          try { img.src = new URL(img.getAttribute('src'), baseObj).href; } catch (e) {}
+        });
+        doc.querySelectorAll('link[rel="stylesheet"][href]').forEach(lnk => {
+          try { lnk.href = new URL(lnk.getAttribute('href'), baseObj).href; } catch (e) {}
+        });
+        doc.querySelectorAll('a[href]').forEach(a => {
+          try {
+            const abs = new URL(a.getAttribute('href'), baseObj).href;
+            a.setAttribute('href', abs);
+            a.onclick = (ev) => {
+              ev.preventDefault();
+              loadWebOrDriveUrl(abs);
+            };
+          } catch (e) {}
+        });
+      } catch (e) {}
+
+      box.innerHTML = '';
+      const contentWrap = document.createElement('div');
+      contentWrap.innerHTML = doc.body ? doc.body.innerHTML : rawHtml;
+      box.appendChild(contentWrap);
     }
 
     // =========================================================================
-    // 3. 🎬 Ultra-Compact WYSIWYG Video Studio (380kbps Low Bitrate for Instant Mobile Download)
+    // 3. 🎬 Video Studio (Locks Built-In Computer Camera -> NEVER triggers iPhone Continuity Camera!)
     // =========================================================================
     let studioStream = null;
     let studioRecorder = null;
@@ -1048,6 +1073,31 @@
     let studioCurrentView = 'split';
     let studioSynthCanvas = null;
     let studioSynthAnimId = null;
+
+    // Prevents macOS from waking up the user's iPhone (Continuity Camera)
+    async function getBuiltInComputerStream() {
+      try {
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const videoInputs = devices.filter(d => d.kind === 'videoinput');
+        const audioInputs = devices.filter(d => d.kind === 'audioinput');
+
+        // Exclude iPhone / Continuity / External wireless cameras
+        const builtInCam = videoInputs.find(d => !/iphone|ipad|continuity|desk view/i.test(d.label)) || videoInputs[0];
+        const builtInMic = audioInputs.find(d => !/iphone|ipad|continuity/i.test(d.label)) || audioInputs[0];
+
+        const videoConstraint = builtInCam && builtInCam.deviceId
+          ? { deviceId: { exact: builtInCam.deviceId }, width: { ideal: 640 }, height: { ideal: 480 } }
+          : { width: { ideal: 640 }, height: { ideal: 480 } }; // No facingMode so macOS won't trigger iPhone!
+
+        const audioConstraint = builtInMic && builtInMic.deviceId
+          ? { deviceId: { exact: builtInMic.deviceId } }
+          : true;
+
+        return await navigator.mediaDevices.getUserMedia({ video: videoConstraint, audio: audioConstraint });
+      } catch (e) {
+        return await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      }
+    }
 
     async function openCreatorStudio(ratioMode = '9-16') {
       document.getElementById('studioOverlay').classList.add('active');
@@ -1070,10 +1120,7 @@
 
       const camVideo = document.getElementById('studioCamVideo');
       try {
-        studioStream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } },
-          audio: true
-        });
+        studioStream = await getBuiltInComputerStream();
         camVideo.srcObject = studioStream;
       } catch (e) {
         studioStream = null;
@@ -1155,7 +1202,6 @@
       studioSeconds = 0;
       document.getElementById('studioTimerBadge').innerText = '🔴 00:00';
 
-      // Lightweight mobile resolution (360x640 / 640x360) for 85% smaller file size!
       studioSynthCanvas = document.createElement('canvas');
       if (studioCurrentRatio === '9-16') {
         studioSynthCanvas.width = 360;
@@ -1259,7 +1305,6 @@
       }
       drawStudioFrame();
 
-      // 15 FPS + 380kbps low-bitrate compression (~2.5MB per minute for fast mobile download!)
       const stream = studioSynthCanvas.captureStream(15);
       if (studioStream) {
         studioStream.getAudioTracks().forEach(t => stream.addTrack(t));
@@ -1307,7 +1352,7 @@
     }
 
     // =========================================================================
-    // 4. Smart Voice Input (Follows Main Page Language + Stops 1.0s After Speaking)
+    // 4. Smart Voice Input (Follows Page Lang + Stops 1.0s After Speaking)
     // =========================================================================
     let activeRec = null;
     let voiceSilenceTimer = null;
@@ -1354,7 +1399,6 @@
       function startRecognitionInstance() {
         if (!isVoiceSessionActive) return;
         activeRec = new SR();
-        // Automatically follows main page language!
         activeRec.lang = currentLang === 'zh' ? 'zh-CN' : 'en-US';
         activeRec.interimResults = true;
         activeRec.continuous = true;
@@ -1395,7 +1439,7 @@
     }
 
     // =========================================================================
-    // 5. Core Compiler + Silent Right-Click 3-in-1 Editor + Fast Multi-Model AI
+    // 5. Core Compiler + Silent Right-Click 3-in-1 Editor
     // =========================================================================
     const DIGITS_ZH = ['零','一','二','三','四','五','六','七','八','九'];
     function intToChinese(numStr) {
@@ -1487,7 +1531,7 @@
       "長大": "zhang3 da4", "长大": "zhang3 da4", "長城": "chang2 cheng2", "长城": "chang2 cheng2",
       "了解": "liao3 jie3", "好了": "hao3 le5", "覺得": "jue2 de5", "觉得": "jue2 de5", "睡覺": "shui4 jiao4", "睡觉": "shui4 jiao4",
       "重慶": "chong2 qing4", "重庆": "chong2 qing4", "重要": "zhong4 yao4", "還錢": "huan2 qian2", "还钱": "huan2 qian2", "還有": "hai2 you3", "还有": "hai2 you3",
-      "我的": "wo3 de5", "你的": "ni3 de5", "好的": "hao3 de5", "曲項": "qu1 xiang4", "曲项": "qu1 xiang4"
+      "我的": "wo3 de5", "你的": "ni3 de5", "好的": "hao3 de5", "曲項": "qu1 xiang4", "曲项": "qu1 xiang4", "朝辭": "zhao1 ci2", "朝辞": "zhao1 ci2"
     };
 
     const userCustomEdits = JSON.parse(localStorage.getItem('tp_custom_char_edits_v2') || '{}');
@@ -1562,17 +1606,11 @@
       document.getElementById('editCharModal').style.display = 'none';
     }
 
-    function prepareOutputCanvas() {
-      document.getElementById('emptyPlaceholder').style.display = 'none';
-    }
-
     function nextPaintTick() {
       return new Promise(resolve => requestAnimationFrame(() => setTimeout(resolve, 10)));
     }
 
-    // Clean 4-in-1 Sentence Rendering (No extra button boxes underneath!)
     function appendSentenceProgressive(rawZhText, enTranslation = '', targetContainerId = 'annotationList') {
-      if (targetContainerId === 'annotationList') prepareOutputCanvas();
       const list = document.getElementById(targetContainerId);
       const block = document.createElement('div');
       block.className = 'sentence-block';
@@ -1633,17 +1671,19 @@
     }
 
     // =========================================================================
-    // 6. Fast & Complete AI Engine (Restored 3-Tier Cache + Multi-Model Racing)
+    // 6. Clean, Non-Repetitive AI Engine (Line 1 Title & Author ALSO Annotated!)
     // =========================================================================
     const IS_LOCAL_FILE = window.location.protocol === 'file:';
     const CF_WORKER_ENDPOINTS = IS_LOCAL_FILE
       ? ['https://treespinyin-api.treespinyin.workers.dev', 'https://treespinyin.com/api']
       : ['https://treespinyin-api.treespinyin.workers.dev', '/api', 'https://treespinyin.com/api'];
 
+    // Line 1 Title + Author is ALSO paired with "|||" so it gets full 4-in-1 Pinyin annotation!
     const BUILTIN_QA_CACHE = {
-      "咏鹅": "《詠鵝》駱賓王 (Ode to the Goose by Luo Binwang)\n鵝，鵝，鵝， ||| Goose, goose, goose,\n曲項向天歌。 ||| You bend your neck and sing to the sky.\n白毛浮綠水， ||| Your white feathers float on the emerald water,\n紅掌撥清波。 ||| Your red webbed feet paddle the clear waves.",
-      "静夜思": "《靜夜思》李白 (Quiet Night Thought by Li Bai)\n床前明月光， ||| Before my bed, the bright moonlight shines,\n疑是地上霜。 ||| I wonder if it is frost upon the ground.\n舉頭望明月， ||| I raise my head to gaze at the bright moon,\n低頭思故鄉。 ||| And lower my head, longing for my hometown.",
-      "春晓": "《春曉》孟浩然 (Spring Morning by Meng Haoran)\n春眠不覺曉， ||| In spring sleep, I am unaware of the dawn,\n處處聞啼鳥。 ||| Everywhere I hear the singing of birds.\n夜來風雨聲， ||| Last night came the sound of wind and rain,\n花落知多少。 ||| Who knows how many blossoms have fallen."
+      "咏鹅": "《詠鵝》駱賓王 ||| Ode to the Goose by Luo Binwang\n鵝，鵝，鵝， ||| Goose, goose, goose,\n曲項向天歌。 ||| You bend your neck and sing to the sky.\n白毛浮綠水， ||| Your white feathers float on the emerald water,\n紅掌撥清波。 ||| Your red webbed feet paddle the clear waves.",
+      "静夜思": "《靜夜思》李白 ||| Quiet Night Thought by Li Bai\n床前明月光， ||| Before my bed, the bright moonlight shines,\n疑是地上霜。 ||| I wonder if it is frost upon the ground.\n舉頭望明月， ||| I raise my head to gaze at the bright moon,\n低頭思故鄉。 ||| And lower my head, longing for my hometown.",
+      "春晓": "《春曉》孟浩然 ||| Spring Morning by Meng Haoran\n春眠不覺曉， ||| In spring sleep, I am unaware of the dawn,\n處處聞啼鳥。 ||| Everywhere I hear the singing of birds.\n夜來風雨聲， ||| Last night came the sound of wind and rain,\n花落知多少。 ||| Who knows how many blossoms have fallen.",
+      "登鹳雀楼": "《登鸛雀樓》王之渙 ||| On the Stork Tower by Wang Zhihuan\n白日依山盡， ||| The white sun sets behind the mountains,\n黃河入海流。 ||| And the Yellow River flows into the sea.\n欲窮千里目， ||| To see a thousand miles further,\n更上一層樓。 ||| Climb one more story higher."
     };
 
     function normalizeCacheKey(rawQ) {
@@ -1652,6 +1692,7 @@
         .replace(/請背誦|请背诵|背誦|背诵|唐詩|唐诗|古詩|古诗|並給出簡短解釋|并给出简短解释|是什麼|是什么/g, '')
         .replace(/[\s,.?!，。？！、：:；;《》〈〉"“”'‘’()（）]/g, '')
         .replace(/詠/g, '咏').replace(/鵝/g, '鹅').replace(/靜/g, '静').replace(/曉/g, '晓')
+        .replace(/鸛/g, '鹳').replace(/樓/g, '楼')
         .slice(0, 100);
     }
 
@@ -1660,7 +1701,7 @@
       if (!k) return '';
       if (BUILTIN_QA_CACHE[k]) return BUILTIN_QA_CACHE[k];
       try {
-        const store = JSON.parse(localStorage.getItem('tp_local_qa_cache_v2') || '{}');
+        const store = JSON.parse(localStorage.getItem('tp_local_qa_cache_v5') || '{}');
         return store[k] || '';
       } catch (e) { return ''; }
     }
@@ -1669,11 +1710,11 @@
       const k = normalizeCacheKey(q);
       if (!k || !ans) return;
       try {
-        const store = JSON.parse(localStorage.getItem('tp_local_qa_cache_v2') || '{}');
+        const store = JSON.parse(localStorage.getItem('tp_local_qa_cache_v5') || '{}');
         const keys = Object.keys(store);
         if (keys.length > 150) delete store[keys[0]];
         store[k] = ans;
-        localStorage.setItem('tp_local_qa_cache_v2', JSON.stringify(store));
+        localStorage.setItem('tp_local_qa_cache_v5', JSON.stringify(store));
       } catch (e) {}
     }
 
@@ -1704,7 +1745,7 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents: [{ parts }],
-          generationConfig: { temperature: 0.15, thinkingConfig: { thinkingBudget: 0 } }
+          generationConfig: { temperature: 0.1, thinkingConfig: { thinkingBudget: 0 } }
         }),
         signal
       });
@@ -1712,7 +1753,7 @@
         r = await fetch(url, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ contents: [{ parts }], generationConfig: { temperature: 0.15 } }),
+          body: JSON.stringify({ contents: [{ parts }], generationConfig: { temperature: 0.1 } }),
           signal
         });
       }
@@ -1725,7 +1766,7 @@
     }
 
     async function fetchFastAccurateAI(promptText, dataUrl = null, rawQuestionForCache = '') {
-      const cleanCacheKey = normalizeCacheKey(rawQuestionForCache);
+      const cleanCacheKey = 'v5_' + normalizeCacheKey(rawQuestionForCache);
       const workerTasks = CF_WORKER_ENDPOINTS.map(async (ep) => {
         const r = await fetchWithTimeout(ep, {
           method: 'POST',
@@ -1799,34 +1840,36 @@
       return { zh: zhPart, en: enPart };
     }
 
+    // Every single line (including Line 1 Title/Author) is rendered as a 4-in-1 block & deduplicated!
     async function renderBilingualAIOutput(aiText) {
       const replyBox = document.getElementById('aiReplyBox');
+      replyBox.style.display = 'none';
       const rawLines = aiText.split(/\n+/).map(l => l.trim()).filter(Boolean);
       if (rawLines.length === 0) return false;
 
-      let startIdx = 0;
-      if (!rawLines[0].includes('|||')) {
-        const headerLine = rawLines[0].replace(/^[-*•\d.)、]+\s*/, '').replace(/\*+/g, '').trim();
-        replyBox.style.display = 'block';
-        replyBox.innerHTML = `<b>${headerLine}</b>`;
-        startIdx = 1;
-        await nextPaintTick();
-      } else {
-        replyBox.style.display = 'none';
-      }
-
+      const seenZh = new Set();
       let renderedPairs = 0;
-      for (let i = startIdx; i < rawLines.length; i++) {
+
+      for (let i = 0; i < rawLines.length; i++) {
         const pair = parseBilingualPairLine(rawLines[i]);
         if (pair) {
+          const normZh = pair.zh.replace(/[^\u4e00-\u9fa5]/g, '');
+          if (!normZh || seenZh.has(normZh)) continue;
+          seenZh.add(normZh);
           renderedPairs++;
           appendSentenceProgressive(pair.zh, pair.en);
           await nextPaintTick();
         } else {
+          // If Line 1 or any line didn't use "|||", extract Chinese & English or auto-translate so Line 1 ALSO gets annotated!
           const fallbackZh = cleanChineseSentence(rawLines[i]);
           if (fallbackZh) {
+            const normZh = fallbackZh.replace(/[^\u4e00-\u9fa5]/g, '');
+            if (!normZh || seenZh.has(normZh)) continue;
+            seenZh.add(normZh);
+            const enMatch = rawLines[i].match(/[A-Za-z][A-Za-z0-9\s,'".!?-]+/);
+            const enStr = enMatch ? enMatch[0].trim() : '';
             renderedPairs++;
-            appendSentenceProgressive(fallbackZh, '');
+            appendSentenceProgressive(fallbackZh, enStr);
             await nextPaintTick();
           }
         }
@@ -1839,12 +1882,11 @@
       if (!q) return;
       if (checkAndWarnProfanity(q)) return;
 
-      prepareOutputCanvas();
       document.getElementById('previewImg').style.display = 'none';
       const replyBox = document.getElementById('aiReplyBox');
       const list = document.getElementById('annotationList');
       replyBox.style.display = 'block';
-      replyBox.innerText = currentLang === 'en' ? '⚡ AI Thinking...' : '⚡ AI 正在極速思考...';
+      replyBox.innerText = currentLang === 'en' ? '⚡ AI Thinking...' : '⚡ AI 正在思考...';
       list.innerHTML = '';
 
       const localHit = getLocalCachedAnswer(q);
@@ -1853,17 +1895,20 @@
         if (ok) return;
       }
 
-      const directPrompt = `You are an authoritative bilingual scholar and assistant.
-User question/request: "${q}"
+      const directPrompt = `You are a concise, authoritative bilingual Mandarin scholar.
+User request: "${q}"
 
-CRITICAL ACCURACY RULES:
-1. Formulate a complete, helpful, accurate answer or authentic classic text (3 to 6 sentences):
-   - Provide both authentic Chinese and natural English for every sentence.
-2. Output Format:
-   - Line 1: A concise 1-line title or summary (in both English & Chinese).
-   - Line 2 onwards: Output each sentence pair strictly on its own line separated by "|||" in this exact order:
+STRICT OUTPUT RULES:
+1. Be 100% clean, direct, and non-repetitive. NO filler, NO intro, NO commentary, NO explanations.
+2. If the user asks for a poem (e.g. 唐詩/古詩) or story:
+   - Line 1 MUST be ONLY the Title and Author in this exact paired format:
+     《詩名》作者 ||| English Title by Author
+   - Line 2+ MUST be ONLY the verses of the poem, one verse per line:
+     Chinese_Verse ||| English_Translation
+3. For any other question:
+   - Output ONLY the direct answer in 1 to 4 lines, every single line formatted as:
      Pure_Chinese_Sentence ||| Authentic_English_Sentence
-   - IMPORTANT: On Lines 2+, the left side of "|||" must contain ONLY Chinese characters and Chinese punctuation.`;
+4. NEVER repeat any line. Left side of "|||" must contain ONLY Chinese characters and punctuation (NO Pinyin).`;
 
       const aiText = await fetchFastAccurateAI(directPrompt, null, q);
       if (aiText) {
@@ -1875,8 +1920,8 @@ CRITICAL ACCURACY RULES:
       }
 
       replyBox.innerHTML = currentLang === 'en'
-        ? `💡 High traffic on the free public channel! Please enter your own free Google Gemini API Key in <b>[🔑 API Key]</b> for unlimited instant responses.`
-        : `💡 當前免費公共通道訪問量較大！請在右上角 <b>[🔑 API Key]</b> 填入您免費的個人 Google Gemini Key 即可享受專屬極速無限通道。`;
+        ? `💡 High traffic! Please enter your free Google Gemini API Key in <b>[🔑 API Key]</b>.`
+        : `💡 免費通道繁忙！請在右上角 <b>[🔑 API Key]</b> 填入個人免費 Gemini Key。`;
       openKeyModal();
     }
 
@@ -1885,7 +1930,6 @@ CRITICAL ACCURACY RULES:
       if (!raw) return;
       if (checkAndWarnProfanity(raw)) return;
 
-      prepareOutputCanvas();
       document.getElementById('previewImg').style.display = 'none';
       document.getElementById('aiReplyBox').style.display = 'none';
       const list = document.getElementById('annotationList');
@@ -2125,7 +2169,6 @@ CRITICAL ACCURACY RULES:
       const file = input.files[0];
       const name = (file.name || '').toLowerCase();
       input.value = '';
-      prepareOutputCanvas();
       const replyBox = document.getElementById('aiReplyBox');
       replyBox.style.display = 'block';
       replyBox.innerText = `📄 Reading ${file.name}...`;
@@ -2161,7 +2204,6 @@ CRITICAL ACCURACY RULES:
     async function handlePhotoUpload(input) {
       if (!input.files || !input.files[0]) return;
       const file = input.files[0];
-      prepareOutputCanvas();
       const reader = new FileReader();
       reader.onload = async (e) => {
         const dataUrl = e.target.result;
