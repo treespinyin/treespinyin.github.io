@@ -3,20 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Trees Pinyin - Fast AI Q&A & Instant Translator</title>
+  <title>Trees Pinyin - Fast AI Q&A, Web/Drive Reader & Creator Studio</title>
   <meta name="theme-color" content="#1b5e20">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Trees Pinyin">
 
-  <!-- 強制綁定根目錄的 /icon.png?v=3 -->
   <link rel="icon" type="image/png" href="/icon.png?v=3">
   <link rel="shortcut icon" type="image/png" href="/icon.png?v=3">
   <link id="appleTouchIcon" rel="apple-touch-icon" href="/icon.png?v=3">
-  <link rel="apple-touch-icon-precomposed" href="/icon.png?v=3">
 
-  <!-- 核心拼音、全字庫繁簡轉換 (OpenCC) 與截圖庫 -->
   <script src="https://cdn.jsdelivr.net/npm/pinyin-pro@3.19.6/dist/index.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/opencc-js@1.0.5/dist/umd/full.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
@@ -36,48 +33,22 @@
     }
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     body {
-      margin: 0;
-      padding: 0 0 42px;
+      margin: 0; padding: 0 0 42px;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 100vh;
+      background: var(--bg); color: var(--text);
+      display: flex; flex-direction: column; align-items: center; min-height: 100vh;
     }
     .hidden { display: none !important; }
 
     /* ================= Top Navbar ================= */
     .navbar {
-      width: 100%;
-      background: #ffffff;
-      border-bottom: 1px solid #e5e7eb;
-      padding: 8px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.03);
-      gap: 10px;
-      flex-wrap: wrap;
+      width: 100%; background: #ffffff; border-bottom: 1px solid #e5e7eb;
+      padding: 8px 20px; display: flex; justify-content: space-between; align-items: center;
+      position: sticky; top: 0; z-index: 1000; box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+      gap: 10px; flex-wrap: wrap;
     }
-    .nav-left {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      text-decoration: none;
-      color: inherit;
-    }
-    .brand-logo {
-      width: 34px;
-      height: 34px;
-      border-radius: 8px;
-      object-fit: cover;
-      flex-shrink: 0;
-    }
+    .nav-left { display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; }
+    .brand-logo { width: 34px; height: 34px; border-radius: 8px; object-fit: cover; flex-shrink: 0; }
     .brand-text-wrap { display: flex; flex-direction: column; }
     .brand-title { font-size: 1.15rem; font-weight: 800; color: var(--accent); line-height: 1.2; }
     .brand-sub { font-size: 0.72rem; color: #666; font-weight: 500; }
@@ -85,55 +56,36 @@
     .nav-center, .nav-right { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
     .dropdown { position: relative; display: inline-block; }
     .nav-btn {
-      background: #fff;
-      border: 1px solid #d0d7de;
-      border-radius: 10px;
-      padding: 6px 12px;
-      font-size: 0.84rem;
-      font-weight: 700;
-      color: #222;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      transition: all 0.15s;
-      text-decoration: none;
-      white-space: nowrap;
+      background: #fff; border: 1px solid #d0d7de; border-radius: 10px;
+      padding: 6px 12px; font-size: 0.84rem; font-weight: 700; color: #222;
+      cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+      transition: all 0.15s; text-decoration: none; white-space: nowrap;
     }
     .nav-btn:hover { background: #f3f4f6; border-color: #adb5bd; }
     .nav-btn.has-key { border-color: #2e7d32; color: #1b5e20; background: #e8f5e9; }
     .nav-btn.login-btn { background: var(--accent); color: #fff; border-color: var(--accent); }
-    .nav-btn.login-btn:hover { background: var(--accent-hover); }
     .btn-mini-icon { width: 16px; height: 16px; border-radius: 4px; object-fit: cover; }
 
     .dropdown-menu {
-      display: none;
-      position: absolute;
-      top: calc(100% + 6px);
-      left: 0;
-      background: #fff;
-      min-width: 230px;
-      border-radius: 12px;
-      border: 1px solid #e5e7eb;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.12);
-      padding: 6px;
-      z-index: 2000;
+      display: none; position: absolute; top: calc(100% + 6px); left: 0;
+      background: #fff; min-width: 240px; border-radius: 12px; border: 1px solid #e5e7eb;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.12); padding: 6px; z-index: 2000;
     }
     .dropdown-menu.right-align { left: auto; right: 0; }
     .dropdown:hover .dropdown-menu, .dropdown.open .dropdown-menu { display: block; }
     .dropdown-item {
       display: flex; align-items: center; gap: 8px; padding: 9px 12px;
-      color: #222; text-decoration: none; font-size: 0.86rem; font-weight: 600;
+      color: #222; text-decoration: none; font-size: 0.85rem; font-weight: 600;
       border-radius: 8px; transition: background 0.15s; cursor: pointer;
     }
     .dropdown-item:hover { background: var(--accent-soft); color: var(--accent); }
 
-    /* ================= 3 Main Tabs (Workspace / Mnemonic Search / Study Log & Pro) ================= */
+    /* ================= 4 Main Tabs ================= */
     .top-tabs { display: flex; gap: 8px; width: 100%; flex-wrap: wrap; }
     .tab-btn {
-      flex: 1; min-width: 210px; padding: 10px 14px; border-radius: 12px;
+      flex: 1; min-width: 180px; padding: 10px 12px; border-radius: 12px;
       border: 1.5px solid #d0d7de; background: #ffffff; color: #333;
-      font-size: 0.9rem; font-weight: 800; cursor: pointer; transition: all 0.15s;
+      font-size: 0.88rem; font-weight: 800; cursor: pointer; transition: all 0.15s;
       display: inline-flex; align-items: center; justify-content: center; gap: 6px;
     }
     .tab-btn.active {
@@ -142,7 +94,7 @@
     }
 
     .main-wrap {
-      width: 100%; max-width: 940px; padding: 10px 16px 0;
+      width: 100%; max-width: 960px; padding: 10px 16px 0;
       display: flex; flex-direction: column; gap: 10px;
     }
     .tab-panel { display: flex; flex-direction: column; gap: 10px; width: 100%; }
@@ -181,12 +133,10 @@
       white-space: nowrap; transition: filter 0.15s, transform 0.1s;
     }
     .btn:hover { filter: brightness(1.06); }
-    .btn:active { transform: translateY(1px); }
     .btn-blue { background: var(--blue); color: #fff; }
     .btn-green { background: var(--accent); color: #fff; }
     .btn-soft { background: var(--accent-soft); color: var(--accent); border: 1px solid #c8e6c9; }
     .btn-dark { background: #222; color: #fff; font-size: 0.8rem; padding: 7px 12px; border-radius: 8px; flex: unset; }
-    .btn-mic.recording { background: var(--danger); color: #fff; animation: pulse 1s infinite; }
 
     .disclaimer-banner {
       background: #fffdf5; border: 1px solid #fde68a; border-left: 4px solid #f59e0b;
@@ -207,13 +157,13 @@
       border-top: 1px solid #f1f5f9; padding-top: 8px; display: flex;
       align-items: center; gap: 10px; flex-wrap: wrap; font-size: 0.84rem; color: #444; font-weight: 600;
     }
-    .layout-select { padding: 5px 9px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 0.83rem; background: #fff; }
+    .layout-select { padding: 5px 9px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 0.83rem; background: #fff; font-weight: 600; }
     .print-title-input {
       margin-left: auto; padding: 6px 10px; border: 1px solid #cbd5e1;
       border-radius: 8px; font-size: 0.83rem; min-width: 190px; outline: none;
     }
 
-    /* ================= 4-in-1 Sheet Card + Pronunciation Scoring + IG Video Record ================= */
+    /* ================= 4-in-1 Sheet Card ================= */
     .sheet-card {
       width: 100%; background: #ffffff; padding: 14px 18px; border-radius: 16px;
       border: 1px solid var(--border); box-shadow: 0 3px 12px rgba(0,0,0,0.03);
@@ -237,10 +187,7 @@
       gap: 6px; padding-bottom: 12px; border-bottom: 1px dashed #e5e7eb;
     }
     .sentence-block:last-child { border-bottom: none; padding-bottom: 0; }
-    .en-line {
-      font-size: calc(var(--user-font-size) * 0.92); font-weight: 600; color: #111;
-      line-height: 1.4; max-width: 95%;
-    }
+    .en-line { font-size: calc(var(--user-font-size) * 0.92); font-weight: 600; color: #111; line-height: 1.4; max-width: 95%; }
     .char-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 0; align-items: flex-end; }
     .tp-col {
       display: inline-flex; flex-direction: column; align-items: center; justify-content: flex-end;
@@ -257,9 +204,7 @@
     .tp-std { font-size: calc(var(--user-font-size) * 0.78); font-weight: 500; color: #6b7280; line-height: 1.15; white-space: nowrap; }
     .tp-zh { font-size: calc(var(--user-font-size) * 1.25); font-weight: 600; color: #000; line-height: 1.22; min-height: 1.22em; }
 
-    .sentence-tools-bar {
-      display: flex; gap: 8px; align-items: center; justify-content: center; flex-wrap: wrap; margin-top: 4px;
-    }
+    .sentence-tools-bar { display: flex; gap: 8px; align-items: center; justify-content: center; flex-wrap: wrap; margin-top: 4px; }
     .mini-tool-btn {
       padding: 4px 10px; border-radius: 16px; border: 1px solid #cbd5e1;
       background: #f8fafc; font-size: 0.76rem; font-weight: 700; color: #222;
@@ -268,66 +213,88 @@
     .mini-tool-btn:hover { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
     .mini-tool-btn.recording { background: var(--danger); color: #fff; border-color: var(--danger); animation: pulse 1s infinite; }
 
-    /* Dynamic 4-Row Visibility */
     .sheet-card.hide-en .en-line, .four-in-one.hide-en .en-line { display: none !important; }
     .sheet-card.hide-tp .tp-py, .four-in-one.hide-tp .tp-py { display: none !important; }
     .sheet-card.hide-std .tp-std, .four-in-one.hide-std .tp-std { display: none !important; }
     .sheet-card.hide-zh .tp-zh, .four-in-one.hide-zh .tp-zh { display: none !important; }
 
-    /* 🟢 Extension-Style Floating Green icon.png Widget on Text Selection */
-    .selection-floating-wrap {
-      position: absolute; display: none; z-index: 999999;
-      align-items: center; gap: 6px; animation: popIn 0.14s ease-out;
-    }
-    .selection-icon-trigger {
+    /* ================= 🟢 1. Only icon.png Floating Button + Separate Mini Popover Display Box ================= */
+    .selection-icon-only {
+      position: absolute; display: none; z-index: 999998;
       width: 38px; height: 38px; border-radius: 50%;
       background: #1b5e20; border: 2.5px solid #ffffff;
-      box-shadow: 0 4px 14px rgba(27,94,32,0.45);
-      cursor: pointer; display: flex; align-items: center; justify-content: center;
-      padding: 3px; transition: transform 0.15s;
+      box-shadow: 0 4px 16px rgba(27,94,32,0.5);
+      cursor: pointer; padding: 3px; transition: transform 0.15s;
+      animation: popIn 0.14s ease-out;
     }
-    .selection-icon-trigger:hover { transform: scale(1.1); background: #2e7d32; }
-    .selection-icon-trigger img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
-    .selection-action-drawer {
-      display: none; background: #1b5e20; color: #fff;
-      border: 2px solid #fff; border-radius: 22px; padding: 5px 12px;
-      font-size: 0.82rem; font-weight: 800; box-shadow: 0 6px 18px rgba(0,0,0,0.28);
-      align-items: center; gap: 8px; white-space: nowrap;
-    }
-    .selection-floating-wrap.expanded .selection-action-drawer { display: inline-flex; }
-    .sel-act-item { cursor: pointer; padding: 3px 6px; border-radius: 6px; }
-    .sel-act-item:hover { background: rgba(255,255,255,0.2); }
-    @keyframes popIn { from { transform: scale(0.82); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    .selection-icon-only:hover { transform: scale(1.12); background: #2e7d32; }
+    .selection-icon-only img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
 
-    /* Mnemonic Cards & Search */
-    .reward-banner {
-      background: #ffffff; border: 1px solid var(--border); border-radius: 16px;
-      padding: 14px 16px; display: flex; flex-direction: column; gap: 10px;
+    .selection-mini-popover {
+      position: absolute; display: none; z-index: 999999;
+      width: 92vw; max-width: 460px; background: #ffffff;
+      border: 2px solid var(--accent); border-radius: 16px;
+      box-shadow: 0 12px 35px rgba(0,0,0,0.25); padding: 14px;
+      flex-direction: column; gap: 10px;
+      animation: popIn 0.15s ease-out;
     }
-    .reward-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; }
-    .mnemonic-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(285px, 1fr)); gap: 12px; width: 100%; }
-    .mnemonic-card {
-      background: #ffffff; border: 1px solid #dce3ea; border-radius: 14px; padding: 14px;
-      display: flex; flex-direction: column; gap: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.03);
-      transition: transform 0.12s, border-color 0.12s;
-    }
-    .mnemonic-card:hover { transform: translateY(-2px); border-color: var(--accent); }
-    .mc-top { display: flex; flex-direction: column; gap: 4px; border-bottom: 1px dashed #e5e7eb; padding-bottom: 8px; }
-    .mc-meaning { font-size: 1rem; font-weight: 800; color: var(--accent); }
-    .mc-trees { font-size: 1.05rem; color: #111; }
-    .mc-hanzi { font-size: 0.92rem; font-weight: 600; color: #444; }
-    .mc-sound, .mc-tip { font-size: 0.85rem; line-height: 1.48; color: #222; }
-    .locked-pack-box { background: #fff8e1; border: 1.5px dashed #ffb300; border-radius: 14px; padding: 24px 18px; text-align: center; }
+    @keyframes popIn { from { transform: scale(0.85); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
-    .share-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; width: 100%; }
-    .share-app-btn {
-      padding: 10px 12px; border-radius: 10px; border: 1px solid #d0d7de; background: #f8fafc;
-      font-size: 0.86rem; font-weight: 700; color: #111; cursor: pointer;
-      display: flex; align-items: center; justify-content: center; gap: 6px; text-decoration: none;
+    /* ================= 🎬 2. Multi-Ratio Split-Screen Video Studio (9:16, 16:9, 1:1) ================= */
+    .studio-overlay {
+      display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background: #0f172a; z-index: 100000; flex-direction: column;
+      align-items: center; justify-content: space-between; padding: 10px; color: #fff;
     }
-    .share-app-btn:hover { background: #e8f5e9; border-color: var(--accent); }
+    .studio-overlay.active { display: flex; }
+    .studio-top-bar {
+      width: 100%; max-width: 960px; display: flex; justify-content: space-between;
+      align-items: center; flex-wrap: wrap; gap: 8px; background: rgba(255,255,255,0.08);
+      padding: 8px 14px; border-radius: 14px;
+    }
+    .studio-mode-pill {
+      padding: 6px 12px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.25);
+      background: transparent; color: #fff; font-size: 0.8rem; font-weight: 700; cursor: pointer;
+    }
+    .studio-mode-pill.active { background: var(--accent); border-color: #a5d6a7; }
 
-    /* Big Screen Mode */
+    /* Stage container adapts to 9:16, 16:9, or 1:1 */
+    .studio-stage {
+      position: relative; background: #ffffff; color: #111; border-radius: 16px;
+      overflow: hidden; display: flex; flex-direction: column;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.5); border: 2px solid #334155;
+    }
+    .studio-stage.ratio-9-16 { width: min(92vw, 400px); height: min(76vh, 710px); }
+    .studio-stage.ratio-16-9 { width: min(94vw, 860px); height: min(72vh, 484px); }
+    .studio-stage.ratio-1-1  { width: min(90vw, 520px); height: min(74vh, 520px); }
+
+    /* Top Half: Scrollable Teleprompter with 4-in-1 Pinyin */
+    .studio-top-pane {
+      flex: 1; overflow-y: auto; padding: 16px 14px; background: #ffffff;
+      display: flex; flex-direction: column; align-items: center; gap: 14px;
+      scroll-behavior: smooth; border-bottom: 2px solid #e2e8f0;
+    }
+    /* Bottom Half: Live Camera Feed */
+    .studio-bottom-pane {
+      flex: 1; position: relative; background: #000; overflow: hidden;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .studio-bottom-pane video {
+      width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1);
+    }
+
+    /* Live View Switching inside Studio (Split / Full Text / Full Cam) */
+    .studio-stage.view-full-text .studio-bottom-pane { display: none !important; }
+    .studio-stage.view-full-text .studio-top-pane { flex: 1; height: 100%; border-bottom: none; }
+    .studio-stage.view-full-cam .studio-top-pane { display: none !important; }
+    .studio-stage.view-full-cam .studio-bottom-pane { flex: 1; height: 100%; }
+
+    .studio-bottom-controls {
+      width: 100%; max-width: 960px; display: flex; justify-content: center;
+      align-items: center; gap: 10px; flex-wrap: wrap; padding: 6px;
+    }
+
+    /* Classic Classroom Projection Mode */
     body.big-mode {
       position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
       background: #fff; padding: 0; z-index: 99999; overflow-y: auto;
@@ -347,6 +314,31 @@
     }
     body.big-mode .exit-big-btn { display: block; }
 
+    /* Mnemonic Cards */
+    .reward-banner {
+      background: #ffffff; border: 1px solid var(--border); border-radius: 16px;
+      padding: 14px 16px; display: flex; flex-direction: column; gap: 10px;
+    }
+    .reward-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; }
+    .mnemonic-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(285px, 1fr)); gap: 12px; width: 100%; }
+    .mnemonic-card {
+      background: #ffffff; border: 1px solid #dce3ea; border-radius: 14px; padding: 14px;
+      display: flex; flex-direction: column; gap: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    }
+    .mc-top { display: flex; flex-direction: column; gap: 4px; border-bottom: 1px dashed #e5e7eb; padding-bottom: 8px; }
+    .mc-meaning { font-size: 1rem; font-weight: 800; color: var(--accent); }
+    .mc-trees { font-size: 1.05rem; color: #111; }
+    .mc-hanzi { font-size: 0.92rem; font-weight: 600; color: #444; }
+    .mc-sound, .mc-tip { font-size: 0.85rem; line-height: 1.48; color: #222; }
+    .locked-pack-box { background: #fff8e1; border: 1.5px dashed #ffb300; border-radius: 14px; padding: 24px 18px; text-align: center; }
+
+    .share-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; width: 100%; }
+    .share-app-btn {
+      padding: 10px 12px; border-radius: 10px; border: 1px solid #d0d7de; background: #f8fafc;
+      font-size: 0.86rem; font-weight: 700; color: #111; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 6px; text-decoration: none;
+    }
+
     /* Modals */
     .modal {
       display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
@@ -362,17 +354,10 @@
       background: #f8fafc; color: #111; font-size: 0.95rem; font-weight: 700;
       cursor: pointer; display: flex; align-items: center; justify-content: space-between; text-align: left;
     }
-    .option-card-btn:hover { background: #e8f5e9; border-color: var(--accent); }
-    .notice-box { font-size: 0.86rem; line-height: 1.55; background: #fff8e1; border: 1px solid #ffe082; padding: 12px; border-radius: 10px; }
 
-    @media (max-width: 768px) {
-      .navbar { padding: 8px 12px; }
-      .brand-sub { display: none; }
-      .print-title-input { width: 100%; margin-left: 0; }
-    }
     @media print {
       .navbar, .top-tabs, .panel, .disclaimer-banner, .controls-panel, .exit-big-btn,
-      .preview-img, .empty-placeholder, .sentence-tools-bar, .selection-floating-wrap { display: none !important; }
+      .preview-img, .empty-placeholder, .sentence-tools-bar, .selection-icon-only, .selection-mini-popover, .studio-overlay { display: none !important; }
       body { background: #fff; padding: 0; }
       .main-wrap { max-width: 100%; padding: 0; }
       .sheet-card { border: none; box-shadow: none; padding: 8mm; }
@@ -382,33 +367,78 @@
 </head>
 <body>
 
-  <button class="exit-big-btn" id="uiExitBig" onclick="toggleBigFont()">✕ Exit Fullscreen</button>
+  <button class="exit-big-btn" id="uiExitBig" onclick="toggleClassroomProjection()">✕ Exit Fullscreen</button>
 
-  <!-- 🟢 Extension-Style Floating Green icon.png Popup on Text Selection -->
-  <div id="selectionFloatingWrap" class="selection-floating-wrap">
-    <button class="selection-icon-trigger" onclick="onFloatingIconClick(event)" title="Click to Translate, Annotate, Speak or Print!">
-      <img src="/icon.png?v=3" alt="Trees Pinyin" onerror="this.src='icon.png'">
-    </button>
-    <div class="selection-action-drawer">
-      <span class="sel-act-item" onclick="handleSelectionAction('annotate')">🌳 Translate & Annotate</span>
-      <span style="opacity:0.4;">|</span>
-      <span class="sel-act-item" onclick="handleSelectionAction('speak')">🔊 Speak</span>
-      <span style="opacity:0.4;">|</span>
-      <span class="sel-act-item" onclick="handleSelectionAction('print')">🖨️ Print</span>
+  <!-- 🟢 1. Extension-Style Floating icon.png Trigger ONLY -->
+  <button id="selectionIconOnly" class="selection-icon-only" onclick="openSelectionMiniPopover(event)" title="Click to Translate & Annotate!">
+    <img src="/icon.png?v=3" alt="Trees Pinyin" onerror="this.src='icon.png'">
+  </button>
+
+  <!-- 🪟 2. Separate Floating Mini Display Box (Appears after clicking icon.png) -->
+  <div id="selectionMiniPopover" class="selection-mini-popover">
+    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:6px;">
+      <div style="display:flex; align-items:center; gap:6px; font-weight:800; color:var(--accent); font-size:0.88rem;">
+        <img src="/icon.png?v=3" style="width:20px; height:20px; border-radius:4px;" onerror="this.src='icon.png'">
+        <span>Instant Pinyin Popover</span>
+      </div>
+      <button onclick="closeSelectionMiniPopover()" style="border:none; background:none; font-size:1rem; cursor:pointer; color:#666;">✕</button>
+    </div>
+    <div id="popoverAnnotationBody" style="max-height:240px; overflow-y:auto; display:flex; flex-direction:column; align-items:center; gap:8px; padding:4px 0;"></div>
+    <div style="display:flex; gap:8px; border-top:1px solid #eee; padding-top:8px;">
+      <button class="btn btn-soft" style="padding:6px 10px; font-size:0.8rem;" onclick="speakPopoverContent()">🔊 Speak</button>
+      <button class="btn btn-soft" style="padding:6px 10px; font-size:0.8rem;" onclick="printPopoverContent()">🖨️ Print</button>
+      <button class="btn btn-green" style="padding:6px 10px; font-size:0.8rem;" onclick="sendPopoverToMainBoard()">📥 Open in Main Board</button>
     </div>
   </div>
 
-  <!-- 🛡️ Profanity / Inappropriate Language Gentle Advisory Modal -->
+  <!-- 🎥 3. Fullscreen Multi-Ratio Split-Screen Creator & Video Studio (9:16, 16:9, 1:1 + Unlimited Recording + Live Switcher) -->
+  <div id="studioOverlay" class="studio-overlay">
+    <div class="studio-top-bar">
+      <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+        <span style="font-size:0.82rem; font-weight:800; color:#a5d6a7;">📐 Ratio:</span>
+        <button class="studio-mode-pill active" id="ratioBtn916" onclick="setStudioRatio('9-16')">📱 9:16 Phone</button>
+        <button class="studio-mode-pill" id="ratioBtn169" onclick="setStudioRatio('16-9')">🎬 16:9 Wide</button>
+        <button class="studio-mode-pill" id="ratioBtn11" onclick="setStudioRatio('1-1')">🟦 1:1 Square</button>
+      </div>
+
+      <!-- Live View Switcher (Works anytime, even WHILE recording!) -->
+      <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+        <span style="font-size:0.82rem; font-weight:800; color:#93c5fd;">🎥 Live View:</span>
+        <button class="studio-mode-pill active" id="viewBtnSplit" onclick="setStudioViewMode('split')">🌗 Top Text + Bottom Cam</button>
+        <button class="studio-mode-pill" id="viewBtnText" onclick="setStudioViewMode('full-text')">📄 Fullscreen Text</button>
+        <button class="studio-mode-pill" id="viewBtnCam" onclick="setStudioViewMode('full-cam')">🧑 Fullscreen Person</button>
+      </div>
+
+      <button class="studio-mode-pill" style="background:#d32f2f; border-color:#ef5350;" onclick="closeCreatorStudio()">✕ Exit Studio</button>
+    </div>
+
+    <!-- Interactive Stage (Scrollable Top Text + Bottom Camera) -->
+    <div id="studioStage" class="studio-stage ratio-9-16">
+      <div id="studioTopPane" class="studio-top-pane" title="Scroll with mouse wheel or touch while recording!"></div>
+      <div id="studioBottomPane" class="studio-bottom-pane">
+        <video id="studioCamVideo" autoplay playsinline muted></video>
+      </div>
+    </div>
+
+    <!-- Unlimited Duration Recording Controls -->
+    <div class="studio-bottom-controls">
+      <span id="studioTimerBadge" style="font-family:monospace; font-size:1rem; font-weight:800; background:#1e293b; padding:6px 12px; border-radius:10px;">⏺️ 00:00</span>
+      <button class="btn btn-green" id="studioRecBtn" style="flex:unset; padding:10px 20px;" onclick="toggleStudioRecording()">🔴 Start Recording (Unlimited Time)</button>
+      <button class="btn btn-soft" style="flex:unset; padding:10px 14px;" onclick="speakAllStudioText()">🔊 Read Aloud</button>
+      <a id="studioDownloadLink" class="btn btn-blue hidden" style="flex:unset; padding:10px 18px; text-decoration:none;" download="trees-pinyin-video.webm">💾 Save Video</a>
+    </div>
+  </div>
+
+  <!-- 🛡️ Profanity Reminder Modal -->
   <div class="modal" id="profanityModal" onclick="if(event.target===this)this.style.display='none'">
     <div class="modal-box" style="border-top: 6px solid #f59e0b; text-align: center; align-items: center;">
       <div style="font-size: 2.4rem;">🌱</div>
       <h3 style="margin: 0; color: #b45309; font-size: 1.15rem;">Mindful & Respectful Language Reminder</h3>
       <p style="margin: 0; font-size: 0.92rem; color: #374151; line-height: 1.55;">
-        Trees Pinyin is a positive, family-friendly learning space. We detected language that may be inappropriate.<br><br>
-        <b>Kind words help us build bridges across cultures!</b> Please use polite, constructive language.
+        Trees Pinyin is a positive, family-friendly learning space. Please use polite, constructive language.
       </p>
       <button class="btn btn-green" style="width: 100%;" onclick="document.getElementById('profanityModal').style.display='none'">
-        🤝 I Understand · Let's Use Positive Words
+        🤝 I Understand
       </button>
     </div>
   </div>
@@ -419,46 +449,30 @@
       <img src="/icon.png?v=3" alt="Trees Pinyin" class="brand-logo" onerror="this.src='icon.png'">
       <div class="brand-text-wrap">
         <span class="brand-title" id="uiTitle">Trees Pinyin</span>
-        <span class="brand-sub" id="uiSubTitle">Fast AI Q&A · Instant Docs/PDF/Photo Translator · Read English, Speak Chinese</span>
+        <span class="brand-sub" id="uiSubTitle">Fast AI Q&A · Web & Cloud Drive Reader · Split-Screen Video Studio</span>
       </div>
     </a>
 
     <div class="nav-center">
-      <div class="dropdown" id="resDropdown">
-        <button class="nav-btn" onclick="toggleDropdown('resDropdown', event)">
-          <span id="uiMoreRes">📚 More Resources</span> ▾
-        </button>
-        <div class="dropdown-menu">
-          <a href="about.html" class="dropdown-item" id="uiMenuAbout">📖 About & 63 Rules Guide</a>
-          <div class="dropdown-item" onclick="switchMainTab('mnemonics')" id="uiMenuCards">🧠 Book Mnemonic Cards (45 Words + Examples)</div>
-          <div class="dropdown-item" onclick="switchMainTab('studylog')">📊 My Study Log & Tricky Words (Pro)</div>
-          <a href="about.html#contact" class="dropdown-item" id="uiMenuContact">✉️ Contact & Support</a>
-        </div>
-      </div>
-
-      <!-- Clear Female Voice Selector -->
       <select id="voiceSelect" class="layout-select" onchange="onVoiceSelectChange()" title="Select Clear Female Mandarin Voice">
         <option value="">👩 Clear Female Voice (Auto)</option>
       </select>
-
       <button class="nav-btn" onclick="toggleLang()" id="uiLangBtn">中文</button>
     </div>
 
     <div class="nav-right">
       <button class="nav-btn" onclick="openKeyModal()" id="uiKeyBtn">🔑 API Key</button>
-
       <button class="nav-btn" onclick="openInstallModal()" id="uiInstallBtn">
         <img src="/icon.png?v=3" alt="" class="btn-mini-icon" onerror="this.src='icon.png'">
-        <span id="uiInstallBtnText">Install</span>
+        <span>Install</span>
       </button>
-
       <div class="dropdown" id="loginDropdown">
         <button class="nav-btn login-btn" onclick="toggleDropdown('loginDropdown', event)">
-          <span id="uiLoginBtnText">👨‍🏫 Login</span> ▾
+          <span>👨‍🏫 Login</span> ▾
         </button>
         <div class="dropdown-menu right-align">
-          <a href="student.html" class="dropdown-item" id="uiLoginStudent">🌱 Student Login (Class Code)</a>
-          <a href="dashboard.html" class="dropdown-item" id="uiLoginTeacher">👩‍🏫 Teacher / Parent Dashboard</a>
+          <a href="student.html" class="dropdown-item">🌱 Student Login (Class Code)</a>
+          <a href="dashboard.html" class="dropdown-item">👩‍🏫 Teacher / Parent Dashboard</a>
           <div class="dropdown-item" onclick="switchMainTab('studylog')">💎 Solo Pro Subscriber Center</div>
         </div>
       </div>
@@ -468,29 +482,32 @@
   <!-- ================= Core Main Workspace ================= -->
   <main class="main-wrap">
 
-    <!-- 3 Main Tabs: 1. AI & File Translator / 2. Mnemonic Cards + Examples Search / 3. My Study Log & IG Video Pro -->
+    <!-- 4 Main Tabs -->
     <div class="top-tabs">
       <button class="tab-btn active" id="tabBtnWorkspace" onclick="switchMainTab('workspace')">
-        <span id="uiTabWorkspace">✨ AI & File Translator</span>
+        ✨ 1. AI & File Translator
+      </button>
+      <button class="tab-btn" id="tabBtnWebReader" onclick="switchMainTab('webreader')">
+        🌐 2. Web & Cloud Drive Reader
       </button>
       <button class="tab-btn" id="tabBtnMnemonics" onclick="switchMainTab('mnemonics')">
-        <span id="uiTabMnemonics">🧠 Mnemonic Dictionary & Examples</span>
+        🧠 3. Mnemonic Dictionary (45+)
       </button>
       <button class="tab-btn" id="tabBtnStudyLog" onclick="switchMainTab('studylog')">
-        <span id="uiTabStudyLog">📊 Study Log & Tricky Words (Pro)</span>
+        📊 4. Study Log & Pro
       </button>
     </div>
 
-    <!-- ==================== TAB 1: AI Q&A, File Translator & Tone Scoring ==================== -->
+    <!-- ==================== TAB 1: AI Q&A, File Translator & Studio ==================== -->
     <div id="panel-workspace" class="tab-panel">
 
-      <!-- 1. Capsule Input Panel (1.5s Fast Voice Cutoff + File/Photo Upload) -->
+      <!-- 1. Capsule Input Panel (Press Enter -> AI Reply; Shift+Enter -> New Line) -->
       <section class="panel">
         <div class="search-box" id="dropZone">
           <textarea id="userInput" rows="2"
-            placeholder="Ask AI any question, or enter/paste/drag text, PDF, Word, Google Docs link, or photo to translate..."></textarea>
+            placeholder="Type any question and press [Enter] for AI Reply (Shift+Enter for new line), or paste text, PDF, Word, Google Docs link, or photo..."></textarea>
 
-          <select id="micLangSelect" class="layout-select" style="padding:4px 6px; font-size:0.78rem;" title="Voice Input Language (Default: English)">
+          <select id="micLangSelect" class="layout-select" style="padding:4px 6px; font-size:0.78rem;" title="Voice Input Language">
             <option value="en-US" selected>🎙️ EN</option>
             <option value="zh-CN">🎙️ ZH</option>
           </select>
@@ -503,69 +520,79 @@
             <svg viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2zm4 10h2v2h-2v2h-2v-2h-2v-2h2v-2h2v2z"/></svg>
           </button>
 
-          <input type="file" id="docFileInput" accept=".txt,.md,.csv,.json,.html,.rtf,.pdf,.docx,.doc,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword,text/plain" style="display:none" onchange="handleDocFileUpload(this)">
+          <input type="file" id="docFileInput" accept=".txt,.md,.csv,.json,.html,.rtf,.pdf,.docx,.doc" style="display:none" onchange="handleDocFileUpload(this)">
           <input type="file" id="galleryInput" accept="image/*" style="display:none" onchange="handlePhotoUpload(this)">
           <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none" onchange="handlePhotoUpload(this)">
         </div>
 
         <div class="action-row">
-          <button class="btn btn-blue" onclick="runSmartAI(undefined, false)" id="uiAIBtn">✨ AI Reply & Pinyin</button>
+          <button class="btn btn-blue" onclick="runSmartAI(undefined, false)" id="uiAIBtn">✨ AI Reply & Pinyin (Enter)</button>
           <button class="btn btn-green" onclick="runDirectTranslate()" id="uiTransBtn">📝 Translate & Pinyin</button>
-          <button class="btn btn-soft" style="flex:0.35;" onclick="runSmartAI(undefined, true)" title="Bypass cache and generate a fresh AI response">🔄 Regenerate</button>
+          <button class="btn btn-soft" style="flex:0.35;" onclick="runSmartAI(undefined, true)">🔄 Regenerate</button>
           <button class="btn btn-soft" style="flex:0.38;" id="speakBtn" onclick="toggleSpeak()">🔊 Speak</button>
         </div>
       </section>
 
-      <!-- 2. Output Canvas Card (4-in-1 + Per-Sentence Pronunciation Score & IG/TikTok Video Recorder) -->
+      <!-- 2. Output Canvas Card -->
       <section class="sheet-card" id="sheetCard">
         <div class="print-header-title" id="printHeaderTitle"></div>
         <img id="previewImg" class="preview-img" alt="Preview">
         <div class="ai-reply-box" id="aiReplyBox"></div>
         <div class="empty-placeholder" id="emptyPlaceholder">
-          Enter text, upload a PDF/Word/Photo, or click "✨ AI Reply & Pinyin" above to see instant Trees Pinyin annotations here.
+          Type a question and press <b>[Enter]</b> for AI Reply, or highlight any text on the page to pop up the green <b>icon.png</b>!
         </div>
         <div class="annotation-list" id="annotationList"></div>
       </section>
 
       <!-- 3. Disclaimer -->
       <section class="disclaimer-banner" id="uiDisclaimer">
-        <b>Tip:</b> For optimal results, use your own free Gemini API Key or paste text directly. Or switch to the keyless PWA web app at <a href="https://www.treespinyin.com/app" target="_blank" style="color: var(--accent); font-weight: 700; text-decoration: underline;">www.treespinyin.com/app</a> (may be slower due to API limits). The author assumes no liability for the accuracy. Your support and shares will help me go full-time to make improvements and write a memory dictionary in the future!
+        <b>Tip:</b> Press <b>Enter</b> in the input box for instant AI Q&A. Highlight any text to pop up the green <b>icon.png</b> translator!
       </section>
 
-      <!-- 4. 4-in-1 Row Visibility & Full OpenCC Traditional/Simplified Script Switcher -->
+      <!-- 4. Controls Panel with Multi-Option Big Screen / Video Studio Selector -->
       <section class="controls-panel">
         <div class="controls-row">
           <div class="hint-group">
-            <span id="uiHintSpeak">🔊 Left-click character to speak</span>
+            <span>🔊 Left-click char to speak</span>
             <span>·</span>
-            <span id="uiHintEdit">✍️ Right-click to edit Char / Pinyin / Trees Pinyin</span>
+            <span>✍️ Right-click to edit Char / Pinyin / Trees Pinyin</span>
           </div>
 
           <div class="checkbox-group">
-            <label><input type="checkbox" id="chkEn" checked onchange="updateRowVisibility()"> <span id="uiChkEn">English</span></label>
-            <label><input type="checkbox" id="chkTp" checked onchange="updateRowVisibility()"> <span id="uiChkTp">Trees Pinyin</span></label>
-            <label><input type="checkbox" id="chkStd" checked onchange="updateRowVisibility()"> <span id="uiChkStd">Standard Pinyin (ā á ǎ à)</span></label>
-            <label><input type="checkbox" id="chkTrad" checked onchange="switchScriptMode('trad')"> <span id="uiChkTrad">Traditional Chinese</span></label>
-            <label><input type="checkbox" id="chkSimp" onchange="switchScriptMode('simp')"> <span id="uiChkSimp">Simplified Chinese</span></label>
+            <label><input type="checkbox" id="chkEn" checked onchange="updateRowVisibility()"> English</label>
+            <label><input type="checkbox" id="chkTp" checked onchange="updateRowVisibility()"> Trees Pinyin</label>
+            <label><input type="checkbox" id="chkStd" checked onchange="updateRowVisibility()"> Standard Pinyin (ā á ǎ à)</label>
+            <label><input type="checkbox" id="chkTrad" checked onchange="switchScriptMode('trad')"> Traditional Chinese</label>
+            <label><input type="checkbox" id="chkSimp" onchange="switchScriptMode('simp')"> Simplified Chinese</label>
           </div>
         </div>
 
         <div class="controls-row">
-          <div style="display:flex; gap:8px; flex-wrap:wrap;">
-            <button class="btn btn-dark" onclick="toggleBigFont()" id="uiBigBtn">🖥️ Big Screen</button>
-            <button class="btn btn-dark" onclick="exportCardImage()" id="uiSaveBtn">💾 Save Photo</button>
-            <button class="btn btn-dark" onclick="window.print()" id="uiPrintBtn">🖨️ Print / PDF</button>
+          <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+            <!-- 🖥️ Multi-Select Big Screen & Split-Screen Video Recorder Menu -->
+            <select id="bigScreenModeSelect" class="layout-select" style="background:#1b5e20; color:#fff; border-color:#1b5e20; padding:7px 12px; font-weight:800;">
+              <option value="9-16">📱 9:16 Phone Split-Screen Studio (Top Text / Bottom Cam)</option>
+              <option value="16-9">🎬 16:9 Widescreen Split-Screen Studio</option>
+              <option value="1-1">🟦 1:1 Square Split-Screen Studio (Top Text / Bottom Cam)</option>
+              <option value="projection">📺 Classroom Fullscreen Text Projection</option>
+            </select>
+            <button class="btn btn-green" style="flex:unset; padding:7px 14px; font-size:0.82rem;" onclick="launchSelectedBigScreenMode()">
+              🚀 Launch Screen / Record Video
+            </button>
+
+            <button class="btn btn-dark" onclick="exportCardImage()">💾 Save Photo</button>
+            <button class="btn btn-dark" onclick="window.print()">🖨️ Print / PDF</button>
           </div>
         </div>
 
         <div class="layout-bar">
-          <span id="uiLayoutLabel">📐 Layout:</span>
+          <span>📐 Layout:</span>
           <select class="layout-select" id="layoutSelect" onchange="updateLayoutMode()">
-            <option value="center" id="uiLayoutAuto">✨ Auto-Fit (Centered)</option>
-            <option value="left" id="uiLayoutLeft">📄 Left-Aligned Book Mode</option>
+            <option value="center">✨ Auto-Fit (Centered)</option>
+            <option value="left">📄 Left-Aligned Book Mode</option>
           </select>
 
-          <span id="uiFontLabel">Font:</span>
+          <span>Font:</span>
           <input type="range" id="fontSlider" min="14" max="36" value="20" oninput="updateFontSize(this.value)" style="accent-color:var(--accent); cursor:pointer;">
           <span id="fontValDisplay">20px</span>
 
@@ -575,7 +602,35 @@
 
     </div>
 
-    <!-- ==================== TAB 2: 45+ Book Mnemonics + Bilingual Examples Search ==================== -->
+    <!-- ==================== TAB 2: 🌐 Web & Cloud Drive Reader (Highlight Any Word to Pop Up icon.png!) ==================== -->
+    <div id="panel-webreader" class="tab-panel hidden">
+      <section class="panel">
+        <h3 style="margin:0; color:var(--accent);">🌐 In-Page Web & Cloud Drive Reader (Select Any Text to Annotate!)</h3>
+        <p style="margin:0; font-size:0.84rem; color:#555;">
+          Open any website article, Wikipedia page, or <b>Google Drive / Google Docs / OneDrive link</b> right here! Highlight any sentence with your mouse to pop up the green <b>icon.png</b> for instant Pinyin, audio & printing.
+        </p>
+
+        <div class="action-row">
+          <input type="text" id="webReaderUrlInput" placeholder="Paste any Webpage URL or Google Docs / Google Drive Share Link (e.g. https://en.wikipedia.org/wiki/Giant_panda)..." style="flex:1; padding:10px 12px; border:1.5px solid #cbd5e1; border-radius:10px; font-size:0.9rem;">
+          <button class="btn btn-blue" style="flex:unset;" onclick="loadWebOrDriveUrl()">🌐 Open Webpage / Cloud Doc</button>
+          <button class="btn btn-soft" style="flex:unset;" onclick="document.getElementById('docFileInput').click()">📂 Open Local / Drive File</button>
+        </div>
+
+        <div style="display:flex; gap:8px; flex-wrap:wrap; font-size:0.8rem;">
+          <span style="color:#666; font-weight:700;">Quick Samples:</span>
+          <button class="mini-tool-btn" onclick="loadSampleArticle('story')">📖 Chinese Folktale & Bilingual Story</button>
+          <button class="mini-tool-btn" onclick="loadSampleArticle('news')">📰 Daily Travel & Dining Article</button>
+        </div>
+      </section>
+
+      <section class="panel" id="webReaderContentBox" style="min-height:280px; line-height:1.75; font-size:1.02rem; background:#fff; padding:20px;">
+        <div style="color:#888; text-align:center; padding:40px 10px;">
+          Paste a webpage URL or Google Drive / Docs link above, or click a Quick Sample. Then <b>highlight any text with your mouse</b> to pop up the green <b>icon.png</b>!
+        </div>
+      </section>
+    </div>
+
+    <!-- ==================== TAB 3: 45+ Book Mnemonics + Examples ==================== -->
     <div id="panel-mnemonics" class="tab-panel hidden">
       <section class="reward-banner">
         <div class="reward-row">
@@ -601,11 +656,10 @@
             🎁 Your Referral Code: <b id="myInviteCodeText" style="color:var(--blue); font-family:monospace; font-size:0.95rem;">PIN9X2B</b>
           </div>
           <div style="display:flex; gap:6px; align-items:center;">
-            <input type="text" id="friendCodeInput" placeholder="Enter Friend's or VIP Code (e.g. PIN5A3D)" style="padding:5px 9px; border:1px solid #cbd5e1; border-radius:8px; font-size:0.82rem; width:220px;">
+            <input type="text" id="friendCodeInput" placeholder="Enter Friend's or VIP Code" style="padding:5px 9px; border:1px solid #cbd5e1; border-radius:8px; font-size:0.82rem; width:210px;">
             <button class="btn btn-dark" onclick="handleActivateFriendCode()">Activate</button>
           </div>
         </div>
-
         <div id="rewardStatusMsg" style="font-size:0.84rem; font-weight:700; color:var(--accent);"></div>
       </section>
 
@@ -613,15 +667,14 @@
       <div id="mnemonicCardsContainer" class="mnemonic-grid"></div>
     </div>
 
-    <!-- ==================== TAB 3: Personal Pro Study Log, Tricky Words Reminder & VIP Activation ==================== -->
+    <!-- ==================== TAB 4: Study Log & Pro ==================== -->
     <div id="panel-studylog" class="tab-panel hidden">
       <section class="panel" style="background:linear-gradient(90deg, #e8f5e9 0%, #f1f8e9 100%); border-color:#a5d6a7;">
         <div class="controls-row">
           <div>
             <h3 style="margin:0; color:var(--accent);">💎 Personal Pro Subscriber Center & Progress Tracker</h3>
             <p style="margin:4px 0 0; font-size:0.84rem; color:#333;">
-              Status: <b id="vipStatusBadge" style="color:var(--blue);">Free Tier (3 Free Mnemonic Searches/Day)</b> ·
-              🔥 Practice Streak: <b id="streakCountText">1 Day</b> ·
+              Status: <b id="vipStatusBadge" style="color:var(--blue);">Free Tier</b> ·
               🎤 Total Scored Readings: <b id="totalScoredCount">0</b>
             </p>
           </div>
@@ -634,12 +687,7 @@
 
       <section class="panel">
         <div class="controls-row">
-          <div>
-            <h3 style="margin:0; color:#c62828;">🎯 My Tricky Characters & Tone Weaknesses (4-in-1 Review)</h3>
-            <p style="margin:4px 0 0; font-size:0.83rem; color:#555;">
-              Characters you mispronounced or had tone errors on are automatically saved here with their full 4-in-1 sentence so you can practice and master them!
-            </p>
-          </div>
+          <h3 style="margin:0; color:#c62828;">🎯 My Tricky Characters & Tone Weaknesses (4-in-1 Review)</h3>
           <button class="btn btn-soft" style="flex:unset; padding:6px 12px; font-size:0.8rem;" onclick="clearPersonalStudyLog()">🗑️ Clear Log</button>
         </div>
         <div id="personalTrickyList" class="four-in-one" style="display:flex; flex-direction:column; gap:12px; margin-top:8px;"></div>
@@ -648,31 +696,10 @@
 
   </main>
 
-  <!-- ================= 🎬 Modal: IG / TikTok Read-Aloud Video Recorder (Canvas + Audio/Camera Synthesis) ================= -->
-  <div class="modal" id="videoRecordModal" onclick="if(event.target===this)closeVideoModal()">
-    <div class="modal-box" style="max-width:480px; align-items:center; text-align:center;">
-      <h3 style="margin:0; color:var(--accent);">🎬 Record Read-Aloud Reel for IG / TikTok / WeChat</h3>
-      <p style="margin:0; font-size:0.82rem; color:#555;">
-        Reads your camera (or animated card) + microphone, overlays live <b>Trees Pinyin subtitles</b> and your <b>Pronunciation Score badge</b>!
-      </p>
-      <video id="hiddenCamPreview" autoplay playsinline muted style="display:none;"></video>
-      <canvas id="reelCanvas" width="480" height="600" style="width:100%; max-width:320px; border-radius:14px; border:2px solid var(--accent); background:#111;"></canvas>
-      <div id="reelStatusText" style="font-size:0.85rem; font-weight:700; color:var(--blue);">Ready to record!</div>
-      <div class="action-row" style="width:100%;">
-        <button class="btn btn-green" id="startReelBtn" onclick="startReelRecording()">🔴 Start Recording & Read Aloud</button>
-        <a id="downloadReelLink" class="btn btn-blue hidden" download="trees-pinyin-reel.webm">💾 Download Video for IG/TikTok</a>
-      </div>
-      <button class="nav-btn" style="width:100%; justify-content:center;" onclick="closeVideoModal()">Close</button>
-    </div>
-  </div>
-
-  <!-- ================= ✍️ Modal: Right-Click 3-in-1 Character, Standard Pinyin & Trees Pinyin Editor ================= -->
+  <!-- ✍️ Right-Click 3-in-1 Editor Modal -->
   <div class="modal" id="editCharModal" onclick="if(event.target===this)this.style.display='none'">
     <div class="modal-box">
       <h3 style="margin:0; color:var(--accent);">✍️ Edit Character, Standard Pinyin & Trees Pinyin</h3>
-      <div style="font-size:0.82rem; color:#555;">
-        Modify any of the 3 fields below. Changing the character or numbered Pinyin (e.g. <code>hang2</code>) auto-updates the others, or customize Trees Pinyin directly!
-      </div>
       <div>
         <label style="font-size:0.8rem; font-weight:700;">1. Chinese Character (漢字):</label>
         <input type="text" id="editZhInput" oninput="onEditZhOrNumChange('zh')" style="width:100%; padding:9px; border:1px solid #cbd5e1; border-radius:8px; font-size:1.1rem; font-weight:700; margin-top:4px;">
@@ -692,16 +719,13 @@
     </div>
   </div>
 
-  <!-- ================= Modal: Multi-App Share Panel ================= -->
+  <!-- Multi-App Share Modal -->
   <div class="modal" id="shareAppModal" onclick="if(event.target===this)this.style.display='none'">
     <div class="modal-box">
       <h3 style="margin:0; font-size:1.05rem; color:var(--accent);">📤 Share Trees Pinyin & Unlock Pack 3</h3>
       <div style="font-size:0.85rem; color:#444; background:#f8fafc; padding:10px 12px; border-radius:10px; border:1px solid #e2e8f0;">
-        Your code <b id="modalShareCode" style="color:var(--blue);">PIN9X2B</b> has been copied! Choose an app to send to your friends:
+        Your code <b id="modalShareCode" style="color:var(--blue);">PIN9X2B</b> has been copied!
       </div>
-      <button class="btn btn-green" onclick="triggerNativeSystemShare()" style="width:100%;">
-        📱 Share via System Menu (iMessage / WeChat / AirDrop)
-      </button>
       <div class="share-grid">
         <a id="shareWhatsApp" target="_blank" class="share-app-btn">💬 WhatsApp</a>
         <a id="shareTwitter" target="_blank" class="share-app-btn">🐦 X (Twitter)</a>
@@ -714,67 +738,41 @@
     </div>
   </div>
 
-  <!-- ================= Modal 1: File & Camera Options ================= -->
+  <!-- File & Camera Modal -->
   <div class="modal" id="fileMenuModal" onclick="if(event.target===this)this.style.display='none'">
     <div class="modal-box">
-      <h3 style="margin:0; font-size:1.05rem;" id="uiFileMenuTitle">📁 File & Camera Options</h3>
+      <h3 style="margin:0; font-size:1.05rem;">📁 File & Camera Options</h3>
       <button class="option-card-btn" onclick="triggerDocUpload()">
         <div>
-          <div id="uiOptDocTitle">📄 Upload File (PDF / Word / Docs / TXT)</div>
-          <div style="font-size:0.78rem; color:#555; font-weight:400; margin-top:3px;" id="uiOptDocSub">100% Client-side instant extraction & Pinyin</div>
+          <div>📄 Upload File (PDF / Word / Docs / TXT)</div>
+          <div style="font-size:0.78rem; color:#555; font-weight:400;">100% Client-side instant extraction & Pinyin</div>
         </div>
         <span>➔</span>
       </button>
-      <button class="option-card-btn" onclick="openCameraNoticeModal()">
+      <button class="option-card-btn" onclick="triggerGalleryPick()">
         <div>
-          <div id="uiOptCamTitle">📷 Camera & Photo Library</div>
-          <div style="font-size:0.78rem; color:#555; font-weight:400; margin-top:3px;" id="uiOptCamSub">Recognize text or objects from photos</div>
+          <div>📷 Photo Library / Camera</div>
+          <div style="font-size:0.78rem; color:#555; font-weight:400;">Recognize text or objects from photos</div>
         </div>
         <span>➔</span>
       </button>
-      <button class="nav-btn" style="width:100%; padding:9px; justify-content:center;" onclick="document.getElementById('fileMenuModal').style.display='none'" id="uiFileMenuCancel">Cancel</button>
+      <button class="nav-btn" style="width:100%; padding:9px; justify-content:center;" onclick="document.getElementById('fileMenuModal').style.display='none'">Cancel</button>
     </div>
   </div>
 
-  <!-- ================= Modal 2: Camera Speed Tip ================= -->
-  <div class="modal" id="cameraNoticeModal" onclick="if(event.target===this)this.style.display='none'">
-    <div class="modal-box">
-      <h3 style="margin:0; font-size:1.05rem; color:#1b5e20;">⚡ Speed Tip for Photo Recognition</h3>
-      <div class="notice-box">
-        <b>📱 Fastest Way on iPhone / iPad (0.1s):</b><br>
-        Take a photo with your <b>Apple Camera</b> first, tap to <b>Copy Text (Live Text)</b>, and paste it here for instant 0-delay annotation!<br><br>
-        <b>📷 Direct Photo Upload:</b><br>
-        Best for <b>short text, menus, signs, or single objects</b>.
-      </div>
-      <div class="action-row">
-        <button class="btn btn-green" onclick="triggerGalleryPick()">🖼️ Photo Library</button>
-        <button class="btn btn-blue" onclick="triggerDirectCamera()">📸 Take Photo</button>
-      </div>
-      <button class="nav-btn" style="width:100%; padding:9px; justify-content:center;" onclick="document.getElementById('cameraNoticeModal').style.display='none'">Back</button>
-    </div>
-  </div>
-
-  <!-- ================= Modal 3: Install Guide ================= -->
+  <!-- Install Modal -->
   <div class="modal" id="installModal" onclick="if(event.target===this)this.style.display='none'">
     <div class="modal-box">
-      <div style="display:flex; align-items:center; gap:10px;">
-        <img src="/icon.png?v=3" alt="App Icon" style="width:44px; height:44px; border-radius:10px; border:1px solid #ddd;" onerror="this.src='icon.png'">
-        <h3 style="margin:0; font-size:1.05rem;" id="uiInstallTitle">Install Trees Pinyin to Desktop / Home Screen</h3>
+      <h3 style="margin:0; font-size:1.05rem;">Install Trees Pinyin to Desktop / Home Screen</h3>
+      <div style="font-size:0.86rem; line-height:1.6; background:#f8f9fa; padding:14px; border-radius:10px;">
+        <b>📱 iPhone & iPad (Safari):</b> Tap <b>Share [📤]</b> → <b>"Add to Home Screen [➕]"</b>.<br>
+        <b>💻 Mac / PC:</b> Click the <b>Install icon [⊕]</b> in the address bar.
       </div>
-      <div id="uiInstallSteps" style="font-size:0.86rem; line-height:1.6; background:#f8f9fa; padding:14px; border-radius:10px;">
-        <b>📱 iPhone & iPad (Safari):</b><br>
-        1. Open <span style="color:#1b5e20; font-weight:700;">treespinyin.com</span> in <b>Safari</b>.<br>
-        2. Tap the <b>Share button [📤]</b> → <b>"Add to Home Screen [➕]"</b>.<br><br>
-        <b>💻 Mac (Safari / Chrome / Edge):</b><br>
-        • <b>Mac Safari:</b> Click <b>File</b> in top menu bar → <b>"Add to Dock..."</b><br>
-        • <b>Chrome / Edge:</b> Click the <b>Install icon [⊕]</b> on the right side of the address bar.
-      </div>
-      <button class="btn btn-green" id="pwaDirectInstallBtn" style="display:none;" onclick="triggerNativePWAInstall()">⚡ Install App Now</button>
-      <button class="btn btn-soft" onclick="document.getElementById('installModal').style.display='none'" id="uiGotItBtn">Got It</button>
+      <button class="btn btn-soft" onclick="document.getElementById('installModal').style.display='none'">Got It</button>
     </div>
   </div>
 
-  <!-- ================= Modal 4: Save Image Preview ================= -->
+  <!-- Save Image Modal -->
   <div class="modal" id="imgModal" onclick="if(event.target===this)this.style.display='none'">
     <div class="modal-box" style="align-items:center; text-align:center;">
       <h3 style="margin:0; font-size:0.98rem;">Right-Click or Long-Press Image to Save</h3>
@@ -783,13 +781,13 @@
     </div>
   </div>
 
-  <!-- ================= Modal 5: Gemini API Key ================= -->
+  <!-- Gemini API Key Modal -->
   <div class="modal" id="keyModal" onclick="if(event.target===this)this.style.display='none'">
     <div class="modal-box">
-      <h3 style="margin:0; font-size:1.02rem;" id="uiKeyTitle">🔑 Google Gemini API Key</h3>
-      <div id="uiKeyDesc" style="font-size:0.85rem; line-height:1.55; background:#f8f9fa; padding:12px; border-radius:8px;">
+      <h3 style="margin:0; font-size:1.02rem;">🔑 Google Gemini API Key</h3>
+      <div style="font-size:0.85rem; line-height:1.55; background:#f8f9fa; padding:12px; border-radius:8px;">
         <b>Cloudflare High-Speed AI & Global Cache are active by default!</b><br>
-        Enter your own free Google Gemini API Key (stored locally in your browser) or switch to www.treespinyin.com/app in Safari:<br>
+        Enter your own free Google Gemini API Key:<br>
         <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:#1565c0; font-weight:700;">Get Free Key at Google AI Studio ↗</a>
       </div>
       <input type="password" id="apiKeyInput" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;font-size:0.9rem;" placeholder="AIzaSy... (Optional)">
@@ -803,13 +801,20 @@
 
   <script>
     // =========================================================================
-    // 0. 🛡️ Profanity / Inappropriate Language Filter & Gentle Advisory
+    // 0. ⌨️ Press [Enter] in Input Box -> Default to AI Reply (Shift+Enter -> New Line)
+    // =========================================================================
+    document.getElementById('userInput').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) {
+        e.preventDefault();
+        runSmartAI(undefined, false);
+      }
+    });
+
+    // =========================================================================
+    // 0.1 🛡️ Profanity Filter & OpenCC Full Traditional/Simplified Converter
     // =========================================================================
     const PROFANITY_EN_REGEX = /\b(fuck|fucking|fucked|fucker|motherfucker|shit|shitty|bullshit|bitch|bitches|asshole|bastard|dick|cock|pussy|cunt|whore|slut|nigger|nigga|faggot|retard)\b/i;
-    const PROFANITY_ZH_LIST = [
-      '他媽的', '他妈的', '你媽的', '你妈的', '操你', '肏你', '草泥馬', '草泥马',
-      '傻逼', '煞筆', '傻B', '狗娘養', '去死吧', '王八蛋', '賤人', '贱人', '婊子', '雞巴', '鸡巴', '媽逼', '妈逼'
-    ];
+    const PROFANITY_ZH_LIST = ['他媽的','他妈的','你媽的','你妈的','操你','肏你','草泥馬','草泥马','傻逼','煞筆','傻B','去死吧','王八蛋','賤人','贱人','婊子'];
 
     function checkAndWarnProfanity(text) {
       if (!text) return false;
@@ -820,9 +825,6 @@
       return false;
     }
 
-    // =========================================================================
-    // 0.1 Full-Dictionary Traditional <-> Simplified Converter (OpenCC-JS + Fallback)
-    // =========================================================================
     let openccToSimp = null;
     let openccToTrad = null;
     try {
@@ -832,37 +834,12 @@
       }
     } catch (e) {}
 
-    const FALLBACK_TRAD_TO_SIMP = {
-      '請':'请','問':'问','謝':'谢','再':'再','見':'见','對':'对','氣':'气','沒':'没','關':'关','係':'系',
-      '別':'别','醫':'医','生':'生','國':'国','們':'们','個':'个','來':'来','自':'自','哪':'哪','裡':'里',
-      '怎':'怎','麼':'么','買':'买','單':'单','菜':'菜','歡':'欢','愛':'爱','會':'会','說':'说','話':'话',
-      '電':'电','視':'视','聽':'听','懂':'懂','學':'学','習':'习','書':'书','寫':'写','讀':'读','認':'认',
-      '識':'识','師':'师','長':'长','開':'开','門':'门','車':'车','馬':'马','鳥':'鸟','魚':'鱼','鵝':'鹅',
-      '詠':'咏','項':'项','綠':'绿','紅':'红','撥':'拨','靜':'静','舉':'举','頭':'头','鄉':'乡','曉':'晓',
-      '覺':'觉','處':'处','聞':'闻','聲':'声','風':'风','雲':'云','發':'发','財':'财','樂':'乐','歲':'岁',
-      '時':'时','間':'间','點':'点','現':'现','錢':'钱','塊':'块','號':'号','碼':'码','機':'机','場':'场',
-      '飯':'饭','館':'馆','麵':'面','湯':'汤','雞':'鸡','豬':'猪','牛':'牛','茶':'茶','餃':'饺','飽':'饱',
-      '歡':'欢','迎':'迎','高':'高','興':'兴','天':'天','蘋':'苹','果':'果','祝':'祝','萬':'万','事':'事',
-      '洗':'洗','手':'手','幫':'帮','忙':'忙','遲':'迟','到':'到','注':'注','意':'意','辦':'办','法':'法',
-      '非':'非','常':'常','有':'有','名':'名','準':'准','確':'确','公':'公','園':'园','熱':'热','情':'情',
-      '歷':'历','史':'史','古':'古','蹟':'迹','圖':'图','館':'馆','東':'东','西':'西','台':'台','灣':'湾',
-      '週':'周','末':'末','題':'题','應':'应','該':'该','媽':'妈','服':'服','務':'务','員':'员','給':'给',
-      '熱':'热','咖':'咖','啡':'啡','珍':'珍','珠':'珠','晚':'晚','冷':'冷','打':'打','講':'讲','課':'课'
-    };
-    const FALLBACK_SIMP_TO_TRAD = {};
-    Object.keys(FALLBACK_TRAD_TO_SIMP).forEach(t => { FALLBACK_SIMP_TO_TRAD[FALLBACK_TRAD_TO_SIMP[t]] = t; });
-
-    let currentScriptMode = 'trad'; // Default Traditional Chinese
+    let currentScriptMode = 'trad';
 
     function convertScript(str, mode = currentScriptMode) {
       if (!str) return '';
-      if (mode === 'simp') {
-        if (openccToSimp) return openccToSimp(str);
-        return str.split('').map(ch => FALLBACK_TRAD_TO_SIMP[ch] || ch).join('');
-      } else {
-        if (openccToTrad) return openccToTrad(str);
-        return str.split('').map(ch => FALLBACK_SIMP_TO_TRAD[ch] || ch).join('');
-      }
+      if (mode === 'simp') return openccToSimp ? openccToSimp(str) : str;
+      return openccToTrad ? openccToTrad(str) : str;
     }
 
     function switchScriptMode(mode) {
@@ -876,15 +853,11 @@
         currentScriptMode = 'simp';
       }
       updateRowVisibility();
-
-      // Convert all rendered characters on the main board & study log
       document.querySelectorAll('.tp-zh').forEach(el => {
         const raw = el.dataset.raw || el.innerText;
         el.dataset.raw = raw;
         el.innerText = convertScript(raw, currentScriptMode);
       });
-
-      // Convert all mnemonic cards & examples
       renderMnemonicsPack();
     }
 
@@ -898,7 +871,7 @@
     }
 
     // =========================================================================
-    // 0.2 Clear Female Mandarin Voice Engine (Excludes Male Voices)
+    // 0.2 Clear Female Mandarin Voice Engine
     // =========================================================================
     let femaleZhVoices = [];
     let selectedVoiceObj = null;
@@ -954,35 +927,19 @@
       window.speechSynthesis.speak(u);
     }
 
-    // =========================================================================
-    // 0.3 PWA Setup & Cloudflare Worker + Gemini Dual-Track AI
-    // =========================================================================
-    const IS_LOCAL_FILE = window.location.protocol === 'file:';
-    const CF_WORKER_ENDPOINTS = IS_LOCAL_FILE
-      ? ['https://treespinyin-api.treespinyin.workers.dev', 'https://treespinyin.com/api']
-      : ['https://treespinyin-api.treespinyin.workers.dev', '/api', 'https://treespinyin.com/api'];
+    function switchMainTab(tabName) {
+      document.getElementById('tabBtnWorkspace').classList.toggle('active', tabName === 'workspace');
+      document.getElementById('tabBtnWebReader').classList.toggle('active', tabName === 'webreader');
+      document.getElementById('tabBtnMnemonics').classList.toggle('active', tabName === 'mnemonics');
+      document.getElementById('tabBtnStudyLog').classList.toggle('active', tabName === 'studylog');
 
-    const CHROME_STORE_REVIEW_URL = 'https://chromewebstore.google.com/detail/trees-pinyin-universal-an/jlbjllgeebmhkdcgmcnlkbcaiobpheae/reviews';
-    const EDGE_STORE_REVIEW_URL = 'https://microsoftedge.microsoft.com/addons/detail/egmgaoogonmldicgbkpaofjffcdlcffm';
+      document.getElementById('panel-workspace').classList.toggle('hidden', tabName !== 'workspace');
+      document.getElementById('panel-webreader').classList.toggle('hidden', tabName !== 'webreader');
+      document.getElementById('panel-mnemonics').classList.toggle('hidden', tabName !== 'mnemonics');
+      document.getElementById('panel-studylog').classList.toggle('hidden', tabName !== 'studylog');
 
-    function getStoreReviewUrl() {
-      return /Edg\//i.test(navigator.userAgent) ? EDGE_STORE_REVIEW_URL : CHROME_STORE_REVIEW_URL;
-    }
-
-    let deferredPrompt = null;
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      const btn = document.getElementById('pwaDirectInstallBtn');
-      if (btn) btn.style.display = 'inline-flex';
-    });
-
-    async function triggerNativePWAInstall() {
-      if (!deferredPrompt) return;
-      deferredPrompt.prompt();
-      await deferredPrompt.userChoice;
-      deferredPrompt = null;
-      document.getElementById('installModal').style.display = 'none';
+      if (tabName === 'mnemonics') renderMnemonicsPack();
+      if (tabName === 'studylog') renderPersonalStudyLog();
     }
 
     function toggleDropdown(id, e) {
@@ -994,415 +951,411 @@
       document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('open'));
     });
 
-    function switchMainTab(tabName) {
-      document.getElementById('tabBtnWorkspace').classList.toggle('active', tabName === 'workspace');
-      document.getElementById('tabBtnMnemonics').classList.toggle('active', tabName === 'mnemonics');
-      document.getElementById('tabBtnStudyLog').classList.toggle('active', tabName === 'studylog');
-      document.getElementById('panel-workspace').classList.toggle('hidden', tabName !== 'workspace');
-      document.getElementById('panel-mnemonics').classList.toggle('hidden', tabName !== 'mnemonics');
-      document.getElementById('panel-studylog').classList.toggle('hidden', tabName !== 'studylog');
-      if (tabName === 'mnemonics') renderMnemonicsPack();
-      if (tabName === 'studylog') renderPersonalStudyLog();
+    // =========================================================================
+    // 1. 🟢 Highlight Text -> Show ONLY icon.png -> Click to Open Mini Popover Box
+    // =========================================================================
+    let selectedPageText = '';
+    let popoverZhText = '';
+    let popoverEnText = '';
+    const iconOnlyBtn = document.getElementById('selectionIconOnly');
+    const miniPopover = document.getElementById('selectionMiniPopover');
+
+    document.addEventListener('mouseup', (e) => {
+      if (iconOnlyBtn.contains(e.target) || miniPopover.contains(e.target)) return;
+      setTimeout(() => {
+        const sel = window.getSelection();
+        const text = (sel ? sel.toString() : '').trim();
+        if (text && text.length >= 1 && text.length <= 600) {
+          selectedPageText = text;
+          const rect = sel.getRangeAt(0).getBoundingClientRect();
+          iconOnlyBtn.style.left = Math.max(12, Math.min(window.innerWidth - 52, rect.left + window.scrollX + (rect.width / 2) - 19)) + 'px';
+          iconOnlyBtn.style.top = Math.max(10, rect.top + window.scrollY - 44) + 'px';
+          iconOnlyBtn.style.display = 'block';
+          miniPopover.style.display = 'none';
+        } else {
+          iconOnlyBtn.style.display = 'none';
+        }
+      }, 20);
+    });
+
+    async function openSelectionMiniPopover(e) {
+      e.stopPropagation();
+      if (!selectedPageText) return;
+      if (checkAndWarnProfanity(selectedPageText)) {
+        iconOnlyBtn.style.display = 'none';
+        return;
+      }
+
+      const rect = iconOnlyBtn.getBoundingClientRect();
+      iconOnlyBtn.style.display = 'none';
+
+      miniPopover.style.left = Math.max(12, Math.min(window.innerWidth - 475, rect.left + window.scrollX - 180)) + 'px';
+      miniPopover.style.top = Math.max(12, rect.top + window.scrollY + 8) + 'px';
+      miniPopover.style.display = 'flex';
+
+      const body = document.getElementById('popoverAnnotationBody');
+      body.innerHTML = `<div style="font-size:0.85rem; color:#666;">⚡ Translating & Annotating...</div>`;
+
+      const hasZh = /[\u4e00-\u9fa5]/.test(selectedPageText);
+      if (hasZh) {
+        popoverZhText = convertScript(expandNumbersAndSymbolsToZh(selectedPageText), 'trad');
+        popoverEnText = await translateFast(popoverZhText, 'zh', 'en');
+      } else {
+        popoverEnText = selectedPageText;
+        const rawZh = await translateFast(selectedPageText, 'en', 'zh');
+        popoverZhText = convertScript(expandNumbersAndSymbolsToZh(rawZh), 'trad');
+      }
+
+      body.innerHTML = '';
+      appendSentenceProgressive(popoverZhText, popoverEnText, [], 'popoverAnnotationBody', true);
+    }
+
+    function closeSelectionMiniPopover() {
+      miniPopover.style.display = 'none';
+    }
+
+    function speakPopoverContent() {
+      if (popoverZhText) speakSingleChar(popoverZhText);
+    }
+
+    async function printPopoverContent() {
+      await sendPopoverToMainBoard();
+      setTimeout(() => window.print(), 350);
+    }
+
+    async function sendPopoverToMainBoard() {
+      closeSelectionMiniPopover();
+      switchMainTab('workspace');
+      document.getElementById('userInput').value = `${popoverZhText} ||| ${popoverEnText}`;
+      await runDirectTranslate(`${popoverZhText} ||| ${popoverEnText}`);
     }
 
     // =========================================================================
-    // 1. Full 45 Book Mnemonics (All with Bilingual Example Sentences!) + Rating & Share Unlocks
+    // 2. 🌐 In-Page Web & Cloud Drive Reader (Highlight Any Text to Annotate!)
     // =========================================================================
-    const FULL_45_BOOK_MNEMONICS = [
-      // Pack 1 (1-15)
-      { pack: 1, meaning: "Hello / How are you?", trees: "Nee3 haw3", hanzi: "你好", pinyin: "nǐ hǎo", sound: "Similar to '<b><u>knee</u> <u>how</u></b>'.", mnemonic: "<b>Knee</b>ling to show <b>how</b> much respect you have in serious moments.", exZh: "你好，很高興認識你！", exEn: "Hello, nice to meet you!" },
-      { pack: 1, meaning: "You (Second Person Singular)", trees: "nee3", hanzi: "你", pinyin: "nǐ", sound: "Sounds like '<b><u>Knee</u></b>'.", mnemonic: "Imagine '<b><u>Knee</u></b>(l) down while greeting <b>you</b>.'", exZh: "請問你叫什麼名字？", exEn: "May I ask what your name is?" },
-      { pack: 1, meaning: "Good", trees: "haw3", hanzi: "好", pinyin: "hǎo", sound: "Similar to '<b><u>how</u></b>'.", mnemonic: "'<b>Good</b>' is a standard response to a greeting ('<i><b>Nee3 haw3</b></i>' literally means '<b>You good</b>').", exZh: "今天天氣真好！", exEn: "The weather is really good today!" },
-      { pack: 1, meaning: "Good morning.", trees: "Dsaw3 (r)sang4 haw3", hanzi: "早上好", pinyin: "zǎo shang hǎo", sound: "'<i><b>dsaw3 (r)sang4</b></i>' sounds like '<b><u>jaw</u> <u>sang</u></b>'.", mnemonic: "The <b>morning</b> movements of yawning: your <b><u>jaw</u> <u>sang</u></b>!", exZh: "老師早上好！", exEn: "Good morning, teacher!" },
-      { pack: 1, meaning: "Big", trees: "dah4", hanzi: "大", pinyin: "dà", sound: "Similar to the first part of '<b><u>do</u></b>zen'.", mnemonic: "Our <b>big</b> family eats a <b><u>do</u></b>zen eggs every morning.", exZh: "這個蘋果非常大。", exEn: "This apple is very big." },
-      { pack: 1, meaning: "Home / Family", trees: "jeeah", hanzi: "家", pinyin: "jiā", sound: "Rapid contraction of '<b><u>Gee</u></b>' and '<b><u>Ah</u></b>', similar to '<b>jar</b>'.", mnemonic: "<b>Ah, gee</b>, our <b>big family</b> (<i><b>dah4 jeeah</b></i>) eats a <b><u>do</u></b>zen eggs in a <b>jar</b>.", exZh: "歡迎來到我家！", exEn: "Welcome to my home!" },
-      { pack: 1, meaning: "Happy", trees: "kooie4 Ler4", hanzi: "快樂", pinyin: "kuài lè", sound: "'<b><u>qui</u></b>(te) <b><u>lo</u></b>(vely)'.", mnemonic: "<b>Happy</b> kids are <b><u>qui</u></b>(te) <b><u>lo</u></b>(vely)!", exZh: "祝你生日快樂！", exEn: "Wish you a happy birthday!" },
-      { pack: 1, meaning: "New", trees: "seen", hanzi: "新", pinyin: "xīn", sound: "Sounds like English '<b><u>seen</u></b>'.", mnemonic: "Never <b><u>seen</u></b> before, so it's <b>new</b>!", exZh: "這是一本新書。", exEn: "This is a new book." },
-      { pack: 1, meaning: "Year", trees: "neean2", hanzi: "年", pinyin: "nián", sound: "Same as '<b><u>Knee</u> <u>an</u></b>', or similar to '<b>Neon</b>'.", mnemonic: "Chinese New <b>Year</b> involves the kowtow (<b><u>knee</u> <u>an</u></b>) ritual and <b>neon</b> lights.", exZh: "祝大家新年快樂！", exEn: "Happy New Year, everyone!" },
-      { pack: 1, meaning: "To be rich / Make a fortune", trees: "fah tsie2", hanzi: "發財", pinyin: "fā cái", sound: "Underlined parts of \"<b><u>far</u></b> i<b><u>t's I</u></b>\". Similar to '<b>far try</b>'.", mnemonic: "Not <b><u>far</u></b> ago, i<b><u>t's I</u></b> who had a <b>far try</b> to <b>make a fortune</b>.", exZh: "恭喜發財，萬事如意！", exEn: "Wishing you prosperity and all the best!" },
-      { pack: 1, meaning: "Could you tell me…? / Excuse me", trees: "Tsing3 wer-n4", hanzi: "請問", pinyin: "qǐng wèn", sound: "Le<b><u>t's sing</u></b> <b><u>when</u></b> we're happy.", mnemonic: "Associate '<i><b>tsing3</b></i>' with \"Le<b><u>t's sing</u></b>\", and '<i><b>wer-n4</b></i>' with '<b><u>when</u></b>'.", exZh: "請問洗手間在哪裡？", exEn: "Excuse me, where is the restroom?" },
-      { pack: 1, meaning: "Thank you! / I appreciate it.", trees: "Seer4 seer", hanzi: "謝謝", pinyin: "xiè xie", sound: "Sounds like '<b><u>See</u> <u>ye</u></b>(s), <b><u>See</u> <u>ye</u></b>(s)'.", mnemonic: "In real life, '<i><b>seer4 seer</b></i>' (<b>Thank you</b>) and '<b>See ya</b>' always go hand in hand!", exZh: "非常謝謝你的幫忙！", exEn: "Thank you very much for your help!" },
-      { pack: 1, meaning: "See you / Good-bye", trees: "Dsie4 jeean4", hanzi: "再見", pinyin: "zài jiàn", sound: "'<b><u>Xy</u></b>lophone, <b><u>Gee</u> <u>an</u></b>'.", mnemonic: "Playing the '<b><u>Xy</u></b>lophone' to express deep emotions when saying <b>goodbye</b>!", exZh: "我們明天見，再見！", exEn: "See you tomorrow, goodbye!" },
-      { pack: 1, meaning: "You are welcome.", trees: "Boo2 ker4 tsee", hanzi: "不客氣", pinyin: "bú kè qi", sound: "Sounds like '<b><u>Boo</u> <u>Cur</u>—<u>tsy</u></b>'.", mnemonic: "Imagine saying '<b><u>Boo</u> <u>Curtsy</u></b>' (\"Don't do this curtsy\").", exZh: "不客氣，這是我應該做的。", exEn: "You're welcome, it's my pleasure." },
-      { pack: 1, meaning: "I'm sorry. / Pardon me.", trees: "Dooay4 boo4 tsee3", hanzi: "對不起", pinyin: "duì bù qǐ", sound: "<b><u>Dway</u></b>ne says '<b><u>boo</u> <u>qi</u></b>'.", mnemonic: "<b><u>Dway</u></b>ne apologizes: <b>I am sorry</b> (<i><b>dooay4 boo4 tsee3</b></i>).", exZh: "對不起，我今天遲到了。", exEn: "I'm sorry, I am late today." },
+    async function loadWebOrDriveUrl() {
+      const rawUrl = (document.getElementById('webReaderUrlInput').value || '').trim();
+      if (!rawUrl) return alert('Please enter a webpage URL or Google Docs / Google Drive link.');
+      const box = document.getElementById('webReaderContentBox');
+      box.innerHTML = `<div style="text-align:center; padding:30px; color:var(--accent); font-weight:700;">🌐 Loading content for interactive selection...</div>`;
 
-      // Pack 2 (16-30)
-      { pack: 2, meaning: "It doesn't matter / It's OK.", trees: "May2 gooan see", hanzi: "沒關係", pinyin: "méi guān xi", sound: "'<b><u>May</u></b> la<b><u>goon</u></b> <b><u>see</u></b>.'", mnemonic: "<b><u>May</u></b> the la<b><u>goon</u></b> be <b><u>see</u></b>n when the tide goes out.", exZh: "沒關係，下次注意就好了。", exEn: "It's OK, just be careful next time." },
-      { pack: 2, meaning: "Don't get angry.", trees: "Beer2 (r)ser-ng tsee4", hanzi: "別生氣", pinyin: "bié shēng qì", sound: "'<b><u>Beer</u> <u>sung</u> <u>qi</u></b>'.", mnemonic: "With <b><u>beer</u></b>, Dwayne had <b><u>sung</u></b> a song full of <b><u>qi</u></b> to cheer his lover up.", exZh: "別生氣，我們一起想辦法。", exEn: "Don't get angry, let's figure it out together." },
-      { pack: 2, meaning: "Doctor", trees: "yee (r)ser-ng", hanzi: "醫生", pinyin: "yī shēng", sound: "'<i><b>yee</b></i>' (one) + '<i><b>(r)ser-ng</b></i>' (<b><u>sung</u></b> / birth).", mnemonic: "Born in a hospital, the very <b>first</b> person you see is a <b>doctor</b>.", exZh: "他是一位非常有名的醫生。", exEn: "He is a very famous doctor." },
-      { pack: 2, meaning: "Day / Sun", trees: "(r)th4", hanzi: "日", pinyin: "rì", sound: "Tongue of '<b><u>r</u></b>ain' + '<b><u>th</u></b>en'.", mnemonic: "And <b>(r)<u>th</u>en</b>... the <b>day</b> begins!", exZh: "今天是個好日子。", exEn: "Today is a great day." },
-      { pack: 2, meaning: "I / Me", trees: "wer3", hanzi: "我", pinyin: "wǒ", sound: "Part of '<b><u>wor</u></b>d' or '<b><u>wor</u></b>ld'.", mnemonic: "<b><u>Wor</u></b>d is the core of language, as <b>I</b> am the core of humanity.", exZh: "我非常喜歡學習中文。", exEn: "I really like learning Chinese." },
-      { pack: 2, meaning: "My / Mine", trees: "wer3 der", hanzi: "我的", pinyin: "wǒ de", sound: "Similar to '<b><u>word</u></b>' or '<b><u>wor</u>(l)<u>d</u></b>'.", mnemonic: "<b>My</b> <b><u>wor</u>(l)<u>d</u></b>! Adding '<i><b>der</b></i>' after '<i><b>wer3</b></i>'.", exZh: "這本書是我的。", exEn: "This book is mine." },
-      { pack: 2, meaning: "Your / Yours (Singular)", trees: "nee3 der", hanzi: "你的", pinyin: "nǐ de", sound: "Sounds like '<b><u>need</u></b>'.", mnemonic: "<b>Yours</b> is what you <b><u>need</u></b>.", exZh: "你的發音非常標準！", exEn: "Your pronunciation is very accurate!" },
-      { pack: 2, meaning: "It / He / She", trees: "tah", hanzi: "他", pinyin: "tā", sound: "First part of '<b><u>Ta</u></b>rget'.", mnemonic: "<b>She</b> and <b>he</b> have to buy it at <b><u>Ta</u></b>rget.", exZh: "他是我們班的好學生。", exEn: "He is a good student in our class." },
-      { pack: 2, meaning: "Its / Her / His", trees: "tah der", hanzi: "他的", pinyin: "tā de", sound: "Similar to '<b><u>tard</u></b>(y)'.", mnemonic: "<b>He</b> was <b><u>tard</u></b>(y) for <b>his</b> English class.", exZh: "他的中文說得很好。", exEn: "He speaks Chinese very well." },
-      { pack: 2, meaning: "Friend", trees: "per-ng2 yoh", hanzi: "朋友", pinyin: "péng yǒu", sound: "'<b><u>peng</u></b>uin <b><u>you</u></b>'.", mnemonic: "A cute <b><u>peng</u></b>uin is <b><u>you</u></b>r best <b>friend</b>!", exZh: "我們是最好的朋友。", exEn: "We are best friends." },
-      { pack: 2, meaning: "Younger & Elder brother", trees: "dee4 dee / ger ger", hanzi: "弟弟哥哥", pinyin: "dì di gē ge", sound: "'<b><u>di</u></b>g' = '<i><b>dee4</b></i>' + '<i><b>ger</b></i>'.", mnemonic: "'<b><u>dig</u></b>' is the teamwork of a <b>younger brother</b> and an <b>elder brother</b>!", exZh: "哥哥和弟弟一起去公園。", exEn: "The elder and younger brothers go to the park together." },
-      { pack: 2, meaning: "Country & The United States", trees: "gooer2 / may3 gooer2", hanzi: "美國", pinyin: "měi guó", sound: "<b><u>May</u></b>flower + gooer2.", mnemonic: "No <b><u>May</u></b>flower, no <b>United States</b> (<i><b>may3 gooer2</b></i>).", exZh: "我來自美國加州。", exEn: "I come from California, USA." },
-      { pack: 2, meaning: "Human / People / Person", trees: "(r)ther-n2", hanzi: "人", pinyin: "rén", sound: "'<b><u>r</u></b>ain' tongue + weak '<b><u>then</u></b>'.", mnemonic: "Placing '<i><b>(r)ther-n2</b></i>' at the end of a country name turns it into its people.", exZh: "這裡的人都非常熱情。", exEn: "The people here are very warm and friendly." },
-      { pack: 2, meaning: "China", trees: "(r)dser-oong gooer2", hanzi: "中國", pinyin: "zhōng guó", sound: "Sounds like '<b><u>drone</u></b>'.", mnemonic: "Fly a <b><u>drone</u></b> across the country of <b>China</b>.", exZh: "中國有很多歷史古蹟。", exEn: "China has many historical sites." },
-      { pack: 2, meaning: "Like / Love", trees: "see3 hooan", hanzi: "喜歡", pinyin: "xǐ huān", sound: "'<b><u>see</u> <u>Juan</u></b>'.", mnemonic: "<b>Like</b> him when you <b><u>see</u></b> a Don <b><u>Juan</u></b>!", exZh: "你喜歡吃什麼水果？", exEn: "What fruit do you like to eat?" },
+      // 1. Check if it is a Google Docs link
+      const gdocMatch = rawUrl.match(/https:\/\/docs\.google\.com\/document\/d\/([a-zA-Z0-9_-]+)/);
+      if (gdocMatch) {
+        try {
+          const r = await fetch(`https://docs.google.com/document/d/${gdocMatch[1]}/export?format=txt`);
+          if (r.ok) {
+            const txt = await r.text();
+            renderInteractiveReaderText('📄 Google Docs Cloud Document', txt);
+            return;
+          }
+        } catch (e) {}
+      }
 
-      // Pack 3 (31-45)
-      { pack: 3, meaning: "Can / Be able to", trees: "hooay4", hanzi: "會", pinyin: "huì", sound: "'<b><u>hoo</u></b>(r)<b><u>ay</u></b>' without 'r'.", mnemonic: "If you <b>can</b> do it, we'll shout '<b><u>hoo</u></b>(r)<b><u>ay</u></b>'!", exZh: "我會說一點點中文。", exEn: "I can speak a little bit of Chinese." },
-      { pack: 3, meaning: "Book", trees: "(r)soo", hanzi: "書", pinyin: "shū", sound: "Sounds like '<b><u>sue</u></b>'.", mnemonic: "If you copy this <b>book</b>, <b><u>Sue</u></b> will <b><u>sue</u></b> you!", exZh: "我喜歡在圖書館看書。", exEn: "I like reading books in the library." },
-      { pack: 3, meaning: "Who & Water", trees: "(r)sooay2 / (r)sooay3", hanzi: "誰喝水", pinyin: "shuí hē shuǐ", sound: "Contract '<b><u>sway</u></b>'.", mnemonic: "<b>Who</b> is gazing at the mermaid <b><u>sway</u></b>ing in the <b>water</b>?", exZh: "請問誰想喝水？", exEn: "Excuse me, who would like to drink water?" },
-      { pack: 3, meaning: "Look for", trees: "(r)dsaw3", hanzi: "找", pinyin: "zhǎo", sound: "Similar to '<b><u>jaw</u></b>'.", mnemonic: "I'll be <b>looking for</b> my <b><u>jaw</u></b> on the floor!", exZh: "你在找什麼東西？", exEn: "What are you looking for?" },
-      { pack: 3, meaning: "From", trees: "Lie2 ds4", hanzi: "來自", pinyin: "lái zì", sound: "Similar to '<b><u>lies</u></b>'.", mnemonic: "The truth <b><u>LIES</u></b> in where you come <b>FROM</b>.", exZh: "我的老師來自台灣。", exEn: "My teacher comes from Taiwan." },
-      { pack: 3, meaning: "Where", trees: "nah3 Lee3", hanzi: "哪裡", pinyin: "nǎ lǐ", sound: "G<b><u>narly</u></b> without 'G'.", mnemonic: "If you don't know <b>WHERE</b> you are, things are getting G<b><u>NARLY</u></b>.", exZh: "你週末想去哪裡玩？", exEn: "Where do you want to go for fun this weekend?" },
-      { pack: 3, meaning: "How", trees: "dser-n3 mer", hanzi: "怎麼", pinyin: "zěn me", sound: "Confu<b><u>sion</u></b>? <b><u>Mer</u></b>maid.", mnemonic: "His confu<b><u>sion</u></b> is <b>how</b> the <b><u>mer</u></b>maid falls in love.", exZh: "這道題應該怎麼做？", exEn: "How should we solve this question?" },
-      { pack: 3, meaning: "Supermarket", trees: "(r)tsaw (r)s4", hanzi: "超市", pinyin: "chāo shì", sound: "r-colored '<b><u>cho</u></b>(i)<b><u>ce</u></b>'.", mnemonic: "So many <b><u>cho</u></b>(i)<b><u>ce</u></b>s in the <b>supermarket</b>!", exZh: "媽媽去超市買水果了。", exEn: "Mom went to the supermarket to buy fruit." },
-      { pack: 3, meaning: "Menu & Check, please", trees: "tsie4 dan / mie3 dan", hanzi: "菜單買單", pinyin: "cài dān mǎi dān", sound: "I<b><u>t's I</u></b> <b><u>done</u></b> / <b><u>My</u> <u>done</u></b>.", mnemonic: "Done with the <b>menu</b>; <b>Check, please</b>!", exZh: "服務員，請給我菜單。", exEn: "Waiter, please give me the menu." },
-      { pack: 3, meaning: "Would like / Want", trees: "seeang3 yaw4", hanzi: "想要", pinyin: "xiǎng yào", sound: "'<b><u>see</u> <u>young</u></b>' + '<b><u>your</u></b>'.", mnemonic: "I <b>want</b> to <b><u>see</u> <u>Young</u></b>'s Ordinary beer.", exZh: "我想要一杯熱咖啡。", exEn: "I would like a cup of hot coffee." },
-      { pack: 3, meaning: "Milk tea", trees: "nie3 (r)tsah2", hanzi: "奶茶", pinyin: "nǎi chá", sound: "'<b><u>ni</u></b>ce <b><u>char</u></b>ge'.", mnemonic: "A cup of <b>milk tea</b> gives her a <b><u>ni</u></b>ce <b><u>char</u></b>ge!", exZh: "珍珠奶茶非常好喝。", exEn: "Boba milk tea is very delicious." },
-      { pack: 3, meaning: "Dumplings", trees: "jeeaw3 ds", hanzi: "餃子", pinyin: "jiǎo zi", sound: "'<b><u>Gee, aw</u></b>esome foo<b><u>ds</u></b>.'", mnemonic: "<b><u>Gee, aw</u></b>esome foo<b><u>ds</u></b>—everyone loves <b>dumplings</b>!", exZh: "我們今天晚上吃餃子。", exEn: "We are eating dumplings tonight." },
-      { pack: 3, meaning: "Cold (Illness)", trees: "gan3 maw4", hanzi: "感冒", pinyin: "gǎn mào", sound: "'<b><u>gun</u> <u>mall</u></b>'.", mnemonic: "Shock at the <b><u>mall</u></b> caused him to catch a <b>cold</b>.", exZh: "天冷了，小心別感冒。", exEn: "It's cold, be careful not to catch a cold." },
-      { pack: 3, meaning: "Telephone", trees: "deean4 hooah4", hanzi: "電話", pinyin: "diàn huà", sound: "'<b><u>the end</u></b>' + '<b><u>who are</u></b>'.", mnemonic: "Call on the <b>telephone</b> to ask: \"At <b><u>the end</u></b>, <b><u>who are</u></b> they?\"", exZh: "請給我打個電話。", exEn: "Please give me a phone call." },
-      { pack: 3, meaning: "Got it.", trees: "Ting der-oong3 Ler", hanzi: "聽懂了", pinyin: "tīng dǒng le", sound: "Shou<b><u>ting</u></b> 'I <b><u>don't</u></b> <b><u>love</u></b> math!'", mnemonic: "Once you hear it, you've <b>got it</b>!", exZh: "老師講的課我都聽懂了！", exEn: "I understood everything the teacher taught!" }
-    ];
-
-    let unlockState = {
-      rateUnlocked: localStorage.getItem('tp_rate_unlocked') === 'true',
-      shareUnlocked: localStorage.getItem('tp_share_unlocked') === 'true',
-      vipUnlocked: localStorage.getItem('tp_vip_pro_unlocked') === 'true',
-      myInviteCode: localStorage.getItem('tp_my_invite_code') || ''
-    };
-    if (!/^PIN[A-Z0-9]{4}$/.test(unlockState.myInviteCode)) {
-      const chars = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
-      let code = 'PIN';
-      for (let i = 0; i < 4; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
-      unlockState.myInviteCode = code;
-      localStorage.setItem('tp_my_invite_code', code);
-    }
-    document.getElementById('myInviteCodeText').innerText = unlockState.myInviteCode;
-
-    function getShareMessage() {
-      return `Learn Chinese pronunciation effortlessly with English phonics! Use my referral code ${unlockState.myInviteCode} on Trees Pinyin: https://www.treespinyin.com`;
-    }
-
-    function handleRateUnlock() {
-      unlockState.rateUnlocked = true;
-      localStorage.setItem('tp_rate_unlocked', 'true');
-      document.getElementById('rewardStatusMsg').innerText = '🎉 Thank you for your 5-star review! Pack 2 is now unlocked!';
-      document.getElementById('packSelect').value = '2';
-      renderMnemonicsPack();
-      window.open(getStoreReviewUrl(), '_blank');
-    }
-
-    function openShareAppModal() {
-      const msg = getShareMessage();
-      navigator.clipboard.writeText(msg).catch(() => {});
-      unlockState.shareUnlocked = true;
-      localStorage.setItem('tp_share_unlocked', 'true');
-      document.getElementById('rewardStatusMsg').innerText = `📋 Referral code (${unlockState.myInviteCode}) copied & Pack 3 unlocked!`;
-      document.getElementById('packSelect').value = '3';
-      renderMnemonicsPack();
-
-      document.getElementById('modalShareCode').innerText = unlockState.myInviteCode;
-      const encMsg = encodeURIComponent(msg);
-      const encUrl = encodeURIComponent('https://www.treespinyin.com');
-      document.getElementById('shareWhatsApp').href = `https://api.whatsapp.com/send?text=${encMsg}`;
-      document.getElementById('shareTwitter').href = `https://twitter.com/intent/tweet?text=${encMsg}`;
-      document.getElementById('shareFacebook').href = `https://www.facebook.com/sharer/sharer.php?u=${encUrl}`;
-      document.getElementById('shareTelegram').href = `https://t.me/share/url?url=${encUrl}&text=${encMsg}`;
-      document.getElementById('shareEmail').href = `mailto:?subject=${encodeURIComponent('Learn Mandarin with Trees Pinyin')}&body=${encMsg}`;
-      document.getElementById('shareAppModal').style.display = 'flex';
-    }
-
-    async function triggerNativeSystemShare() {
-      const msg = getShareMessage();
-      if (navigator.share) {
-        try { await navigator.share({ title: 'Trees Pinyin', text: msg, url: 'https://www.treespinyin.com' }); } catch (e) {}
-      } else { copyShareTextOnly(); }
-    }
-
-    function copyShareTextOnly() {
-      navigator.clipboard.writeText(getShareMessage()).catch(() => {});
-      alert('Copied! Paste it in WeChat, iMessage, or any app to share with friends.');
-    }
-
-    function handleActivateFriendCode() {
-      const code = (document.getElementById('friendCodeInput').value || '').trim().toUpperCase();
-      if (!code) return;
-      unlockState.rateUnlocked = true;
-      unlockState.shareUnlocked = true;
-      unlockState.vipUnlocked = true;
-      localStorage.setItem('tp_rate_unlocked', 'true');
-      localStorage.setItem('tp_share_unlocked', 'true');
-      localStorage.setItem('tp_vip_pro_unlocked', 'true');
-      document.getElementById('rewardStatusMsg').innerText = `🎉 Code ${code} activated! All Mnemonic Packs & Pro Search unlocked!`;
-      document.getElementById('packSelect').value = 'all';
-      renderMnemonicsPack();
-    }
-
-    function renderMnemonicsPack() {
-      const selEl = document.getElementById('packSelect');
-      if (!selEl) return;
-      const packVal = selEl.value;
-      const query = (document.getElementById('mnemonicSearchInput')?.value || '').trim().toLowerCase();
-      const grid = document.getElementById('mnemonicCardsContainer');
-      const lockedBox = document.getElementById('mnemonicLockedBox');
-      if (!grid || !lockedBox) return;
-      grid.innerHTML = '';
-
-      if (!query && packVal !== 'all') {
-        const packId = parseInt(packVal, 10) || 1;
-        const isLocked = (packId === 2 && !unlockState.rateUnlocked && !unlockState.vipUnlocked) ||
-                         (packId === 3 && !unlockState.shareUnlocked && !unlockState.vipUnlocked);
-        if (isLocked) {
-          grid.classList.add('hidden');
-          lockedBox.classList.remove('hidden');
-          const actionBtn = packId === 2
-            ? `<button class="btn btn-green" style="margin-top:10px;" onclick="handleRateUnlock()">⭐ Click Here to Rate 5-Stars & Unlock Pack 2</button>`
-            : `<button class="btn btn-green" style="margin-top:10px;" onclick="openShareAppModal()">📤 Click Here to Share via App & Unlock Pack 3</button>`;
-          lockedBox.innerHTML = `<h3 style="margin:0 0 8px 0; color:#bf360c;">🔒 Pack ${packId} Locked</h3><p style="margin:0; font-size:0.9rem; color:#333;">Unlock 15 book mnemonic cards & bilingual example sentences with 1 click:</p>${actionBtn}`;
+      // 2. Fetch external webpage via CORS reader proxy (Jina Reader / AllOrigins fallback)
+      try {
+        const target = rawUrl.startsWith('http') ? rawUrl : ('https://' + rawUrl);
+        const r = await fetch(`https://r.jina.ai/${target}`);
+        if (r.ok) {
+          const mdText = await r.text();
+          renderInteractiveReaderText(`🌐 Webpage: ${target}`, mdText.slice(0, 6000));
           return;
+        }
+      } catch (e) {}
+
+      try {
+        const target = rawUrl.startsWith('http') ? rawUrl : ('https://' + rawUrl);
+        const r2 = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(target)}`);
+        const d2 = await r2.json();
+        const tmp = document.createElement('div');
+        tmp.innerHTML = d2.contents || '';
+        tmp.querySelectorAll('script, style, nav, footer').forEach(n => n.remove());
+        renderInteractiveReaderText(`🌐 Webpage: ${target}`, (tmp.innerText || '').slice(0, 6000));
+      } catch (e) {
+        box.innerHTML = `<div style="color:#d32f2f; padding:20px;">⚠️ Could not fetch this URL directly due to remote security settings. You can copy & paste the text or upload the file via 📂 Open Local / Drive File!</div>`;
+      }
+    }
+
+    function renderInteractiveReaderText(title, rawText) {
+      const box = document.getElementById('webReaderContentBox');
+      const paras = rawText.split(/\n+/).map(p => p.trim()).filter(p => p.length > 1);
+      box.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e5e7eb; padding-bottom:10px; margin-bottom:12px;">
+          <b style="color:var(--accent);">${title}</b>
+          <span style="font-size:0.78rem; background:#e8f5e9; color:#1b5e20; padding:4px 10px; border-radius:12px; font-weight:700;">
+            💡 Highlight any words with your mouse to pop up icon.png!
+          </span>
+        </div>
+        ${paras.map(p => `<p style="margin:0 0 12px; cursor:text;">${p.replace(/</g, '<')}</p>`).join('')}
+      `;
+    }
+
+    function loadSampleArticle(type) {
+      if (type === 'story') {
+        renderInteractiveReaderText('📖 Bilingual Folktale: The Clever Panda (Highlight any sentence!)',
+          `從前，在美麗的四川竹林裡，住著一隻聰明的大熊貓。\nOnce upon a time, in the beautiful bamboo forests of Sichuan, lived a clever giant panda.\n每天早上，他都會對朋友們說：「早上好！今天天氣真好！」\nEvery morning, he would say to his friends: "Good morning! The weather is really good today!"\n如果你想要學習中文，只要看著英語自然拼讀，就能立刻開口說中文。`);
+      } else {
+        renderInteractiveReaderText('📰 Travel & Dining in Taiwan & China (Highlight any sentence!)',
+          `請問洗手間在哪裡？我想去超市買一杯珍珠奶茶。\nExcuse me, where is the restroom? I would like to go to the supermarket to buy a cup of boba milk tea.\n服務員，請給我菜單。我們今天晚上想吃餃子，謝謝！\nWaiter, please give me the menu. We would like to eat dumplings tonight, thank you!`);
+      }
+    }
+
+    // =========================================================================
+    // 3. 🖥️ Multi-Ratio Split-Screen Video Studio (9:16, 16:9, 1:1 + Unlimited Recording + Live Switcher)
+    // =========================================================================
+    let studioStream = null;
+    let studioRecorder = null;
+    let studioChunks = [];
+    let studioTimerInterval = null;
+    let studioSeconds = 0;
+    let studioCurrentRatio = '9-16';
+    let studioCurrentView = 'split'; // 'split' | 'full-text' | 'full-cam'
+    let studioSynthCanvas = null;
+    let studioSynthAnimId = null;
+
+    function launchSelectedBigScreenMode() {
+      const mode = document.getElementById('bigScreenModeSelect').value;
+      if (mode === 'projection') {
+        toggleClassroomProjection();
+        return;
+      }
+      openCreatorStudio(mode);
+    }
+
+    function toggleClassroomProjection() {
+      document.body.classList.toggle('big-mode');
+    }
+
+    async function openCreatorStudio(ratioMode = '9-16', singleZh = '', singleEn = '') {
+      const overlay = document.getElementById('studioOverlay');
+      overlay.classList.add('active');
+      setStudioRatio(ratioMode);
+      setStudioViewMode('split');
+
+      // Populate Top Scrollable Teleprompter Pane with current board content
+      const topPane = document.getElementById('studioTopPane');
+      topPane.innerHTML = '';
+
+      if (singleZh) {
+        appendSentenceProgressive(singleZh, singleEn, [], 'studioTopPane', true);
+      } else {
+        const existingBlocks = document.querySelectorAll('#annotationList .sentence-block');
+        if (existingBlocks.length > 0) {
+          existingBlocks.forEach(b => {
+            appendSentenceProgressive(b.dataset.zh, b.dataset.en, [], 'studioTopPane', true);
+          });
+        } else {
+          appendSentenceProgressive('你好，歡迎來到 Trees Pinyin！', 'Hello, welcome to Trees Pinyin!', [], 'studioTopPane', true);
         }
       }
 
-      lockedBox.classList.add('hidden');
-      grid.classList.remove('hidden');
-
-      const filtered = FULL_45_BOOK_MNEMONICS.filter(c => {
-        if (query) {
-          return c.meaning.toLowerCase().includes(query) || c.hanzi.includes(query) ||
-                 convertScript(c.hanzi, 'simp').includes(query) || c.exZh.includes(query) ||
-                 c.exEn.toLowerCase().includes(query) || c.trees.toLowerCase().includes(query);
-        }
-        if (packVal === 'all') return true;
-        return c.pack === parseInt(packVal, 10);
-      });
-
-      filtered.forEach((card, i) => {
-        const dispHanzi = convertScript(card.hanzi, currentScriptMode);
-        const dispExZh = convertScript(card.exZh, currentScriptMode);
-        const el = document.createElement('div');
-        el.className = 'mnemonic-card';
-        el.innerHTML = `
-          <div class="mc-top">
-            <div class="mc-meaning">#${i + 1} ${card.meaning}</div>
-            <div style="display:flex; justify-content:space-between; width:100%; align-items:baseline;">
-              <span class="mc-trees"><i><b>${card.trees}</b></i></span>
-              <span class="mc-hanzi" style="cursor:pointer;" onclick="speakSingleChar('${card.hanzi}')">🔊 (${dispHanzi} / ${card.pinyin})</span>
-            </div>
-          </div>
-          <div class="mc-sound"><b>Sound:</b> ${card.sound}</div>
-          <div class="mc-tip"><b>Mnemonic:</b> ${card.mnemonic}</div>
-          <div style="background:#f8fafc; padding:8px 10px; border-radius:10px; border:1px dashed #cbd5e1; font-size:0.83rem; margin-top:auto;">
-            <div style="color:var(--blue); font-weight:700;">📖 Example Sentence:</div>
-            <div style="font-weight:700; margin:2px 0; cursor:pointer;" onclick="speakSingleChar('${card.exZh}')">🔊 ${dispExZh}</div>
-            <div style="color:#444;">${card.exEn}</div>
-            <div style="display:flex; gap:6px; margin-top:6px;">
-              <button class="mini-tool-btn" onclick="sendExampleToWorkspace('${card.exZh}', '${card.exEn.replace(/'/g, "\\'")}')">🎤 Score My Reading</button>
-              <button class="mini-tool-btn" onclick="openVideoReelModal('${card.exZh}', '${card.exEn.replace(/'/g, "\\'")}')">🎬 Record IG/TikTok</button>
-            </div>
-          </div>
-        `;
-        grid.appendChild(el);
-      });
+      // Start Camera & Microphone
+      const camVideo = document.getElementById('studioCamVideo');
+      try {
+        studioStream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } },
+          audio: true
+        });
+        camVideo.srcObject = studioStream;
+      } catch (e) {
+        studioStream = null;
+      }
     }
 
-    function sendExampleToWorkspace(zh, en) {
-      switchMainTab('workspace');
-      document.getElementById('userInput').value = `${zh} ||| ${en}`;
-      runDirectTranslate(`${zh} ||| ${en}`);
+    function setStudioRatio(ratio) {
+      studioCurrentRatio = ratio;
+      const stage = document.getElementById('studioStage');
+      stage.classList.remove('ratio-9-16', 'ratio-16-9', 'ratio-1-1');
+      stage.classList.add(`ratio-${ratio}`);
+      document.getElementById('ratioBtn916').classList.toggle('active', ratio === '9-16');
+      document.getElementById('ratioBtn169').classList.toggle('active', ratio === '16-9');
+      document.getElementById('ratioBtn11').classList.toggle('active', ratio === '1-1');
+    }
+
+    // Works live EVEN DURING recording!
+    function setStudioViewMode(viewMode) {
+      studioCurrentView = viewMode;
+      const stage = document.getElementById('studioStage');
+      stage.classList.remove('view-full-text', 'view-full-cam');
+      if (viewMode === 'full-text') stage.classList.add('view-full-text');
+      if (viewMode === 'full-cam') stage.classList.add('view-full-cam');
+
+      document.getElementById('viewBtnSplit').classList.toggle('active', viewMode === 'split');
+      document.getElementById('viewBtnText').classList.toggle('active', viewMode === 'full-text');
+      document.getElementById('viewBtnCam').classList.toggle('active', viewMode === 'full-cam');
+    }
+
+    function speakAllStudioText() {
+      const blocks = document.querySelectorAll('#studioTopPane .sentence-block');
+      const allZh = Array.from(blocks).map(b => b.dataset.zh).join('。');
+      if (allZh) speakSingleChar(allZh);
+    }
+
+    // Unlimited Duration Recorder: synthesizes Top Scrollable Text + Bottom Camera + Live View Switches!
+    function toggleStudioRecording() {
+      const recBtn = document.getElementById('studioRecBtn');
+      const dlLink = document.getElementById('studioDownloadLink');
+
+      if (studioRecorder && studioRecorder.state === 'recording') {
+        studioRecorder.stop();
+        return;
+      }
+
+      dlLink.classList.add('hidden');
+      studioChunks = [];
+      studioSeconds = 0;
+      document.getElementById('studioTimerBadge').innerText = '🔴 00:00';
+
+      // Create offscreen synthesis canvas matching the selected aspect ratio
+      studioSynthCanvas = document.createElement('canvas');
+      if (studioCurrentRatio === '9-16') { studioSynthCanvas.width = 720; studioSynthCanvas.height = 1280; }
+      else if (studioCurrentRatio === '16-9') { studioSynthCanvas.width = 1280; studioSynthCanvas.height = 720; }
+      else { studioSynthCanvas.width = 960; studioSynthCanvas.height = 960; }
+
+      const ctx = studioSynthCanvas.getContext('2d');
+      const camVideo = document.getElementById('studioCamVideo');
+      const topPane = document.getElementById('studioTopPane');
+
+      function drawStudioFrame() {
+        const W = studioSynthCanvas.width;
+        const H = studioSynthCanvas.height;
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, W, H);
+
+        const drawTextHalf = (yStart, boxH) => {
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, yStart, W, boxH);
+
+          // Watermark header
+          ctx.fillStyle = '#1b5e20';
+          ctx.font = 'bold 22px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText('🌳 TreesPinyin.com · Read English, Speak Chinese', W / 2, yStart + 38);
+
+          // Sync with user's mouse scroll position in #studioTopPane!
+          const maxScroll = Math.max(1, topPane.scrollHeight - topPane.clientHeight);
+          const scrollRatio = topPane.scrollTop / maxScroll;
+          const blocks = Array.from(topPane.querySelectorAll('.sentence-block'));
+          const activeIdx = Math.min(blocks.length - 1, Math.floor(scrollRatio * blocks.length));
+          const activeBlock = blocks[activeIdx] || blocks[0];
+
+          if (activeBlock) {
+            const zh = convertScript(activeBlock.dataset.zh || '', currentScriptMode);
+            const en = activeBlock.dataset.en || '';
+            const pyArr = getAccuratePinyinArray( activeBlock.dataset.zh || '' );
+            const tpStr = pyArr.map(p => compileToTreesPinyin(p)).join(' ');
+            const stdStr = pyArr.map(p => numPinyinToToneMark(p)).join(' ');
+
+            const midY = yStart + (boxH / 2);
+            ctx.fillStyle = '#111111';
+            ctx.font = 'bold 26px sans-serif';
+            ctx.fillText(en.slice(0, 48), W / 2, midY - 65);
+
+            ctx.fillStyle = '#1b5e20';
+            ctx.font = 'italic bold 36px sans-serif';
+            ctx.fillText(tpStr.slice(0, 38), W / 2, midY - 10);
+
+            ctx.fillStyle = '#6b7280';
+            ctx.font = '24px sans-serif';
+            ctx.fillText(stdStr.slice(0, 42), W / 2, midY + 32);
+
+            ctx.fillStyle = '#000000';
+            ctx.font = 'bold 46px sans-serif';
+            ctx.fillText(zh.slice(0, 20), W / 2, midY + 95);
+          }
+        };
+
+        const drawCamHalf = (yStart, boxH) => {
+          ctx.fillStyle = '#000000';
+          ctx.fillRect(0, yStart, W, boxH);
+          if (studioStream && camVideo.readyState >= 2) {
+            ctx.save();
+            ctx.translate(W, yStart);
+            ctx.scale(-1, 1);
+            ctx.drawImage(camVideo, 0, 0, W, boxH);
+            ctx.restore();
+          }
+        };
+
+        if (studioCurrentView === 'split') {
+          drawTextHalf(0, H / 2);
+          drawCamHalf(H / 2, H / 2);
+          ctx.strokeStyle = '#1b5e20';
+          ctx.lineWidth = 4;
+          ctx.beginPath();
+          ctx.moveTo(0, H / 2);
+          ctx.lineTo(W, H / 2);
+          ctx.stroke();
+        } else if (studioCurrentView === 'full-text') {
+          drawTextHalf(0, H);
+        } else {
+          drawCamHalf(0, H);
+        }
+
+        studioSynthAnimId = requestAnimationFrame(drawStudioFrame);
+      }
+      drawStudioFrame();
+
+      const stream = studioSynthCanvas.captureStream(30);
+      if (studioStream) {
+        studioStream.getAudioTracks().forEach(t => stream.addTrack(t));
+      }
+
+      studioRecorder = new MediaRecorder(stream);
+      studioRecorder.ondataavailable = (e) => { if (e.data.size > 0) studioChunks.push(e.data); };
+      studioRecorder.onstop = () => {
+        cancelAnimationFrame(studioSynthAnimId);
+        clearInterval(studioTimerInterval);
+        const blob = new Blob(studioChunks, { type: 'video/webm' });
+        dlLink.href = URL.createObjectURL(blob);
+        dlLink.classList.remove('hidden');
+        recBtn.innerText = '🔴 Start New Recording';
+        recBtn.style.background = '';
+      };
+
+      studioRecorder.start(200);
+      recBtn.innerText = '⏹️ Stop & Save Video';
+      recBtn.style.background = '#d32f2f';
+
+      studioTimerInterval = setInterval(() => {
+        studioSeconds++;
+        const m = String(Math.floor(studioSeconds / 60)).padStart(2, '0');
+        const s = String(studioSeconds % 60).padStart(2, '0');
+        document.getElementById('studioTimerBadge').innerText = `🔴 ${m}:${s}`;
+      }, 1000);
+    }
+
+    function closeCreatorStudio() {
+      if (studioRecorder && studioRecorder.state === 'recording') studioRecorder.stop();
+      cancelAnimationFrame(studioSynthAnimId);
+      clearInterval(studioTimerInterval);
+      if (studioStream) {
+        studioStream.getTracks().forEach(t => t.stop());
+        studioStream = null;
+      }
+      document.getElementById('studioOverlay').classList.remove('active');
     }
 
     // =========================================================================
-    // 2. Number, Time & Symbol Expander + High-Accuracy Dual-Track AI Engine
+    // 4. Core Compiler, Mnemonics, AI & 1.5s Voice Input
     // =========================================================================
     const DIGITS_ZH = ['零','一','二','三','四','五','六','七','八','九'];
-
     function intToChinese(numStr) {
       let n = parseInt(numStr, 10);
       if (isNaN(n)) return numStr;
       if (n === 0) return '零';
-      if (n < 0) return '負' + intToChinese(String(-n));
-      if (numStr.length === 4 && n >= 1900 && n <= 2099) {
-        return numStr.split('').map(d => DIGITS_ZH[parseInt(d, 10)]).join('');
-      }
       if (n < 10) return DIGITS_ZH[n];
       if (n < 100) {
         let ten = Math.floor(n / 10), rem = n % 10;
         return (ten === 1 ? '十' : DIGITS_ZH[ten] + '十') + (rem > 0 ? DIGITS_ZH[rem] : '');
       }
-      if (n < 1000) {
-        let hun = Math.floor(n / 100), rem = n % 100;
-        if (rem === 0) return DIGITS_ZH[hun] + '百';
-        if (rem < 10) return DIGITS_ZH[hun] + '百零' + DIGITS_ZH[rem];
-        return DIGITS_ZH[hun] + '百' + intToChinese(String(rem));
-      }
-      if (n < 10000) {
-        let th = Math.floor(n / 1000), rem = n % 1000;
-        if (rem === 0) return DIGITS_ZH[th] + '千';
-        if (rem < 100) return DIGITS_ZH[th] + '千零' + intToChinese(String(rem));
-        return DIGITS_ZH[th] + '千' + intToChinese(String(rem));
-      }
       return numStr.split('').map(d => DIGITS_ZH[parseInt(d, 10)] || d).join('');
     }
-
-    function numberToChinese(str) {
-      if (str.includes('.')) {
-        let parts = str.split('.');
-        let intPart = intToChinese(parts[0] || '0');
-        let decPart = parts[1].split('').map(d => DIGITS_ZH[parseInt(d, 10)]).join('');
-        return intPart + '點' + decPart;
-      }
-      return intToChinese(str);
-    }
-
     function expandNumbersAndSymbolsToZh(text) {
       if (!text) return '';
-      let s = text;
-      s = s.replace(/\bH2O\b/gi, '水').replace(/\bCO2\b/gi, '二氧化碳').replace(/\bO2\b/gi, '氧氣');
-      s = s.replace(/°C|℃/g, '攝氏度').replace(/°F|℉/g, '華氏度');
-      s = s.replace(/\b(\d{1,2}):(\d{2})\b/g, (_, h, m) => intToChinese(h) + '點' + (m === '00' ? '整' : intToChinese(m) + '分'));
-      s = s.replace(/(\d+(?:\.\d+)?)\s*%/g, (_, num) => '百分之' + numberToChinese(num));
-      s = s.replace(/\$\s*(\d+(?:\.\d+)?)/g, (_, num) => numberToChinese(num) + '美元');
-      s = s.replace(/[¥￥]\s*(\d+(?:\.\d+)?)/g, (_, num) => numberToChinese(num) + '元');
-      s = s.replace(/\+/g, '加').replace(/=/g, '等於').replace(/&/g, '和');
-      s = s.replace(/\d+(?:\.\d+)?/g, (match) => numberToChinese(match));
-      return s;
+      return text.replace(/\bH2O\b/gi, '水').replace(/\bCO2\b/gi, '二氧化碳').replace(/\d+/g, m => intToChinese(m));
     }
 
-    const BUILTIN_QA_CACHE = {
-      "咏鹅": "《詠鵝》駱賓王 (Ode to the Goose by Luo Binwang)\n鵝，鵝，鵝， ||| Goose, goose, goose,\n曲項向天歌。 ||| You bend your neck and sing to the sky.\n白毛浮綠水， ||| Your white feathers float on the emerald water,\n紅掌撥清波。 ||| Your red webbed feet paddle the clear waves.",
-      "静夜思": "《靜夜思》李白 (Quiet Night Thought by Li Bai)\n床前明月光， ||| Before my bed, the bright moonlight shines,\n疑是地上霜。 ||| I wonder if it is frost upon the ground.\n舉頭望明月， ||| I raise my head to gaze at the bright moon,\n低頭思故鄉。 ||| And lower my head, longing for my hometown.",
-      "春晓": "《春曉》孟浩然 (Spring Morning by Meng Haoran)\n春眠不覺曉， ||| In spring sleep, I am unaware of the dawn,\n處處聞啼鳥。 ||| Everywhere I hear the singing of birds.\n夜來風雨聲， ||| Last night came the sound of wind and rain,\n花落知多少。 ||| Who knows how many blossoms have fallen."
-    };
-
-    function normalizeCacheKey(rawQ) {
-      if (!rawQ) return '';
-      const trimmed = rawQ.trim().toLowerCase()
-        .replace(/詠/g, '咏').replace(/鵝/g, '鹅').replace(/靜/g, '静').replace(/曉/g, '晓');
-      if (trimmed === '咏鹅' || trimmed === '《咏鹅》') return '咏鹅';
-      if (trimmed === '静夜思' || trimmed === '《静夜思》') return '静夜思';
-      if (trimmed === '春晓' || trimmed === '《春晓》') return '春晓';
-      return 'v3_' + trimmed.replace(/[\s,.?!，。？！、：:；;《》〈〉"“”'‘’()（）]/g, '').slice(0, 140);
-    }
-
-    function getLocalCachedAnswer(q) {
-      const k = normalizeCacheKey(q);
-      if (!k) return '';
-      if (BUILTIN_QA_CACHE[k]) return BUILTIN_QA_CACHE[k];
-      try {
-        const store = JSON.parse(localStorage.getItem('tp_local_qa_cache_v3') || '{}');
-        return store[k] || '';
-      } catch (e) { return ''; }
-    }
-
-    function saveLocalCachedAnswer(q, ans) {
-      const k = normalizeCacheKey(q);
-      if (!k || !ans) return;
-      try {
-        const store = JSON.parse(localStorage.getItem('tp_local_qa_cache_v3') || '{}');
-        const keys = Object.keys(store);
-        if (keys.length > 150) delete store[keys[0]];
-        store[k] = ans;
-        localStorage.setItem('tp_local_qa_cache_v3', JSON.stringify(store));
-      } catch (e) {}
-    }
-
-    let backupKey = (localStorage.getItem('tp_v22_backup_key') || localStorage.getItem('tp_test_gemini_key') || '').trim();
-    let availableFastModels = ['gemini-2.5-flash', 'gemini-3.5-flash-lite', 'gemini-flash-latest', 'gemini-flash-lite-latest'];
-
-    function refreshKeyBtnStyle() {
-      const btn = document.getElementById('uiKeyBtn');
-      if (btn) btn.classList.toggle('has-key', Boolean(backupKey));
-    }
-    refreshKeyBtnStyle();
-
-    function openKeyModal() {
-      document.getElementById('apiKeyInput').value = backupKey;
-      document.getElementById('keyModal').style.display = 'flex';
-    }
-
-    async function saveBackupKey() {
-      backupKey = document.getElementById('apiKeyInput').value.trim();
-      localStorage.setItem('tp_v22_backup_key', backupKey);
-      localStorage.setItem('tp_test_gemini_key', backupKey);
-      refreshKeyBtnStyle();
-      document.getElementById('keyModal').style.display = 'none';
-      const pendingQ = document.getElementById('userInput').value.trim();
-      if (pendingQ) runSmartAI(pendingQ, true);
-    }
-
-    function clearBackupKey() {
-      backupKey = '';
-      localStorage.removeItem('tp_v22_backup_key');
-      localStorage.removeItem('tp_test_gemini_key');
-      document.getElementById('apiKeyInput').value = '';
-      refreshKeyBtnStyle();
-    }
-
-    function fetchWithTimeout(url, options = {}, timeoutMs = 9000) {
-      const ctrl = new AbortController();
-      const timer = setTimeout(() => ctrl.abort(), timeoutMs);
-      return fetch(url, { ...options, signal: ctrl.signal }).finally(() => clearTimeout(timer));
-    }
-
-    async function callSingleGeminiModelFast(modelName, promptText, dataUrl, signal) {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${encodeURIComponent(backupKey)}`;
-      const parts = [{ text: promptText }];
-      if (dataUrl && dataUrl.includes(',')) {
-        const mime = dataUrl.substring(dataUrl.indexOf(':') + 1, dataUrl.indexOf(';'));
-        parts.push({ inline_data: { mime_type: mime, data: dataUrl.split(',')[1] } });
-      }
-      let r = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ contents: [{ parts }], generationConfig: { temperature: 0.2, thinkingConfig: { thinkingBudget: 0 } } }),
-        signal
-      });
-      if (r.status === 400) {
-        r = await fetch(url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ contents: [{ parts }], generationConfig: { temperature: 0.2 } }),
-          signal
-        });
-      }
-      const d = await r.json();
-      if (!r.ok) throw new Error(d?.error?.message || `HTTP ${r.status}`);
-      const resParts = d?.candidates?.[0]?.content?.parts || [];
-      const text = resParts.filter(p => !p.thought && typeof p.text === 'string').map(p => p.text).join('').trim();
-      if (!text) throw new Error('EMPTY');
-      return text;
-    }
-
-    async function fetchFastAccurateAI(promptText, dataUrl = null, rawQuestionForCache = '', bypassCache = false) {
-      const cleanCacheKey = bypassCache ? ('nocache_' + Date.now()) : normalizeCacheKey(rawQuestionForCache);
-      const workerTasks = CF_WORKER_ENDPOINTS.map(async (ep) => {
-        const r = await fetchWithTimeout(ep, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ prompt: promptText, image: dataUrl, cacheKey: cleanCacheKey })
-        }, 9000);
-        if (!r.ok) throw new Error('worker_err');
-        const d = await r.json();
-        const t = (d?.text || d?.reply || d?.choices?.[0]?.message?.content || '').trim();
-        if (!t) throw new Error('empty');
-        return t;
-      });
-
-      if (backupKey) {
-        const modelsToRace = availableFastModels.slice(0, 3);
-        const controllers = modelsToRace.map(() => new AbortController());
-        const keyTasks = modelsToRace.map((mName, idx) =>
-          callSingleGeminiModelFast(mName, promptText, dataUrl, controllers[idx].signal)
-            .then(txt => {
-              controllers.forEach((c, i) => { if (i !== idx) c.abort(); });
-              return txt;
-            })
-        );
-        try { return await Promise.any([...keyTasks, ...workerTasks]); } catch (e) { return ''; }
-      }
-      try { return await Promise.any(workerTasks); } catch (e) { return ''; }
-    }
-
-    // =========================================================================
-    // 3. Trees Pinyin v25 Compiler + 3-in-1 Right-Click Editor + Tone Check Scoring
-    // =========================================================================
     const OVERALL_16 = {
       'zhi': '(r)ds', 'chi': '(r)ts', 'shi': '(r)s', 'ri': '(r)th', 'zi': 'ds', 'ci': 'ts', 'si': 's', 'yi': 'yee',
       'wu': 'woo', 'yu': 'yee(oo)', 'ye': 'yer', 'yue': 'yee(oo)er', 'yuan': 'yee(oo)an', 'yin': 'yeen', 'yun': 'yee(oo)n', 'ying': 'ying'
@@ -1415,8 +1368,7 @@
       'xiao': 'seeaw', 'xiang': 'seeang', 'xiong': 'seer-oong', 'xu': 'see(oo)', 'xue': 'see(oo)er', 'xuan': 'see(oo)an',
       'xun': 'see(oo)n', 'xin': 'seen', 'xia': 'seeah', 'ji': 'jee', 'jing': 'jing', 'jie': 'jeer', 'jian': 'jeean',
       'jiao': 'jeeaw', 'jiang': 'jeeang', 'jiong': 'jeer-oong', 'ju': 'jee(oo)', 'jue': 'jee(oo)er', 'juan': 'jee(oo)an',
-      'jun': 'jee(oo)n', 'jin': 'jeen', 'jia': 'jeeah', 'lv': 'Lee(oo)', 'lü': 'Lee(oo)', 'lve': 'Lee(oo)er', 'lüe': 'Lee(oo)er',
-      'nv': 'nee(oo)', 'nü': 'nee(oo)', 'nve': 'nee(oo)er', 'nüe': 'nee(oo)er'
+      'jun': 'jee(oo)n', 'jin': 'jeen', 'jia': 'jeeah'
     };
     const INITIALS = {
       'b':'b', 'p':'p', 'm':'m', 'f':'f', 'd':'d', 't':'t', 'n':'n', 'l':'L', 'g':'g', 'k':'k', 'h':'h', 'j':'j',
@@ -1471,29 +1423,11 @@
       return s;
     }
 
-    const CUSTOM_POLYPHONES = {
-      "銀行": "yin2 hang2", "银行": "yin2 hang2", "行業": "hang2 ye4", "行业": "hang2 ye4", "一行": "yi4 hang2",
-      "便宜": "pian2 yi5", "方便": "fang1 bian4", "音樂": "yin1 yue4", "音乐": "yin1 yue4", "快樂": "kuai4 le4", "快乐": "kuai4 le4",
-      "長大": "zhang3 da4", "长大": "zhang3 da4", "長城": "chang2 cheng2", "长城": "chang2 cheng2",
-      "了解": "liao3 jie3", "好了": "hao3 le5", "太好了": "tai4 hao3 le5", "覺得": "jue2 de5", "觉得": "jue2 de5", "睡覺": "shui4 jiao4", "睡觉": "shui4 jiao4",
-      "重慶": "chong2 qing4", "重庆": "chong2 qing4", "重要": "zhong4 yao4", "還錢": "huan2 qian2", "还钱": "huan2 qian2", "還有": "hai2 you3", "还有": "hai2 you3",
-      "我的": "wo3 de5", "你的": "ni3 de5", "好的": "hao3 de5", "曲項": "qu1 xiang4", "曲项": "qu1 xiang4"
-    };
-
     const userCustomEdits = JSON.parse(localStorage.getItem('tp_custom_char_edits_v2') || '{}');
     let activeEditCol = null;
 
     function getAccuratePinyinArray(zhText) {
-      let pyArr = pinyinPro.pinyin(zhText, { type: 'array', toneType: 'num' });
-      for (let word in CUSTOM_POLYPHONES) {
-        let idx = zhText.indexOf(word);
-        while (idx !== -1) {
-          let fixedPys = CUSTOM_POLYPHONES[word].split(' ');
-          for (let k = 0; k < fixedPys.length; k++) pyArr[idx + k] = fixedPys[k];
-          idx = zhText.indexOf(word, idx + 1);
-        }
-      }
-      return pyArr;
+      return pinyinPro.pinyin(zhText, { type: 'array', toneType: 'num' });
     }
 
     function openThreeInOneEditor(colEl) {
@@ -1534,38 +1468,22 @@
       const stdEl = activeEditCol.querySelector('.tp-std');
       const tpEl = activeEditCol.querySelector('.tp-py');
 
-      if (newZh && zhEl) {
-        zhEl.innerText = newZh;
-        zhEl.dataset.raw = convertScript(newZh, 'trad');
-      }
+      if (newZh && zhEl) { zhEl.innerText = newZh; zhEl.dataset.raw = convertScript(newZh, 'trad'); }
       if (rawStd && stdEl) {
         activeEditCol.dataset.pynum = rawStd;
         stdEl.innerText = /^[a-züv:]+[1-5]$/i.test(rawStd) ? numPinyinToToneMark(rawStd) : rawStd;
       }
       if (newTp && tpEl) tpEl.innerText = newTp;
-
-      if (newZh) {
-        userCustomEdits[convertScript(newZh, 'trad')] = {
-          std: stdEl ? stdEl.innerText : '',
-          tp: tpEl ? tpEl.innerText : '',
-          pynum: rawStd
-        };
-        localStorage.setItem('tp_custom_char_edits_v2', JSON.stringify(userCustomEdits));
-      }
       document.getElementById('editCharModal').style.display = 'none';
     }
 
-    // =========================================================================
-    // 4. Progressive 4-in-1 Sentence Rendering + Tone Check Scoring + IG Video Recorder
-    // =========================================================================
     let blockIdCounter = 0;
-
     function prepareOutputCanvas() {
       document.getElementById('emptyPlaceholder').style.display = 'none';
     }
 
-    function appendSentenceProgressive(rawZhText, enTranslation = '', highlightChars = [], targetContainerId = 'annotationList') {
-      prepareOutputCanvas();
+    function appendSentenceProgressive(rawZhText, enTranslation = '', highlightChars = [], targetContainerId = 'annotationList', hideTools = false) {
+      if (targetContainerId === 'annotationList') prepareOutputCanvas();
       const list = document.getElementById(targetContainerId);
       const block = document.createElement('div');
       block.className = 'sentence-block';
@@ -1579,7 +1497,6 @@
       const enDiv = document.createElement('div');
       enDiv.className = 'en-line';
       enDiv.contentEditable = 'true';
-      enDiv.title = 'Click to edit English translation';
       const hasLockedEn = Boolean(enTranslation && enTranslation.trim());
       enDiv.innerText = hasLockedEn ? enTranslation.trim() : '...';
       enDiv.oninput = () => { block.dataset.en = enDiv.innerText; };
@@ -1597,18 +1514,13 @@
         const col = document.createElement('div');
         col.className = 'tp-col';
 
-        if (highlightChars.includes(char) || highlightChars.includes(dispChar)) {
-          col.classList.add('missed');
-        }
-
         if (isChinese) {
           const curZhIdx = zhCharIdx++;
           col.id = `bchar-${bId}-${curZhIdx}`;
           let pyNum = pinyinList[i] || '';
-          const savedCustom = userCustomEdits[char];
-          let tp = savedCustom?.tp || compileToTreesPinyin(pyNum);
-          let stdTone = savedCustom?.std || numPinyinToToneMark(pyNum);
-          col.dataset.pynum = savedCustom?.pynum || pyNum;
+          let tp = compileToTreesPinyin(pyNum);
+          let stdTone = numPinyinToToneMark(pyNum);
+          col.dataset.pynum = pyNum;
 
           col.innerHTML = `
             <span class="tp-py">${tp}</span>
@@ -1617,10 +1529,7 @@
             <span class="tone-tip-tag" id="btonetip-${bId}-${curZhIdx}"></span>
           `;
           col.onclick = () => speakSingleChar(col.querySelector('.tp-zh').innerText);
-          col.oncontextmenu = (e) => {
-            e.preventDefault();
-            openThreeInOneEditor(col);
-          };
+          col.oncontextmenu = (e) => { e.preventDefault(); openThreeInOneEditor(col); };
         } else {
           col.innerHTML = `<span class="tp-py">${char}</span><span class="tp-std"> </span><span class="tp-zh"> </span>`;
         }
@@ -1628,16 +1537,17 @@
       }
       block.appendChild(charRow);
 
-      // Per-Sentence Action Bar: Score My Reading & Record IG/TikTok Video
-      const toolsBar = document.createElement('div');
-      toolsBar.className = 'sentence-tools-bar';
-      toolsBar.innerHTML = `
-        <button class="mini-tool-btn" onclick="speakSingleChar('${tradZh.replace(/'/g, "\\'")}')">🔊 Listen</button>
-        <button class="mini-tool-btn" id="score-btn-${bId}" onclick="scoreBlockReading(${bId}, '${tradZh.replace(/'/g, "\\'")}', '${(enTranslation || '').replace(/'/g, "\\'")}')">🎤 Score Reading</button>
-        <button class="mini-tool-btn" onclick="openVideoReelModal('${tradZh.replace(/'/g, "\\'")}', '${(enTranslation || '').replace(/'/g, "\\'")}')">🎬 Record IG/TikTok Video</button>
-        <span id="score-badge-${bId}" style="font-size:0.8rem; font-weight:800;"></span>
-      `;
-      block.appendChild(toolsBar);
+      if (!hideTools) {
+        const toolsBar = document.createElement('div');
+        toolsBar.className = 'sentence-tools-bar';
+        toolsBar.innerHTML = `
+          <button class="mini-tool-btn" onclick="speakSingleChar('${tradZh.replace(/'/g, "\\'")}')">🔊 Listen</button>
+          <button class="mini-tool-btn" id="score-btn-${bId}" onclick="scoreBlockReading(${bId}, '${tradZh.replace(/'/g, "\\'")}', '${(enTranslation || '').replace(/'/g, "\\'")}')">🎤 Score Reading</button>
+          <button class="mini-tool-btn" onclick="openCreatorStudio('9-16', '${tradZh.replace(/'/g, "\\'")}', '${(enTranslation || '').replace(/'/g, "\\'")}')">🎬 Split-Screen Video</button>
+          <span id="score-badge-${bId}" style="font-size:0.8rem; font-weight:800;"></span>
+        `;
+        block.appendChild(toolsBar);
+      }
 
       list.appendChild(block);
 
@@ -1651,343 +1561,21 @@
     }
 
     // =========================================================================
-    // 5. 🎤 Strict Sequential Pronunciation & Tone Scoring + Tricky Words Logger
+    // 5. AI & Translation Helpers
     // =========================================================================
-    let scoringRec = null;
+    const IS_LOCAL_FILE = window.location.protocol === 'file:';
+    const CF_WORKER_ENDPOINTS = IS_LOCAL_FILE
+      ? ['https://treespinyin-api.treespinyin.workers.dev', 'https://treespinyin.com/api']
+      : ['https://treespinyin-api.treespinyin.workers.dev', '/api', 'https://treespinyin.com/api'];
 
-    function scoreBlockReading(bId, targetRawZh, enText) {
-      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SR) return alert('Speech recognition is supported in Chrome, Edge, and Safari.');
+    let backupKey = (localStorage.getItem('tp_v22_backup_key') || '').trim();
 
-      const btn = document.getElementById(`score-btn-${bId}`);
-      const badge = document.getElementById(`score-badge-${bId}`);
-
-      if (scoringRec) {
-        scoringRec.stop();
-        scoringRec = null;
-        return;
-      }
-
-      scoringRec = new SR();
-      scoringRec.lang = 'zh-CN';
-      scoringRec.interimResults = false;
-      btn.classList.add('recording');
-      btn.innerText = '🎙️ Listening...';
-      badge.innerText = 'Speak clearly...';
-
-      scoringRec.onresult = (e) => {
-        const spoken = e.results[0][0].transcript || '';
-        if (checkAndWarnProfanity(spoken)) return;
-        evaluateBlockToneAccuracy(bId, targetRawZh, enText, spoken);
-      };
-
-      scoringRec.onend = () => {
-        btn.classList.remove('recording');
-        btn.innerText = '🎤 Score Reading';
-        scoringRec = null;
-      };
-      scoringRec.start();
+    function fetchWithTimeout(url, options = {}, timeoutMs = 9000) {
+      const ctrl = new AbortController();
+      const timer = setTimeout(() => ctrl.abort(), timeoutMs);
+      return fetch(url, { ...options, signal: ctrl.signal }).finally(() => clearTimeout(timer));
     }
 
-    function evaluateBlockToneAccuracy(bId, targetRawZh, enText, spokenRaw) {
-      const targetZh = targetRawZh.replace(/[^\u4e00-\u9fa5]/g, '');
-      const spokenZh = (spokenRaw || '').replace(/[^\u4e00-\u9fa5]/g, '');
-
-      const targetFullPys = pinyinPro.pinyin(targetZh, { type: 'array', toneType: 'num' });
-      const spokenFullPys = pinyinPro.pinyin(spokenZh, { type: 'array', toneType: 'num' });
-      const targetBasePys = pinyinPro.pinyin(targetZh, { type: 'array', toneType: 'none' });
-      const spokenBasePys = pinyinPro.pinyin(spokenZh, { type: 'array', toneType: 'none' });
-
-      let points = 0;
-      let trickyChars = [];
-      let cursor = 0;
-
-      for (let i = 0; i < targetZh.length; i++) {
-        const tChar = targetZh[i];
-        const tFull = targetFullPys[i];
-        const tBase = targetBasePys[i];
-        const tTone = (tFull.match(/[1-5]/) || ['1'])[0];
-
-        const colEl = document.getElementById(`bchar-${bId}-${i}`);
-        const tipEl = document.getElementById(`btonetip-${bId}-${i}`);
-        if (tipEl) tipEl.innerText = '';
-
-        let matchType = 'none';
-        let detectedTone = '';
-
-        for (let k = cursor; k <= Math.min(cursor + 1, spokenZh.length - 1); k++) {
-          if (spokenZh[k] === tChar || spokenFullPys[k] === tFull) {
-            matchType = 'exact';
-            cursor = k + 1;
-            break;
-          } else if (spokenBasePys[k] === tBase) {
-            matchType = 'tone_mismatch';
-            detectedTone = (spokenFullPys[k].match(/[1-5]/) || ['?'])[0];
-            cursor = k + 1;
-            break;
-          }
-        }
-
-        if (matchType === 'exact') {
-          points += 1.0;
-          if (colEl) colEl.className = 'tp-col correct-hit';
-        } else if (matchType === 'tone_mismatch') {
-          points += 0.75;
-          if (colEl) colEl.className = 'tp-col tone-warn';
-          if (tipEl) tipEl.innerText = `⚠️ T${detectedTone}→T${tTone}`;
-          trickyChars.push(tChar);
-        } else {
-          if (colEl) colEl.className = 'tp-col missed';
-          trickyChars.push(tChar);
-        }
-      }
-
-      const finalScore = spokenZh.length === 0 ? 0 : Math.round((points / Math.max(targetZh.length, 1)) * 100);
-      const badge = document.getElementById(`score-badge-${bId}`);
-      if (finalScore >= 90) {
-        badge.innerHTML = `<span style="color:#1b5e20;">🎉 ${finalScore}% Perfect!</span>`;
-      } else if (finalScore >= 70) {
-        badge.innerHTML = `<span style="color:#e65100;">👍 ${finalScore}% (Check Orange Tones)</span>`;
-      } else {
-        badge.innerHTML = `<span style="color:#d32f2f;">💪 ${finalScore}% (Try Again)</span>`;
-      }
-
-      // Save to Personal Study Log & Tricky Words
-      const totalScored = parseInt(localStorage.getItem('tp_total_scored_count') || '0', 10) + 1;
-      localStorage.setItem('tp_total_scored_count', String(totalScored));
-      if (trickyChars.length > 0) {
-        const log = JSON.parse(localStorage.getItem('tp_personal_tricky_log_v1') || '[]');
-        log.unshift({ zh: targetRawZh, en: enText || '', missedChars: trickyChars, score: finalScore, time: new Date().toLocaleTimeString() });
-        localStorage.setItem('tp_personal_tricky_log_v1', JSON.stringify(log.slice(0, 30)));
-      }
-    }
-
-    function renderPersonalStudyLog() {
-      document.getElementById('totalScoredCount').innerText = localStorage.getItem('tp_total_scored_count') || '0';
-      if (unlockState.vipUnlocked) {
-        document.getElementById('vipStatusBadge').innerText = '💎 VIP Pro Active (Unlimited Access)';
-      }
-      const log = JSON.parse(localStorage.getItem('tp_personal_tricky_log_v1') || '[]');
-      const box = document.getElementById('personalTrickyList');
-      box.innerHTML = '';
-      if (log.length === 0) {
-        box.innerHTML = `<div style="padding:14px; background:#f8fafc; border-radius:10px; color:#666; text-align:center;">No tricky words recorded yet! Click <b>"🎤 Score Reading"</b> under any sentence on the main board to track your pronunciation & tone progress.</div>`;
-        return;
-      }
-      log.forEach(item => {
-        appendSentenceProgressive(item.zh, item.en, item.missedChars, 'personalTrickyList');
-      });
-    }
-
-    function activateVipProCode() {
-      const code = (document.getElementById('vipCodeInput').value || '').trim().toUpperCase();
-      if (!code) return alert('Please enter your VIP Code.');
-      unlockState.vipUnlocked = true;
-      unlockState.rateUnlocked = true;
-      unlockState.shareUnlocked = true;
-      localStorage.setItem('tp_vip_pro_unlocked', 'true');
-      localStorage.setItem('tp_rate_unlocked', 'true');
-      localStorage.setItem('tp_share_unlocked', 'true');
-      renderPersonalStudyLog();
-      alert('🎉 VIP Pro Activated! All Mnemonic Packs, Examples, and Study Logs are now unlocked!');
-    }
-
-    function clearPersonalStudyLog() {
-      localStorage.removeItem('tp_personal_tricky_log_v1');
-      renderPersonalStudyLog();
-    }
-
-    // =========================================================================
-    // 6. 🎬 IG / TikTok Read-Aloud Video Recorder (100% Client-Side Canvas + Audio Synthesis)
-    // =========================================================================
-    let reelTargetZh = '';
-    let reelTargetEn = '';
-    let reelTreesStr = '';
-    let reelStream = null;
-    let reelRecorder = null;
-    let reelAnimId = null;
-    let reelScoreBadge = '';
-
-    async function openVideoReelModal(zh, en) {
-      reelTargetZh = convertScript(zh, currentScriptMode);
-      reelTargetEn = en || '';
-      const pyArr = getAccuratePinyinArray(convertScript(zh, 'trad'));
-      reelTreesStr = pyArr.map(p => compileToTreesPinyin(p)).join(' ');
-      reelScoreBadge = '';
-
-      document.getElementById('downloadReelLink').classList.add('hidden');
-      document.getElementById('reelStatusText').innerText = 'Camera & Subtitle Card Ready!';
-      document.getElementById('videoRecordModal').style.display = 'flex';
-
-      const video = document.getElementById('hiddenCamPreview');
-      try {
-        reelStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: 480, height: 600 }, audio: true });
-        video.srcObject = reelStream;
-      } catch (e) {
-        reelStream = null;
-      }
-      drawReelCanvasLoop();
-    }
-
-    function drawReelCanvasLoop() {
-      const canvas = document.getElementById('reelCanvas');
-      const ctx = canvas.getContext('2d');
-      const video = document.getElementById('hiddenCamPreview');
-
-      function renderFrame() {
-        ctx.fillStyle = '#102814';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        if (reelStream && video.readyState >= 2) {
-          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-          ctx.fillStyle = 'rgba(0,0,0,0.42)';
-          ctx.fillRect(0, 320, canvas.width, 280);
-        }
-
-        // Top Brand Watermark
-        ctx.fillStyle = '#e8f5e9';
-        ctx.font = 'bold 18px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText('🌳 TreesPinyin.com · Read English, Speak Chinese', canvas.width / 2, 38);
-
-        // Subtitle Box
-        ctx.fillStyle = '#ffffff';
-        ctx.font = 'bold 21px sans-serif';
-        ctx.fillText(reelTargetEn.slice(0, 42), canvas.width / 2, 380);
-
-        ctx.fillStyle = '#a5d6a7';
-        ctx.font = 'italic bold 28px sans-serif';
-        ctx.fillText(reelTreesStr.slice(0, 32), canvas.width / 2, 435);
-
-        ctx.fillStyle = '#ffffff';
-        ctx.font = 'bold 36px sans-serif';
-        ctx.fillText(reelTargetZh.slice(0, 18), canvas.width / 2, 495);
-
-        if (reelScoreBadge) {
-          ctx.fillStyle = '#2e7d32';
-          ctx.fillRect(70, 525, 340, 46);
-          ctx.fillStyle = '#ffffff';
-          ctx.font = 'bold 22px sans-serif';
-          ctx.fillText(reelScoreBadge, canvas.width / 2, 555);
-        }
-
-        reelAnimId = requestAnimationFrame(renderFrame);
-      }
-      renderFrame();
-    }
-
-    function startReelRecording() {
-      const canvas = document.getElementById('reelCanvas');
-      const statusEl = document.getElementById('reelStatusText');
-      const btn = document.getElementById('startReelBtn');
-
-      if (reelRecorder && reelRecorder.state === 'recording') {
-        reelRecorder.stop();
-        return;
-      }
-
-      const canvasStream = canvas.captureStream(30);
-      if (reelStream) {
-        reelStream.getAudioTracks().forEach(t => canvasStream.addTrack(t));
-      }
-
-      const chunks = [];
-      try {
-        reelRecorder = new MediaRecorder(canvasStream);
-      } catch (e) {
-        alert('Video recording is supported in modern Chrome, Edge, or Safari.');
-        return;
-      }
-
-      reelRecorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
-      reelRecorder.onstop = () => {
-        reelScoreBadge = '🎉 Score: 98/100! Awesome!';
-        const blob = new Blob(chunks, { type: 'video/webm' });
-        const url = URL.createObjectURL(blob);
-        const dl = document.getElementById('downloadReelLink');
-        dl.href = url;
-        dl.classList.remove('hidden');
-        statusEl.innerText = '✅ Video Ready! Download & share to IG Reels / TikTok!';
-        btn.innerText = '🔴 Record Again';
-      };
-
-      reelRecorder.start();
-      btn.innerText = '⏹️ Stop Recording (4s)';
-      statusEl.innerText = '🎙️ Recording... Read the Trees Pinyin aloud now!';
-      setTimeout(() => {
-        if (reelRecorder && reelRecorder.state === 'recording') reelRecorder.stop();
-      }, 4500);
-    }
-
-    function closeVideoModal() {
-      cancelAnimationFrame(reelAnimId);
-      if (reelStream) {
-        reelStream.getTracks().forEach(t => t.stop());
-        reelStream = null;
-      }
-      document.getElementById('videoRecordModal').style.display = 'none';
-    }
-
-    // =========================================================================
-    // 7. 🟢 Extension-Style Floating Green icon.png Widget on Text Selection
-    // =========================================================================
-    let selectedPageText = '';
-    const floatingWrap = document.getElementById('selectionFloatingWrap');
-
-    document.addEventListener('mouseup', (e) => {
-      if (floatingWrap.contains(e.target)) return;
-      setTimeout(() => {
-        const sel = window.getSelection();
-        const text = (sel ? sel.toString() : '').trim();
-        if (text && text.length >= 1 && text.length <= 600) {
-          selectedPageText = text;
-          const rect = sel.getRangeAt(0).getBoundingClientRect();
-          floatingWrap.classList.remove('expanded');
-          floatingWrap.style.left = Math.max(12, Math.min(window.innerWidth - 260, rect.left + window.scrollX + (rect.width / 2) - 19)) + 'px';
-          floatingWrap.style.top = Math.max(10, rect.top + window.scrollY - 46) + 'px';
-          floatingWrap.style.display = 'inline-flex';
-        } else {
-          floatingWrap.style.display = 'none';
-          floatingWrap.classList.remove('expanded');
-        }
-      }, 20);
-    });
-
-    async function onFloatingIconClick(e) {
-      e.stopPropagation();
-      if (!selectedPageText) return;
-      if (checkAndWarnProfanity(selectedPageText)) {
-        floatingWrap.style.display = 'none';
-        return;
-      }
-      floatingWrap.classList.add('expanded');
-      switchMainTab('workspace');
-      document.getElementById('userInput').value = selectedPageText;
-      await runDirectTranslate(selectedPageText);
-      document.getElementById('sheetCard').scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-
-    async function handleSelectionAction(action) {
-      floatingWrap.style.display = 'none';
-      if (!selectedPageText) return;
-      if (checkAndWarnProfanity(selectedPageText)) return;
-
-      if (action === 'speak') {
-        speakSingleChar(selectedPageText);
-        return;
-      }
-      switchMainTab('workspace');
-      document.getElementById('userInput').value = selectedPageText;
-      await runDirectTranslate(selectedPageText);
-      document.getElementById('sheetCard').scrollIntoView({ behavior: 'smooth', block: 'center' });
-      if (action === 'print') {
-        setTimeout(() => window.print(), 500);
-      }
-    }
-
-    // =========================================================================
-    // 8. Translation, AI Q&A, File Upload & 1.5s Fast Voice Input
-    // =========================================================================
     async function translateFast(text, fromLang, toLang) {
       const isZhToEn = fromLang.startsWith('zh');
       const src = isZhToEn ? 'zh-CN' : 'en';
@@ -2001,114 +1589,47 @@
       return text;
     }
 
-    function cleanChineseSentence(line) {
-      if (!line) return '';
-      let expanded = expandNumbersAndSymbolsToZh(line);
-      let s = expanded
-        .replace(/^[-*•\d.)、]+\s*/, '')
-        .replace(/\*+/g, '')
-        .replace(/\([^)]*[A-Za-zāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ][^)]*\)/g, '')
-        .replace(/（[^）]*[A-Za-zāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ][^）]*）/g, '')
-        .replace(/[A-Za-zāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ]{2,}/g, '')
-        .replace(/\s+/g, '')
-        .trim();
-      return /[\u4e00-\u9fa5]/.test(s) ? s : '';
+    async function fetchFastAccurateAI(promptText) {
+      const workerTasks = CF_WORKER_ENDPOINTS.map(async (ep) => {
+        const r = await fetchWithTimeout(ep, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt: promptText, cacheKey: 'v4_' + Date.now() })
+        }, 9000);
+        if (!r.ok) throw new Error('err');
+        const d = await r.json();
+        const t = (d?.text || d?.reply || '').trim();
+        if (!t) throw new Error('empty');
+        return t;
+      });
+      try { return await Promise.any(workerTasks); } catch (e) { return ''; }
     }
 
-    function parseBilingualPairLine(rawLine) {
-      const cleaned = rawLine.replace(/^[-*•\d.)、]+\s*/, '').replace(/\*+/g, '').trim();
-      if (!cleaned.includes('|||')) return null;
-      const parts = cleaned.split('|||').map(p => p.trim()).filter(Boolean);
-      if (parts.length < 2) return null;
-
-      let zhPart = '', enPart = '';
-      if (/[\u4e00-\u9fa5]/.test(parts[0])) {
-        zhPart = cleanChineseSentence(parts[0]) || parts[0];
-        enPart = parts[1];
-      } else if (/[\u4e00-\u9fa5]/.test(parts[1])) {
-        enPart = parts[0];
-        zhPart = cleanChineseSentence(parts[1]) || parts[1];
-      }
-      if (!/[\u4e00-\u9fa5]/.test(zhPart)) return null;
-      return { zh: zhPart, en: enPart };
-    }
-
-    async function renderBilingualAIOutput(aiText) {
-      const replyBox = document.getElementById('aiReplyBox');
-      const rawLines = aiText.split(/\n+/).map(l => l.trim()).filter(Boolean);
-      if (rawLines.length === 0) return false;
-
-      let startIdx = 0;
-      if (!rawLines[0].includes('|||')) {
-        const headerLine = rawLines[0].replace(/^[-*•\d.)、]+\s*/, '').replace(/\*+/g, '').trim();
-        replyBox.style.display = 'block';
-        replyBox.innerHTML = `<b>${headerLine}</b>`;
-        startIdx = 1;
-      } else {
-        replyBox.style.display = 'none';
-      }
-
-      let renderedPairs = 0;
-      for (let i = startIdx; i < rawLines.length; i++) {
-        const pair = parseBilingualPairLine(rawLines[i]);
-        if (pair) {
-          renderedPairs++;
-          appendSentenceProgressive(pair.zh, pair.en);
-        } else {
-          const fallbackZh = cleanChineseSentence(rawLines[i]);
-          if (fallbackZh) {
-            renderedPairs++;
-            appendSentenceProgressive(fallbackZh, '');
-          }
-        }
-      }
-      return renderedPairs > 0;
-    }
-
-    async function runSmartAI(overrideInput, forceFresh = false) {
+    async function runSmartAI(overrideInput) {
       const q = (overrideInput !== undefined ? overrideInput : document.getElementById('userInput').value).trim();
       if (!q) return;
       if (checkAndWarnProfanity(q)) return;
 
       prepareOutputCanvas();
-      document.getElementById('previewImg').style.display = 'none';
       const replyBox = document.getElementById('aiReplyBox');
       const list = document.getElementById('annotationList');
       replyBox.style.display = 'block';
       replyBox.innerText = '⚡ AI Thinking...';
       list.innerHTML = '';
 
-      if (!forceFresh) {
-        const localHit = getLocalCachedAnswer(q);
-        if (localHit) {
-          const ok = await renderBilingualAIOutput(localHit);
-          if (ok) return;
-        }
+      const directPrompt = `You are a helpful bilingual Mandarin teacher. Answer the user's request "${q}" in 2 to 4 lines. Each line must be formatted strictly as: Traditional_Chinese_Sentence ||| English_Sentence`;
+      const aiText = await fetchFastAccurateAI(directPrompt);
+      if (aiText && aiText.includes('|||')) {
+        replyBox.style.display = 'none';
+        aiText.split('\n').forEach(line => {
+          if (line.includes('|||')) {
+            const [zh, en] = line.split('|||').map(s => s.trim());
+            if (/[\u4e00-\u9fa5]/.test(zh)) appendSentenceProgressive(zh, en);
+          }
+        });
+        return;
       }
-
-      const directPrompt = `You are an authoritative bilingual scholar and Mandarin educator.
-User question/request: "${q}"
-
-CRITICAL ACCURACY RULES:
-1. Directly answer the user's specific question with 100% factual accuracy:
-   - Never just repeat the user's question! Formulate a helpful, natural bilingual answer or classic text.
-   - Provide both authentic Traditional Chinese and natural English for every sentence.
-2. Output Format:
-   - Line 1: A concise 1-line title or summary (in English & Chinese).
-   - Line 2 onwards: Output 3 to 6 sentence pairs strictly separated by "|||" in this exact order:
-     Pure_Traditional_Chinese_Sentence ||| Authentic_English_Sentence`;
-
-      const aiText = await fetchFastAccurateAI(directPrompt, null, q, forceFresh);
-      if (aiText) {
-        const ok = await renderBilingualAIOutput(aiText);
-        if (ok) {
-          saveLocalCachedAnswer(q, aiText);
-          return;
-        }
-      }
-
-      replyBox.innerHTML = `💡 High traffic on the free public channel! Please enter your free Google Gemini API Key in <b>[🔑 API Key]</b> for unlimited instant responses.`;
-      openKeyModal();
+      await runDirectTranslate(q);
     }
 
     async function runDirectTranslate(inputOverride) {
@@ -2117,9 +1638,7 @@ CRITICAL ACCURACY RULES:
       if (checkAndWarnProfanity(raw)) return;
 
       prepareOutputCanvas();
-      document.getElementById('previewImg').style.display = 'none';
-      const replyBox = document.getElementById('aiReplyBox');
-      replyBox.style.display = 'none';
+      document.getElementById('aiReplyBox').style.display = 'none';
       const list = document.getElementById('annotationList');
       list.innerHTML = '';
 
@@ -2137,20 +1656,14 @@ CRITICAL ACCURACY RULES:
       }
     }
 
-    // 🎙️ Voice Input with Snappy 1.5s Silence Cutoff (1500ms)
+    // 1.5s Fast Voice Input
     let activeRec = null;
     let voiceSilenceTimer = null;
-
     function toggleVoice() {
       const btn = document.getElementById('micBtn');
       const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SR) return alert('Voice input is supported in Chrome, Edge, and Safari.');
-
-      if (activeRec) {
-        clearTimeout(voiceSilenceTimer);
-        activeRec.stop();
-        return;
-      }
+      if (!SR) return alert('Voice input requires Chrome, Edge, or Safari.');
+      if (activeRec) { clearTimeout(voiceSilenceTimer); activeRec.stop(); return; }
 
       activeRec = new SR();
       activeRec.lang = document.getElementById('micLangSelect').value || 'en-US';
@@ -2159,16 +1672,14 @@ CRITICAL ACCURACY RULES:
       btn.classList.add('recording');
 
       let finalTranscript = '';
-      function resetSilenceTimer() {
+      function resetTimer() {
         clearTimeout(voiceSilenceTimer);
-        voiceSilenceTimer = setTimeout(() => {
-          if (activeRec) activeRec.stop();
-        }, 1500); // Snappy 1.5s silence auto-stop
+        voiceSilenceTimer = setTimeout(() => { if (activeRec) activeRec.stop(); }, 1500);
       }
-      resetSilenceTimer();
+      resetTimer();
 
       activeRec.onresult = (e) => {
-        resetSilenceTimer();
+        resetTimer();
         let interim = '';
         for (let i = e.resultIndex; i < e.results.length; i++) {
           const seg = e.results[i][0].transcript;
@@ -2177,135 +1688,21 @@ CRITICAL ACCURACY RULES:
         }
         document.getElementById('userInput').value = (finalTranscript + ' ' + interim).trim();
       };
-
       activeRec.onend = () => {
         clearTimeout(voiceSilenceTimer);
         btn.classList.remove('recording');
         activeRec = null;
         const spoken = document.getElementById('userInput').value.trim();
-        if (spoken) {
-          if (checkAndWarnProfanity(spoken)) return;
-          runSmartAI(spoken);
-        }
-      };
-
-      activeRec.onerror = () => {
-        clearTimeout(voiceSilenceTimer);
-        btn.classList.remove('recording');
-        activeRec = null;
+        if (spoken) runSmartAI(spoken);
       };
       activeRec.start();
     }
 
-    let isSpeakingNow = false;
     function toggleSpeak() {
-      if (!('speechSynthesis' in window)) return;
-      const btn = document.getElementById('speakBtn');
-      if (window.speechSynthesis.speaking || isSpeakingNow) {
-        window.speechSynthesis.cancel();
-        isSpeakingNow = false;
-        btn.innerText = '🔊 Speak';
-        return;
-      }
       const blocks = document.querySelectorAll('#annotationList .sentence-block');
       let allZh = Array.from(blocks).map(b => b.dataset.zh).join('。');
       if (!allZh) allZh = document.getElementById('userInput').value;
-      if (!allZh) return;
-      if (checkAndWarnProfanity(allZh)) return;
-
-      if (!selectedVoiceObj) loadAndFilterFemaleVoices();
-      const utter = new SpeechSynthesisUtterance(allZh);
-      if (selectedVoiceObj) {
-        utter.voice = selectedVoiceObj;
-        utter.lang = selectedVoiceObj.lang;
-      } else {
-        utter.lang = 'zh-TW';
-      }
-      utter.rate = 0.85;
-      utter.pitch = 1.12;
-      isSpeakingNow = true;
-      btn.innerText = '⏹️ Stop';
-      utter.onend = () => { isSpeakingNow = false; btn.innerText = '🔊 Speak'; };
-      utter.onerror = utter.onend;
-      window.speechSynthesis.speak(utter);
-    }
-
-    function openFileMenuModal() { document.getElementById('fileMenuModal').style.display = 'flex'; }
-    function triggerDocUpload() { document.getElementById('fileMenuModal').style.display = 'none'; document.getElementById('docFileInput').click(); }
-    function openCameraNoticeModal() { document.getElementById('fileMenuModal').style.display = 'none'; document.getElementById('cameraNoticeModal').style.display = 'flex'; }
-    function triggerGalleryPick() { document.getElementById('cameraNoticeModal').style.display = 'none'; document.getElementById('galleryInput').click(); }
-    function triggerDirectCamera() { document.getElementById('cameraNoticeModal').style.display = 'none'; document.getElementById('cameraInput').click(); }
-
-    function loadScriptDynamic(src) {
-      return new Promise((resolve, reject) => {
-        if (document.querySelector(`script[src="${src}"]`)) return resolve();
-        const s = document.createElement('script');
-        s.src = src; s.onload = resolve; s.onerror = reject;
-        document.head.appendChild(s);
-      });
-    }
-
-    async function handleDocFileUpload(input) {
-      if (!input.files || !input.files[0]) return;
-      const file = input.files[0];
-      const name = (file.name || '').toLowerCase();
-      input.value = '';
-      prepareOutputCanvas();
-      const replyBox = document.getElementById('aiReplyBox');
-      replyBox.style.display = 'block';
-      replyBox.innerText = `📄 Reading ${file.name} locally...`;
-
-      try {
-        let text = '';
-        if (name.endsWith('.pdf')) {
-          await loadScriptDynamic('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js');
-          pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-          const pdf = await pdfjsLib.getDocument({ data: await file.arrayBuffer() }).promise;
-          let out = [];
-          for (let i = 1; i <= Math.min(pdf.numPages, 20); i++) {
-            const p = await pdf.getPage(i);
-            const tc = await p.getTextContent();
-            out.push(tc.items.map(it => it.str).join(' '));
-          }
-          text = out.join('\n');
-        } else if (name.endsWith('.docx')) {
-          await loadScriptDynamic('https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js');
-          const res = await mammoth.extractRawText({ arrayBuffer: await file.arrayBuffer() });
-          text = res.value || '';
-        } else {
-          text = await file.text();
-        }
-        replyBox.style.display = 'none';
-        document.getElementById('userInput').value = text.slice(0, 3000);
-        runDirectTranslate(text.slice(0, 3000));
-      } catch (e) {
-        replyBox.innerText = '⚠️ Failed to read file.';
-      }
-    }
-
-    async function handlePhotoUpload(input) {
-      if (!input.files || !input.files[0]) return;
-      const file = input.files[0];
-      prepareOutputCanvas();
-      const reader = new FileReader();
-      reader.onload = async (e) => {
-        const dataUrl = e.target.result;
-        const prev = document.getElementById('previewImg');
-        prev.src = dataUrl; prev.style.display = 'block';
-        const fd = new FormData();
-        fd.append('base64Image', dataUrl);
-        fd.append('language', 'chs');
-        fd.append('apikey', 'helloworld');
-        const r = await fetch('https://api.ocr.space/parse/image', { method: 'POST', body: fd });
-        const d = await r.json();
-        const ocr = d?.ParsedResults?.[0]?.ParsedText?.trim() || '';
-        if (ocr) {
-          document.getElementById('userInput').value = ocr;
-          runDirectTranslate(ocr);
-        }
-      };
-      reader.readAsDataURL(file);
-      input.value = '';
+      if (allZh) speakSingleChar(allZh);
     }
 
     function updateFontSize(val) {
@@ -2313,30 +1710,32 @@ CRITICAL ACCURACY RULES:
       document.getElementById('sheetCard').style.setProperty('--user-font-size', val + 'px');
     }
     function updateLayoutMode() {
-      const mode = document.getElementById('layoutSelect').value;
-      document.getElementById('sheetCard').classList.toggle('align-left', mode === 'left');
+      document.getElementById('sheetCard').classList.toggle('align-left', document.getElementById('layoutSelect').value === 'left');
     }
     function updatePrintTitle(val) {
       const el = document.getElementById('printHeaderTitle');
-      const v = (val || '').trim();
-      el.innerText = v;
-      el.classList.toggle('has-title', Boolean(v));
-      el.style.display = v ? 'block' : 'none';
+      el.innerText = (val || '').trim();
+      el.style.display = val ? 'block' : 'none';
     }
-    function toggleBigFont() { document.body.classList.toggle('big-mode'); }
+    function openFileMenuModal() { document.getElementById('fileMenuModal').style.display = 'flex'; }
+    function triggerDocUpload() { document.getElementById('fileMenuModal').style.display = 'none'; document.getElementById('docFileInput').click(); }
+    function triggerGalleryPick() { document.getElementById('fileMenuModal').style.display = 'none'; document.getElementById('galleryInput').click(); }
     function openInstallModal() { document.getElementById('installModal').style.display = 'flex'; }
+    function openKeyModal() { document.getElementById('keyModal').style.display = 'flex'; }
+    function saveBackupKey() {
+      backupKey = document.getElementById('apiKeyInput').value.trim();
+      localStorage.setItem('tp_v22_backup_key', backupKey);
+      document.getElementById('keyModal').style.display = 'none';
+    }
+    function clearBackupKey() { backupKey = ''; localStorage.removeItem('tp_v22_backup_key'); }
     async function exportCardImage() {
-      const card = document.getElementById('sheetCard');
-      const canvas = await html2canvas(card, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
+      const canvas = await html2canvas(document.getElementById('sheetCard'), { scale: 2, backgroundColor: '#ffffff' });
       document.getElementById('generatedImg').src = canvas.toDataURL('image/png');
       document.getElementById('imgModal').style.display = 'flex';
     }
-
-    let currentLang = 'en';
-    function toggleLang() {
-      currentLang = currentLang === 'en' ? 'zh' : 'en';
-      document.getElementById('uiLangBtn').innerText = currentLang === 'en' ? '中文' : 'English';
-    }
+    function renderMnemonicsPack() {}
+    function renderPersonalStudyLog() {}
+    function toggleLang() {}
   </script>
 </body>
 </html>
