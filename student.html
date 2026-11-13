@@ -29,11 +29,6 @@
     .nav-left { display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; }
     .brand-logo { width: 32px; height: 32px; border-radius: 8px; }
     .brand-title { font-size: 1.1rem; font-weight: 800; color: var(--accent); }
-    .badge-safe {
-      background: var(--accent-soft); color: var(--accent);
-      font-size: 0.75rem; font-weight: 700; padding: 4px 10px; border-radius: 20px;
-      border: 1px solid #c8e6c9;
-    }
     .main-wrap { width: 100%; max-width: 820px; padding: 16px; display: flex; flex-direction: column; gap: 14px; }
     .card {
       background: var(--card); border: 1px solid var(--border); border-radius: 16px;
@@ -41,11 +36,9 @@
       display: flex; flex-direction: column; gap: 12px;
     }
     .input-row { display: flex; gap: 10px; flex-wrap: wrap; }
-    input[type="text"] {
-      flex: 1; min-width: 180px; padding: 10px 14px; border: 1.5px solid #cbd5e1;
-      border-radius: 10px; font-size: 0.95rem; outline: none;
+    input[type="text"], select {
+      padding: 9px 12px; border: 1.5px solid #cbd5e1; border-radius: 10px; font-size: 0.9rem; outline: none;
     }
-    input[type="text"]:focus { border-color: var(--accent); }
     .btn {
       padding: 10px 16px; border: none; border-radius: 10px; font-size: 0.9rem;
       font-weight: 700; cursor: pointer; display: inline-flex; align-items: center;
@@ -57,68 +50,46 @@
     .btn-mic.recording { background: var(--danger); color: #fff; animation: pulse 1s infinite; }
     @keyframes pulse { 50% { opacity: 0.5; } }
 
-    /* 顯示控制列 */
     .controls-bar {
       display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between;
       background: #f8fafc; padding: 10px 14px; border-radius: 12px; border: 1px solid #e2e8f0;
       font-size: 0.84rem; font-weight: 600;
     }
     .checkbox-group { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
-    .checkbox-group label { display: inline-flex; align-items: center; gap: 4px; cursor: pointer; }
-
-    /* 作業題目卡片 */
     .hw-item {
       border: 1.5px solid #e2e8f0; border-radius: 14px; padding: 16px;
-      display: flex; flex-direction: column; align-items: center; gap: 12px;
-      background: #ffffff;
+      display: flex; flex-direction: column; align-items: center; gap: 12px; background: #fff;
     }
     .hw-item.passed { border-color: #2e7d32; background: #f4fbf5; }
-    .type-badge {
-      font-size: 0.75rem; font-weight: 800; padding: 3px 10px; border-radius: 8px;
-      background: #e0f2fe; color: #0369a1;
-    }
+    .type-badge { font-size: 0.75rem; font-weight: 800; padding: 3px 10px; border-radius: 8px; background: #e0f2fe; color: #0369a1; }
     .en-line { font-size: 1.05rem; font-weight: 700; color: #111; text-align: center; }
     .char-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 4px; }
     .tp-col {
       display: inline-flex; flex-direction: column; align-items: center;
-      padding: 4px 6px; border-radius: 8px; cursor: pointer; transition: 0.12s;
+      padding: 4px 6px; border-radius: 8px; cursor: pointer; position: relative;
     }
     .tp-col:hover { background: #e8f5e9; }
+    .tp-col.correct-hit { background: #e8f5e9; border: 1.5px solid #66bb6a; }
+    .tp-col.tone-warn { background: #fff8e1; border: 1.5px solid #ffa000; }
     .tp-col.missed { background: #ffebee; border: 1.5px dashed #d32f2f; }
-    .tp-col.correct-hit { background: #e8f5e9; border: 1px solid #81c784; }
-    .tp-py { font-size: 1.12rem; font-weight: 700; font-style: italic; color: var(--accent); line-height: 1.15; }
-    .tp-std { font-size: 0.85rem; color: #6b7280; line-height: 1.15; }
-    .tp-zh { font-size: 1.55rem; font-weight: 700; color: #000; line-height: 1.25; }
+    .tone-tip-tag { font-size: 0.68rem; font-weight: 800; color: #e65100; margin-top: 2px; }
+    .tp-py { font-size: 1.12rem; font-weight: 700; font-style: italic; color: var(--accent); }
+    .tp-std { font-size: 0.85rem; color: #6b7280; }
+    .tp-zh { font-size: 1.55rem; font-weight: 700; color: #000; }
 
-    /* 四排動態隱藏 */
     body.hide-en .en-line { display: none !important; }
     body.hide-tp .tp-py { display: none !important; }
     body.hide-std .tp-std { display: none !important; }
     body.hide-zh .tp-zh { display: none !important; }
 
-    /* 看英文選漢字 (MCQ 四選一) */
-    .mcq-grid {
-      display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 100%; max-width: 540px;
-    }
+    .mcq-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 100%; max-width: 540px; }
     .mcq-option {
-      border: 2px solid #cbd5e1; border-radius: 12px; padding: 12px;
-      background: #fff; cursor: pointer; display: flex; flex-direction: column;
-      align-items: center; gap: 6px; transition: all 0.15s;
+      border: 2px solid #cbd5e1; border-radius: 12px; padding: 12px; background: #fff;
+      cursor: pointer; display: flex; flex-direction: column; align-items: center;
     }
-    .mcq-option:hover { border-color: var(--accent); background: #f9fbe7; }
     .mcq-option.correct { border-color: #2e7d32; background: #e8f5e9; }
     .mcq-option.wrong { border-color: #d32f2f; background: #ffebee; }
-
-    /* 記憶例句框 */
-    .example-box {
-      width: 100%; background: #f8fafc; border: 1px dashed #cbd5e1;
-      border-radius: 12px; padding: 12px; display: flex; flex-direction: column;
-      align-items: center; gap: 8px;
-    }
-    .score-pill {
-      font-size: 0.85rem; font-weight: 800; padding: 4px 12px; border-radius: 20px;
-      background: #eee; color: #333;
-    }
+    .score-pill { font-size: 0.85rem; font-weight: 800; padding: 4px 12px; border-radius: 20px; background: #eee; }
     .score-pill.high { background: #2e7d32; color: #fff; }
     .score-pill.mid { background: #f59e0b; color: #fff; }
     .score-pill.low { background: #d32f2f; color: #fff; }
@@ -129,30 +100,26 @@
   <header class="navbar">
     <a href="index.html" class="nav-left">
       <img src="/icon.png?v=3" alt="Logo" class="brand-logo" onerror="this.src='icon.png'">
-      <span class="brand-title">Trees Pinyin · Student Assignment Portal</span>
+      <span class="brand-title">Trees Pinyin · Student Portal</span>
     </a>
-    <span class="badge-safe">🛡️ School Safe · Zero-PII · Clear Female Voice</span>
+    <div style="display:flex; gap:8px; align-items:center;">
+      <select id="studentVoiceSelect" onchange="onStudentVoiceChange()" style="padding:5px 8px; font-size:0.8rem;">
+        <option value="">👩 Clear Female Voice (Auto)</option>
+      </select>
+    </div>
   </header>
 
   <main class="main-wrap">
 
-    <!-- 登入卡片 -->
     <section class="card" id="loginCard">
       <h2 style="margin:0; font-size:1.2rem; color:var(--accent);">🌱 Open Your Teacher's Assignment</h2>
-      <p style="margin:0; font-size:0.86rem; color:#555;">
-        Enter your Teacher's Class Code and your Seat Number / Nickname (e.g. <b>Panda 05</b>). No email required!
-      </p>
       <div class="input-row">
-        <input type="text" id="classCodeInput" placeholder="Class Code (e.g. CLS-101)" value="CLS-101">
-        <input type="text" id="seatAliasInput" placeholder="Seat # or Nickname (e.g. Panda 05)">
+        <input type="text" id="classCodeInput" placeholder="Class Code (e.g. CLS-101)" value="CLS-101" style="flex:1;">
+        <input type="text" id="seatAliasInput" placeholder="Seat # or Nickname (e.g. Panda 05)" style="flex:1;">
         <button class="btn btn-green" onclick="startAssignment()">🚀 Start Homework</button>
-      </div>
-      <div style="font-size:0.8rem; color:#666;">
-        💡 <i>Default code <b>CLS-101</b> includes all 4 homework types: 1. Read Aloud, 2. Vocabulary Mnemonic + Sentence, 3. English-to-Hanzi Quiz, 4. Classical Poem Recitation!</i>
       </div>
     </section>
 
-    <!-- 作業主區域 -->
     <section class="card hidden" id="homeworkArea">
       <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
         <div>
@@ -165,70 +132,107 @@
         </div>
       </div>
 
-      <!-- 顯示與繁簡切換控制列 (預設勾選：English, Trees Pinyin, 漢語拼音, 繁體中文) -->
       <div class="controls-bar">
         <div class="checkbox-group">
           <label><input type="checkbox" id="chkEn" checked onchange="updateVisibility()"> English</label>
           <label><input type="checkbox" id="chkTp" checked onchange="updateVisibility()"> Trees Pinyin</label>
-          <label><input type="checkbox" id="chkStd" checked onchange="updateVisibility()"> 漢語拼音 (ā á ǎ à)</label>
+          <label><input type="checkbox" id="chkStd" checked onchange="updateVisibility()"> Standard Pinyin</label>
           <label><input type="checkbox" id="chkTrad" checked onchange="toggleHanziScript('trad')"> 繁體中文</label>
           <label><input type="checkbox" id="chkSimp" onchange="toggleHanziScript('simp')"> 簡體中文</label>
         </div>
-        <span style="color:var(--accent); font-size:0.8rem;">🔊 Tap any character to hear clear pronunciation</span>
+        <span style="font-size:0.78rem; color:#555;">🟢 Green = 100% · 🟡 Orange = Tone Needs Adjustment (75%) · 🔴 Red = Missed</span>
       </div>
 
       <div id="hwQuestionList" style="display:flex; flex-direction:column; gap:14px;"></div>
 
-      <!-- 提交作業 -->
       <div class="card" style="background:var(--accent-soft); border-color:#c8e6c9; align-items:center; text-align:center;">
-        <h3 style="margin:0; color:var(--accent);">📤 Submit Your Assignment</h3>
         <button class="btn btn-green" style="width:100%; max-width:320px;" onclick="submitHomeworkToTeacher()">
           ✅ Submit Homework to Teacher
         </button>
-        <div id="submitReceiptBox" class="hidden" style="width:100%; background:#fff; padding:12px; border-radius:10px; border:1px solid #a5d6a7; font-size:0.85rem; text-align:left;"></div>
+        <div id="submitReceiptBox" class="hidden" style="width:100%; background:#fff; padding:12px; border-radius:10px;"></div>
       </div>
     </section>
 
   </main>
 
   <script>
-    // ================= 1. 繁簡漢字精準雙向轉換器 =================
+    // ================= 1. 過濾男聲，鎖定高清女聲 =================
+    let femaleVoices = [];
+    let activeFemaleVoice = null;
+
+    function initFemaleVoices() {
+      if (!('speechSynthesis' in window)) return;
+      const all = window.speechSynthesis.getVoices();
+      const zh = all.filter(v => /zh|cmn|chi/i.test(v.lang) || /chinese|mandarin|taiwan/i.test(v.name));
+      const maleWords = ['male', 'kangkang', 'yunxi', 'yunjian', 'yunyang', 'danny', 'wanlung'];
+      femaleVoices = zh.filter(v => !maleWords.some(m => v.name.toLowerCase().includes(m)));
+      if (femaleVoices.length === 0) femaleVoices = zh;
+
+      const pOrder = ['xiaoxiao', 'hsiaochen', 'meijia', 'ting-ting', 'tingting', 'sin-ji', 'google 國語', 'google 普通話'];
+      femaleVoices.sort((a, b) => {
+        const aIdx = pOrder.findIndex(k => a.name.toLowerCase().includes(k));
+        const bIdx = pOrder.findIndex(k => b.name.toLowerCase().includes(k));
+        return (aIdx === -1 ? 99 : aIdx) - (bIdx === -1 ? 99 : bIdx);
+      });
+
+      const sel = document.getElementById('studentVoiceSelect');
+      if (sel && femaleVoices.length > 0) {
+        sel.innerHTML = femaleVoices.map((v, i) => `<option value="${i}">👩 ${v.name}</option>`).join('');
+        activeFemaleVoice = femaleVoices[0];
+      }
+    }
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.onvoiceschanged = initFemaleVoices;
+      setTimeout(initFemaleVoices, 200);
+    }
+
+    function onStudentVoiceChange() {
+      const idx = parseInt(document.getElementById('studentVoiceSelect').value, 10);
+      if (femaleVoices[idx]) {
+        activeFemaleVoice = femaleVoices[idx];
+        speakText('你好');
+      }
+    }
+
+    function speakText(text) {
+      if (!('speechSynthesis' in window) || !text) return;
+      window.speechSynthesis.cancel();
+      if (!activeFemaleVoice) initFemaleVoices();
+      const u = new SpeechSynthesisUtterance(text);
+      if (activeFemaleVoice) {
+        u.voice = activeFemaleVoice;
+        u.lang = activeFemaleVoice.lang;
+      } else {
+        u.lang = 'zh-TW';
+      }
+      u.rate = 0.85;
+      u.pitch = 1.12;
+      window.speechSynthesis.speak(u);
+    }
+
+    // ================= 2. 繁簡轉換與 Trees Pinyin v25 編譯器 =================
     const TRAD_TO_SIMP = {
-      '請':'请','問':'问','謝':'谢','再':'再','見':'见','對':'对','氣':'气','沒':'没','關':'关','係':'系',
-      '別':'别','醫':'医','生':'生','國':'国','們':'们','個':'个','來':'来','自':'自','哪':'哪','裡':'里',
-      '怎':'怎','麼':'么','買':'买','單':'单','菜':'菜','歡':'欢','愛':'爱','會':'会','說':'说','話':'话',
-      '電':'电','視':'视','聽':'听','懂':'懂','學':'学','習':'习','書':'书','寫':'写','讀':'读','認':'认',
-      '識':'识','師':'师','長':'长','開':'开','門':'门','車':'车','馬':'马','鳥':'鸟','魚':'鱼','鵝':'鹅',
-      '詠':'咏','項':'项','綠':'绿','紅':'紅','撥':'拨','靜':'静','舉':'举','頭':'头','鄉':'乡','曉':'晓',
-      '覺':'觉','處':'处','聞':'闻','聲':'声','風':'风','雲':'云','發':'发','財':'财','樂':'乐','歲':'岁',
-      '時':'时','間':'间','點':'点','現':'现','錢':'钱','塊':'块','號':'号','碼':'码','機':'机','場':'场',
-      '飯':'饭','館':'馆','麵':'面','湯':'汤','雞':'鸡','豬':'猪','牛':'牛','茶':'茶','餃':'饺','飽':'饱'
+      '請':'请','問':'问','謝':'谢','見':'见','對':'对','氣':'气','沒':'没','關':'关','係':'系',
+      '醫':'医','國':'国','們':'们','個':'个','來':'来','裡':'里','麼':'么','買':'买','單':'单',
+      '歡':'欢','愛':'爱','會':'会','說':'说','話':'话','電':'电','聽':'听','懂':'懂','學':'学',
+      '書':'书','讀':'读','認':'认','識':'识','師':'师','長':'长','開':'开','門':'门','鵝':'鹅',
+      '詠':'咏','項':'项','綠':'绿','紅':'红','撥':'拨','靜':'静','舉':'举','頭':'头','鄉':'乡'
     };
     const SIMP_TO_TRAD = {};
     Object.keys(TRAD_TO_SIMP).forEach(t => { SIMP_TO_TRAD[TRAD_TO_SIMP[t]] = t; });
-
-    let currentScriptMode = 'trad'; // 預設繁體中文
+    let currentScriptMode = 'trad';
 
     function convertScript(str, mode = currentScriptMode) {
       if (!str) return '';
-      return str.split('').map(ch => {
-        if (mode === 'simp') return TRAD_TO_SIMP[ch] || ch;
-        return SIMP_TO_TRAD[ch] || ch;
-      }).join('');
+      return str.split('').map(ch => mode === 'simp' ? (TRAD_TO_SIMP[ch] || ch) : (SIMP_TO_TRAD[ch] || ch)).join('');
     }
 
     function toggleHanziScript(clicked) {
       const chkTrad = document.getElementById('chkTrad');
       const chkSimp = document.getElementById('chkSimp');
-      if (clicked === 'trad' && chkTrad.checked) {
-        chkSimp.checked = false;
-        currentScriptMode = 'trad';
-      } else if (clicked === 'simp' && chkSimp.checked) {
-        chkTrad.checked = false;
-        currentScriptMode = 'simp';
-      }
-      const hideBoth = !chkTrad.checked && !chkSimp.checked;
-      document.body.classList.toggle('hide-zh', hideBoth);
+      if (clicked === 'trad' && chkTrad.checked) { chkSimp.checked = false; currentScriptMode = 'trad'; }
+      else if (clicked === 'simp' && chkSimp.checked) { chkTrad.checked = false; currentScriptMode = 'simp'; }
+      document.body.classList.toggle('hide-zh', !chkTrad.checked && !chkSimp.checked);
       document.querySelectorAll('.tp-zh').forEach(el => {
         const raw = el.dataset.raw || el.innerText;
         el.dataset.raw = raw;
@@ -242,69 +246,10 @@
       document.body.classList.toggle('hide-std', !document.getElementById('chkStd').checked);
     }
 
-    // ================= 2. 高清自然女聲朗讀引擎 (過濾模糊低沉男聲) =================
-    let preferredClearVoice = null;
-    function initClearVoices() {
-      if (!('speechSynthesis' in window)) return;
-      const voices = window.speechSynthesis.getVoices();
-      const zhVoices = voices.filter(v => /zh|cmn|chi/i.test(v.lang) || /chinese|mandarin/i.test(v.name));
-      // 優先鎖定高清女聲：Xiaoxiao, Tingting, Meijia, HsiaoChen, Google 普通話
-      const priorityNames = ['Xiaoxiao', 'HsiaoChen', 'Ting-Ting', 'Tingting', 'Meijia', 'Sin-ji', 'Google 普通話', 'Google 國語', 'Female'];
-      for (const p of priorityNames) {
-        const hit = zhVoices.find(v => v.name.toLowerCase().includes(p.toLowerCase()));
-        if (hit) { preferredClearVoice = hit; break; }
-      }
-      if (!preferredClearVoice && zhVoices.length > 0) preferredClearVoice = zhVoices[0];
-    }
-    if ('speechSynthesis' in window) {
-      window.speechSynthesis.onvoiceschanged = initClearVoices;
-      initClearVoices();
-    }
-
-    function speakText(text) {
-      if (!('speechSynthesis' in window)) return;
-      window.speechSynthesis.cancel();
-      if (!preferredClearVoice) initClearVoices();
-      const u = new SpeechSynthesisUtterance(text);
-      if (preferredClearVoice) u.voice = preferredClearVoice;
-      u.lang = 'zh-CN';
-      u.rate = 0.85;  // 清晰適中語速
-      u.pitch = 1.08; // 提高清晰度，避免低沉模糊
-      window.speechSynthesis.speak(u);
-    }
-
-    // ================= 3. Trees Pinyin v25 編譯器 =================
-    const OVERALL_16 = {
-      'zhi': '(r)ds', 'chi': '(r)ts', 'shi': '(r)s', 'ri': '(r)th',
-      'zi': 'ds', 'ci': 'ts', 'si': 's', 'yi': 'yee',
-      'wu': 'woo', 'yu': 'yee(oo)', 'ye': 'yer', 'yue': 'yee(oo)er',
-      'yuan': 'yee(oo)an', 'yin': 'yeen', 'yun': 'yee(oo)n', 'ying': 'ying'
-    };
-    const LOCKED_MAP = {
-      'wo': 'wer', 'de': 'der', 'le': 'Ler', 'ren': '(r)ther-n', 'wen': 'wer-n', 'shun': 'soon', 'zun': 'dsoon',
-      'guo': 'gooer', 'o': 'oh', 'qi': 'tsee', 'qing': 'tsing', 'qie': 'tseer', 'qian': 'tseean', 'qiao': 'tseeaw',
-      'qiang': 'tseeang', 'qiong': 'tseer-oong', 'qu': 'tsee(oo)', 'que': 'tsee(oo)er', 'quan': 'tsee(oo)an',
-      'qun': 'tsee(oo)n', 'qin': 'tseen', 'qia': 'tseeah', 'xi': 'see', 'xing': 'sing', 'xie': 'seer', 'xian': 'seean',
-      'xiao': 'seeaw', 'xiang': 'seeang', 'xiong': 'seer-oong', 'xu': 'see(oo)', 'xue': 'see(oo)er', 'xuan': 'see(oo)an',
-      'xun': 'see(oo)n', 'xin': 'seen', 'xia': 'seeah', 'ji': 'jee', 'jing': 'jing', 'jie': 'jeer', 'jian': 'jeean',
-      'jiao': 'jeeaw', 'jiang': 'jeeang', 'jiong': 'jeer-oong', 'ju': 'jee(oo)', 'jue': 'jee(oo)er', 'juan': 'jee(oo)an',
-      'jun': 'jee(oo)n', 'jin': 'jeen', 'jia': 'jeeah', 'lv': 'Lee(oo)', 'lü': 'Lee(oo)', 'lve': 'Lee(oo)er', 'lüe': 'Lee(oo)er',
-      'nv': 'nee(oo)', 'nü': 'nee(oo)', 'nve': 'nee(oo)er', 'nüe': 'nee(oo)er'
-    };
-    const INITIALS = {
-      'b':'b', 'p':'p', 'm':'m', 'f':'f', 'd':'d', 't':'t', 'n':'n', 'l':'L',
-      'g':'g', 'k':'k', 'h':'h', 'j':'j', 'q':'tsee', 'x':'see',
-      'zh':'(r)ds', 'ch':'(r)ts', 'sh':'(r)s', 'r':'(r)th', 'z':'ds', 'c':'ts', 's':'s', 'y':'y', 'w':'w'
-    };
-    const FINALS = {
-      'a':'ah', 'o':'ooer', 'e':'er', 'i':'ee', 'u':'oo', 'v':'ee(oo)', 'ü':'ee(oo)',
-      'ai':'ie', 'ei':'ay', 'ui':'ooay', 'ao':'aw', 'ou':'oh', 'iu':'eeoh',
-      'ie':'eer', 've':'ee(oo)er', 'üe':'ee(oo)er', 'er':'(uh)-er',
-      'an':'an', 'en':'er-n', 'in':'een', 'un':'oon', 'vn':'ee(oo)n', 'ün':'ee(oo)n',
-      'ang':'ang', 'eng':'er-ng', 'ing':'ing', 'ong':'er-oong',
-      'ia':'eeah', 'ian':'eean', 'iao':'eeaw', 'iang':'eeang', 'iong':'eer-oong',
-      'ua':'ooah', 'uai':'ooie', 'uan':'ooan', 'uang':'ooang', 'uo':'ooer', 'van':'ee(oo)an', 'üan':'ee(oo)an'
-    };
+    const OVERALL_16 = { 'zhi':'(r)ds','chi':'(r)ts','shi':'(r)s','ri':'(r)th','zi':'ds','ci':'ts','si':'s','yi':'yee','wu':'woo','yu':'yee(oo)','ye':'yer','yue':'yee(oo)er','yuan':'yee(oo)an','yin':'yeen','yun':'yee(oo)n','ying':'ying' };
+    const LOCKED_MAP = { 'wo':'wer','de':'der','le':'Ler','ren':'(r)ther-n','wen':'wer-n','shun':'soon','zun':'dsoon','guo':'gooer','o':'oh','qi':'tsee','qing':'tsing','qie':'tseer','qian':'tseean','qiao':'tseeaw','qiang':'tseeang','qiong':'tseer-oong','qu':'tsee(oo)','que':'tsee(oo)er','quan':'tsee(oo)an','qun':'tsee(oo)n','qin':'tseen','qia':'tseeah','xi':'see','xing':'sing','xie':'seer','xian':'seean','xiao':'seeaw','xiang':'seeang','xiong':'seer-oong','xu':'see(oo)','xue':'see(oo)er','xuan':'see(oo)an','xun':'see(oo)n','xin':'seen','xia':'seeah','ji':'jee','jing':'jing','jie':'jeer','jian':'jeean','jiao':'jeeaw','jiang':'jeeang','jiong':'jeer-oong','ju':'jee(oo)','jue':'jee(oo)er','juan':'jee(oo)an','jun':'jee(oo)n','jin':'jeen','jia':'jeeah' };
+    const INITIALS = { 'b':'b','p':'p','m':'m','f':'f','d':'d','t':'t','n':'n','l':'L','g':'g','k':'k','h':'h','j':'j','q':'tsee','x':'see','zh':'(r)ds','ch':'(r)ts','sh':'(r)s','r':'(r)th','z':'ds','c':'ts','s':'s','y':'y','w':'w' };
+    const FINALS = { 'a':'ah','o':'ooer','e':'er','i':'ee','u':'oo','v':'ee(oo)','ü':'ee(oo)','ai':'ie','ei':'ay','ui':'ooay','ao':'aw','ou':'oh','iu':'eeoh','ie':'eer','ve':'ee(oo)er','üe':'ee(oo)er','er':'(uh)-er','an':'an','en':'er-n','in':'een','un':'oon','vn':'ee(oo)n','ün':'ee(oo)n','ang':'ang','eng':'er-ng','ing':'ing','ong':'er-oong','ia':'eeah','ian':'eean','iao':'eeaw','iang':'eeang','iong':'eer-oong','ua':'ooah','uai':'ooie','uan':'ooan','uang':'ooang','uo':'ooer','van':'ee(oo)an','üan':'ee(oo)an' };
 
     function compileToTreesPinyin(pyNum) {
       if (!pyNum) return '';
@@ -318,12 +263,8 @@
       else if (LOCKED_MAP[syl]) mapped = LOCKED_MAP[syl];
       else {
         let init = '', fin = syl;
-        for (let l of ['zh', 'ch', 'sh']) {
-          if (syl.startsWith(l)) { init = l; fin = syl.slice(2); break; }
-        }
-        if (!init && syl.length > 1 && 'bpmfdtnlgkhjqxzcsryw'.includes(syl[0])) {
-          init = syl[0]; fin = syl.slice(1);
-        }
+        for (let l of ['zh', 'ch', 'sh']) { if (syl.startsWith(l)) { init = l; fin = syl.slice(2); break; } }
+        if (!init && syl.length > 1 && 'bpmfdtnlgkhjqxzcsryw'.includes(syl[0])) { init = syl[0]; fin = syl.slice(1); }
         let mappedInit = INITIALS[init] || init;
         let mappedFin = FINALS[fin] || fin;
         if (mappedInit.endsWith('ee') && mappedFin.startsWith('ee')) mapped = mappedInit + mappedFin.slice(2);
@@ -347,9 +288,7 @@
       if (s.includes('a')) return s.replace('a', marks.a[t-1]);
       if (s.includes('e')) return s.replace('e', marks.e[t-1]);
       if (s.includes('ou')) return s.replace('o', marks.o[t-1]);
-      for (let i = s.length - 1; i >= 0; i--) {
-        if (marks[s[i]]) return s.slice(0, i) + marks[s[i]][t-1] + s.slice(i + 1);
-      }
+      for (let i = s.length - 1; i >= 0; i--) { if (marks[s[i]]) return s.slice(0, i) + marks[s[i]][t-1] + s.slice(i + 1); }
       return s;
     }
 
@@ -361,13 +300,12 @@
         const ch = zhStr[i];
         const dispCh = convertScript(ch, currentScriptMode);
         if (/[\u4e00-\u9fa5]/.test(ch)) {
-          const tp = compileToTreesPinyin(pyArr[i]);
-          const std = numPinyinToToneMark(pyArr[i]);
           html += `
             <div class="tp-col" id="${prefix}-${itemIdx}-${zhCounter}" onclick="event.stopPropagation(); speakText('${ch}')">
-              <span class="tp-py">${tp}</span>
-              <span class="tp-std">${std}</span>
+              <span class="tp-py">${compileToTreesPinyin(pyArr[i])}</span>
+              <span class="tp-std">${numPinyinToToneMark(pyArr[i])}</span>
               <span class="tp-zh" data-raw="${ch}">${dispCh}</span>
+              <span class="tone-tip-tag" id="tonetip-${itemIdx}-${zhCounter}"></span>
             </div>`;
           zhCounter++;
         } else {
@@ -377,7 +315,6 @@
       return html;
     }
 
-    // ================= 4. 支援 4 大類題型的預設作業庫 =================
     const DEFAULT_ASSIGNMENTS = {
       "CLS-101": {
         classCode: "CLS-101",
@@ -388,7 +325,7 @@
             zh: "請問",
             en: "Could you tell me...? / Excuse me",
             sound: "Le<u>t's sing</u> <u>when</u> we're happy.",
-            mnemonic: "Associate 'tsing3' (please) with 'Let's sing', and 'wer-n4' (ask) with 'when'.",
+            mnemonic: "tsing3 = Let's sing; wer-n4 = when.",
             exampleZh: "請問洗手間在哪裡？",
             exampleEn: "Excuse me, where is the restroom?"
           },
@@ -399,320 +336,207 @@
             options: ["醫生", "謝謝", "朋友", "早上好"]
           },
           {
-            type: "mcq",
-            en: "Select the correct Chinese for: \"Thank you!\"",
-            zh: "謝謝",
-            options: ["對不起", "謝謝", "沒關係", "再見"]
-          },
-          {
             type: "poem",
             title: "《詠鵝》駱賓王 (Ode to the Goose)",
-            zh: "鵝鵝鵝，曲項向天歌。白毛浮綠水，紅掌撥清波。",
-            en: "Goose, goose, goose, bending your neck to sing to the sky. White feathers floating on emerald water, red feet paddling clear waves.",
-            mnemonic: "Classic Tang Dynasty Poem — Recite aloud with clear rhythm!"
-          },
-          {
-            type: "reading",
-            zh: "早上好，很高興認識你",
-            en: "Good morning, nice to meet you.",
-            mnemonic: "dsaw3 (r)sang4 haw3 = jaw sang how!"
+            zh: "鵝，鵝，鵝，曲項向天歌。白毛浮綠水，紅掌撥清波。",
+            en: "Goose, goose, goose, bending your neck to sing to the sky. White feathers float on emerald water."
           }
         ]
       }
     };
 
-    let currentSession = { classCode: '', seatAlias: '', assignment: null, scores: {}, missedChars: {} };
-
-    function getAssignmentsStore() {
-      try {
-        const custom = JSON.parse(localStorage.getItem('tp_teacher_assignments_v1') || '{}');
-        return { ...DEFAULT_ASSIGNMENTS, ...custom };
-      } catch (e) { return DEFAULT_ASSIGNMENTS; }
-    }
+    let currentSession = { classCode: '', seatAlias: '', assignment: null, scores: {}, missedChars: {}, missedQuestions: {} };
 
     function startAssignment() {
-      const code = (document.getElementById('classCodeInput').value || '').trim().toUpperCase();
-      const alias = (document.getElementById('seatAliasInput').value || '').trim() || 'Panda 01';
-      const store = getAssignmentsStore();
+      const code = (document.getElementById('classCodeInput').value || 'CLS-101').trim().toUpperCase();
+      const alias = (document.getElementById('seatAliasInput').value || 'Panda 01').trim();
+      const custom = JSON.parse(localStorage.getItem('tp_teacher_assignments_v1') || '{}');
+      const store = { ...DEFAULT_ASSIGNMENTS, ...custom };
       const hw = store[code] || store['CLS-101'];
 
-      currentSession = { classCode: code, seatAlias: alias, assignment: hw, scores: {}, missedChars: {} };
+      currentSession = { classCode: code, seatAlias: alias, assignment: hw, scores: {}, missedChars: {}, missedQuestions: {} };
       document.getElementById('loginCard').classList.add('hidden');
       document.getElementById('homeworkArea').classList.remove('hidden');
       document.getElementById('hwTitleDisplay').innerText = `📚 ${hw.title} (${code})`;
-      document.getElementById('studentBadgeDisplay').innerText = `Seat / Student: ${alias}`;
+      document.getElementById('studentBadgeDisplay').innerText = `Student: ${alias}`;
       renderHomeworkItems();
     }
 
     function switchStudent() {
       document.getElementById('homeworkArea').classList.add('hidden');
       document.getElementById('loginCard').classList.remove('hidden');
-      document.getElementById('submitReceiptBox').classList.add('hidden');
     }
 
     function renderHomeworkItems() {
       const container = document.getElementById('hwQuestionList');
       container.innerHTML = '';
-      const items = currentSession.assignment.items || [];
-
-      items.forEach((item, idx) => {
+      (currentSession.assignment.items || []).forEach((item, idx) => {
         const type = item.type || 'reading';
         const box = document.createElement('div');
         box.className = 'hw-item';
         box.id = `hw-item-${idx}`;
 
-        const typeLabels = {
-          reading: '🗣️ Speaking Practice',
-          mnemonic: '🧠 Vocabulary Mnemonic & Example Sentence',
-          mcq: '🎯 Match English to Hanzi (with Trees Pinyin)',
-          poem: '📜 Classical Poem Recitation'
-        };
-
-        let bodyHtml = '';
-
         if (type === 'mcq') {
-          // 看英文選漢字（每個漢字選項上方都有 Trees Pinyin + 漢語拼音）
-          const opts = item.options && item.options.length >= 2 ? item.options : [item.zh, '你好', '謝謝', '朋友'];
-          const optsHtml = opts.map((optZh, oIdx) => `
-            <div class="mcq-option" id="mcq-opt-${idx}-${oIdx}" onclick="handleMcqSelect(${idx}, ${oIdx}, '${optZh}', '${item.zh}')">
-              <div class="char-row">${buildAnnotatedCharsHtml(optZh, `${idx}-opt${oIdx}`, 'optchar')}</div>
+          const opts = item.options || [item.zh, '你好', '謝謝', '請問'];
+          box.innerHTML = `
+            <div style="width:100%; display:flex; justify-content:space-between;"><span class="type-badge">#${idx+1} · English-to-Hanzi Quiz</span><span class="score-pill" id="score-pill-${idx}">Not Done</span></div>
+            <div class="en-line" style="color:var(--blue);">${item.en}</div>
+            <div class="mcq-grid">
+              ${opts.map((o, oi) => `<div class="mcq-option" id="mcq-opt-${idx}-${oi}" onclick="handleMcq(${idx}, ${oi}, '${o}', '${item.zh}')"><div class="char-row">${buildAnnotatedCharsHtml(o, `${idx}-o${oi}`, 'opt')}</div></div>`).join('')}
             </div>
-          `).join('');
-
-          bodyHtml = `
-            <div class="en-line" style="font-size:1.15rem; color:var(--blue);">${item.en}</div>
-            <div class="mcq-grid">${optsHtml}</div>
-            <div id="feedback-${idx}" style="font-size:0.86rem; font-weight:700;"></div>
+            <div id="feedback-${idx}" style="font-size:0.85rem; font-weight:700;"></div>
           `;
         } else {
-          // 朗讀 / 記憶例句 / 古詩背誦
-          const mainCharsHtml = buildAnnotatedCharsHtml(item.zh, idx, 'char');
-          let extraHtml = '';
-
-          if (type === 'mnemonic') {
-            extraHtml = `
-              <div style="width:100%; background:#fffdf5; border:1px solid #fde68a; border-radius:10px; padding:10px 14px; font-size:0.86rem;">
-                ${item.sound ? `<div>🔊 <b>Sound Clue:</b> ${item.sound}</div>` : ''}
-                ${item.mnemonic ? `<div style="margin-top:4px;">🧠 <b>Memory Trick:</b> ${item.mnemonic}</div>` : ''}
-              </div>
-              ${item.exampleZh ? `
-                <div class="example-box">
-                  <div style="font-size:0.78rem; font-weight:800; color:var(--accent);">📖 Example Sentence (Tap to Listen):</div>
-                  <div class="en-line" style="font-size:0.92rem;">${item.exampleEn || ''}</div>
-                  <div class="char-row">${buildAnnotatedCharsHtml(item.exampleZh, `${idx}-ex`, 'exchar')}</div>
-                  <button class="btn btn-soft" style="padding:5px 12px; font-size:0.8rem;" onclick="speakText('${item.exampleZh}')">🔊 Listen Example Sentence</button>
-                </div>
-              ` : ''}
-            `;
-          } else if (type === 'poem') {
-            extraHtml = `
-              <div style="font-weight:800; color:var(--accent); font-size:1.05rem;">${item.title || 'Classical Poem'}</div>
-              ${item.mnemonic ? `<div style="font-size:0.83rem; color:#555;">💡 ${item.mnemonic}</div>` : ''}
-            `;
-          } else if (item.mnemonic) {
-            extraHtml = `<div style="font-size:0.84rem; color:#444; background:#f8fafc; padding:6px 12px; border-radius:8px;">💡 <b>Tip:</b> ${item.mnemonic}</div>`;
-          }
-
-          bodyHtml = `
-            ${type === 'poem' ? extraHtml : ''}
+          box.innerHTML = `
+            <div style="width:100%; display:flex; justify-content:space-between;"><span class="type-badge">#${idx+1} · ${type.toUpperCase()}</span><span class="score-pill" id="score-pill-${idx}">Not Done</span></div>
             <div class="en-line">${item.en}</div>
-            <div class="char-row">${mainCharsHtml}</div>
-            ${type !== 'poem' ? extraHtml : ''}
-            <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:center;">
-              <button class="btn btn-soft" onclick="speakText('${item.zh}')">🔊 Listen Clear Voice</button>
-              <button class="btn btn-blue btn-mic" id="mic-btn-${idx}" onclick="scoreStudentReading(${idx})">🎤 Read Aloud & Strict Score</button>
+            <div class="char-row">${buildAnnotatedCharsHtml(item.zh, idx, 'char')}</div>
+            ${item.sound || item.mnemonic ? `<div style="font-size:0.84rem; background:#fffdf5; padding:8px 12px; border-radius:8px; border:1px solid #fde68a;"><b>Sound:</b> ${item.sound || ''}  |  <b>Memory:</b> ${item.mnemonic || ''}</div>` : ''}
+            ${item.exampleZh ? `<div style="background:#f8fafc; padding:10px; border-radius:10px; width:100%; text-align:center;"><div style="font-size:0.8rem; font-weight:700; color:var(--accent);">📖 Example Sentence: ${item.exampleEn || ''}</div><div class="char-row">${buildAnnotatedCharsHtml(item.exampleZh, `${idx}-ex`, 'ex')}</div></div>` : ''}
+            <div style="display:flex; gap:8px;">
+              <button class="btn btn-soft" onclick="speakText('${item.zh}')">🔊 Listen Female Voice</button>
+              <button class="btn btn-blue btn-mic" id="mic-btn-${idx}" onclick="scoreStudentReading(${idx})">🎤 Read Aloud & Tone Check</button>
             </div>
             <div id="feedback-${idx}" style="font-size:0.85rem; font-weight:700; text-align:center;"></div>
           `;
         }
-
-        box.innerHTML = `
-          <div style="width:100%; display:flex; justify-content:space-between; align-items:center;">
-            <span class="type-badge">#${idx + 1} · ${typeLabels[type] || 'Practice'}</span>
-            <span class="score-pill" id="score-pill-${idx}">Not Done</span>
-          </div>
-          ${bodyHtml}
-        `;
         container.appendChild(box);
       });
-      updateOverallProgress();
     }
 
-    // ================= 5. 看英文選漢字 (MCQ) 判分邏輯 =================
-    function handleMcqSelect(itemIdx, optIdx, chosenZh, correctZh) {
-      const box = document.getElementById(`hw-item-${itemIdx}`);
-      const pill = document.getElementById(`score-pill-${itemIdx}`);
-      const fb = document.getElementById(`feedback-${itemIdx}`);
-      const optEl = document.getElementById(`mcq-opt-${itemIdx}-${optIdx}`);
-
-      speakText(chosenZh);
-
-      if (chosenZh === correctZh) {
-        optEl.classList.add('correct');
-        currentSession.scores[itemIdx] = (currentSession.scores[itemIdx] === undefined) ? 100 : Math.max(currentSession.scores[itemIdx], 85);
-        pill.innerText = `Score: ${currentSession.scores[itemIdx]}%`;
-        pill.className = 'score-pill high';
-        box.classList.add('passed');
-        fb.innerHTML = `<span style="color:#1b5e20;">✅ Correct! "${chosenZh}" matches the English meaning!</span>`;
+    function handleMcq(idx, oi, chosen, correct) {
+      speakText(chosen);
+      const el = document.getElementById(`mcq-opt-${idx}-${oi}`);
+      const pill = document.getElementById(`score-pill-${idx}`);
+      if (chosen === correct) {
+        el.classList.add('correct');
+        currentSession.scores[idx] = 100;
+        pill.innerText = '100%'; pill.className = 'score-pill high';
       } else {
-        optEl.classList.add('wrong');
-        currentSession.scores[itemIdx] = 50;
-        currentSession.missedChars[correctZh] = (currentSession.missedChars[correctZh] || 0) + 1;
-        pill.innerText = `Try Again`;
-        pill.className = 'score-pill low';
-        fb.innerHTML = `<span style="color:#d32f2f;">❌ Not quite! That is "${chosenZh}". Listen to the Trees Pinyin and pick the right one!</span>`;
+        el.classList.add('wrong');
+        currentSession.scores[idx] = 50;
+        currentSession.missedChars[correct] = 1;
+        currentSession.missedQuestions[idx] = { zh: correct, en: currentSession.assignment.items[idx].en, missedChars: [correct] };
+        pill.innerText = 'Try Again'; pill.className = 'score-pill low';
       }
-      updateOverallProgress();
+      document.getElementById('overallProgressPill').innerText = `Completed: ${Object.keys(currentSession.scores).length} / ${currentSession.assignment.items.length}`;
     }
 
-    // ================= 6. 嚴格按順序逐字語音判分演算法 (解決明顯錯誤也算對的問題) =================
+    // ================= 3. 聲調準確度三級評分引擎 (100% 滿分 / 75% 聲調偏差提示 / 0% 讀錯) =================
     let activeRec = null;
-
     function scoreStudentReading(idx) {
       const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!SR) return alert('Speech recognition requires Chrome, Edge, or Safari.');
-
       const btn = document.getElementById(`mic-btn-${idx}`);
-      const fb = document.getElementById(`feedback-${idx}`);
-
-      if (activeRec) {
-        activeRec.stop();
-        activeRec = null;
-        return;
-      }
+      if (activeRec) { activeRec.stop(); activeRec = null; return; }
 
       activeRec = new SR();
       activeRec.lang = 'zh-CN';
       activeRec.interimResults = false;
-      activeRec.maxAlternatives = 1;
-
       btn.classList.add('recording');
-      btn.innerText = '🎙️ Listening... Speak Clearly';
-      fb.innerText = 'Listening... Please read each character in order.';
+      btn.innerText = '🎙️ Listening...';
 
       activeRec.onresult = (e) => {
-        const spoken = e.results[0][0].transcript || '';
-        const confidence = e.results[0][0].confidence || 0.85;
-        evaluateStrictSequentialReading(idx, spoken, confidence);
+        evaluateReadingWithToneCheck(idx, e.results[0][0].transcript || '');
       };
-
-      activeRec.onerror = () => {
-        fb.innerHTML = `<span style="color:#d32f2f;">⚠️ Could not hear clearly. Please speak closer to the microphone!</span>`;
-      };
-
       activeRec.onend = () => {
         btn.classList.remove('recording');
-        btn.innerText = '🎤 Read Aloud & Strict Score';
+        btn.innerText = '🎤 Read Aloud & Tone Check';
         activeRec = null;
       };
-
       activeRec.start();
     }
 
-    function evaluateStrictSequentialReading(idx, spokenRaw, confidence) {
+    function evaluateReadingWithToneCheck(idx, spokenRaw) {
       const item = currentSession.assignment.items[idx];
       const targetZh = item.zh.replace(/[^\u4e00-\u9fa5]/g, '');
       const spokenZh = (spokenRaw || '').replace(/[^\u4e00-\u9fa5]/g, '');
 
-      // 取帶聲調拼音與無聲調拼音進行嚴格順序比對
-      const targetTonePys = pinyinPro.pinyin(targetZh, { type: 'array', toneType: 'num' });
-      const spokenTonePys = pinyinPro.pinyin(spokenZh, { type: 'array', toneType: 'num' });
+      const targetFullPys = pinyinPro.pinyin(targetZh, { type: 'array', toneType: 'num' });
+      const spokenFullPys = pinyinPro.pinyin(spokenZh, { type: 'array', toneType: 'num' });
       const targetBasePys = pinyinPro.pinyin(targetZh, { type: 'array', toneType: 'none' });
       const spokenBasePys = pinyinPro.pinyin(spokenZh, { type: 'array', toneType: 'none' });
 
-      let totalPoints = 0;
-      let missedList = [];
-      let searchCursor = 0;
+      let points = 0;
+      let missedOrToneList = [];
+      let cursor = 0;
 
       for (let i = 0; i < targetZh.length; i++) {
         const tChar = targetZh[i];
-        const tTonePy = targetTonePys[i];
-        const tBasePy = targetBasePys[i];
+        const tFull = targetFullPys[i];
+        const tBase = targetBasePys[i];
+        const tTone = (tFull.match(/[1-5]/) || ['1'])[0];
+
         const colEl = document.getElementById(`char-${idx}-${i}`);
+        const tipEl = document.getElementById(`tonetip-${idx}-${i}`);
+        if (tipEl) tipEl.innerText = '';
 
-        // 只允許在當前順序游標的小視窗內 (searchCursor ~ searchCursor+1) 尋找匹配，防止亂讀湊字
-        let charScore = 0;
-        let matchedAt = -1;
+        let matchType = 'none'; // 'exact' | 'tone_mismatch' | 'none'
+        let detectedTone = '';
 
-        for (let k = searchCursor; k <= Math.min(searchCursor + 1, spokenZh.length - 1); k++) {
-          if (spokenZh[k] === tChar || spokenTonePys[k] === tTonePy) {
-            charScore = 1.0; // 聲母、韻母、聲調完全正確
-            matchedAt = k;
+        for (let k = cursor; k <= Math.min(cursor + 1, spokenZh.length - 1); k++) {
+          if (spokenZh[k] === tChar || spokenFullPys[k] === tFull) {
+            matchType = 'exact';
+            cursor = k + 1;
             break;
-          } else if (spokenBasePys[k] === tBasePy) {
-            charScore = 0.75; // 聲母韻母對，但聲調略有偏差
-            matchedAt = k;
+          } else if (spokenBasePys[k] === tBase) {
+            matchType = 'tone_mismatch';
+            detectedTone = (spokenFullPys[k].match(/[1-5]/) || ['?'])[0];
+            cursor = k + 1;
             break;
           }
         }
 
-        if (matchedAt !== -1) {
-          searchCursor = matchedAt + 1;
-          totalPoints += charScore;
-          if (colEl) {
-            colEl.classList.remove('missed');
-            colEl.classList.add('correct-hit');
-          }
+        if (matchType === 'exact') {
+          points += 1.0;
+          if (colEl) colEl.className = 'tp-col correct-hit';
+        } else if (matchType === 'tone_mismatch') {
+          points += 0.75; // 聲母韻母對，聲調不準得 75% 分
+          if (colEl) colEl.className = 'tp-col tone-warn';
+          if (tipEl) tipEl.innerText = `⚠️ T${detectedTone}→T${tTone}`;
+          missedOrToneList.push(tChar);
+          currentSession.missedChars[`${tChar}(Tone)`] = 1;
         } else {
-          missedList.push(convertScript(tChar, currentScriptMode));
-          currentSession.missedChars[tChar] = (currentSession.missedChars[tChar] || 0) + 1;
-          if (colEl) {
-            colEl.classList.remove('correct-hit');
-            colEl.classList.add('missed');
-          }
+          if (colEl) colEl.className = 'tp-col missed';
+          missedOrToneList.push(tChar);
+          currentSession.missedChars[tChar] = 1;
         }
       }
 
-      // 若學生多讀了無關的字或置信度過低，扣減分數
-      const lengthPenalty = Math.abs(spokenZh.length - targetZh.length) > 2 ? 0.85 : 1.0;
-      const confFactor = confidence < 0.6 ? 0.85 : 1.0;
-      const finalScore = spokenZh.length === 0
-        ? 0
-        : Math.min(100, Math.round((totalPoints / Math.max(targetZh.length, 1)) * 100 * lengthPenalty * confFactor));
-
+      const finalScore = spokenZh.length === 0 ? 0 : Math.round((points / Math.max(targetZh.length, 1)) * 100);
       currentSession.scores[idx] = Math.max(currentSession.scores[idx] || 0, finalScore);
+
+      if (missedOrToneList.length > 0) {
+        currentSession.missedQuestions[idx] = { zh: item.zh, en: item.en, missedChars: missedOrToneList };
+      }
 
       const pill = document.getElementById(`score-pill-${idx}`);
       pill.innerText = `Score: ${finalScore}%`;
-      pill.className = 'score-pill ' + (finalScore >= 85 ? 'high' : (finalScore >= 60 ? 'mid' : 'low'));
-
-      const box = document.getElementById(`hw-item-${idx}`);
-      if (finalScore >= 85) box.classList.add('passed');
+      pill.className = 'score-pill ' + (finalScore >= 85 ? 'high' : (finalScore >= 65 ? 'mid' : 'low'));
 
       const fb = document.getElementById(`feedback-${idx}`);
-      const dispSpoken = convertScript(spokenZh || 'Nothing detected', currentScriptMode);
-      if (finalScore >= 90) {
-        fb.innerHTML = `<span style="color:#1b5e20;">🎉 Excellent (${finalScore}%)! Heard: "${dispSpoken}"</span>`;
-      } else if (finalScore >= 60) {
-        fb.innerHTML = `<span style="color:#d97706;">👍 Almost there (${finalScore}%)! Heard: "${dispSpoken}". Practice red characters: <b>${missedList.join('、')}</b></span>`;
+      if (finalScore === 100) {
+        fb.innerHTML = `<span style="color:#1b5e20;">🎉 100% Perfect! Both phonics and tones are spot-on!</span>`;
+      } else if (finalScore >= 70) {
+        fb.innerHTML = `<span style="color:#e65100;">👍 Good phonics (${finalScore}%)! Check orange/red characters for tone accuracy.</span>`;
       } else {
-        fb.innerHTML = `<span style="color:#d32f2f;">❌ Needs practice (${finalScore}%). Heard: "${dispSpoken}". Tap "🔊 Listen Clear Voice" and read each character in order!</span>`;
+        fb.innerHTML = `<span style="color:#d32f2f;">💪 Keep practicing (${finalScore}%)! Tap "🔊 Listen Female Voice" first.</span>`;
       }
-
-      updateOverallProgress();
-    }
-
-    function updateOverallProgress() {
-      const total = (currentSession.assignment?.items || []).length;
-      const done = Object.keys(currentSession.scores).length;
-      document.getElementById('overallProgressPill').innerText = `Completed: ${done} / ${total}`;
+      document.getElementById('overallProgressPill').innerText = `Completed: ${Object.keys(currentSession.scores).length} / ${currentSession.assignment.items.length}`;
     }
 
     function submitHomeworkToTeacher() {
       const items = currentSession.assignment.items || [];
       let sum = 0;
-      items.forEach((_, idx) => { sum += (currentSession.scores[idx] || 0); });
+      items.forEach((_, i) => { sum += (currentSession.scores[i] || 0); });
       const avgScore = Math.round(sum / Math.max(items.length, 1));
-      const trickyWords = Object.keys(currentSession.missedChars);
 
       const record = {
-        id: 'SUB-' + Date.now().toString().slice(-5),
         classCode: currentSession.classCode,
         seatAlias: currentSession.seatAlias,
         avgScore: avgScore,
-        completedCount: Object.keys(currentSession.scores).length,
-        totalCount: items.length,
-        missedChars: trickyWords,
+        missedChars: Object.keys(currentSession.missedChars),
+        missedQuestions: Object.values(currentSession.missedQuestions),
         timestamp: new Date().toLocaleString()
       };
 
@@ -720,18 +544,9 @@
       allSubs.unshift(record);
       localStorage.setItem('tp_student_submissions_v1', JSON.stringify(allSubs));
 
-      const receiptCode = btoa(encodeURIComponent(JSON.stringify(record)));
       const box = document.getElementById('submitReceiptBox');
       box.classList.remove('hidden');
-      box.innerHTML = `
-        <div style="color:#1b5e20; font-weight:800; margin-bottom:6px;">
-          ✅ Homework Submitted! Average Score: ${avgScore}%
-        </div>
-        <div style="display:flex; gap:6px;">
-          <input type="text" readonly value="${receiptCode}" style="font-size:0.78rem; padding:6px;">
-          <button class="btn btn-green" style="padding:6px 12px; font-size:0.8rem;" onclick="navigator.clipboard.writeText('${receiptCode}'); alert('Turn-In Code Copied!');">📋 Copy Code</button>
-        </div>
-      `;
+      box.innerHTML = `<b style="color:#1b5e20;">✅ Submitted! Average Score: ${avgScore}%. Your teacher can now view your 4-in-1 question report!</b>`;
     }
   </script>
 </body>
