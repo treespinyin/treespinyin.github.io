@@ -24,7 +24,7 @@
     }
     .hidden { display: none !important; }
 
-    /* 頂部導覽列 (完全承襲 index.html 並全英文化) */
+    /* Top Navbar */
     .navbar {
       width: 100%; background: #ffffff; border-bottom: 1px solid #e5e7eb;
       padding: 8px 20px; display: flex; justify-content: space-between; align-items: center;
@@ -43,11 +43,12 @@
       text-decoration: none; white-space: nowrap; transition: 0.15s;
     }
     .nav-btn:hover { background: #f3f4f6; }
+    .nav-btn.has-key { border-color: #2e7d32; color: #1b5e20; background: #e8f5e9; }
     .nav-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
 
     .main-wrap { width: 100%; max-width: 980px; padding: 12px 16px 0; display: flex; flex-direction: column; gap: 12px; }
 
-    /* 教師1年免費試用與推薦橫幅 */
+    /* Teacher 1-Year Free Trial & Referral Banner */
     .license-banner {
       background: linear-gradient(90deg, #e8f5e9 0%, #f1f8e9 100%);
       border: 1px solid #a5d6a7; border-radius: 14px; padding: 10px 16px;
@@ -55,7 +56,7 @@
       font-size: 0.85rem;
     }
 
-    /* 三大主功能分頁 */
+    /* Main Tabs */
     .top-tabs { display: flex; gap: 8px; width: 100%; flex-wrap: wrap; }
     .tab-btn {
       flex: 1; min-width: 220px; padding: 10px 14px; border-radius: 12px;
@@ -64,7 +65,7 @@
     }
     .tab-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); box-shadow: 0 3px 10px rgba(27,94,32,0.18); }
 
-    /* index.html 原版膠囊輸入區 */
+    /* Search & Capsule Input Panel */
     .panel {
       width: 100%; background: var(--card); padding: 14px; border-radius: 16px;
       box-shadow: 0 2px 10px rgba(0,0,0,0.03); border: 1px solid var(--border);
@@ -101,7 +102,7 @@
     .btn-soft { background: var(--accent-soft); color: var(--accent); border: 1px solid #c8e6c9; }
     .btn-dark { background: #222; color: #fff; font-size: 0.8rem; padding: 7px 12px; border-radius: 8px; flex: unset; }
 
-    /* 四位一體顯示控制箱 */
+    /* Controls Panel */
     .controls-panel {
       background: #fff; border: 1px solid var(--border); border-radius: 14px;
       padding: 11px 16px; display: flex; flex-direction: column; gap: 9px;
@@ -112,7 +113,7 @@
     .checkbox-group input[type="checkbox"] { width: 15px; height: 15px; accent-color: var(--accent); }
     .layout-select { padding: 5px 9px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 0.83rem; background: #fff; }
 
-    /* 四位一體輸出卡片 */
+    /* 4-in-1 Sheet Card */
     .sheet-card {
       width: 100%; background: #fff; padding: 16px 18px; border-radius: 16px;
       border: 1px solid var(--border); min-height: 90px;
@@ -137,6 +138,7 @@
     .tp-col {
       display: inline-flex; flex-direction: column; align-items: center;
       margin: 0 0.28ch; cursor: pointer; padding: 2px 3px; border-radius: 6px;
+      transition: background 0.12s;
     }
     .tp-col:hover { background: #f1f8e9; }
     .tp-col.err-highlight { background: #ffebee; border: 1.5px dashed #d32f2f; }
@@ -149,7 +151,7 @@
     .sheet-card.hide-std .tp-std, .four-in-one.hide-std .tp-std { display: none !important; }
     .sheet-card.hide-zh .tp-zh, .four-in-one.hide-zh .tp-zh { display: none !important; }
 
-    /* 全屏課堂演示 / 直播投屏模式 */
+    /* Live Projection Fullscreen Mode */
     body.big-mode {
       position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
       background: #fff; padding: 0; z-index: 99999; overflow-y: auto;
@@ -167,14 +169,40 @@
     }
     body.big-mode .exit-big-bar { display: flex; }
 
-    /* 記憶閃卡網格 */
+    /* 🟢 Extension-Style Floating Green icon.png Widget on Text Selection */
+    .selection-floating-wrap {
+      position: absolute; display: none; z-index: 999999;
+      align-items: center; gap: 6px;
+      animation: popIn 0.14s ease-out;
+    }
+    .selection-icon-trigger {
+      width: 38px; height: 38px; border-radius: 50%;
+      background: #1b5e20; border: 2.5px solid #ffffff;
+      box-shadow: 0 4px 14px rgba(27,94,32,0.45);
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      padding: 3px; transition: transform 0.15s;
+    }
+    .selection-icon-trigger:hover { transform: scale(1.1); background: #2e7d32; }
+    .selection-icon-trigger img {
+      width: 100%; height: 100%; border-radius: 50%; object-fit: cover;
+    }
+    .selection-action-drawer {
+      display: none; background: #1b5e20; color: #fff;
+      border: 2px solid #fff; border-radius: 22px; padding: 5px 12px;
+      font-size: 0.82rem; font-weight: 800; box-shadow: 0 6px 18px rgba(0,0,0,0.28);
+      align-items: center; gap: 8px; white-space: nowrap;
+    }
+    .selection-floating-wrap.expanded .selection-action-drawer { display: inline-flex; }
+    .sel-act-item { cursor: pointer; padding: 3px 6px; border-radius: 6px; transition: background 0.12s; }
+    .sel-act-item:hover { background: rgba(255,255,255,0.2); }
+    @keyframes popIn { from { transform: scale(0.82); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
     .mnemonic-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 12px; width: 100%; }
     .mnemonic-card {
       background: #fff; border: 1px solid #dce3ea; border-radius: 14px; padding: 14px;
       display: flex; flex-direction: column; gap: 8px;
     }
 
-    /* 彈窗 */
     .modal {
       display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
       background: rgba(0,0,0,0.55); z-index: 9999; justify-content: center; align-items: center; padding: 16px;
@@ -191,29 +219,64 @@
     table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
     th, td { padding: 9px 10px; border-bottom: 1px solid #eee; text-align: left; }
     th { background: #f8fafc; font-weight: 700; }
+
+    @media print {
+      .navbar, .license-banner, .top-tabs, .hide-in-big, .exit-big-bar, .selection-floating-wrap { display: none !important; }
+      body { background: #fff; padding: 0; }
+      .main-wrap { max-width: 100%; padding: 0; }
+      .sheet-card { border: none; box-shadow: none; padding: 8mm; }
+    }
   </style>
 </head>
 <body>
 
-  <!-- 全屏演示/直播頂部懸浮控制條 -->
+  <!-- 🟢 Extension-Style Floating Green icon.png Popup on Text Selection -->
+  <div id="selectionFloatingWrap" class="selection-floating-wrap">
+    <button class="selection-icon-trigger" onclick="onFloatingIconClick(event)" title="Click to Translate, Annotate, Speak or Print!">
+      <img src="/icon.png?v=3" alt="Trees Pinyin" onerror="this.src='icon.png'">
+    </button>
+    <div class="selection-action-drawer">
+      <span class="sel-act-item" onclick="handleSelectionAction('annotate')">🌳 Translate & Annotate</span>
+      <span style="opacity:0.4;">|</span>
+      <span class="sel-act-item" onclick="handleSelectionAction('speak')">🔊 Speak</span>
+      <span style="opacity:0.4;">|</span>
+      <span class="sel-act-item" onclick="handleSelectionAction('print')">🖨️ Print</span>
+    </div>
+  </div>
+
+  <!-- 🛡️ Profanity / Inappropriate Language Gentle Advisory Modal -->
+  <div class="modal" id="profanityModal" onclick="if(event.target===this)this.style.display='none'">
+    <div class="modal-box" style="border-top: 6px solid #f59e0b; text-align: center; align-items: center;">
+      <div style="font-size: 2.4rem;">🌱</div>
+      <h3 style="margin: 0; color: #b45309; font-size: 1.15rem;">Mindful & Respectful Language Reminder</h3>
+      <p style="margin: 0; font-size: 0.92rem; color: #374151; line-height: 1.55;">
+        Trees Pinyin is a positive, school-safe educational workspace. We detected language that may be inappropriate or disrespectful.<br><br>
+        <b>Kind words help us build bridges across cultures!</b> Please revise your text using polite, constructive language.
+      </p>
+      <button class="btn btn-green" style="width: 100%;" onclick="document.getElementById('profanityModal').style.display='none'">
+        🤝 I Understand · Let's Use Positive Words
+      </button>
+    </div>
+  </div>
+
+  <!-- Fullscreen Live Projection Top Control Bar -->
   <div class="exit-big-bar">
-    <button class="btn btn-green" style="padding:6px 12px; font-size:0.82rem;" onclick="toggleSpeak()">🔊 Speak All (Female Voice)</button>
-    <button class="btn btn-soft" style="padding:6px 12px; font-size:0.82rem;" onclick="quickFlipScript()">繁/簡 Switch</button>
+    <button class="btn btn-green" style="padding:6px 12px; font-size:0.82rem;" onclick="toggleSpeak()">🔊 Speak All</button>
+    <button class="btn btn-soft" style="padding:6px 12px; font-size:0.82rem;" onclick="quickFlipScript()">Switch Script (Trad/Simp)</button>
     <button class="btn btn-dark" style="background:#d32f2f; padding:6px 14px;" onclick="toggleBigFont()">✕ Exit Fullscreen</button>
   </div>
 
-  <!-- 頂部導覽列 (全英文按鈕) -->
+  <!-- Top Navbar -->
   <header class="navbar">
     <a href="index.html" class="nav-left">
       <img src="/icon.png?v=3" alt="Trees Pinyin" class="brand-logo" onerror="this.src='icon.png'">
       <div>
         <div class="brand-title">Trees Pinyin · Teacher Workspace</div>
-        <div class="brand-sub">AI Lesson Prep · PDF/Doc/Photo Translator · Live Projection · 1-Click Homework</div>
+        <div class="brand-sub">Fast AI Q&A · Instant Docs/PDF/Photo Translator · Live Projection · 1-Click Homework</div>
       </div>
     </a>
 
     <div class="nav-right">
-      <!-- 女聲選擇器：徹底解決男聲問題 -->
       <select id="voiceSelect" class="layout-select" onchange="onVoiceSelectChange()" title="Select Clear Female Mandarin Voice">
         <option value="">👩 Clear Female Voice (Auto)</option>
       </select>
@@ -226,7 +289,7 @@
 
   <main class="main-wrap">
 
-    <!-- 教師 1 年免費試用 + 推薦解鎖 50 記憶句子與經典題庫 -->
+    <!-- Teacher 1-Year Free Trial + Referral Unlock Banner -->
     <section class="license-banner">
       <div>
         🎁 <b>Teacher 1-Year Free Pass:</b> <span id="daysLeftText" style="color:var(--accent); font-weight:800;">365 Days Remaining</span>
@@ -240,10 +303,10 @@
       </div>
     </section>
 
-    <!-- 三大主分頁切換 (全英文按鈕) -->
+    <!-- Main Navigation Tabs -->
     <div class="top-tabs">
       <button class="tab-btn active" id="tabBtnWorkspace" onclick="switchTeacherTab('workspace')">
-        ✨ 1. AI Prep, File Translator & Publish Homework
+        ✨ 1. AI Q&A, File Translator & Publish Homework
       </button>
       <button class="tab-btn" id="tabBtnMnemonics" onclick="switchTeacherTab('mnemonics')">
         🧠 2. 45+ Memory Sentences & Classical Question Bank
@@ -253,26 +316,23 @@
       </button>
     </div>
 
-    <!-- ==================== 分頁 1：完整繼承 index.html 的 AI 與文件翻譯工作台 + 一鍵發作業 ==================== -->
+    <!-- ==================== TAB 1: AI Q&A, File Translator & Homework Publisher ==================== -->
     <div id="panel-workspace" style="display:flex; flex-direction:column; gap:12px; width:100%;">
 
-      <!-- 1. 原版膠囊輸入框 (含語音輸入語言選擇 + PDF/Word/照片上傳) -->
       <section class="panel hide-in-big">
         <div class="search-box" id="dropZone">
           <textarea id="userInput" rows="2"
             placeholder="Ask AI any question, or enter/paste/drag text, PDF, Word, Google Docs link, or photo to translate & annotate..."></textarea>
 
-          <!-- 語音輸入語言切換 (預設支援中英文語音識別) -->
-          <select id="micLangSelect" class="layout-select" style="padding:4px 6px; font-size:0.78rem;" title="Voice Input Language">
-            <option value="en-US">🎙️ Speak EN</option>
-            <option value="zh-CN">🎙️ Speak 中文</option>
+          <select id="micLangSelect" class="layout-select" style="padding:4px 6px; font-size:0.78rem;" title="Voice Input Language (Default: English)">
+            <option value="en-US" selected>🎙️ Speak EN</option>
+            <option value="zh-CN">🎙️ Speak ZH</option>
           </select>
 
-          <button class="icon-action" id="micBtn" onclick="toggleVoice()" title="Click to Start/Stop Voice Input">
+          <button class="icon-action" id="micBtn" onclick="toggleVoice()" title="Voice Input (Speak English or Chinese)">
             <svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.91-3c-.49 0-.9.36-.98.85C16.52 14.2 14.47 16 12 16s-4.52-1.8-4.93-4.15c-.08-.49-.49-.85-.98-.85-.61 0-1.09.54-1 1.14.49 3 2.89 5.35 5.91 5.78V20c0 .55.45 1 1 1s1-.45 1-1v-2.08c3.02-.43 5.42-2.78 5.91-5.78.1-.6-.39-1.14-1-1.14z"/></svg>
           </button>
 
-          <!-- 文件與拍照選單按鈕 -->
           <button class="icon-action" id="fileMenuBtn" onclick="openFileMenuModal()" title="Upload PDF, Word, TXT or Photo">
             <svg viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2zm4 10h2v2h-2v2h-2v-2h-2v-2h2v-2h2v2z"/></svg>
           </button>
@@ -283,24 +343,25 @@
         </div>
 
         <div class="action-row">
-          <button class="btn btn-blue" onclick="runSmartAI()">✨ AI Reply & Pinyin</button>
+          <button class="btn btn-blue" onclick="runSmartAI(undefined, false)">✨ AI Reply & Pinyin</button>
           <button class="btn btn-green" onclick="runDirectTranslate()">📝 Translate & Pinyin</button>
-          <button class="btn btn-soft" style="flex:0.45;" id="speakBtn" onclick="toggleSpeak()">🔊 Speak (Female)</button>
+          <button class="btn btn-soft" style="flex:0.38;" onclick="runSmartAI(undefined, true)" title="Bypass cache and generate a fresh AI response">🔄 Regenerate AI</button>
+          <button class="btn btn-soft" style="flex:0.38;" id="speakBtn" onclick="toggleSpeak()">🔊 Speak</button>
         </div>
       </section>
 
-      <!-- 2. 四位一體顯示控制面板 (預設全勾選：English, Trees Pinyin, Standard Pinyin, 繁體中文；支援切換簡體) -->
+      <!-- 2. 4-in-1 Display & Script Control Panel -->
       <section class="controls-panel hide-in-big">
         <div class="controls-row">
           <div style="font-size:0.82rem; font-weight:700; color:var(--accent);">
-            🔊 Left-click character to speak · ✍️ Right-click to edit polyphone · Click English to edit
+            🔊 Left-click character to speak · ✍️ Right-click to edit Character / Standard Pinyin / Trees Pinyin · Highlight text to pop up green icon
           </div>
           <div class="checkbox-group">
             <label><input type="checkbox" id="chkEn" checked onchange="updateRowVisibility()"> English</label>
             <label><input type="checkbox" id="chkTp" checked onchange="updateRowVisibility()"> Trees Pinyin</label>
             <label><input type="checkbox" id="chkStd" checked onchange="updateRowVisibility()"> Standard Pinyin (ā á ǎ à)</label>
-            <label><input type="checkbox" id="chkTrad" checked onchange="switchScriptMode('trad')"> 繁體中文</label>
-            <label><input type="checkbox" id="chkSimp" onchange="switchScriptMode('simp')"> 簡體中文</label>
+            <label><input type="checkbox" id="chkTrad" checked onchange="switchScriptMode('trad')"> Traditional Chinese</label>
+            <label><input type="checkbox" id="chkSimp" onchange="switchScriptMode('simp')"> Simplified Chinese</label>
           </div>
         </div>
 
@@ -310,7 +371,7 @@
             <button class="btn btn-dark" onclick="exportCardImage()">💾 Save Photo</button>
             <button class="btn btn-dark" onclick="window.print()">🖨️ Print / PDF</button>
             <select class="layout-select" id="layoutSelect" onchange="updateLayoutMode()">
-              <option value="center">✨ Centered Layout</option>
+              <option value="center">✨ Auto-Fit (Centered)</option>
               <option value="left">📄 Left-Aligned Book Mode</option>
             </select>
             <span style="font-size:0.82rem; font-weight:700;">Font:</span>
@@ -320,14 +381,14 @@
         </div>
       </section>
 
-      <!-- 3. 四位一體輸出畫布 -->
+      <!-- 3. 4-in-1 Output Sheet Card -->
       <section class="sheet-card" id="sheetCard">
         <img id="previewImg" style="max-width:80%; max-height:150px; border-radius:10px; display:none;" alt="Preview">
         <div class="ai-reply-box" id="aiReplyBox"></div>
         <div class="annotation-list" id="annotationList"></div>
       </section>
 
-      <!-- 4. 修改排版後，一鍵發布為今日作業 -->
+      <!-- 4. 1-Click Publish Formatted Board as Homework -->
       <section class="panel hide-in-big" style="background:#f1f8e9; border-color:#a5d6a7;">
         <div style="font-weight:800; color:var(--accent); font-size:0.95rem;">
           🚀 1-Click Publish Formatted Board as Student Homework (Saves to Daily Record)
@@ -347,7 +408,7 @@
       </section>
     </div>
 
-    <!-- ==================== 分頁 2：完整 45 句原書記憶詞庫（含例句）+ 推薦解鎖 +50 句與經典題庫 ==================== -->
+    <!-- ==================== TAB 2: 45+ Memory Sentences & Classical Question Bank ==================== -->
     <div id="panel-mnemonics" class="hidden" style="display:flex; flex-direction:column; gap:12px; width:100%;">
       <section class="panel">
         <div class="controls-row">
@@ -355,9 +416,9 @@
             <b style="color:var(--accent);">📚 Select Bank:</b>
             <select id="packSelect" class="layout-select" style="font-weight:700;" onchange="renderTeacherMnemonicBank()">
               <option value="1">Pack 1: Greetings & Polite Expressions (15 Words · Free)</option>
-              <option value="2">Pack 2: Pronouns, Family & Countries (15 Words · Free for Teachers)</option>
-              <option value="3">Pack 3: Questions, Dining & Services (15 Words · Free for Teachers)</option>
-              <option value="4">Pack 4: +50 Bonus Memory Sentences & Classical Poems (🎁 Teacher Referral Unlock)</option>
+              <option value="2">Pack 2: Pronouns, Family & Countries (15 Words · Free)</option>
+              <option value="3">Pack 3: Questions, Dining & Services (15 Words · Free)</option>
+              <option value="4">Pack 4: +50 Memory Sentences & Classical Question Bank (🎁 Referral Unlock)</option>
             </select>
             <input type="text" id="searchBankInput" placeholder="🔍 Search English, Hanzi or Pinyin..." oninput="renderTeacherMnemonicBank()" style="padding:6px 10px; border:1px solid #cbd5e1; border-radius:8px; font-size:0.84rem;">
           </div>
@@ -371,16 +432,14 @@
       <div id="mnemonicCardsContainer" class="mnemonic-grid"></div>
     </div>
 
-    <!-- ==================== 分頁 3：學生錯題連同題目「四位一體」展示 + 每日作業歷史 ==================== -->
+    <!-- ==================== TAB 3: Student Error Radar (4-in-1 View) & Daily History ==================== -->
     <div id="panel-analytics" class="hidden" style="display:flex; flex-direction:column; gap:14px; width:100%;">
-
-      <!-- 學生錯題連同原題目四位一體完整展示 -->
       <section class="panel">
         <div class="controls-row">
           <div>
             <h3 style="margin:0; color:#c62828;">🎯 Student Error Questions & Tricky Characters (4-in-1 Full Question View)</h3>
             <p style="margin:4px 0 0; font-size:0.83rem; color:#555;">
-              Displays the exact questions students missed in full 4-line format (English + Trees Pinyin + Standard Pinyin + Hanzi) with red highlights on mispronounced characters or tone errors!
+              Displays the exact questions students missed in full 4-in-1 format (English + Trees Pinyin + Standard Pinyin + Hanzi) with red highlights on mispronounced characters!
             </p>
           </div>
           <div style="display:flex; gap:8px;">
@@ -392,7 +451,6 @@
         <div id="missedQuestionsFourInOneList" class="four-in-one" style="display:flex; flex-direction:column; gap:12px; margin-top:8px;"></div>
       </section>
 
-      <!-- 每日作業歷史記錄 -->
       <section class="panel">
         <h3 style="margin:0; color:var(--accent);">📅 Daily Homework History Log</h3>
         <table>
@@ -403,7 +461,6 @@
         </table>
       </section>
 
-      <!-- 學生提交成績明細 -->
       <section class="panel">
         <h3 style="margin:0; color:var(--accent);">📈 Student Submissions Log</h3>
         <table>
@@ -417,7 +474,37 @@
 
   </main>
 
-  <!-- 彈窗 1：文件上傳與拍照選單 (與 index.html 完全一致) -->
+  <!-- ✍️ Right-Click 3-in-1 Character & Pinyin Editor Modal -->
+  <div class="modal" id="editCharModal" onclick="if(event.target===this)this.style.display='none'">
+    <div class="modal-box">
+      <h3 style="margin:0; color:var(--accent);">✍️ Edit Character, Standard Pinyin & Trees Pinyin</h3>
+      <div style="font-size:0.82rem; color:#555;">
+        Modify any of the 3 fields below. Changing the character or numbered Pinyin (e.g. <code>hang2</code>) auto-calculates the others, or customize Trees Pinyin directly!
+      </div>
+
+      <div>
+        <label style="font-size:0.8rem; font-weight:700;">1. Chinese Character (漢字):</label>
+        <input type="text" id="editZhInput" oninput="onEditZhOrNumChange('zh')" style="width:100%; padding:9px; border:1px solid #cbd5e1; border-radius:8px; font-size:1.1rem; font-weight:700; margin-top:4px;">
+      </div>
+
+      <div>
+        <label style="font-size:0.8rem; font-weight:700;">2. Standard Pinyin (Enter tone number like <code>hang2</code> or tone mark <code>háng</code>):</label>
+        <input type="text" id="editStdInput" oninput="onEditZhOrNumChange('std')" style="width:100%; padding:9px; border:1px solid #cbd5e1; border-radius:8px; font-size:0.95rem; margin-top:4px;">
+      </div>
+
+      <div>
+        <label style="font-size:0.8rem; font-weight:700;">3. Trees Pinyin (Editable Custom Phonics):</label>
+        <input type="text" id="editTpInput" style="width:100%; padding:9px; border:1px solid #2e7d32; border-radius:8px; font-size:1rem; font-weight:700; color:#1b5e20; margin-top:4px;">
+      </div>
+
+      <div class="action-row">
+        <button class="btn btn-green" onclick="saveThreeInOneEdit()">✅ Save Changes</button>
+        <button class="btn btn-soft" onclick="document.getElementById('editCharModal').style.display='none'">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 1: File & Camera Options -->
   <div class="modal" id="fileMenuModal" onclick="if(event.target===this)this.style.display='none'">
     <div class="modal-box">
       <h3 style="margin:0; font-size:1.05rem;">📁 File & Camera Options</h3>
@@ -439,23 +526,25 @@
     </div>
   </div>
 
-  <!-- 彈窗 2：API Key 設置 -->
+  <!-- Modal 2: API Key Setup -->
   <div class="modal" id="keyModal" onclick="if(event.target===this)this.style.display='none'">
     <div class="modal-box">
       <h3 style="margin:0;">🔑 Google Gemini API Key</h3>
       <div style="font-size:0.84rem; background:#f8f9fa; padding:10px; border-radius:8px;">
-        Cloudflare High-Speed AI is active by default! You can also enter your own free Gemini API Key:<br>
+        <b>Cloudflare High-Speed AI & Global Cache are active by default!</b><br>
+        Enter your own free Google Gemini API Key (stored locally in your browser) for unlimited instant AI responses:<br>
         <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:#1565c0; font-weight:700;">Get Free Key at Google AI Studio ↗</a>
       </div>
-      <input type="password" id="apiKeyInput" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:8px;" placeholder="AIzaSy...">
+      <input type="password" id="apiKeyInput" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:8px;" placeholder="AIzaSy... (Optional)">
       <div class="action-row">
         <button class="btn btn-green" onclick="saveBackupKey()">Save Key</button>
-        <button class="btn btn-soft" onclick="document.getElementById('keyModal').style.display='none'">Close</button>
+        <button class="btn btn-soft" style="flex:0.45;" onclick="clearBackupKey()">Clear</button>
       </div>
+      <button class="nav-btn" style="width:100%; justify-content:center;" onclick="document.getElementById('keyModal').style.display='none'">Close</button>
     </div>
   </div>
 
-  <!-- 彈窗 3：保存圖片預覽 -->
+  <!-- Modal 3: Save Image Preview -->
   <div class="modal" id="imgModal" onclick="if(event.target===this)this.style.display='none'">
     <div class="modal-box" style="align-items:center;">
       <h3 style="margin:0; font-size:0.95rem;">Right-Click or Long-Press Image to Save</h3>
@@ -464,7 +553,7 @@
     </div>
   </div>
 
-  <!-- 彈窗 4：新增自定義記憶詞條與例句 (方便隨時擴充題庫) -->
+  <!-- Modal 4: Add Custom Memory Sentence -->
   <div class="modal" id="addCustomModal" onclick="if(event.target===this)this.style.display='none'">
     <div class="modal-box">
       <h3 style="margin:0; color:var(--accent);">➕ Add Custom Memory Word & Sentence</h3>
@@ -483,7 +572,259 @@
 
   <script>
     // =========================================================================
-    // 1. 徹底解決男聲問題：自動過濾男聲，優先鎖定高清女聲 (Meijia / Tingting / Xiaoxiao)
+    // 0. 🛡️ Profanity / Inappropriate Language Filter & Gentle Advisory
+    // =========================================================================
+    const PROFANITY_EN_REGEX = /\b(fuck|fucking|fucked|fucker|motherfucker|shit|shitty|bullshit|bitch|bitches|asshole|bastard|dick|cock|pussy|cunt|whore|slut|nigger|nigga|faggot|retard)\b/i;
+    const PROFANITY_ZH_LIST = [
+      '他媽的', '他妈的', '你媽的', '你妈的', '操你', '肏你', '草泥馬', '草泥马',
+      '傻逼', '煞筆', '傻B', '狗娘養', '去死吧', '王八蛋', '賤人', '贱人', '婊子', '雞巴', '鸡巴', '媽逼', '妈逼'
+    ];
+
+    function checkAndWarnProfanity(text) {
+      if (!text) return false;
+      const hitEn = PROFANITY_EN_REGEX.test(text);
+      const hitZh = PROFANITY_ZH_LIST.some(w => text.includes(w));
+      if (hitEn || hitZh) {
+        document.getElementById('profanityModal').style.display = 'flex';
+        return true;
+      }
+      return false;
+    }
+
+    // =========================================================================
+    // 0.1 Number, Time, Symbol & Chemical Formula to Spoken Chinese Expander
+    // =========================================================================
+    const DIGITS_ZH = ['零','一','二','三','四','五','六','七','八','九'];
+
+    function intToChinese(numStr) {
+      let n = parseInt(numStr, 10);
+      if (isNaN(n)) return numStr;
+      if (n === 0) return '零';
+      if (n < 0) return '負' + intToChinese(String(-n));
+      if (numStr.length === 4 && n >= 1900 && n <= 2099) {
+        return numStr.split('').map(d => DIGITS_ZH[parseInt(d, 10)]).join('');
+      }
+      if (n < 10) return DIGITS_ZH[n];
+      if (n < 100) {
+        let ten = Math.floor(n / 10), rem = n % 10;
+        return (ten === 1 ? '十' : DIGITS_ZH[ten] + '十') + (rem > 0 ? DIGITS_ZH[rem] : '');
+      }
+      if (n < 1000) {
+        let hun = Math.floor(n / 100), rem = n % 100;
+        if (rem === 0) return DIGITS_ZH[hun] + '百';
+        if (rem < 10) return DIGITS_ZH[hun] + '百零' + DIGITS_ZH[rem];
+        return DIGITS_ZH[hun] + '百' + intToChinese(String(rem));
+      }
+      if (n < 10000) {
+        let th = Math.floor(n / 1000), rem = n % 1000;
+        if (rem === 0) return DIGITS_ZH[th] + '千';
+        if (rem < 100) return DIGITS_ZH[th] + '千零' + intToChinese(String(rem));
+        return DIGITS_ZH[th] + '千' + intToChinese(String(rem));
+      }
+      return numStr.split('').map(d => DIGITS_ZH[parseInt(d, 10)] || d).join('');
+    }
+
+    function numberToChinese(str) {
+      if (str.includes('.')) {
+        let parts = str.split('.');
+        let intPart = intToChinese(parts[0] || '0');
+        let decPart = parts[1].split('').map(d => DIGITS_ZH[parseInt(d, 10)]).join('');
+        return intPart + '點' + decPart;
+      }
+      return intToChinese(str);
+    }
+
+    function expandNumbersAndSymbolsToZh(text) {
+      if (!text) return '';
+      let s = text;
+      s = s.replace(/\bH2O\b/gi, '水').replace(/\bCO2\b/gi, '二氧化碳').replace(/\bO2\b/gi, '氧氣');
+      s = s.replace(/°C|℃/g, '攝氏度').replace(/°F|℉/g, '華氏度');
+      s = s.replace(/\b(\d{1,2}):(\d{2})\b/g, (_, h, m) => intToChinese(h) + '點' + (m === '00' ? '整' : intToChinese(m) + '分'));
+      s = s.replace(/(\d+(?:\.\d+)?)\s*%/g, (_, num) => '百分之' + numberToChinese(num));
+      s = s.replace(/\$\s*(\d+(?:\.\d+)?)/g, (_, num) => numberToChinese(num) + '美元');
+      s = s.replace(/[¥￥]\s*(\d+(?:\.\d+)?)/g, (_, num) => numberToChinese(num) + '元');
+      s = s.replace(/\+/g, '加').replace(/=/g, '等於').replace(/&/g, '和');
+      s = s.replace(/\d+(?:\.\d+)?/g, (match) => numberToChinese(match));
+      return s;
+    }
+
+    // =========================================================================
+    // 0.2 High-Accuracy Dual-Track AI Engine (Fixed Cache Collisions & Bilingual Parsing)
+    // =========================================================================
+    const IS_LOCAL_FILE = window.location.protocol === 'file:';
+    const CF_WORKER_ENDPOINTS = IS_LOCAL_FILE
+      ? ['https://treespinyin-api.treespinyin.workers.dev', 'https://treespinyin.com/api']
+      : ['https://treespinyin-api.treespinyin.workers.dev', '/api', 'https://treespinyin.com/api'];
+
+    let backupKey = (localStorage.getItem('tp_v22_backup_key') || localStorage.getItem('tp_test_gemini_key') || '').trim();
+    let availableFastModels = [
+      'gemini-2.5-flash',
+      'gemini-3.5-flash-lite',
+      'gemini-flash-latest',
+      'gemini-flash-lite-latest'
+    ];
+
+    function refreshKeyBtnStyle() {
+      const btn = document.getElementById('uiKeyBtn');
+      if (btn) btn.classList.toggle('has-key', Boolean(backupKey));
+    }
+    refreshKeyBtnStyle();
+
+    async function discoverFastModels(key) {
+      if (!key) return;
+      try {
+        const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(key)}`);
+        if (!r.ok) return;
+        const data = await r.json();
+        const all = (data.models || [])
+          .filter(m => (m.supportedGenerationMethods || []).includes('generateContent'))
+          .map(m => m.name.replace('models/', ''))
+          .filter(n => !n.includes('tts') && !n.includes('image') && !n.includes('embedding') && !n.includes('veo'));
+
+        const priority = ['gemini-2.5-flash', 'gemini-3.5-flash', 'gemini-flash-latest', 'gemini-3.5-flash-lite', 'gemini-flash-lite-latest'];
+        const sorted = [];
+        for (const p of priority) { if (all.includes(p)) sorted.push(p); }
+        for (const m of all) { if (m.includes('flash') && !sorted.includes(m)) sorted.push(m); }
+        if (sorted.length > 0) availableFastModels = sorted;
+      } catch (e) {}
+    }
+    if (backupKey) discoverFastModels(backupKey);
+
+    function openKeyModal() {
+      document.getElementById('apiKeyInput').value = backupKey;
+      document.getElementById('keyModal').style.display = 'flex';
+    }
+
+    async function saveBackupKey() {
+      backupKey = document.getElementById('apiKeyInput').value.trim();
+      localStorage.setItem('tp_v22_backup_key', backupKey);
+      localStorage.setItem('tp_test_gemini_key', backupKey);
+      refreshKeyBtnStyle();
+      document.getElementById('keyModal').style.display = 'none';
+      if (backupKey) {
+        await discoverFastModels(backupKey);
+        const pendingQ = document.getElementById('userInput').value.trim();
+        if (pendingQ) runSmartAI(pendingQ, true);
+      }
+    }
+
+    function clearBackupKey() {
+      backupKey = '';
+      localStorage.removeItem('tp_v22_backup_key');
+      localStorage.removeItem('tp_test_gemini_key');
+      document.getElementById('apiKeyInput').value = '';
+      refreshKeyBtnStyle();
+    }
+
+    const BUILTIN_QA_CACHE = {
+      "咏鹅": "《詠鵝》駱賓王 (Ode to the Goose by Luo Binwang)\n鵝，鵝，鵝， ||| Goose, goose, goose,\n曲項向天歌。 ||| You bend your neck and sing to the sky.\n白毛浮綠水， ||| Your white feathers float on the emerald water,\n紅掌撥清波。 ||| Your red webbed feet paddle the clear waves.",
+      "静夜思": "《靜夜思》李白 (Quiet Night Thought by Li Bai)\n床前明月光， ||| Before my bed, the bright moonlight shines,\n疑是地上霜。 ||| I wonder if it is frost upon the ground.\n舉頭望明月， ||| I raise my head to gaze at the bright moon,\n低頭思故鄉。 ||| And lower my head, longing for my hometown.",
+      "春晓": "《春曉》孟浩然 (Spring Morning by Meng Haoran)\n春眠不覺曉， ||| In spring sleep, I am unaware of the dawn,\n處處聞啼鳥。 ||| Everywhere I hear the singing of birds.\n夜來風雨聲， ||| Last night came the sound of wind and rain,\n花落知多少。 ||| Who knows how many blossoms have fallen."
+    };
+
+    // Fixed Cache Key: preserves full semantic meaning to prevent false cache collisions
+    function normalizeCacheKey(rawQ) {
+      if (!rawQ) return '';
+      const trimmed = rawQ.trim().toLowerCase()
+        .replace(/詠/g, '咏').replace(/鵝/g, '鹅').replace(/靜/g, '静').replace(/曉/g, '晓');
+      if ( trimmed === '咏鹅' || trimmed === '《咏鹅》' ) return '咏鹅';
+      if ( trimmed === '静夜思' || trimmed === '《静夜思》' ) return '静夜思';
+      if ( trimmed === '春晓' || trimmed === '《春晓》' ) return '春晓';
+      return 'v3_' + trimmed.replace(/[\s,.?!，。？！、：:；;《》〈〉"“”'‘’()（）]/g, '').slice(0, 140);
+    }
+
+    function getLocalCachedAnswer(q) {
+      const k = normalizeCacheKey(q);
+      if (!k) return '';
+      if (BUILTIN_QA_CACHE[k]) return BUILTIN_QA_CACHE[k];
+      try {
+        const store = JSON.parse(localStorage.getItem('tp_local_qa_cache_v3') || '{}');
+        return store[k] || '';
+      } catch (e) { return ''; }
+    }
+
+    function saveLocalCachedAnswer(q, ans) {
+      const k = normalizeCacheKey(q);
+      if (!k || !ans) return;
+      try {
+        const store = JSON.parse(localStorage.getItem('tp_local_qa_cache_v3') || '{}');
+        const keys = Object.keys(store);
+        if (keys.length > 150) delete store[keys[0]];
+        store[k] = ans;
+        localStorage.setItem('tp_local_qa_cache_v3', JSON.stringify(store));
+      } catch (e) {}
+    }
+
+    function fetchWithTimeout(url, options = {}, timeoutMs = 9000) {
+      const ctrl = new AbortController();
+      const timer = setTimeout(() => ctrl.abort(), timeoutMs);
+      return fetch(url, { ...options, signal: ctrl.signal }).finally(() => clearTimeout(timer));
+    }
+
+    async function callSingleGeminiModelFast(modelName, promptText, dataUrl, signal) {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${encodeURIComponent(backupKey)}`;
+      const parts = [{ text: promptText }];
+      if (dataUrl && dataUrl.includes(',')) {
+        const mime = dataUrl.substring(dataUrl.indexOf(':') + 1, dataUrl.indexOf(';'));
+        parts.push({ inline_data: { mime_type: mime, data: dataUrl.split(',')[1] } });
+      }
+      let r = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts }],
+          generationConfig: { temperature: 0.2, thinkingConfig: { thinkingBudget: 0 } }
+        }),
+        signal
+      });
+      if (r.status === 400) {
+        r = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ contents: [{ parts }], generationConfig: { temperature: 0.2 } }),
+          signal
+        });
+      }
+      const d = await r.json();
+      if (!r.ok) throw new Error(d?.error?.message || `HTTP ${r.status}`);
+      const resParts = d?.candidates?.[0]?.content?.parts || [];
+      const text = resParts.filter(p => !p.thought && typeof p.text === 'string').map(p => p.text).join('').trim();
+      if (!text) throw new Error('EMPTY');
+      return text;
+    }
+
+    async function fetchFastAccurateAI(promptText, dataUrl = null, rawQuestionForCache = '', bypassCache = false) {
+      const cleanCacheKey = bypassCache ? ('nocache_' + Date.now()) : normalizeCacheKey(rawQuestionForCache);
+      const workerTasks = CF_WORKER_ENDPOINTS.map(async (ep) => {
+        const r = await fetchWithTimeout(ep, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt: promptText, image: dataUrl, cacheKey: cleanCacheKey })
+        }, 9000);
+        if (!r.ok) throw new Error('worker_err');
+        const d = await r.json();
+        const t = (d?.text || d?.reply || d?.choices?.[0]?.message?.content || '').trim();
+        if (!t) throw new Error('empty');
+        return t;
+      });
+
+      if (backupKey) {
+        const modelsToRace = availableFastModels.slice(0, 3);
+        const controllers = modelsToRace.map(() => new AbortController());
+        const keyTasks = modelsToRace.map((mName, idx) =>
+          callSingleGeminiModelFast(mName, promptText, dataUrl, controllers[idx].signal)
+            .then(txt => {
+              controllers.forEach((c, i) => { if (i !== idx) c.abort(); });
+              return txt;
+            })
+        );
+        try { return await Promise.any([...keyTasks, ...workerTasks]); } catch (e) { return ''; }
+      }
+      try { return await Promise.any(workerTasks); } catch (e) { return ''; }
+    }
+
+    // =========================================================================
+    // 1. Clear Female Mandarin Voice Engine
     // =========================================================================
     let femaleZhVoices = [];
     let selectedVoiceObj = null;
@@ -492,13 +833,10 @@
       if (!('speechSynthesis' in window)) return;
       const all = window.speechSynthesis.getVoices();
       const zhAll = all.filter(v => /zh|cmn|chi/i.test(v.lang) || /chinese|mandarin|taiwan|hong kong/i.test(v.name));
-
-      // 明確排除所有常見男聲名稱
-      const maleKeywords = ['male', 'kangkang', 'yunxi', 'yunjian', 'yunyang', 'danny', 'wanlung', 'yating'];
+      const maleKeywords = ['male', 'kangkang', 'yunxi', 'yunjian', 'yunyang', 'danny', 'wanlung'];
       femaleZhVoices = zhAll.filter(v => !maleKeywords.some(m => v.name.toLowerCase().includes(m)));
       if (femaleZhVoices.length === 0) femaleZhVoices = zhAll;
 
-      // 按照清晰度排序：優先微軟自然女聲與蘋果美佳/婷婷女聲
       const priorityOrder = ['xiaoxiao', 'hsiaochen', 'meijia', 'ting-ting', 'tingting', 'sin-ji', 'google 國語', 'google 普通話', 'female'];
       femaleZhVoices.sort((a, b) => {
         const aScore = priorityOrder.findIndex(k => a.name.toLowerCase().includes(k));
@@ -512,7 +850,6 @@
         selectedVoiceObj = femaleZhVoices[0];
       }
     }
-
     if ('speechSynthesis' in window) {
       window.speechSynthesis.onvoiceschanged = loadAndFilterFemaleVoices;
       setTimeout(loadAndFilterFemaleVoices, 200);
@@ -522,23 +859,24 @@
       const idx = parseInt(document.getElementById('voiceSelect').value, 10);
       if (femaleZhVoices[idx]) {
         selectedVoiceObj = femaleZhVoices[idx];
-        speakSingleChar('你好，聲音已切換為清晰女聲');
+        speakSingleChar('你好');
       }
     }
 
     function speakSingleChar(text) {
       if (!('speechSynthesis' in window) || !text) return;
+      if (checkAndWarnProfanity(text)) return;
       window.speechSynthesis.cancel();
       if (!selectedVoiceObj) loadAndFilterFemaleVoices();
       const u = new SpeechSynthesisUtterance(text);
       if (selectedVoiceObj) {
         u.voice = selectedVoiceObj;
-        u.lang = selectedVoiceObj.lang; // 關鍵：保持與女聲一致的語系，防止系統強制切回預設男聲
+        u.lang = selectedVoiceObj.lang;
       } else {
-        u.lang = 'zh-TW'; // fallback 台灣女聲語系
+        u.lang = 'zh-TW';
       }
       u.rate = 0.85;
-      u.pitch = 1.12; // 清亮女聲頻段
+      u.pitch = 1.12;
       window.speechSynthesis.speak(u);
     }
 
@@ -549,13 +887,14 @@
       if (window.speechSynthesis.speaking || isSpeakingNow) {
         window.speechSynthesis.cancel();
         isSpeakingNow = false;
-        btn.innerText = '🔊 Speak (Female)';
+        btn.innerText = '🔊 Speak';
         return;
       }
       const blocks = document.querySelectorAll('#annotationList .sentence-block');
       let allZh = Array.from(blocks).map(b => b.dataset.zh).join('。');
       if (!allZh) allZh = document.getElementById('userInput').value;
       if (!allZh) return;
+      if (checkAndWarnProfanity(allZh)) return;
 
       if (!selectedVoiceObj) loadAndFilterFemaleVoices();
       const u = new SpeechSynthesisUtterance(allZh);
@@ -569,13 +908,13 @@
       u.pitch = 1.12;
       isSpeakingNow = true;
       btn.innerText = '⏹️ Stop';
-      u.onend = () => { isSpeakingNow = false; btn.innerText = '🔊 Speak (Female)'; };
+      u.onend = () => { isSpeakingNow = false; btn.innerText = '🔊 Speak'; };
       u.onerror = u.onend;
       window.speechSynthesis.speak(u);
     }
 
     // =========================================================================
-    // 2. 繁體/簡體雙向字典轉換 (預設繁體中文，勾選簡體自動切換)
+    // 2. Traditional / Simplified Chinese Script Converter
     // =========================================================================
     const TRAD_TO_SIMP = {
       '請':'请','問':'问','謝':'谢','再':'再','見':'见','對':'对','氣':'气','沒':'没','關':'关','係':'系',
@@ -586,13 +925,12 @@
       '詠':'咏','項':'项','綠':'绿','紅':'红','撥':'拨','靜':'静','舉':'举','頭':'头','鄉':'乡','曉':'晓',
       '覺':'觉','處':'处','聞':'闻','聲':'声','風':'风','雲':'云','發':'发','財':'财','樂':'乐','歲':'岁',
       '時':'时','間':'间','點':'点','現':'现','錢':'钱','塊':'块','號':'号','碼':'码','機':'机','場':'场',
-      '飯':'饭','館':'馆','麵':'面','湯':'汤','雞':'鸡','豬':'猪','牛':'牛','茶':'茶','餃':'饺','飽':'饱',
-      '體':'体','簡':'简','繁':'繁','題':'题','庫':'库','選':'选','擇':'择','語':'语','音':'音','錯':'错'
+      '飯':'饭','館':'馆','麵':'面','湯':'汤','雞':'鸡','豬':'猪','牛':'牛','茶':'茶','餃':'饺','飽':'饱'
     };
     const SIMP_TO_TRAD = {};
     Object.keys(TRAD_TO_SIMP).forEach(t => { SIMP_TO_TRAD[TRAD_TO_SIMP[t]] = t; });
 
-    let currentScriptMode = 'trad'; // 預設繁體
+    let currentScriptMode = 'trad';
 
     function convertScript(str, mode = currentScriptMode) {
       if (!str) return '';
@@ -649,186 +987,7 @@
     }
 
     // =========================================================================
-    // 3. 完整 45 句原書記憶詞條 (每條均配齊雙語例句) + 推薦解鎖 +50 句與經典題庫
-    // =========================================================================
-    const FULL_45_MNEMONICS = [
-      // Pack 1 (1-15)
-      { pack: 1, meaning: "Hello / How are you?", trees: "Nee3 haw3", hanzi: "你好", pinyin: "nǐ hǎo", sound: "Similar to '<b><u>knee</u> <u>how</u></b>'.", mnemonic: "<b>Knee</b>ling to show <b>how</b> much respect you have.", exZh: "你好，很高興認識你！", exEn: "Hello, nice to meet you!" },
-      { pack: 1, meaning: "You (Singular)", trees: "nee3", hanzi: "你", pinyin: "nǐ", sound: "Sounds like '<b><u>Knee</u></b>'.", mnemonic: "<b><u>Knee</u></b>(l) down while greeting <b>you</b>.", exZh: "請問你叫什麼名字？", exEn: "May I ask what your name is?" },
-      { pack: 1, meaning: "Good", trees: "haw3", hanzi: "好", pinyin: "hǎo", sound: "Similar to '<b><u>how</u></b>'.", mnemonic: "'Nee3 haw3' literally means 'You good'.", exZh: "今天天氣真好！", exEn: "The weather is really good today!" },
-      { pack: 1, meaning: "Good morning.", trees: "Dsaw3 (r)sang4 haw3", hanzi: "早上好", pinyin: "zǎo shang hǎo", sound: "Sounds like '<b><u>jaw</u> <u>sang</u></b>'.", mnemonic: "Morning yawning: your <b><u>jaw</u> <u>sang</u></b>!", exZh: "老師早上好！", exEn: "Good morning, teacher!" },
-      { pack: 1, meaning: "Big", trees: "dah4", hanzi: "大", pinyin: "dà", sound: "First part of '<b><u>do</u></b>zen'.", mnemonic: "Our <b>big</b> family eats a <b><u>do</u></b>zen eggs.", exZh: "這個蘋果非常大。", exEn: "This apple is very big." },
-      { pack: 1, meaning: "Home / Family", trees: "jeeah", hanzi: "家", pinyin: "jiā", sound: "Contraction of '<b><u>Gee</u></b>' and '<b><u>Ah</u></b>' (like 'jar').", mnemonic: "Our <b>big family</b> (dah4 jeeah) eats eggs in a <b>jar</b>.", exZh: "歡迎來到我家！", exEn: "Welcome to my home!" },
-      { pack: 1, meaning: "Happy", trees: "kooie4 Ler4", hanzi: "快樂", pinyin: "kuài lè", sound: "'<b><u>qui</u></b>(te) <b><u>lo</u></b>(vely)'.", mnemonic: "<b>Happy</b> kids are <b><u>qui</u></b>(te) <b><u>lo</u></b>(vely)!", exZh: "祝你生日快樂！", exEn: "Wish you a happy birthday!" },
-      { pack: 1, meaning: "New", trees: "seen", hanzi: "新", pinyin: "xīn", sound: "Sounds like '<b><u>seen</u></b>'.", mnemonic: "Never <b><u>seen</u></b> before, so it's <b>new</b>!", exZh: "這是一本新書。", exEn: "This is a new book." },
-      { pack: 1, meaning: "Year", trees: "neean2", hanzi: "年", pinyin: "nián", sound: "'<b><u>Knee</u> <u>an</u></b>' or '<b>Neon</b>'.", mnemonic: "New <b>Year</b> involves kowtow (knee an) and <b>neon</b> lights.", exZh: "祝大家新年快樂！", exEn: "Happy New Year, everyone!" },
-      { pack: 1, meaning: "Make a fortune", trees: "fah tsie2", hanzi: "發財", pinyin: "fā cái", sound: "\"<b><u>far</u></b> i<b><u>t's I</u></b>\" / 'far try'.", mnemonic: "A bold 'far try' to <b>make a fortune</b>.", exZh: "恭喜發財，萬事如意！", exEn: "Wishing you prosperity and all the best!" },
-      { pack: 1, meaning: "Excuse me / Could you tell me...?", trees: "Tsing3 wer-n4", hanzi: "請問", pinyin: "qǐng wèn", sound: "Le<b><u>t's sing</u></b> <b><u>when</u></b> happy.", mnemonic: "tsing3 = Let's sing; wer-n4 = when.", exZh: "請問洗手間在哪裡？", exEn: "Excuse me, where is the restroom?" },
-      { pack: 1, meaning: "Thank you!", trees: "Seer4 seer", hanzi: "謝謝", pinyin: "xiè xie", sound: "'<b><u>See</u> <u>ye</u></b>(s)' / 'See ya'.", mnemonic: "'Thank you' and 'See ya' go hand in hand!", exZh: "非常謝謝你的幫忙！", exEn: "Thank you very much for your help!" },
-      { pack: 1, meaning: "See you / Good-bye", trees: "Dsie4 jeean4", hanzi: "再見", pinyin: "zài jiàn", sound: "'<b><u>Xy</u></b>lophone, <b><u>Gee</u> <u>an</u></b>'.", mnemonic: "Playing the <b><u>Xy</u></b>lophone to say <b>goodbye</b>.", exZh: "我們明天學校見，再見！", exEn: "See you at school tomorrow, goodbye!" },
-      { pack: 1, meaning: "You are welcome.", trees: "Boo2 ker4 tsee", hanzi: "不客氣", pinyin: "bú kè qi", sound: "'<b><u>Boo</u> <u>Cur</u>—<u>tsy</u></b>'.", mnemonic: "No need to do a curtsy ('Boo Curtsy').", exZh: "不客氣，這是我應該做的。", exEn: "You're welcome, it's my pleasure." },
-      { pack: 1, meaning: "I'm sorry.", trees: "Dooay4 boo4 tsee3", hanzi: "對不起", pinyin: "duì bù qǐ", sound: "<b><u>Dway</u></b>ne says '<b><u>boo</u> <u>qi</u></b>'.", mnemonic: "Dwayne apologizes: I'm sorry!", exZh: "對不起，我今天遲到了。", exEn: "I'm sorry, I am late today." },
-
-      // Pack 2 (16-30)
-      { pack: 2, meaning: "It doesn't matter / It's OK.", trees: "May2 gooan see", hanzi: "沒關係", pinyin: "méi guān xi", sound: "'<b><u>May</u></b> la<b><u>goon</u></b> <b><u>see</u></b>.'", mnemonic: "May the lagoon be seen when the tide goes out.", exZh: "沒關係，下次注意就好了。", exEn: "It's OK, just be careful next time." },
-      { pack: 2, meaning: "Don't get angry.", trees: "Beer2 (r)ser-ng tsee4", hanzi: "別生氣", pinyin: "bié shēng qì", sound: "'<b><u>Beer</u> <u>sung</u> <u>qi</u></b>'.", mnemonic: "With beer, Dwayne sung a song full of qi.", exZh: "別生氣，我們一起想辦法。", exEn: "Don't get angry, let's figure it out together." },
-      { pack: 2, meaning: "Doctor", trees: "yee (r)ser-ng", hanzi: "醫生", pinyin: "yī shēng", sound: "yee (one) + (r)ser-ng (sung/birth).", mnemonic: "The very first person you see at birth is a doctor.", exZh: "他是一位非常有名的醫生。", exEn: "He is a very famous doctor." },
-      { pack: 2, meaning: "Day / Sun", trees: "(r)th4", hanzi: "日", pinyin: "rì", sound: "Tongue of '<b><u>r</u></b>ain' + '<b><u>th</u></b>en'.", mnemonic: "And (r)then... the day begins!", exZh: "今天是個好日子。", exEn: "Today is a great day." },
-      { pack: 2, meaning: "I / Me", trees: "wer3", hanzi: "我", pinyin: "wǒ", sound: "Part of '<b><u>wor</u></b>d' or '<b><u>wor</u></b>ld'.", mnemonic: "I am the core of my world.", exZh: "我非常喜歡學習中文。", exEn: "I really like learning Chinese." },
-      { pack: 2, meaning: "My / Mine", trees: "wer3 der", hanzi: "我的", pinyin: "wǒ de", sound: "Similar to '<b><u>word</u></b>'.", mnemonic: "My world! Adding 'der' after 'wer3'.", exZh: "這本書是我的。", exEn: "This book is mine." },
-      { pack: 2, meaning: "Your / Yours", trees: "nee3 der", hanzi: "你的", pinyin: "nǐ de", sound: "Sounds like '<b><u>need</u></b>'.", mnemonic: "Yours is what you need.", exZh: "你的發音非常標準！", exEn: "Your pronunciation is very accurate!" },
-      { pack: 2, meaning: "It / He / She", trees: "tah", hanzi: "他", pinyin: "tā", sound: "First part of '<b><u>Ta</u></b>rget'.", mnemonic: "He and she buy it at Target.", exZh: "他是我們班的好學生。", exEn: "He is a good student in our class." },
-      { pack: 2, meaning: "His / Her / Its", trees: "tah der", hanzi: "他的", pinyin: "tā de", sound: "Similar to '<b><u>tard</u></b>(y)'.", mnemonic: "He was tardy for his English class.", exZh: "他的中文說得很好。", exEn: "He speaks Chinese very well." },
-      { pack: 2, meaning: "Friend", trees: "per-ng2 yoh", hanzi: "朋友", pinyin: "péng yǒu", sound: "'<b><u>peng</u></b>uin <b><u>you</u></b>'.", mnemonic: "A cute penguin is your best friend!", exZh: "我們是最好的朋友。", exEn: "We are best friends." },
-      { pack: 2, meaning: "Younger & Elder Brother", trees: "dee4 dee / ger ger", hanzi: "弟弟哥哥", pinyin: "dì di gē ge", sound: "'<b><u>di</u></b>g' = dee4 + ger.", mnemonic: "'dig' is teamwork of younger and elder brother!", exZh: "哥哥和弟弟一起去公園。", exEn: "The elder and younger brothers go to the park together." },
-      { pack: 2, meaning: "Country & USA", trees: "may3 gooer2", hanzi: "美國", pinyin: "měi guó", sound: "<b><u>May</u></b>flower + gooer2.", mnemonic: "No Mayflower, no United States.", exZh: "我來自美國加州。", exEn: "I come from California, USA." },
-      { pack: 2, meaning: "Human / People", trees: "(r)ther-n2", hanzi: "人", pinyin: "rén", sound: "'r' tongue + weak '<b><u>then</u></b>'.", mnemonic: "Add (r)ther-n2 after a country for its people.", exZh: "這裡的人都非常熱情。", exEn: "The people here are very warm and friendly." },
-      { pack: 2, meaning: "China", trees: "(r)dser-oong gooer2", hanzi: "中國", pinyin: "zhōng guó", sound: "Sounds like '<b><u>drone</u></b>'.", mnemonic: "Fly a drone across China.", exZh: "中國有很多歷史古蹟。", exEn: "China has many historical sites." },
-      { pack: 2, meaning: "Like / Love", trees: "see3 hooan", hanzi: "喜歡", pinyin: "xǐ huān", sound: "'<b><u>see</u> <u>Juan</u></b>'.", mnemonic: "Like him when you see Don Juan!", exZh: "你喜歡吃什麼水果？", exEn: "What fruit do you like to eat?" },
-
-      // Pack 3 (31-45)
-      { pack: 3, meaning: "Can / Be able to", trees: "hooay4", hanzi: "會", pinyin: "huì", sound: "'<b><u>hoo</u></b>(r)<b><u>ay</u></b>' without r.", mnemonic: "If you can do it, shout hooray!", exZh: "我會說一點點中文。", exEn: "I can speak a little bit of Chinese." },
-      { pack: 3, meaning: "Book", trees: "(r)soo", hanzi: "書", pinyin: "shū", sound: "Sounds like '<b><u>sue</u></b>'.", mnemonic: "Copy this book and Sue will sue you!", exZh: "我喜歡在圖書館看書。", exEn: "I like reading books in the library." },
-      { pack: 3, meaning: "Who & Water", trees: "(r)sooay2 / (r)sooay3", hanzi: "誰喝水", pinyin: "shuí hē shuǐ", sound: "Contract '<b><u>sway</u></b>'.", mnemonic: "Who sees the mermaid swaying in the water?", exZh: "請問誰想喝水？", exEn: "Excuse me, who would like to drink water?" },
-      { pack: 3, meaning: "Look for", trees: "(r)dsaw3", hanzi: "找", pinyin: "zhǎo", sound: "Similar to '<b><u>jaw</u></b>'.", mnemonic: "Looking for my jaw on the floor!", exZh: "你在找什麼東西？", exEn: "What are you looking for?" },
-      { pack: 3, meaning: "From", trees: "Lie2 ds4", hanzi: "來自", pinyin: "lái zì", sound: "Similar to '<b><u>lies</u></b>'.", mnemonic: "The truth lies in where you come from.", exZh: "我的老師來自台灣。", exEn: "My teacher comes from Taiwan." },
-      { pack: 3, meaning: "Where", trees: "nah3 Lee3", hanzi: "哪裡", pinyin: "nǎ lǐ", sound: "G<b><u>narly</u></b> without G.", mnemonic: "Don't know where you are? Gnarly!", exZh: "你週末想去哪裡玩？", exEn: "Where do you want to go for fun this weekend?" },
-      { pack: 3, meaning: "How", trees: "dser-n3 mer", hanzi: "怎麼", pinyin: "zěn me", sound: "Confu<b><u>sion</u></b> <b><u>Mer</u></b>maid.", mnemonic: "How the mermaid falls in love.", exZh: "這道題應該怎麼做？", exEn: "How should we solve this question?" },
-      { pack: 3, meaning: "Supermarket", trees: "(r)tsaw (r)s4", hanzi: "超市", pinyin: "chāo shì", sound: "r-colored '<b><u>cho</u></b>(i)<b><u>ce</u></b>'.", mnemonic: "So many choices in the supermarket!", exZh: "媽媽去超市買水果了。", exEn: "Mom went to the supermarket to buy fruit." },
-      { pack: 3, meaning: "Menu & Check, please", trees: "tsie4 dan / mie3 dan", hanzi: "菜單買單", pinyin: "cài dān mǎi dān", sound: "I<b><u>t's I</u></b> <b><u>done</u></b> / <b><u>My</u> <u>done</u></b>.", mnemonic: "Done with the menu; check, please!", exZh: "服務員，請給我菜單。", exEn: "Waiter, please give me the menu." },
-      { pack: 3, meaning: "Would like / Want", trees: "seeang3 yaw4", hanzi: "想要", pinyin: "xiǎng yào", sound: "'<b><u>see</u> <u>young</u></b>' + '<b><u>your</u></b>'.", mnemonic: "Want to see Young's beer.", exZh: "我想要一杯熱咖啡。", exEn: "I would like a cup of hot coffee." },
-      { pack: 3, meaning: "Milk tea", trees: "nie3 (r)tsah2", hanzi: "奶茶", pinyin: "nǎi chá", sound: "'<b><u>ni</u></b>ce <b><u>char</u></b>ge'.", mnemonic: "Milk tea gives a nice charge!", exZh: "珍珠奶茶非常好喝。", exEn: "Boba milk tea is very delicious." },
-      { pack: 3, meaning: "Dumplings", trees: "jeeaw3 ds", hanzi: "餃子", pinyin: "jiǎo zi", sound: "'<b><u>Gee, aw</u></b>esome foo<b><u>ds</u></b>.'", mnemonic: "Everyone loves dumplings!", exZh: "我們今天晚上吃餃子。", exEn: "We are eating dumplings tonight." },
-      { pack: 3, meaning: "Cold (Illness)", trees: "gan3 maw4", hanzi: "感冒", pinyin: "gǎn mào", sound: "'<b><u>gun</u> <u>mall</u></b>'.", mnemonic: "Shock at the mall caused a cold.", exZh: "天冷了，小心別感冒。", exEn: "It's cold, be careful not to catch a cold." },
-      { pack: 3, meaning: "Telephone", trees: "deean4 hooah4", hanzi: "電話", pinyin: "diàn huà", sound: "'<b><u>the end</u></b>' + '<b><u>who are</u></b>'.", mnemonic: "Call on the telephone to ask who they are.", exZh: "請給我打個電話。", exEn: "Please give me a phone call." },
-      { pack: 3, meaning: "Got it.", trees: "Ting der-oong3 Ler", hanzi: "聽懂了", pinyin: "tīng dǒng le", sound: "Shou<b><u>ting</u></b> '<b><u>don't</u></b> <b><u>love</u></b>'.", mnemonic: "Once you hear it, you've got it!", exZh: "老師講的課我都聽懂了！", exEn: "I understood everything the teacher taught!" },
-
-      // Pack 4: 教師推薦解鎖 (+50 記憶句子與經典古詩題庫代表)
-      { pack: 4, meaning: "[Classical Poem] Ode to the Goose 《詠鵝》", trees: "er2 er2 er2", hanzi: "鵝鵝鵝曲項向天歌白毛浮綠水紅掌撥清波", pinyin: "é é é, qū xiàng xiàng tiān gē", sound: "Tang Dynasty Classic by Luo Binwang", mnemonic: "Unlocked via Teacher Referral!", exZh: "鵝，鵝，鵝，曲項向天歌。白毛浮綠水，紅掌撥清波。", exEn: "Goose, goose, goose, bending your neck to sing to the sky. White feathers float on emerald water, red feet paddle clear waves." },
-      { pack: 4, meaning: "[Classical Poem] Quiet Night Thought 《靜夜思》", trees: "tswang2 tseean2 ming2", hanzi: "床前明月光疑是地上霜舉頭望明月低頭思故鄉", pinyin: "chuáng qián míng yuè guāng", sound: "Tang Dynasty Classic by Li Bai", mnemonic: "Unlocked via Teacher Referral!", exZh: "床前明月光，疑是地上霜。舉頭望明月，低頭思故鄉。", exEn: "Before my bed, bright moonlight shines. I raise my head to gaze at the moon, and lower it, thinking of home." },
-      { pack: 4, meaning: "[Classical Poem] Spring Morning 《春曉》", trees: "tsoon meean2 boo4", hanzi: "春眠不覺曉處處聞啼鳥夜來風雨聲花落知多少", pinyin: "chūn mián bù jué xiǎo", sound: "Tang Dynasty Classic by Meng Haoran", mnemonic: "Unlocked via Teacher Referral!", exZh: "春眠不覺曉，處處聞啼鳥。夜來風雨聲，花落知多少。", exEn: "In spring sleep I am unaware of dawn; everywhere I hear singing birds." },
-      { pack: 4, meaning: "[Classroom Phrase] Please open your book", trees: "tsing3 dah3 kie (r)soo", hanzi: "請打開書", pinyin: "qǐng dǎ kāi shū", sound: "Let's sing + dah kie + sue", mnemonic: "Essential Classroom Command", exZh: "同學們，請打開書第十分頁。", exEn: "Class, please open your book to page ten." },
-      { pack: 4, meaning: "[Classroom Phrase] Read after me", trees: "ger-n wer3 doo2", hanzi: "跟我讀", pinyin: "gēn wǒ dú", sound: "gun + word + do", mnemonic: "Essential Classroom Command", exZh: "請大家大聲跟我讀一遍。", exEn: "Everyone, please read aloud after me once." }
-    ];
-
-    // 自動嘗試載入外部擴充檔案 mnemonics-extra.json (方便未來無限擴充)
-    fetch('mnemonics-extra.json')
-      .then(r => r.ok ? r.json() : [])
-      .then(extraList => {
-        if (Array.isArray(extraList)) FULL_45_MNEMONICS.push(...extraList);
-      }).catch(() => {});
-
-    // 載入老師自己在本地新增的記憶句子
-    const localCustomCards = JSON.parse(localStorage.getItem('tp_custom_mnemonics_v1') || '[]');
-    FULL_45_MNEMONICS.push(...localCustomCards);
-
-    function shareTeacherReferral() {
-      const msg = `Join me on Trees Pinyin Teacher Workspace! Free for 1 full year with 45 core memory sentences. Use my Teacher Referral Code TCH-8829 to unlock +50 bonus memory sentences & the Classical Question Bank: https://www.treespinyin.com/dashboard.html`;
-      navigator.clipboard.writeText(msg).catch(() => {});
-      localStorage.setItem('tp_teacher_ref_unlocked', 'true');
-      document.getElementById('unlockedBankStatus').innerText = '95+ Memory Sentences & Classical Bank Unlocked 🎉';
-      document.getElementById('packSelect').value = '4';
-      renderTeacherMnemonicBank();
-      alert('🎁 Referral message copied! You have unlocked +50 Memory Sentences & the Classical Question Bank!');
-    }
-
-    function renderTeacherMnemonicBank() {
-      const container = document.getElementById('mnemonicCardsContainer');
-      if (!container) return;
-      const packId = parseInt(document.getElementById('packSelect').value, 10) || 1;
-      const query = (document.getElementById('searchBankInput').value || '').trim().toLowerCase();
-      const refUnlocked = localStorage.getItem('tp_teacher_ref_unlocked') === 'true';
-
-      if (packId === 4 && !refUnlocked) {
-        container.innerHTML = `
-          <div style="grid-column:1/-1; background:#fff8e1; border:1.5px dashed #ffb300; border-radius:14px; padding:24px; text-align:center;">
-            <h3 style="margin:0 0 8px; color:#bf360c;">🔒 Pack 4: +50 Memory Sentences & Classical Question Bank</h3>
-            <p style="margin:0 0 12px; font-size:0.9rem;">Refer one fellow teacher to unlock 50 additional memory sentences and classic poems instantly!</p>
-            <button class="btn btn-green" style="max-width:340px;" onclick="shareTeacherReferral()">📤 Click to Share Referral & Unlock Now</button>
-          </div>`;
-        return;
-      }
-
-      const list = FULL_45_MNEMONICS.filter(c => {
-        if (query) {
-          return c.meaning.toLowerCase().includes(query) || c.hanzi.includes(query) || c.exZh.includes(query) || c.exEn.toLowerCase().includes(query);
-        }
-        return c.pack === packId;
-      });
-
-      container.innerHTML = list.map((card, idx) => {
-        const dispHanzi = convertScript(card.hanzi, currentScriptMode);
-        const dispExZh = convertScript(card.exZh, currentScriptMode);
-        return `
-          <div class="mnemonic-card">
-            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px dashed #e5e7eb; padding-bottom:6px;">
-              <label style="display:flex; align-items:center; gap:6px; font-weight:800; color:var(--accent); cursor:pointer;">
-                <input type="checkbox" class="mnemonic-assign-chk" data-hanzi="${card.hanzi}" data-en="${card.meaning}" data-sound="${card.sound.replace(/"/g, '"')}" data-mnemonic="${card.mnemonic.replace(/"/g, '"')}" data-exzh="${card.exZh}" data-exen="${card.exEn}" checked style="width:16px; height:16px;">
-                <span>#${idx + 1} ${card.meaning}</span>
-              </label>
-              <button class="nav-btn" style="padding:3px 8px; font-size:0.78rem;" onclick="speakSingleChar('${card.exZh}')">🔊 Speak</button>
-            </div>
-            <div style="display:flex; justify-content:space-between; align-items:baseline;">
-              <span style="font-size:1.05rem; color:#1b5e20;"><i><b>${card.trees}</b></i></span>
-              <span style="font-weight:700; font-size:1.1rem;">${dispHanzi} <small style="color:#666;">(${card.pinyin})</small></span>
-            </div>
-            <div style="font-size:0.83rem;"><b>Sound:</b> ${card.sound}</div>
-            <div style="font-size:0.83rem;"><b>Mnemonic:</b> ${card.mnemonic}</div>
-            <div style="background:#f8fafc; padding:8px; border-radius:8px; border:1px dashed #cbd5e1; font-size:0.83rem;">
-              <div style="color:var(--blue); font-weight:700;">📖 Example Sentence:</div>
-              <div><b>${dispExZh}</b></div>
-              <div style="color:#444;">${card.exEn}</div>
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    function openAddCustomSentenceModal() {
-      document.getElementById('addCustomModal').style.display = 'flex';
-    }
-
-    function saveCustomMnemonicCard() {
-      const meaning = document.getElementById('custMeaning').value.trim();
-      const hanzi = document.getElementById('custHanzi').value.trim();
-      const sound = document.getElementById('custSound').value.trim();
-      const mnemonic = document.getElementById('custMnemonic').value.trim();
-      const exZh = document.getElementById('custExZh').value.trim() || hanzi;
-      const exEn = document.getElementById('custExEn').value.trim() || meaning;
-      if (!meaning || !hanzi) return alert('Please enter English Meaning and Chinese Characters.');
-
-      const pyArr = pinyinPro.pinyin(hanzi, { type: 'array', toneType: 'num' });
-      const trees = pyArr.map(p => compileToTreesPinyin(p)).join(' ');
-      const std = pinyinPro.pinyin(hanzi);
-
-      const newCard = { pack: 1, meaning, trees, hanzi, pinyin: std, sound, mnemonic, exZh, exEn };
-      FULL_45_MNEMONICS.unshift(newCard);
-      const saved = JSON.parse(localStorage.getItem('tp_custom_mnemonics_v1') || '[]');
-      saved.unshift(newCard);
-      localStorage.setItem('tp_custom_mnemonics_v1', JSON.stringify(saved));
-
-      document.getElementById('addCustomModal').style.display = 'none';
-      renderTeacherMnemonicBank();
-    }
-
-    function assignSelectedMnemonicCards() {
-      const chks = Array.from(document.querySelectorAll('.mnemonic-assign-chk:checked'));
-      if (chks.length === 0) return alert('Please check at least 1 card to assign!');
-      const items = chks.map(c => ({
-        type: 'mnemonic',
-        zh: c.dataset.hanzi,
-        en: c.dataset.en,
-        sound: c.dataset.sound,
-        mnemonic: c.dataset.mnemonic,
-        exampleZh: c.dataset.exzh,
-        exampleEn: c.dataset.exen
-      }));
-      recordAndSaveAssignment('CLS-101', 'Vocabulary Mnemonics & Example Sentences', 'mnemonic', items);
-      alert(`✅ Assigned ${items.length} Vocabulary Mnemonic Cards (with Example Sentences) to Class Code CLS-101!`);
-    }
-
-    // =========================================================================
-    // 4. Trees Pinyin v25 編譯器 + 四位一體 DOM 生成器 (供工作台與錯題分析共用)
+    // 3. Trees Pinyin v25 Compiler + 3-in-1 Right-Click Editor
     // =========================================================================
     const OVERALL_16 = {
       'zhi': '(r)ds', 'chi': '(r)ts', 'shi': '(r)s', 'ri': '(r)th', 'zi': 'ds', 'ci': 'ts', 'si': 's', 'yi': 'yee',
@@ -897,23 +1056,113 @@
       return s;
     }
 
+    const CUSTOM_POLYPHONES = {
+      "銀行": "yin2 hang2", "银行": "yin2 hang2", "行業": "hang2 ye4", "行业": "hang2 ye4", "一行": "yi4 hang2",
+      "便宜": "pian2 yi5", "方便": "fang1 bian4", "音樂": "yin1 yue4", "音乐": "yin1 yue4", "快樂": "kuai4 le4", "快乐": "kuai4 le4",
+      "長大": "zhang3 da4", "长大": "zhang3 da4", "長城": "chang2 cheng2", "长城": "chang2 cheng2",
+      "了解": "liao3 jie3", "好了": "hao3 le5", "太好了": "tai4 hao3 le5", "覺得": "jue2 de5", "觉得": "jue2 de5", "睡覺": "shui4 jiao4", "睡觉": "shui4 jiao4",
+      "重慶": "chong2 qing4", "重庆": "chong2 qing4", "重要": "zhong4 yao4", "還錢": "huan2 qian2", "还钱": "huan2 qian2", "還有": "hai2 you3", "还有": "hai2 you3",
+      "我的": "wo3 de5", "你的": "ni3 de5", "好的": "hao3 de5", "曲項": "qu1 xiang4", "曲项": "qu1 xiang4"
+    };
+
+    const userCustomEdits = JSON.parse(localStorage.getItem('tp_custom_char_edits_v2') || '{}');
+    let activeEditCol = null;
+
+    function getAccuratePinyinArray(zhText) {
+      let pyArr = pinyinPro.pinyin(zhText, { type: 'array', toneType: 'num' });
+      for (let word in CUSTOM_POLYPHONES) {
+        let idx = zhText.indexOf(word);
+        while (idx !== -1) {
+          let fixedPys = CUSTOM_POLYPHONES[word].split(' ');
+          for (let k = 0; k < fixedPys.length; k++) pyArr[idx + k] = fixedPys[k];
+          idx = zhText.indexOf(word, idx + 1);
+        }
+      }
+      return pyArr;
+    }
+
+    function openThreeInOneEditor(colEl) {
+      activeEditCol = colEl;
+      const zhEl = colEl.querySelector('.tp-zh');
+      const stdEl = colEl.querySelector('.tp-std');
+      const tpEl = colEl.querySelector('.tp-py');
+
+      document.getElementById('editZhInput').value = zhEl ? zhEl.innerText : '';
+      document.getElementById('editStdInput').value = colEl.dataset.pynum || (stdEl ? stdEl.innerText : '');
+      document.getElementById('editTpInput').value = tpEl ? tpEl.innerText : '';
+      document.getElementById('editCharModal').style.display = 'flex';
+    }
+
+    function onEditZhOrNumChange(source) {
+      if (source === 'zh') {
+        const newCh = document.getElementById('editZhInput').value.trim();
+        if (newCh && /[\u4e00-\u9fa5]/.test(newCh)) {
+          const pyNum = pinyinPro.pinyin(newCh[0], { toneType: 'num' });
+          document.getElementById('editStdInput').value = pyNum;
+          document.getElementById('editTpInput').value = compileToTreesPinyin(pyNum);
+        }
+      } else if (source === 'std') {
+        const rawStd = document.getElementById('editStdInput').value.trim();
+        if (/^[a-züv:]+[0-5]?$/i.test(rawStd)) {
+          document.getElementById('editTpInput').value = compileToTreesPinyin(rawStd);
+        }
+      }
+    }
+
+    function saveThreeInOneEdit() {
+      if (!activeEditCol) return;
+      const newZh = document.getElementById('editZhInput').value.trim();
+      const rawStd = document.getElementById('editStdInput').value.trim();
+      const newTp = document.getElementById('editTpInput').value.trim();
+      if (checkAndWarnProfanity(newZh)) return;
+
+      const zhEl = activeEditCol.querySelector('.tp-zh');
+      const stdEl = activeEditCol.querySelector('.tp-std');
+      const tpEl = activeEditCol.querySelector('.tp-py');
+
+      if (newZh && zhEl) {
+        zhEl.innerText = newZh;
+        zhEl.dataset.raw = convertScript(newZh, 'trad');
+      }
+      if (rawStd && stdEl) {
+        activeEditCol.dataset.pynum = rawStd;
+        stdEl.innerText = /^[a-züv:]+[1-5]$/i.test(rawStd) ? numPinyinToToneMark(rawStd) : rawStd;
+      }
+      if (newTp && tpEl) {
+        tpEl.innerText = newTp;
+      }
+
+      if (newZh) {
+        userCustomEdits[convertScript(newZh, 'trad')] = {
+          std: stdEl ? stdEl.innerText : '',
+          tp: tpEl ? tpEl.innerText : '',
+          pynum: rawStd
+        };
+        localStorage.setItem('tp_custom_char_edits_v2', JSON.stringify(userCustomEdits));
+      }
+
+      document.getElementById('editCharModal').style.display = 'none';
+    }
+
     function createFourInOneBlock(rawZhText, enTranslation = '', highlightChars = []) {
       const block = document.createElement('div');
       block.className = 'sentence-block';
-      const tradZh = convertScript(rawZhText, 'trad');
+      const expandedZh = expandNumbersAndSymbolsToZh(rawZhText);
+      const tradZh = convertScript(expandedZh, 'trad');
       block.dataset.zh = tradZh;
       block.dataset.en = enTranslation;
 
       const enDiv = document.createElement('div');
       enDiv.className = 'en-line';
       enDiv.contentEditable = 'true';
+      enDiv.title = 'Click to edit English line';
       enDiv.innerText = enTranslation || '...';
       enDiv.oninput = () => { block.dataset.en = enDiv.innerText; };
       block.appendChild(enDiv);
 
       const charRow = document.createElement('div');
       charRow.className = 'char-row';
-      const pyArr = pinyinPro.pinyin(tradZh, { type: 'array', toneType: 'num' });
+      const pyArr = getAccuratePinyinArray(tradZh);
 
       for (let i = 0; i < tradZh.length; i++) {
         const ch = tradZh[i];
@@ -926,20 +1175,20 @@
 
         if (/[\u4e00-\u9fa5]/.test(ch)) {
           let pyNum = pyArr[i] || '';
+          const savedCustom = userCustomEdits[ch];
+          const tpStr = savedCustom?.tp || compileToTreesPinyin(pyNum);
+          const stdStr = savedCustom?.std || numPinyinToToneMark(pyNum);
+          col.dataset.pynum = savedCustom?.pynum || pyNum;
+
           col.innerHTML = `
-            <span class="tp-py">${compileToTreesPinyin(pyNum)}</span>
-            <span class="tp-std">${numPinyinToToneMark(pyNum)}</span>
+            <span class="tp-py">${tpStr}</span>
+            <span class="tp-std">${stdStr}</span>
             <span class="tp-zh" data-raw="${ch}">${dispCh}</span>
           `;
-          col.onclick = () => speakSingleChar(ch);
+          col.onclick = () => speakSingleChar(col.querySelector('.tp-zh').innerText);
           col.oncontextmenu = (e) => {
             e.preventDefault();
-            const edited = prompt(`Edit Pinyin for "${dispCh}" (e.g. hang2, le5):`, pyNum);
-            if (edited && edited.trim()) {
-              pyNum = edited.trim();
-              col.querySelector('.tp-py').innerText = compileToTreesPinyin(pyNum);
-              col.querySelector('.tp-std').innerText = numPinyinToToneMark(pyNum);
-            }
+            openThreeInOneEditor(col);
           };
         } else {
           col.innerHTML = `<span class="tp-py">${ch}</span><span class="tp-std"> </span><span class="tp-zh"> </span>`;
@@ -949,18 +1198,226 @@
       block.appendChild(charRow);
 
       if (!enTranslation) {
-        fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=zh-CN&tl=en&dt=t&q=${encodeURIComponent(tradZh)}`)
-          .then(r => r.json())
-          .then(d => {
-            const tr = d?.[0]?.map(x => x[0]).join('') || '';
-            if (tr) { enDiv.innerText = tr; block.dataset.en = tr; }
-          }).catch(() => {});
+        translateFast(tradZh, 'zh', 'en').then(tr => {
+          if (tr) { enDiv.innerText = tr; block.dataset.en = tr; }
+        });
       }
       return block;
     }
 
     // =========================================================================
-    // 5. 完整承襲 index.html 的語音輸入、文件上傳、AI 問答與翻譯
+    // 4. 🟢 Extension-Style Floating Green icon.png Widget on Text Selection
+    // =========================================================================
+    let selectedPageText = '';
+    const floatingWrap = document.getElementById('selectionFloatingWrap');
+
+    document.addEventListener('mouseup', (e) => {
+      if (floatingWrap.contains(e.target)) return;
+      setTimeout(() => {
+        const sel = window.getSelection();
+        const text = (sel ? sel.toString() : '').trim();
+        if (text && text.length >= 1 && text.length <= 600) {
+          selectedPageText = text;
+          const range = sel.getRangeAt(0);
+          const rect = range.getBoundingClientRect();
+          floatingWrap.classList.remove('expanded');
+          floatingWrap.style.left = Math.max(12, Math.min(window.innerWidth - 260, rect.left + window.scrollX + (rect.width / 2) - 19)) + 'px';
+          floatingWrap.style.top = Math.max(10, rect.top + window.scrollY - 46) + 'px';
+          floatingWrap.style.display = 'inline-flex';
+        } else {
+          floatingWrap.style.display = 'none';
+          floatingWrap.classList.remove('expanded');
+        }
+      }, 20);
+    });
+
+    // Clicking the green icon.png immediately annotates & expands quick actions (Speak / Print)
+    async function onFloatingIconClick(e) {
+      e.stopPropagation();
+      if (!selectedPageText) return;
+      if (checkAndWarnProfanity(selectedPageText)) {
+        floatingWrap.style.display = 'none';
+        return;
+      }
+      floatingWrap.classList.add('expanded');
+      switchTeacherTab('workspace');
+      document.getElementById('userInput').value = selectedPageText;
+      await runDirectTranslate(selectedPageText);
+      document.getElementById('sheetCard').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    async function handleSelectionAction(action) {
+      floatingWrap.style.display = 'none';
+      if (!selectedPageText) return;
+      if (checkAndWarnProfanity(selectedPageText)) return;
+
+      if (action === 'speak') {
+        speakSingleChar(selectedPageText);
+        return;
+      }
+      switchTeacherTab('workspace');
+      document.getElementById('userInput').value = selectedPageText;
+      await runDirectTranslate(selectedPageText);
+      document.getElementById('sheetCard').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      if (action === 'print') {
+        setTimeout(() => window.print(), 500);
+      }
+    }
+
+    // =========================================================================
+    // 5. High-Precision AI Q&A & Direct Translation Engine
+    // =========================================================================
+    async function translateFast(text, fromLang, toLang) {
+      const isZhToEn = fromLang.startsWith('zh');
+      const src = isZhToEn ? 'zh-CN' : 'en';
+      const tgt = isZhToEn ? 'en' : 'zh-TW';
+      try {
+        const r = await fetchWithTimeout(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=${src}&tl=${tgt}&dt=t&q=${encodeURIComponent(text)}`, {}, 4500);
+        const d = await r.json();
+        const j = d?.[0]?.map(x => x[0]).join('');
+        if (j && j.trim()) return j.trim();
+      } catch (e) {}
+      return text;
+    }
+
+    function cleanChineseSentence(line) {
+      if (!line) return '';
+      // First convert numbers, %, time, and H2O/CO2 into spoken Chinese characters so nothing is lost
+      let expanded = expandNumbersAndSymbolsToZh(line);
+      let s = expanded
+        .replace(/^[-*•\d.)、]+\s*/, '')
+        .replace(/\*+/g, '')
+        .replace(/\([^)]*[A-Za-zāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ][^)]*\)/g, '')
+        .replace(/（[^）]*[A-Za-zāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ][^）]*）/g, '')
+        .replace(/[A-Za-zāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ]{2,}/g, '')
+        .replace(/\s+/g, '')
+        .trim();
+      return /[\u4e00-\u9fa5]/.test(s) ? s : '';
+    }
+
+    function parseBilingualPairLine(rawLine) {
+      const cleaned = rawLine.replace(/^[-*•\d.)、]+\s*/, '').replace(/\*+/g, '').trim();
+      if (!cleaned.includes('|||')) return null;
+      const parts = cleaned.split('|||').map(p => p.trim()).filter(Boolean);
+      if (parts.length < 2) return null;
+
+      let zhPart = '', enPart = '';
+      if (/[\u4e00-\u9fa5]/.test(parts[0])) {
+        zhPart = cleanChineseSentence(parts[0]) || parts[0];
+        enPart = parts[1];
+      } else if (/[\u4e00-\u9fa5]/.test(parts[1])) {
+        enPart = parts[0];
+        zhPart = cleanChineseSentence(parts[1]) || parts[1];
+      }
+      if (!/[\u4e00-\u9fa5]/.test(zhPart)) return null;
+      return { zh: zhPart, en: enPart };
+    }
+
+    async function renderBilingualAIOutput(aiText) {
+      const replyBox = document.getElementById('aiReplyBox');
+      const list = document.getElementById('annotationList');
+      const rawLines = aiText.split(/\n+/).map(l => l.trim()).filter(Boolean);
+      if (rawLines.length === 0) return false;
+
+      let startIdx = 0;
+      if (!rawLines[0].includes('|||')) {
+        const headerLine = rawLines[0].replace(/^[-*•\d.)、]+\s*/, '').replace(/\*+/g, '').trim();
+        replyBox.style.display = 'block';
+        replyBox.innerHTML = `<b>${headerLine}</b>`;
+        startIdx = 1;
+      } else {
+        replyBox.style.display = 'none';
+      }
+
+      let renderedPairs = 0;
+      for (let i = startIdx; i < rawLines.length; i++) {
+        const pair = parseBilingualPairLine(rawLines[i]);
+        if (pair) {
+          renderedPairs++;
+          list.appendChild(createFourInOneBlock(pair.zh, pair.en));
+        } else {
+          const fallbackZh = cleanChineseSentence(rawLines[i]);
+          if (fallbackZh) {
+            renderedPairs++;
+            list.appendChild(createFourInOneBlock(fallbackZh, ''));
+          }
+        }
+      }
+      return renderedPairs > 0;
+    }
+
+    async function runSmartAI(overrideInput, forceFresh = false) {
+      const q = (overrideInput !== undefined ? overrideInput : document.getElementById('userInput').value).trim();
+      if (!q) return;
+      if (checkAndWarnProfanity(q)) return;
+
+      document.getElementById('previewImg').style.display = 'none';
+      const replyBox = document.getElementById('aiReplyBox');
+      const list = document.getElementById('annotationList');
+      replyBox.style.display = 'block';
+      replyBox.innerText = '⚡ AI Thinking & Generating Accurate Bilingual Response...';
+      list.innerHTML = '';
+
+      if (!forceFresh) {
+        const localHit = getLocalCachedAnswer(q);
+        if (localHit) {
+          const ok = await renderBilingualAIOutput(localHit);
+          if (ok) return;
+        }
+      }
+
+      const directPrompt = `You are an authoritative bilingual scholar and Mandarin educator.
+User question/request: "${q}"
+
+CRITICAL ACCURACY RULES:
+1. Directly answer the user's specific question with 100% factual accuracy:
+   - If the user asks about a Chinese poem, idiom, recipe, or factual question: provide the exact, authentic Chinese sentences and accurate English translations.
+   - If the user asks in English (e.g. a dialogue, speech, or general question): formulate natural, idiomatic English sentences and accurate Traditional Chinese counterparts.
+   - NEVER just repeat the prompt, and NEVER include Pinyin or Romanization on the Chinese side. Write numbers in Chinese characters on the left side.
+2. Output Format:
+   - Line 1: A concise 1-line title or direct summary answer (in English & Chinese).
+   - Line 2 onwards: Output 3 to 6 sentence pairs, strictly one pair per line separated by "|||" in this exact order:
+     Pure_Traditional_Chinese_Sentence ||| Authentic_English_Sentence`;
+
+      const aiText = await fetchFastAccurateAI(directPrompt, null, q, forceFresh);
+      if (aiText) {
+        const ok = await renderBilingualAIOutput(aiText);
+        if (ok) {
+          saveLocalCachedAnswer(q, aiText);
+          return;
+        }
+      }
+
+      replyBox.innerHTML = `💡 Public AI channel is busy! Please enter your free Google Gemini API Key in <b>[🔑 API Key]</b> at the top right for unlimited instant AI responses.`;
+      openKeyModal();
+    }
+
+    async function runDirectTranslate(overrideText) {
+      const raw = (overrideText !== undefined ? overrideText : document.getElementById('userInput').value).trim();
+      if (!raw) return;
+      if (checkAndWarnProfanity(raw)) return;
+
+      const list = document.getElementById('annotationList');
+      const replyBox = document.getElementById('aiReplyBox');
+      replyBox.style.display = 'none';
+      list.innerHTML = '';
+
+      const lines = raw.split(/\n+|(?<=[。！？.!?])\s*/).map(s => s.trim()).filter(Boolean);
+      for (const line of lines) {
+        if (line.includes('|||')) {
+          const [zh, en] = line.split('|||').map(s => s.trim());
+          list.appendChild(createFourInOneBlock(zh, en));
+        } else if (/[\u4e00-\u9fa5]/.test(line)) {
+          list.appendChild(createFourInOneBlock(line, ''));
+        } else {
+          const zhTw = await translateFast(line, 'en', 'zh');
+          list.appendChild(createFourInOneBlock(zhTw, line));
+        }
+      }
+    }
+
+    // =========================================================================
+    // 6. Voice Input & File / Photo Upload
     // =========================================================================
     let activeRec = null;
     let voiceSilenceTimer = null;
@@ -968,7 +1425,7 @@
     function toggleVoice() {
       const btn = document.getElementById('micBtn');
       const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SR) return alert('Voice input requires Chrome, Edge, or Safari.');
+      if (!SR) return alert('Voice input is supported in Chrome, Edge, and Safari.');
 
       if (activeRec) {
         clearTimeout(voiceSilenceTimer);
@@ -1005,7 +1462,10 @@
         btn.classList.remove('recording');
         activeRec = null;
         const spoken = document.getElementById('userInput').value.trim();
-        if (spoken) runDirectTranslate(spoken);
+        if (spoken) {
+          if (checkAndWarnProfanity(spoken)) return;
+          runSmartAI(spoken);
+        }
       };
 
       activeRec.onerror = () => {
@@ -1090,43 +1550,174 @@
       input.value = '';
     }
 
-    async function runDirectTranslate(overrideText) {
-      const raw = (overrideText !== undefined ? overrideText : document.getElementById('userInput').value).trim();
-      if (!raw) return;
-      const list = document.getElementById('annotationList');
-      list.innerHTML = '';
+    // =========================================================================
+    // 7. Full 45 Book Mnemonics + Referral Unlock (+50 Sentences & Classical Bank)
+    // =========================================================================
+    const FULL_45_MNEMONICS = [
+      { pack: 1, meaning: "Hello / How are you?", trees: "Nee3 haw3", hanzi: "你好", pinyin: "nǐ hǎo", sound: "Similar to '<b><u>knee</u> <u>how</u></b>'.", mnemonic: "<b>Knee</b>ling to show <b>how</b> much respect you have.", exZh: "你好，很高興認識你！", exEn: "Hello, nice to meet you!" },
+      { pack: 1, meaning: "You (Singular)", trees: "nee3", hanzi: "你", pinyin: "nǐ", sound: "Sounds like '<b><u>Knee</u></b>'.", mnemonic: "<b><u>Knee</u></b>(l) down while greeting <b>you</b>.", exZh: "請問你叫什麼名字？", exEn: "May I ask what your name is?" },
+      { pack: 1, meaning: "Good", trees: "haw3", hanzi: "好", pinyin: "hǎo", sound: "Similar to '<b><u>how</u></b>'.", mnemonic: "'Nee3 haw3' literally means 'You good'.", exZh: "今天天氣真好！", exEn: "The weather is really good today!" },
+      { pack: 1, meaning: "Good morning.", trees: "Dsaw3 (r)sang4 haw3", hanzi: "早上好", pinyin: "zǎo shang hǎo", sound: "Sounds like '<b><u>jaw</u> <u>sang</u></b>'.", mnemonic: "Morning yawning: your <b><u>jaw</u> <u>sang</u></b>!", exZh: "老師早上好！", exEn: "Good morning, teacher!" },
+      { pack: 1, meaning: "Big", trees: "dah4", hanzi: "大", pinyin: "dà", sound: "First part of '<b><u>do</u></b>zen'.", mnemonic: "Our <b>big</b> family eats a <b><u>do</u></b>zen eggs.", exZh: "這個蘋果非常大。", exEn: "This apple is very big." },
+      { pack: 1, meaning: "Home / Family", trees: "jeeah", hanzi: "家", pinyin: "jiā", sound: "Contraction of '<b><u>Gee</u></b>' and '<b><u>Ah</u></b>' (like 'jar').", mnemonic: "Our <b>big family</b> (dah4 jeeah) eats eggs in a <b>jar</b>.", exZh: "歡迎來到我家！", exEn: "Welcome to my home!" },
+      { pack: 1, meaning: "Happy", trees: "kooie4 Ler4", hanzi: "快樂", pinyin: "kuài lè", sound: "'<b><u>qui</u></b>(te) <b><u>lo</u></b>(vely)'.", mnemonic: "<b>Happy</b> kids are <b><u>qui</u></b>(te) <b><u>lo</u></b>(vely)!", exZh: "祝你生日快樂！", exEn: "Wish you a happy birthday!" },
+      { pack: 1, meaning: "New", trees: "seen", hanzi: "新", pinyin: "xīn", sound: "Sounds like '<b><u>seen</u></b>'.", mnemonic: "Never <b><u>seen</u></b> before, so it's <b>new</b>!", exZh: "這是一本新書。", exEn: "This is a new book." },
+      { pack: 1, meaning: "Year", trees: "neean2", hanzi: "年", pinyin: "nián", sound: "'<b><u>Knee</u> <u>an</u></b>' or '<b>Neon</b>'.", mnemonic: "New <b>Year</b> involves kowtow (knee an) and <b>neon</b> lights.", exZh: "祝大家新年快樂！", exEn: "Happy New Year, everyone!" },
+      { pack: 1, meaning: "Make a fortune", trees: "fah tsie2", hanzi: "發財", pinyin: "fā cái", sound: "\"<b><u>far</u></b> i<b><u>t's I</u></b>\" / 'far try'.", mnemonic: "A bold 'far try' to <b>make a fortune</b>.", exZh: "恭喜發財，萬事如意！", exEn: "Wishing you prosperity and all the best!" },
+      { pack: 1, meaning: "Excuse me / Could you tell me...?", trees: "Tsing3 wer-n4", hanzi: "請問", pinyin: "qǐng wèn", sound: "Le<b><u>t's sing</u></b> <b><u>when</u></b> happy.", mnemonic: "tsing3 = Let's sing; wer-n4 = when.", exZh: "請問洗手間在哪裡？", exEn: "Excuse me, where is the restroom?" },
+      { pack: 1, meaning: "Thank you!", trees: "Seer4 seer", hanzi: "謝謝", pinyin: "xiè xie", sound: "'<b><u>See</u> <u>ye</u></b>(s)' / 'See ya'.", mnemonic: "'Thank you' and 'See ya' go hand in hand!", exZh: "非常謝謝你的幫忙！", exEn: "Thank you very much for your help!" },
+      { pack: 1, meaning: "See you / Good-bye", trees: "Dsie4 jeean4", hanzi: "再見", pinyin: "zài jiàn", sound: "'<b><u>Xy</u></b>lophone, <b><u>Gee</u> <u>an</u></b>'.", mnemonic: "Playing the <b><u>Xy</u></b>lophone to say <b>goodbye</b>.", exZh: "我們明天學校見，再見！", exEn: "See you at school tomorrow, goodbye!" },
+      { pack: 1, meaning: "You are welcome.", trees: "Boo2 ker4 tsee", hanzi: "不客氣", pinyin: "bú kè qi", sound: "'<b><u>Boo</u> <u>Cur</u>—<u>tsy</u></b>'.", mnemonic: "No need to do a curtsy ('Boo Curtsy').", exZh: "不客氣，這是我應該做的。", exEn: "You're welcome, it's my pleasure." },
+      { pack: 1, meaning: "I'm sorry.", trees: "Dooay4 boo4 tsee3", hanzi: "對不起", pinyin: "duì bù qǐ", sound: "<b><u>Dway</u></b>ne says '<b><u>boo</u> <u>qi</u></b>'.", mnemonic: "Dwayne apologizes: I'm sorry!", exZh: "對不起，我今天遲到了。", exEn: "I'm sorry, I am late today." },
 
-      const lines = raw.split(/\n+|(?<=[。！？.!?])\s*/).map(s => s.trim()).filter(Boolean);
-      for (const line of lines) {
-        if (line.includes('|||')) {
-          const [zh, en] = line.split('|||').map(s => s.trim());
-          list.appendChild(createFourInOneBlock(zh, en));
-        } else if (/[\u4e00-\u9fa5]/.test(line)) {
-          list.appendChild(createFourInOneBlock(line, ''));
-        } else {
-          const r = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=zh-TW&dt=t&q=${encodeURIComponent(line)}`);
-          const d = await r.json();
-          const zhTw = d?.[0]?.map(x => x[0]).join('') || line;
-          list.appendChild(createFourInOneBlock(zhTw, line));
-        }
-      }
+      { pack: 2, meaning: "It doesn't matter / It's OK.", trees: "May2 gooan see", hanzi: "沒關係", pinyin: "méi guān xi", sound: "'<b><u>May</u></b> la<b><u>goon</u></b> <b><u>see</u></b>.'", mnemonic: "May the lagoon be seen when the tide goes out.", exZh: "沒關係，下次注意就好了。", exEn: "It's OK, just be careful next time." },
+      { pack: 2, meaning: "Don't get angry.", trees: "Beer2 (r)ser-ng tsee4", hanzi: "別生氣", pinyin: "bié shēng qì", sound: "'<b><u>Beer</u> <u>sung</u> <u>qi</u></b>'.", mnemonic: "With beer, Dwayne sung a song full of qi.", exZh: "別生氣，我們一起想辦法。", exEn: "Don't get angry, let's figure it out together." },
+      { pack: 2, meaning: "Doctor", trees: "yee (r)ser-ng", hanzi: "醫生", pinyin: "yī shēng", sound: "yee (one) + (r)ser-ng (sung/birth).", mnemonic: "The very first person you see at birth is a doctor.", exZh: "他是一位非常有名的醫生。", exEn: "He is a very famous doctor." },
+      { pack: 2, meaning: "Day / Sun", trees: "(r)th4", hanzi: "日", pinyin: "rì", sound: "Tongue of '<b><u>r</u></b>ain' + '<b><u>th</u></b>en'.", mnemonic: "And (r)then... the day begins!", exZh: "今天是個好日子。", exEn: "Today is a great day." },
+      { pack: 2, meaning: "I / Me", trees: "wer3", hanzi: "我", pinyin: "wǒ", sound: "Part of '<b><u>wor</u></b>d' or '<b><u>wor</u></b>ld'.", mnemonic: "I am the core of my world.", exZh: "我非常喜歡學習中文。", exEn: "I really like learning Chinese." },
+      { pack: 2, meaning: "My / Mine", trees: "wer3 der", hanzi: "我的", pinyin: "wǒ de", sound: "Similar to '<b><u>word</u></b>'.", mnemonic: "My world! Adding 'der' after 'wer3'.", exZh: "這本書是我的。", exEn: "This book is mine." },
+      { pack: 2, meaning: "Your / Yours", trees: "nee3 der", hanzi: "你的", pinyin: "nǐ de", sound: "Sounds like '<b><u>need</u></b>'.", mnemonic: "Yours is what you need.", exZh: "你的發音非常標準！", exEn: "Your pronunciation is very accurate!" },
+      { pack: 2, meaning: "It / He / She", trees: "tah", hanzi: "他", pinyin: "tā", sound: "First part of '<b><u>Ta</u></b>rget'.", mnemonic: "He and she buy it at Target.", exZh: "他是我們班的好學生。", exEn: "He is a good student in our class." },
+      { pack: 2, meaning: "His / Her / Its", trees: "tah der", hanzi: "他的", pinyin: "tā de", sound: "Similar to '<b><u>tard</u></b>(y)'.", mnemonic: "He was tardy for his English class.", exZh: "他的中文說得很好。", exEn: "He speaks Chinese very well." },
+      { pack: 2, meaning: "Friend", trees: "per-ng2 yoh", hanzi: "朋友", pinyin: "péng yǒu", sound: "'<b><u>peng</u></b>uin <b><u>you</u></b>'.", mnemonic: "A cute penguin is your best friend!", exZh: "我們是最好的朋友。", exEn: "We are best friends." },
+      { pack: 2, meaning: "Younger & Elder Brother", trees: "dee4 dee / ger ger", hanzi: "弟弟哥哥", pinyin: "dì di gē ge", sound: "'<b><u>di</u></b>g' = dee4 + ger.", mnemonic: "'dig' is teamwork of younger and elder brother!", exZh: "哥哥和弟弟一起去公園。", exEn: "The elder and younger brothers go to the park together." },
+      { pack: 2, meaning: "Country & USA", trees: "may3 gooer2", hanzi: "美國", pinyin: "měi guó", sound: "<b><u>May</u></b>flower + gooer2.", mnemonic: "No Mayflower, no United States.", exZh: "我來自美國加州。", exEn: "I come from California, USA." },
+      { pack: 2, meaning: "Human / People", trees: "(r)ther-n2", hanzi: "人", pinyin: "rén", sound: "'r' tongue + weak '<b><u>then</u></b>'.", mnemonic: "Add (r)ther-n2 after a country for its people.", exZh: "這裡的人都非常熱情。", exEn: "The people here are very warm and friendly." },
+      { pack: 2, meaning: "China", trees: "(r)dser-oong gooer2", hanzi: "中國", pinyin: "zhōng guó", sound: "Sounds like '<b><u>drone</u></b>'.", mnemonic: "Fly a drone across China.", exZh: "中國有很多歷史古蹟。", exEn: "China has many historical sites." },
+      { pack: 2, meaning: "Like / Love", trees: "see3 hooan", hanzi: "喜歡", pinyin: "xǐ huān", sound: "'<b><u>see</u> <u>Juan</u></b>'.", mnemonic: "Like him when you see Don Juan!", exZh: "你喜歡吃什麼水果？", exEn: "What fruit do you like to eat?" },
+
+      { pack: 3, meaning: "Can / Be able to", trees: "hooay4", hanzi: "會", pinyin: "huì", sound: "'<b><u>hoo</u></b>(r)<b><u>ay</u></b>' without r.", mnemonic: "If you can do it, shout hooray!", exZh: "我會說一點點中文。", exEn: "I can speak a little bit of Chinese." },
+      { pack: 3, meaning: "Book", trees: "(r)soo", hanzi: "書", pinyin: "shū", sound: "Sounds like '<b><u>sue</u></b>'.", mnemonic: "Copy this book and Sue will sue you!", exZh: "我喜歡在圖書館看書。", exEn: "I like reading books in the library." },
+      { pack: 3, meaning: "Who & Water", trees: "(r)sooay2 / (r)sooay3", hanzi: "誰喝水", pinyin: "shuí hē shuǐ", sound: "Contract '<b><u>sway</u></b>'.", mnemonic: "Who sees the mermaid swaying in the water?", exZh: "請問誰想喝水？", exEn: "Excuse me, who would like to drink water?" },
+      { pack: 3, meaning: "Look for", trees: "(r)dsaw3", hanzi: "找", pinyin: "zhǎo", sound: "Similar to '<b><u>jaw</u></b>'.", mnemonic: "Looking for my jaw on the floor!", exZh: "你在找什麼東西？", exEn: "What are you looking for?" },
+      { pack: 3, meaning: "From", trees: "Lie2 ds4", hanzi: "來自", pinyin: "lái zì", sound: "Similar to '<b><u>lies</u></b>'.", mnemonic: "The truth lies in where you come from.", exZh: "我的老師來自台灣。", exEn: "My teacher comes from Taiwan." },
+      { pack: 3, meaning: "Where", trees: "nah3 Lee3", hanzi: "哪裡", pinyin: "nǎ lǐ", sound: "G<b><u>narly</u></b> without G.", mnemonic: "Don't know where you are? Gnarly!", exZh: "你週末想去哪裡玩？", exEn: "Where do you want to go for fun this weekend?" },
+      { pack: 3, meaning: "How", trees: "dser-n3 mer", hanzi: "怎麼", pinyin: "zěn me", sound: "Confu<b><u>sion</u></b> <b><u>Mer</u></b>maid.", mnemonic: "How the mermaid falls in love.", exZh: "這道題應該怎麼做？", exEn: "How should we solve this question?" },
+      { pack: 3, meaning: "Supermarket", trees: "(r)tsaw (r)s4", hanzi: "超市", pinyin: "chāo shì", sound: "r-colored '<b><u>cho</u></b>(i)<b><u>ce</u></b>'.", mnemonic: "So many choices in the supermarket!", exZh: "媽媽去超市買水果了。", exEn: "Mom went to the supermarket to buy fruit." },
+      { pack: 3, meaning: "Menu & Check, please", trees: "tsie4 dan / mie3 dan", hanzi: "菜單買單", pinyin: "cài dān mǎi dān", sound: "I<b><u>t's I</u></b> <b><u>done</u></b> / <b><u>My</u> <u>done</u></b>.", mnemonic: "Done with the menu; check, please!", exZh: "服務員，請給我菜單。", exEn: "Waiter, please give me the menu." },
+      { pack: 3, meaning: "Would like / Want", trees: "seeang3 yaw4", hanzi: "想要", pinyin: "xiǎng yào", sound: "'<b><u>see</u> <u>young</u></b>' + '<b><u>your</u></b>'.", mnemonic: "Want to see Young's beer.", exZh: "我想要一杯熱咖啡。", exEn: "I would like a cup of hot coffee." },
+      { pack: 3, meaning: "Milk tea", trees: "nie3 (r)tsah2", hanzi: "奶茶", pinyin: "nǎi chá", sound: "'<b><u>ni</u></b>ce <b><u>char</u></b>ge'.", mnemonic: "Milk tea gives a nice charge!", exZh: "珍珠奶茶非常好喝。", exEn: "Boba milk tea is very delicious." },
+      { pack: 3, meaning: "Dumplings", trees: "jeeaw3 ds", hanzi: "餃子", pinyin: "jiǎo zi", sound: "'<b><u>Gee, aw</u></b>esome foo<b><u>ds</u></b>.'", mnemonic: "Everyone loves dumplings!", exZh: "我們今天晚上吃餃子。", exEn: "We are eating dumplings tonight." },
+      { pack: 3, meaning: "Cold (Illness)", trees: "gan3 maw4", hanzi: "感冒", pinyin: "gǎn mào", sound: "'<b><u>gun</u> <u>mall</u></b>'.", mnemonic: "Shock at the mall caused a cold.", exZh: "天冷了，小心別感冒。", exEn: "It's cold, be careful not to catch a cold." },
+      { pack: 3, meaning: "Telephone", trees: "deean4 hooah4", hanzi: "電話", pinyin: "diàn huà", sound: "'<b><u>the end</u></b>' + '<b><u>who are</u></b>'.", mnemonic: "Call on the telephone to ask who they are.", exZh: "請給我打個電話。", exEn: "Please give me a phone call." },
+      { pack: 3, meaning: "Got it.", trees: "Ting der-oong3 Ler", hanzi: "聽懂了", pinyin: "tīng dǒng le", sound: "Shou<b><u>ting</u></b> '<b><u>don't</u></b> <b><u>love</u></b>'.", mnemonic: "Once you hear it, you've got it!", exZh: "老師講的課我都聽懂了！", exEn: "I understood everything the teacher taught!" },
+
+      { pack: 4, meaning: "[Classical Poem] Ode to the Goose 《詠鵝》", trees: "er2 er2 er2", hanzi: "鵝鵝鵝曲項向天歌白毛浮綠水紅掌撥清波", pinyin: "é é é, qū xiàng xiàng tiān gē", sound: "Tang Dynasty Classic by Luo Binwang", mnemonic: "Unlocked via Teacher Referral!", exZh: "鵝，鵝，鵝，曲項向天歌。白毛浮綠水，紅掌撥清波。", exEn: "Goose, goose, goose, bending your neck to sing to the sky. White feathers float on emerald water, red feet paddle clear waves." },
+      { pack: 4, meaning: "[Classical Poem] Quiet Night Thought 《靜夜思》", trees: "tswang2 tseean2 ming2", hanzi: "床前明月光疑是地上霜舉頭望明月低頭思故鄉", pinyin: "chuáng qián míng yuè guāng", sound: "Tang Dynasty Classic by Li Bai", mnemonic: "Unlocked via Teacher Referral!", exZh: "床前明月光，疑是地上霜。舉頭望明月，低頭思故鄉。", exEn: "Before my bed, bright moonlight shines. I raise my head to gaze at the moon, and lower it, thinking of home." },
+      { pack: 4, meaning: "[Classical Poem] Spring Morning 《春曉》", trees: "tsoon meean2 boo4", hanzi: "春眠不覺曉處處聞啼鳥夜來風雨聲花落知多少", pinyin: "chūn mián bù jué xiǎo", sound: "Tang Dynasty Classic by Meng Haoran", mnemonic: "Unlocked via Teacher Referral!", exZh: "春眠不覺曉，處處聞啼鳥。夜來風雨聲，花落知多少。", exEn: "In spring sleep I am unaware of dawn; everywhere I hear singing birds." }
+    ];
+
+    const localCustomCards = JSON.parse(localStorage.getItem('tp_custom_mnemonics_v1') || '[]');
+    FULL_45_MNEMONICS.push(...localCustomCards);
+
+    function shareTeacherReferral() {
+      const msg = `Join me on Trees Pinyin Teacher Workspace! Free for 1 full year with 45 core memory sentences. Use my Teacher Referral Code TCH-8829 to unlock +50 bonus memory sentences & the Classical Question Bank: https://www.treespinyin.com/dashboard.html`;
+      navigator.clipboard.writeText(msg).catch(() => {});
+      localStorage.setItem('tp_teacher_ref_unlocked', 'true');
+      document.getElementById('unlockedBankStatus').innerText = '95+ Memory Sentences & Classical Bank Unlocked 🎉';
+      document.getElementById('packSelect').value = '4';
+      renderTeacherMnemonicBank();
+      alert('🎁 Referral message copied! You have unlocked +50 Memory Sentences & the Classical Question Bank!');
     }
 
-    async function runSmartAI() {
-      const q = document.getElementById('userInput').value.trim();
-      if (!q) return;
-      const list = document.getElementById('annotationList');
-      list.innerHTML = '';
-      if (/詠鵝|咏鹅|goose/i.test(q)) {
-        list.appendChild(createFourInOneBlock('鵝，鵝，鵝，曲項向天歌。', 'Goose, goose, goose, bending your neck to sing to the sky.'));
-        list.appendChild(createFourInOneBlock('白毛浮綠水，紅掌撥清波。', 'White feathers float on emerald water, red feet paddle clear waves.'));
+    function renderTeacherMnemonicBank() {
+      const container = document.getElementById('mnemonicCardsContainer');
+      if (!container) return;
+      const packId = parseInt(document.getElementById('packSelect').value, 10) || 1;
+      const query = (document.getElementById('searchBankInput').value || '').trim().toLowerCase();
+      const refUnlocked = localStorage.getItem('tp_teacher_ref_unlocked') === 'true';
+
+      if (packId === 4 && !refUnlocked) {
+        container.innerHTML = `
+          <div style="grid-column:1/-1; background:#fff8e1; border:1.5px dashed #ffb300; border-radius:14px; padding:24px; text-align:center;">
+            <h3 style="margin:0 0 8px; color:#bf360c;">🔒 Pack 4: +50 Memory Sentences & Classical Question Bank</h3>
+            <p style="margin:0 0 12px; font-size:0.9rem;">Refer a fellow teacher to unlock 50 additional memory sentences and the Classical Question Bank instantly!</p>
+            <button class="btn btn-green" style="max-width:340px;" onclick="shareTeacherReferral()">📤 Share Referral & Unlock Now</button>
+          </div>`;
         return;
       }
-      await runDirectTranslate(q);
+
+      const list = FULL_45_MNEMONICS.filter(c => {
+        if (query) {
+          return c.meaning.toLowerCase().includes(query) || c.hanzi.includes(query) || c.exZh.includes(query) || c.exEn.toLowerCase().includes(query);
+        }
+        return c.pack === packId;
+      });
+
+      container.innerHTML = list.map((card, idx) => {
+        const dispHanzi = convertScript(card.hanzi, currentScriptMode);
+        const dispExZh = convertScript(card.exZh, currentScriptMode);
+        return `
+          <div class="mnemonic-card">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px dashed #e5e7eb; padding-bottom:6px;">
+              <label style="display:flex; align-items:center; gap:6px; font-weight:800; color:var(--accent); cursor:pointer;">
+                <input type="checkbox" class="mnemonic-assign-chk" data-hanzi="${card.hanzi}" data-en="${card.meaning}" data-sound="${card.sound.replace(/"/g, '"')}" data-mnemonic="${card.mnemonic.replace(/"/g, '"')}" data-exzh="${card.exZh}" data-exen="${card.exEn}" checked style="width:16px; height:16px;">
+                <span>#${idx + 1} ${card.meaning}</span>
+              </label>
+              <button class="nav-btn" style="padding:3px 8px; font-size:0.78rem;" onclick="speakSingleChar('${card.exZh}')">🔊 Speak</button>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:baseline;">
+              <span style="font-size:1.05rem; color:#1b5e20;"><i><b>${card.trees}</b></i></span>
+              <span style="font-weight:700; font-size:1.1rem;">${dispHanzi} <small style="color:#666;">(${card.pinyin})</small></span>
+            </div>
+            <div style="font-size:0.83rem;"><b>Sound:</b> ${card.sound}</div>
+            <div style="font-size:0.83rem;"><b>Mnemonic:</b> ${card.mnemonic}</div>
+            <div style="background:#f8fafc; padding:8px; border-radius:8px; border:1px dashed #cbd5e1; font-size:0.83rem;">
+              <div style="color:var(--blue); font-weight:700;">📖 Example Sentence:</div>
+              <div><b>${dispExZh}</b></div>
+              <div style="color:#444;">${card.exEn}</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function openAddCustomSentenceModal() {
+      document.getElementById('addCustomModal').style.display = 'flex';
+    }
+
+    function saveCustomMnemonicCard() {
+      const meaning = document.getElementById('custMeaning').value.trim();
+      const hanzi = document.getElementById('custHanzi').value.trim();
+      const sound = document.getElementById('custSound').value.trim();
+      const mnemonic = document.getElementById('custMnemonic').value.trim();
+      const exZh = document.getElementById('custExZh').value.trim() || hanzi;
+      const exEn = document.getElementById('custExEn').value.trim() || meaning;
+      if (!meaning || !hanzi) return alert('Please enter English Meaning and Chinese Characters.');
+      if (checkAndWarnProfanity(meaning + ' ' + hanzi + ' ' + exZh + ' ' + exEn)) return;
+
+      const pyArr = pinyinPro.pinyin(hanzi, { type: 'array', toneType: 'num' });
+      const trees = pyArr.map(p => compileToTreesPinyin(p)).join(' ');
+      const std = pinyinPro.pinyin(hanzi);
+
+      const newCard = { pack: 1, meaning, trees, hanzi, pinyin: std, sound, mnemonic, exZh, exEn };
+      FULL_45_MNEMONICS.unshift(newCard);
+      const saved = JSON.parse(localStorage.getItem('tp_custom_mnemonics_v1') || '[]');
+      saved.unshift(newCard);
+      localStorage.setItem('tp_custom_mnemonics_v1', JSON.stringify(saved));
+
+      document.getElementById('addCustomModal').style.display = 'none';
+      renderTeacherMnemonicBank();
+    }
+
+    function assignSelectedMnemonicCards() {
+      const chks = Array.from(document.querySelectorAll('.mnemonic-assign-chk:checked'));
+      if (chks.length === 0) return alert('Please check at least 1 card to assign!');
+      const items = chks.map(c => ({
+        type: 'mnemonic',
+        zh: c.dataset.hanzi,
+        en: c.dataset.en,
+        sound: c.dataset.sound,
+        mnemonic: c.dataset.mnemonic,
+        exampleZh: c.dataset.exzh,
+        exampleEn: c.dataset.exen
+      }));
+      recordAndSaveAssignment('CLS-101', 'Vocabulary Mnemonics & Example Sentences', 'mnemonic', items);
+      alert(`✅ Assigned ${items.length} Vocabulary Mnemonic Cards to Class Code CLS-101!`);
     }
 
     // =========================================================================
-    // 6. 一鍵發布作業 + 第 3 分頁「連同題目四位一體展示學生錯題」
+    // 8. Homework Publisher & 4-in-1 Student Error Question Analytics
     // =========================================================================
     function publishBoardAsHomework() {
       const blocks = Array.from(document.querySelectorAll('#annotationList .sentence-block'));
@@ -1159,7 +1750,6 @@
     }
 
     function renderAnalyticsAndFourInOneErrors() {
-      // 1. 渲染每日作業歷史
       const hist = JSON.parse(localStorage.getItem('tp_daily_hw_history_v1') || '[]');
       const hBody = document.getElementById('dailyHwHistoryBody');
       if (hBody) {
@@ -1176,10 +1766,9 @@
             </tr>`).join('');
       }
 
-      // 2. 渲染學生提交記錄與「連同原題目四位一體錯題展示」
       const subs = JSON.parse(localStorage.getItem('tp_student_submissions_v1') || '[]');
       const sBody = document.getElementById('submissionsTableBody');
-      const missedQuestionMap = {}; // zh -> { zh, en, missedChars: Set, count }
+      const missedQuestionMap = {};
 
       if (sBody) {
         sBody.innerHTML = subs.length === 0
@@ -1197,13 +1786,12 @@
                 <td><b>${s.classCode}</b></td>
                 <td>${s.seatAlias}</td>
                 <td><b style="color:${s.avgScore >= 80 ? '#1b5e20' : '#d97706'}">${s.avgScore}%</b></td>
-                <td>${(s.missedChars || []).join('、') || '✨ Perfect'}</td>
+                <td>${(s.missedChars || []).join(', ') || '✨ Perfect'}</td>
                 <td>${s.timestamp}</td>
               </tr>`;
           }).join('');
       }
 
-      // 3. 將學生出錯的完整題目以「四位一體」渲染出來（紅框標記讀錯或聲調不準的字）
       const fourInOneBox = document.getElementById('missedQuestionsFourInOneList');
       if (fourInOneBox) {
         fourInOneBox.innerHTML = '';
@@ -1275,25 +1863,18 @@
       if (tab === 'analytics') renderAnalyticsAndFourInOneErrors();
     }
 
-    function openKeyModal() {
-      document.getElementById('apiKeyInput').value = localStorage.getItem('tp_v22_backup_key') || '';
-      document.getElementById('keyModal').style.display = 'flex';
-    }
-    function saveBackupKey() {
-      localStorage.setItem('tp_v22_backup_key', document.getElementById('apiKeyInput').value.trim());
-      document.getElementById('keyModal').style.display = 'none';
-    }
     async function exportCardImage() {
       const canvas = await html2canvas(document.getElementById('sheetCard'), { scale: 2, backgroundColor: '#ffffff' });
       document.getElementById('generatedImg').src = canvas.toDataURL('image/png');
       document.getElementById('imgModal').style.display = 'flex';
     }
+
     function copySchoolWhitelistLetter() {
-      navigator.clipboard.writeText(`Subject: Whitelist Request for Trees Pinyin (Zero-PII / COPPA & FERPA Compliant)\n\nPlease whitelist *.treespinyin.com for classroom instruction.`);
+      navigator.clipboard.writeText(`Subject: Whitelist Request for Trees Pinyin (Zero-PII / COPPA & CIPA Compliant)\n\nPlease whitelist *.treespinyin.com for classroom instruction.`);
       alert('🛡️ School IT Whitelist Letter copied!');
     }
 
-    // 預設初始化載入
+    // Default Initialization
     document.getElementById('userInput').value = '請問洗手間在哪裡？ ||| Excuse me, where is the restroom?\n鵝，鵝，鵝，曲項向天歌。 ||| Goose, goose, goose, bending your neck to sing to the sky.';
     runDirectTranslate();
     renderTeacherMnemonicBank();
