@@ -3,1534 +3,557 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Trees Pinyin - Fast AI Q&A & Instant Translator</title>
+  <title>Trees Pinyin - Teacher Super Workspace & Dashboard</title>
   <meta name="theme-color" content="#1b5e20">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Trees Pinyin">
-
-  <!-- 強制綁定根目錄的 /icon.png?v=3 -->
   <link rel="icon" type="image/png" href="/icon.png?v=3">
-  <link rel="shortcut icon" type="image/png" href="/icon.png?v=3">
-  <link id="appleTouchIcon" rel="apple-touch-icon" href="/icon.png?v=3">
-  <link rel="apple-touch-icon-precomposed" href="/icon.png?v=3">
-
-  <!-- 核心拼音與截圖庫 -->
   <script src="https://cdn.jsdelivr.net/npm/pinyin-pro@3.19.6/dist/index.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
   <style>
     :root {
-      --bg: #f5f7f9;
-      --card: #ffffff;
-      --text: #111111;
-      --muted: #555555;
-      --accent: #1b5e20;
-      --accent-hover: #2e7d32;
-      --accent-soft: #e8f5e9;
-      --blue: #1565c0;
-      --border: #dcdcdc;
+      --bg: #f5f7f9; --card: #ffffff; --text: #111111; --muted: #555555;
+      --accent: #1b5e20; --accent-hover: #2e7d32; --accent-soft: #e8f5e9;
+      --blue: #1565c0; --border: #dcdcdc; --danger: #d32f2f;
     }
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     body {
-      margin: 0;
-      padding: 0 0 36px;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 100vh;
+      margin: 0; padding: 0 0 48px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      background: var(--bg); color: var(--text);
+      display: flex; flex-direction: column; align-items: center; min-height: 100vh;
     }
     .hidden { display: none !important; }
 
-    /* ================= 頂部導覽列 Navbar ================= */
+    /* Top Navbar (100% English Default) */
     .navbar {
-      width: 100%;
-      background: #ffffff;
-      border-bottom: 1px solid #e5e7eb;
-      padding: 8px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.03);
-      gap: 10px;
+      width: 100%; background: #ffffff; border-bottom: 1px solid #e5e7eb;
+      padding: 8px 20px; display: flex; justify-content: space-between; align-items: center;
+      position: sticky; top: 0; z-index: 1000; box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+      flex-wrap: wrap; gap: 10px;
     }
-    .nav-left {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      text-decoration: none;
-      color: inherit;
-    }
-    .brand-logo {
-      width: 34px;
-      height: 34px;
-      border-radius: 8px;
-      object-fit: cover;
-      flex-shrink: 0;
-    }
-    .brand-text-wrap {
-      display: flex;
-      flex-direction: column;
-    }
-    .brand-title {
-      font-size: 1.15rem;
-      font-weight: 800;
-      color: var(--accent);
-      line-height: 1.2;
-    }
-    .brand-sub {
-      font-size: 0.72rem;
-      color: #666;
-      font-weight: 500;
-    }
-
-    .nav-center {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .dropdown {
-      position: relative;
-      display: inline-block;
-    }
+    .nav-left { display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; }
+    .brand-logo { width: 34px; height: 34px; border-radius: 8px; object-fit: cover; }
+    .brand-title { font-size: 1.15rem; font-weight: 800; color: var(--accent); line-height: 1.2; }
+    .brand-sub { font-size: 0.72rem; color: #666; font-weight: 500; }
+    .nav-right { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
     .nav-btn {
-      background: #fff;
-      border: 1px solid #d0d7de;
-      border-radius: 10px;
-      padding: 6px 12px;
-      font-size: 0.84rem;
-      font-weight: 700;
-      color: #222;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      transition: all 0.15s;
-      text-decoration: none;
-      white-space: nowrap;
+      background: #fff; border: 1px solid #d0d7de; border-radius: 10px;
+      padding: 6px 12px; font-size: 0.84rem; font-weight: 700; color: #222;
+      cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+      text-decoration: none; white-space: nowrap; transition: 0.15s;
     }
-    .nav-btn:hover {
-      background: #f3f4f6;
-      border-color: #adb5bd;
-    }
-    .nav-btn.has-key {
-      border-color: #2e7d32;
-      color: #1b5e20;
-      background: #e8f5e9;
-    }
-    .nav-btn.login-btn {
-      background: var(--accent);
-      color: #fff;
-      border-color: var(--accent);
-    }
-    .nav-btn.login-btn:hover {
-      background: var(--accent-hover);
-    }
-    .btn-mini-icon {
-      width: 16px;
-      height: 16px;
-      border-radius: 4px;
-      object-fit: cover;
+    .nav-btn:hover { background: #f3f4f6; }
+    .nav-btn.has-key { border-color: #2e7d32; color: #1b5e20; background: #e8f5e9; }
+    .nav-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+    .main-wrap { width: 100%; max-width: 980px; padding: 12px 16px 0; display: flex; flex-direction: column; gap: 12px; }
+
+    /* Teacher 1-Year Free Trial & Referral Banner */
+    .license-banner {
+      background: linear-gradient(90deg, #e8f5e9 0%, #f1f8e9 100%);
+      border: 1px solid #a5d6a7; border-radius: 14px; padding: 10px 16px;
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;
+      font-size: 0.85rem;
     }
 
-    .dropdown-menu {
-      display: none;
-      position: absolute;
-      top: calc(100% + 6px);
-      left: 0;
-      background: #fff;
-      min-width: 220px;
-      border-radius: 12px;
-      border: 1px solid #e5e7eb;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.12);
-      padding: 6px;
-      z-index: 2000;
-    }
-    .dropdown-menu.right-align {
-      left: auto;
-      right: 0;
-    }
-    .dropdown:hover .dropdown-menu,
-    .dropdown.open .dropdown-menu {
-      display: block;
-    }
-    .dropdown-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 9px 12px;
-      color: #222;
-      text-decoration: none;
-      font-size: 0.86rem;
-      font-weight: 600;
-      border-radius: 8px;
-      transition: background 0.15s;
-      cursor: pointer;
-    }
-    .dropdown-item:hover {
-      background: var(--accent-soft);
-      color: var(--accent);
-    }
-
-    .nav-right {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    /* ================= 雙分頁切換列（AI 翻譯工作台 vs 原書記憶閃卡） ================= */
-    .top-tabs {
-      display: flex;
-      gap: 8px;
-      width: 100%;
-    }
+    /* Main Tabs */
+    .top-tabs { display: flex; gap: 8px; width: 100%; flex-wrap: wrap; }
     .tab-btn {
-      flex: 1;
-      padding: 10px 14px;
-      border-radius: 12px;
-      border: 1.5px solid #d0d7de;
-      background: #ffffff;
-      color: #333;
-      font-size: 0.92rem;
-      font-weight: 800;
-      cursor: pointer;
-      transition: all 0.15s;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
+      flex: 1; min-width: 220px; padding: 10px 14px; border-radius: 12px;
+      border: 1.5px solid #d0d7de; background: #fff; color: #333;
+      font-size: 0.9rem; font-weight: 800; cursor: pointer; transition: 0.15s;
     }
-    .tab-btn.active {
-      background: var(--accent);
-      color: #ffffff;
-      border-color: var(--accent);
-      box-shadow: 0 3px 10px rgba(27,94,32,0.18);
-    }
+    .tab-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); box-shadow: 0 3px 10px rgba(27,94,32,0.18); }
 
-    /* ================= 主容器 ================= */
-    .main-wrap {
-      width: 100%;
-      max-width: 920px;
-      padding: 10px 16px 0;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .tab-panel {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      width: 100%;
-    }
-
+    /* Search & Capsule Input Panel */
     .panel {
-      width: 100%;
-      background: var(--card);
-      padding: 12px 14px;
-      border-radius: 16px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.03);
-      border: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
+      width: 100%; background: var(--card); padding: 14px; border-radius: 16px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.03); border: 1px solid var(--border);
+      display: flex; flex-direction: column; gap: 10px;
     }
     .search-box {
-      display: flex;
-      align-items: center;
-      border: 1.5px solid #cbd5e1;
-      border-radius: 14px;
-      padding: 6px 8px 6px 12px;
-      background: #fff;
-      gap: 8px;
-      transition: border-color 0.2s, box-shadow 0.2s;
+      display: flex; align-items: center; border: 1.5px solid #cbd5e1;
+      border-radius: 14px; padding: 6px 8px 6px 12px; background: #fff; gap: 8px;
     }
-    .search-box:focus-within {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(27, 94, 32, 0.1);
-    }
+    .search-box:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(27,94,32,0.1); }
     textarea {
-      flex: 1;
-      border: none;
-      font-size: 0.96rem;
-      line-height: 1.4;
-      resize: vertical;
-      outline: none;
-      font-family: inherit;
-      padding: 2px 0;
-      background: transparent;
-      min-height: 42px;
+      flex: 1; border: none; font-size: 0.95rem; line-height: 1.4;
+      resize: vertical; outline: none; font-family: inherit; min-height: 44px; background: transparent;
     }
     .icon-action {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      border: none;
-      background: #f1f3f4;
-      color: #333;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      flex-shrink: 0;
-      transition: background 0.15s;
+      width: 40px; height: 40px; border-radius: 50%; border: none;
+      background: #f1f3f4; color: #333; display: flex; align-items: center;
+      justify-content: center; cursor: pointer; flex-shrink: 0; transition: 0.15s;
     }
     .icon-action:hover { background: #e2e8f0; }
-    .icon-action:active { background: #cbd5e1; }
     .icon-action svg { width: 21px; height: 21px; fill: currentColor; }
-    .icon-action.recording {
-      background: #d32f2f;
-      color: #fff;
-      animation: pulse 1s infinite;
-    }
+    .icon-action.recording { background: var(--danger); color: #fff; animation: pulse 1s infinite; }
     @keyframes pulse { 50% { opacity: 0.45; } }
 
-    .action-row {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-    }
+    .action-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
     .btn {
-      flex: 1;
-      padding: 10px 14px;
-      border: none;
-      border-radius: 10px;
-      font-size: 0.92rem;
-      font-weight: 700;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      white-space: nowrap;
-      transition: filter 0.15s, transform 0.1s;
+      flex: 1; padding: 10px 14px; border: none; border-radius: 10px;
+      font-size: 0.9rem; font-weight: 700; cursor: pointer;
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+      white-space: nowrap; transition: 0.15s;
     }
-    .btn:hover { filter: brightness(1.06); }
-    .btn:active { transform: translateY(1px); }
     .btn-blue { background: var(--blue); color: #fff; }
     .btn-green { background: var(--accent); color: #fff; }
     .btn-soft { background: var(--accent-soft); color: var(--accent); border: 1px solid #c8e6c9; }
     .btn-dark { background: #222; color: #fff; font-size: 0.8rem; padding: 7px 12px; border-radius: 8px; flex: unset; }
 
-    /* 免責聲明橫幅 */
-    .disclaimer-banner {
-      background: #fffdf5;
-      border: 1px solid #fde68a;
-      border-left: 4px solid #f59e0b;
-      border-radius: 10px;
-      padding: 9px 14px;
-      font-size: 0.82rem;
-      color: #4b5563;
-      line-height: 1.45;
-    }
-
-    /* 控制工具箱 */
+    /* Controls Panel */
     .controls-panel {
-      background: #ffffff;
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 11px 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 9px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+      background: #fff; border: 1px solid var(--border); border-radius: 14px;
+      padding: 11px 16px; display: flex; flex-direction: column; gap: 9px;
     }
-    .controls-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-    .hint-group {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 0.83rem;
-      font-weight: 700;
-      color: var(--accent);
-      flex-wrap: wrap;
-    }
-    .checkbox-group {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: #222;
-    }
-    .checkbox-group label {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      cursor: pointer;
-      user-select: none;
-    }
-    .checkbox-group input[type="checkbox"] {
-      width: 15px;
-      height: 15px;
-      accent-color: var(--accent);
-      cursor: pointer;
-    }
-    .layout-bar {
-      border-top: 1px solid #f1f5f9;
-      padding-top: 8px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-      font-size: 0.84rem;
-      color: #444;
-      font-weight: 600;
-    }
-    .layout-select {
-      padding: 5px 9px;
-      border-radius: 8px;
-      border: 1px solid #cbd5e1;
-      font-size: 0.83rem;
-      background: #fff;
-    }
-    .print-title-input {
-      margin-left: auto;
-      padding: 6px 10px;
-      border: 1px solid #cbd5e1;
-      border-radius: 8px;
-      font-size: 0.83rem;
-      min-width: 190px;
-      outline: none;
-    }
-    .print-title-input:focus { border-color: var(--accent); }
+    .controls-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+    .checkbox-group { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; font-size: 0.85rem; font-weight: 600; }
+    .checkbox-group label { display: inline-flex; align-items: center; gap: 4px; cursor: pointer; }
+    .checkbox-group input[type="checkbox"] { width: 15px; height: 15px; accent-color: var(--accent); }
+    .layout-select { padding: 5px 9px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 0.83rem; background: #fff; }
 
-    /* ================= 輸出結果卡片區（已縮短高度，下方提示一覽無遺） ================= */
+    /* 4-in-1 Sheet Card */
     .sheet-card {
-      width: 100%;
-      background: #ffffff;
-      padding: 12px 18px;
-      border-radius: 16px;
-      border: 1px solid var(--border);
-      box-shadow: 0 3px 12px rgba(0,0,0,0.03);
-      min-height: 76px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      gap: 10px;
+      width: 100%; background: #fff; padding: 16px 18px; border-radius: 16px;
+      border: 1px solid var(--border); min-height: 90px;
+      display: flex; flex-direction: column; align-items: center; text-align: center; gap: 12px;
       --user-font-size: 20px;
     }
-    .sheet-card.align-left {
-      align-items: flex-start;
-      text-align: left;
-    }
-    .sheet-card.align-left .char-row {
-      justify-content: flex-start;
-    }
-    .sheet-card.align-left .sentence-block {
-      align-items: flex-start;
-    }
-    .print-header-title {
-      font-size: 1.4rem;
-      font-weight: 800;
-      color: #111;
-      margin-bottom: 2px;
-      display: none;
-    }
-    .preview-img {
-      max-width: 80%;
-      max-height: 150px;
-      border-radius: 10px;
-      object-fit: contain;
-      display: none;
-    }
+    .sheet-card.align-left { align-items: flex-start; text-align: left; }
+    .sheet-card.align-left .char-row { justify-content: flex-start; }
+    .sheet-card.align-left .sentence-block { align-items: flex-start; }
     .ai-reply-box {
-      width: 100%;
-      background: #f9fbe7;
-      border: 1px solid #dce775;
-      border-radius: 10px;
-      padding: 8px 14px;
-      font-size: 0.94rem;
-      color: #111;
-      line-height: 1.45;
-      text-align: center;
-      display: none;
+      width: 100%; background: #f9fbe7; border: 1px solid #dce775;
+      border-radius: 10px; padding: 8px 14px; font-size: 0.92rem; display: none;
     }
-    .empty-placeholder {
-      color: #9ca3af;
-      font-size: 0.88rem;
-      margin: auto 0;
-      padding: 8px 12px;
-      user-select: none;
-    }
-    .annotation-list {
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 16px;
-    }
+    .annotation-list { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 16px; }
     .sentence-block {
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 6px;
-      padding-bottom: 12px;
-      border-bottom: 1px dashed #e5e7eb;
+      width: 100%; display: flex; flex-direction: column; align-items: center;
+      gap: 6px; padding-bottom: 12px; border-bottom: 1px dashed #e5e7eb;
     }
     .sentence-block:last-child { border-bottom: none; padding-bottom: 0; }
-    .en-line {
-      font-size: calc(var(--user-font-size) * 0.92);
-      font-weight: 600;
-      color: #111;
-      line-height: 1.4;
-      word-break: normal;
-      overflow-wrap: break-word;
-      max-width: 95%;
-    }
-    .char-row {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 8px 0;
-      align-items: flex-end;
-    }
+    .en-line { font-size: calc(var(--user-font-size) * 0.92); font-weight: 600; color: #111; line-height: 1.4; }
+    .char-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 0; align-items: flex-end; }
     .tp-col {
-      display: inline-flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-end;
-      margin: 0 0.28ch;
-      cursor: pointer;
-      padding: 2px 2px;
-      border-radius: 6px;
+      display: inline-flex; flex-direction: column; align-items: center;
+      margin: 0 0.28ch; cursor: pointer; padding: 2px 3px; border-radius: 6px;
       transition: background 0.12s;
     }
     .tp-col:hover { background: #f1f8e9; }
-    .tp-col:active { background: #c8e6c9; }
-    .tp-py {
-      font-size: calc(var(--user-font-size) * 0.96);
-      font-weight: 700;
-      font-style: italic;
-      color: #1b5e20;
-      line-height: 1.16;
-      white-space: nowrap;
-    }
-    .tp-std {
-      font-size: calc(var(--user-font-size) * 0.78);
-      font-weight: 500;
-      color: #6b7280;
-      line-height: 1.15;
-      white-space: nowrap;
-    }
-    .tp-zh {
-      font-size: calc(var(--user-font-size) * 1.25);
-      font-weight: 600;
-      color: #000;
-      line-height: 1.22;
-      min-height: 1.22em;
-    }
+    .tp-col.err-highlight { background: #ffebee; border: 1.5px dashed #d32f2f; }
+    .tp-py { font-size: calc(var(--user-font-size) * 0.96); font-weight: 700; font-style: italic; color: #1b5e20; line-height: 1.16; }
+    .tp-std { font-size: calc(var(--user-font-size) * 0.78); font-weight: 500; color: #6b7280; line-height: 1.15; }
+    .tp-zh { font-size: calc(var(--user-font-size) * 1.25); font-weight: 600; color: #000; line-height: 1.22; }
 
-    /* 四排動態隱藏控制 */
-    .sheet-card.hide-en .en-line { display: none !important; }
-    .sheet-card.hide-tp .tp-py { display: none !important; }
-    .sheet-card.hide-std .tp-std { display: none !important; }
-    .sheet-card.hide-zh .tp-zh { display: none !important; }
+    .sheet-card.hide-en .en-line, .four-in-one.hide-en .en-line { display: none !important; }
+    .sheet-card.hide-tp .tp-py, .four-in-one.hide-tp .tp-py { display: none !important; }
+    .sheet-card.hide-std .tp-std, .four-in-one.hide-std .tp-std { display: none !important; }
+    .sheet-card.hide-zh .tp-zh, .four-in-one.hide-zh .tp-zh { display: none !important; }
 
-    /* ================= 記憶閃卡專區（Book Mnemonic Cards + 打分與分享解鎖） ================= */
-    .reward-banner {
-      background: #ffffff;
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 14px 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
-    }
-    .reward-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .mnemonic-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(275px, 1fr));
-      gap: 12px;
-      width: 100%;
-    }
-    .mnemonic-card {
-      background: #ffffff;
-      border: 1px solid #dce3ea;
-      border-radius: 14px;
-      padding: 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
-      transition: transform 0.12s, border-color 0.12s;
-    }
-    .mnemonic-card:hover {
-      transform: translateY(-2px);
-      border-color: var(--accent);
-    }
-    .mc-top {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      border-bottom: 1px dashed #e5e7eb;
-      padding-bottom: 8px;
-    }
-    .mc-meaning {
-      font-size: 1rem;
-      font-weight: 800;
-      color: var(--accent);
-    }
-    .mc-trees {
-      font-size: 1.05rem;
-      color: #111;
-    }
-    .mc-hanzi {
-      font-size: 0.92rem;
-      font-weight: 600;
-      color: #444;
-    }
-    .mc-sound, .mc-tip {
-      font-size: 0.85rem;
-      line-height: 1.48;
-      color: #222;
-    }
-    .locked-pack-box {
-      background: #fff8e1;
-      border: 1.5px dashed #ffb300;
-      border-radius: 14px;
-      padding: 24px 18px;
-      text-align: center;
-    }
-
-    /* 社交 App 分享矩陣按鈕 */
-    .share-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 8px;
-      width: 100%;
-    }
-    .share-app-btn {
-      padding: 10px 12px;
-      border-radius: 10px;
-      border: 1px solid #d0d7de;
-      background: #f8fafc;
-      font-size: 0.86rem;
-      font-weight: 700;
-      color: #111;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      text-decoration: none;
-      transition: background 0.15s;
-    }
-    .share-app-btn:hover {
-      background: #e8f5e9;
-      border-color: var(--accent);
-    }
-
-    /* 全屏大字模式 */
+    /* Live Projection Fullscreen Mode */
     body.big-mode {
       position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
       background: #fff; padding: 0; z-index: 99999; overflow-y: auto;
     }
-    body.big-mode .navbar,
-    body.big-mode .top-tabs,
-    body.big-mode .panel,
-    body.big-mode .disclaimer-banner,
-    body.big-mode .controls-panel,
-    body.big-mode .preview-img { display: none !important; }
-    body.big-mode .main-wrap { max-width: 100%; width: 100%; min-height: 100vh; padding: 0; }
+    body.big-mode .navbar, body.big-mode .license-banner, body.big-mode .top-tabs,
+    body.big-mode .hide-in-big { display: none !important; }
+    body.big-mode .main-wrap { max-width: 100%; width: 100%; padding: 20px; }
     body.big-mode .sheet-card {
-      border: none; box-shadow: none; border-radius: 0;
-      min-height: 100vh; justify-content: center; padding: 48px 24px;
-      --user-font-size: 36px !important;
+      border: none; box-shadow: none; min-height: 90vh; justify-content: center;
+      --user-font-size: 38px !important;
     }
-    .exit-big-btn {
-      display: none; position: fixed; top: 16px; right: 16px;
-      background: #111; color: #fff; border: none; border-radius: 20px;
-      padding: 10px 18px; font-size: 0.92rem; font-weight: 700; z-index: 100000; cursor: pointer;
+    .exit-big-bar {
+      display: none; position: fixed; top: 16px; right: 16px; z-index: 100000;
+      gap: 8px; background: rgba(0,0,0,0.85); padding: 8px 14px; border-radius: 24px;
     }
-    body.big-mode .exit-big-btn { display: block; }
+    body.big-mode .exit-big-bar { display: flex; }
 
-    /* 彈窗樣式 */
+    /* 🪄 Extension-Style Floating Text Selection Popup */
+    .selection-floating-btn {
+      position: absolute; display: none; z-index: 999999;
+      background: #1b5e20; color: #ffffff; border: 2px solid #ffffff;
+      border-radius: 24px; padding: 6px 14px; font-size: 0.84rem; font-weight: 800;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.28); cursor: pointer;
+      align-items: center; gap: 8px; white-space: nowrap;
+      animation: popIn 0.14s ease-out;
+    }
+    .selection-floating-btn:hover { background: #2e7d32; transform: translateY(-1px); }
+    @keyframes popIn { from { transform: scale(0.88); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+    .mnemonic-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 12px; width: 100%; }
+    .mnemonic-card {
+      background: #fff; border: 1px solid #dce3ea; border-radius: 14px; padding: 14px;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+
     .modal {
       display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
       background: rgba(0,0,0,0.55); z-index: 9999; justify-content: center; align-items: center; padding: 16px;
     }
     .modal-box {
-      background: #fff; width: 100%; max-width: 420px; border-radius: 16px;
+      background: #fff; width: 100%; max-width: 440px; border-radius: 16px;
       padding: 20px; display: flex; flex-direction: column; gap: 12px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
     }
     .option-card-btn {
-      width: 100%;
-      padding: 13px 14px;
-      border: 1.5px solid #d0d7de;
-      border-radius: 12px;
-      background: #f8fafc;
-      color: #111;
-      font-size: 0.95rem;
-      font-weight: 700;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      text-align: left;
-      transition: background 0.15s, border-color 0.15s;
+      width: 100%; padding: 12px 14px; border: 1.5px solid #d0d7de; border-radius: 12px;
+      background: #f8fafc; font-size: 0.92rem; font-weight: 700; cursor: pointer;
+      display: flex; justify-content: space-between; align-items: center; text-align: left;
     }
-    .option-card-btn:hover, .option-card-btn:active {
-      background: #e8f5e9;
-      border-color: var(--accent);
-    }
-    .notice-box {
-      font-size: 0.86rem;
-      line-height: 1.55;
-      background: #fff8e1;
-      border: 1px solid #ffe082;
-      color: #333;
-      padding: 12px;
-      border-radius: 10px;
-    }
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    th, td { padding: 9px 10px; border-bottom: 1px solid #eee; text-align: left; }
+    th { background: #f8fafc; font-weight: 700; }
 
-    @media (max-width: 768px) {
-      .navbar { padding: 8px 12px; flex-wrap: wrap; }
-      .brand-sub { display: none; }
-      .action-row { flex-wrap: wrap; }
-      .action-row .btn { min-width: 45%; }
-      .print-title-input { width: 100%; margin-left: 0; }
-    }
     @media print {
-      .navbar, .top-tabs, .panel, .disclaimer-banner, .controls-panel, .exit-big-btn, .preview-img, .empty-placeholder {
-        display: none !important;
-      }
+      .navbar, .license-banner, .top-tabs, .hide-in-big, .exit-big-bar, .selection-floating-btn { display: none !important; }
       body { background: #fff; padding: 0; }
       .main-wrap { max-width: 100%; padding: 0; }
       .sheet-card { border: none; box-shadow: none; padding: 8mm; }
-      .print-header-title.has-title { display: block !important; }
     }
   </style>
 </head>
 <body>
 
-  <button class="exit-big-btn" id="uiExitBig" onclick="toggleBigFont()">✕ Exit Fullscreen</button>
+  <!-- 🪄 Extension-Style Floating Popup when Selecting Any Text -->
+  <div id="selectionFloatingBtn" class="selection-floating-btn">
+    <span onclick="handleSelectionAction('annotate')">🌳 Translate & Annotate</span>
+    <span style="opacity:0.5;">|</span>
+    <span onclick="handleSelectionAction('speak')">🔊 Speak</span>
+    <span style="opacity:0.5;">|</span>
+    <span onclick="handleSelectionAction('print')">🖨️ Print</span>
+  </div>
 
-  <!-- ================= 頂部導覽列 ================= -->
+  <!-- Fullscreen Live Projection Top Control Bar -->
+  <div class="exit-big-bar">
+    <button class="btn btn-green" style="padding:6px 12px; font-size:0.82rem;" onclick="toggleSpeak()">🔊 Speak All</button>
+    <button class="btn btn-soft" style="padding:6px 12px; font-size:0.82rem;" onclick="quickFlipScript()">Switch Script (Trad/Simp)</button>
+    <button class="btn btn-dark" style="background:#d32f2f; padding:6px 14px;" onclick="toggleBigFont()">✕ Exit Fullscreen</button>
+  </div>
+
+  <!-- Top Navbar (100% English Default) -->
   <header class="navbar">
     <a href="index.html" class="nav-left">
       <img src="/icon.png?v=3" alt="Trees Pinyin" class="brand-logo" onerror="this.src='icon.png'">
-      <div class="brand-text-wrap">
-        <span class="brand-title" id="uiTitle">Trees Pinyin</span>
-        <span class="brand-sub" id="uiSubTitle">Fast AI Q&A · Instant Docs/PDF/Photo Translator · Read English, Speak Chinese</span>
+      <div>
+        <div class="brand-title">Trees Pinyin · Teacher Workspace</div>
+        <div class="brand-sub">Fast AI Q&A · Instant Docs/PDF/Photo Translator · Live Projection · 1-Click Homework</div>
       </div>
     </a>
 
-    <div class="nav-center">
-      <div class="dropdown" id="resDropdown">
-        <button class="nav-btn" onclick="toggleDropdown('resDropdown', event)">
-          <span id="uiMoreRes">📚 More Resources</span> ▾
-        </button>
-        <div class="dropdown-menu">
-          <a href="about.html" class="dropdown-item" id="uiMenuAbout">📖 About & 63 Rules Guide</a>
-          <div class="dropdown-item" onclick="switchMainTab('mnemonics')" id="uiMenuCards">🧠 Book Mnemonic Cards (45 Words)</div>
-          <a href="arcade.html" class="dropdown-item" id="uiMenuGames">🎮 Mini Games</a>
-          <a href="about.html#contact" class="dropdown-item" id="uiMenuContact">✉️ Contact & Support</a>
-        </div>
-      </div>
-
-      <button class="nav-btn" onclick="toggleLang()" id="uiLangBtn">中文</button>
-    </div>
-
     <div class="nav-right">
+      <select id="voiceSelect" class="layout-select" onchange="onVoiceSelectChange()" title="Select Clear Female Mandarin Voice">
+        <option value="">👩 Clear Female Voice (Auto)</option>
+      </select>
       <button class="nav-btn" onclick="openKeyModal()" id="uiKeyBtn">🔑 API Key</button>
-
-      <button class="nav-btn" onclick="openInstallModal()" id="uiInstallBtn">
-        <img src="/icon.png?v=3" alt="" class="btn-mini-icon" onerror="this.src='icon.png'">
-        <span id="uiInstallBtnText">Install</span>
-      </button>
-
-      <div class="dropdown" id="loginDropdown">
-        <button class="nav-btn login-btn" onclick="toggleDropdown('loginDropdown', event)">
-          <span id="uiLoginBtnText">👨‍🏫 Login</span> ▾
-        </button>
-        <div class="dropdown-menu right-align">
-          <a href="student.html" class="dropdown-item" id="uiLoginStudent">🌱 Student Login (Class Code)</a>
-          <a href="dashboard.html" class="dropdown-item" id="uiLoginTeacher">👩‍🏫 Teacher / Parent Dashboard</a>
-        </div>
-      </div>
+      <button class="nav-btn" onclick="copySchoolWhitelistLetter()">🛡️ School IT Letter</button>
+      <button class="nav-btn primary" onclick="toggleBigFont()">🖥️ Live Projection</button>
+      <a href="student.html" class="nav-btn">🌱 Student View ↗</a>
     </div>
   </header>
 
-  <!-- ================= 核心主工作區 ================= -->
   <main class="main-wrap">
 
-    <!-- 頂部雙分頁切換按鈕：1. AI與文件翻譯 / 2. 原書記憶閃卡（含打分與分享解鎖） -->
+    <!-- Teacher 1-Year Free Trial + Referral Unlock Banner -->
+    <section class="license-banner">
+      <div>
+        🎁 <b>Teacher 1-Year Free Pass:</b> <span id="daysLeftText" style="color:var(--accent); font-weight:800;">365 Days Remaining</span>
+         |  📚 Memory Bank: <b id="unlockedBankStatus">45 Core Sentences Active</b>
+      </div>
+      <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+        <span>Teacher Referral Code: <b style="color:var(--blue); font-family:monospace;">TCH-8829</b></span>
+        <button class="btn btn-green" style="padding:6px 12px; font-size:0.8rem; flex:unset;" onclick="shareTeacherReferral()">
+          📤 Refer a Teacher (Unlock +50 Memory Sentences & Classical Question Bank)
+        </button>
+      </div>
+    </section>
+
+    <!-- Main Navigation Tabs -->
     <div class="top-tabs">
-      <button class="tab-btn active" id="tabBtnWorkspace" onclick="switchMainTab('workspace')">
-        <span id="uiTabWorkspace">✨ AI & File Translator</span>
+      <button class="tab-btn active" id="tabBtnWorkspace" onclick="switchTeacherTab('workspace')">
+        ✨ 1. AI Q&A, File Translator & Publish Homework
       </button>
-      <button class="tab-btn" id="tabBtnMnemonics" onclick="switchMainTab('mnemonics')">
-        <span id="uiTabMnemonics">🧠 Book Mnemonic Cards (15/Pack)</span>
+      <button class="tab-btn" id="tabBtnMnemonics" onclick="switchTeacherTab('mnemonics')">
+        🧠 2. 45+ Memory Sentences & Classical Question Bank
+      </button>
+      <button class="tab-btn" id="tabBtnAnalytics" onclick="switchTeacherTab('analytics')">
+        📊 3. Student Error Radar (4-in-1 View) & Daily History
       </button>
     </div>
 
-    <!-- ==================== 分頁 1：AI 問答與文件翻譯工作區 ==================== -->
-    <div id="panel-workspace" class="tab-panel">
+    <!-- ==================== TAB 1: AI Q&A, File Translator & Homework Publisher ==================== -->
+    <div id="panel-workspace" style="display:flex; flex-direction:column; gap:12px; width:100%;">
 
-      <!-- 1. 膠囊輸入面板 -->
-      <section class="panel">
+      <!-- 1. Capsule Input Panel (Identical to index.html + English Default Voice) -->
+      <section class="panel hide-in-big">
         <div class="search-box" id="dropZone">
           <textarea id="userInput" rows="2"
-            placeholder="Ask AI any question, or enter/paste/drag text, PDF, Word, Google Docs link, or photo to translate..."></textarea>
+            placeholder="Ask AI any question, or enter/paste/drag text, PDF, Word, Google Docs link, or photo to translate & annotate..."></textarea>
 
-          <!-- 語音輸入（預設英文持續錄音，不早斷；切換中文時識別中文） -->
+          <select id="micLangSelect" class="layout-select" style="padding:4px 6px; font-size:0.78rem;" title="Voice Input Language (Default: English)">
+            <option value="en-US" selected>🎙️ Speak EN</option>
+            <option value="zh-CN">🎙️ Speak ZH</option>
+          </select>
+
           <button class="icon-action" id="micBtn" onclick="toggleVoice()" title="Voice Input (Speak English or Chinese)">
             <svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.91-3c-.49 0-.9.36-.98.85C16.52 14.2 14.47 16 12 16s-4.52-1.8-4.93-4.15c-.08-.49-.49-.85-.98-.85-.61 0-1.09.54-1 1.14.49 3 2.89 5.35 5.91 5.78V20c0 .55.45 1 1 1s1-.45 1-1v-2.08c3.02-.43 5.42-2.78 5.91-5.78.1-.6-.39-1.14-1-1.14z"/></svg>
           </button>
 
-          <!-- 文件與拍照選單 -->
           <button class="icon-action" id="fileMenuBtn" onclick="openFileMenuModal()" title="Upload PDF, Word, TXT or Photo">
             <svg viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2zm4 10h2v2h-2v2h-2v-2h-2v-2h2v-2h2v2z"/></svg>
           </button>
 
-          <input type="file" id="docFileInput" accept=".txt,.md,.csv,.json,.html,.rtf,.pdf,.docx,.doc,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword,text/plain" style="display:none" onchange="handleDocFileUpload(this)">
+          <input type="file" id="docFileInput" accept=".txt,.md,.csv,.json,.html,.rtf,.pdf,.docx,.doc" style="display:none" onchange="handleDocFileUpload(this)">
           <input type="file" id="galleryInput" accept="image/*" style="display:none" onchange="handlePhotoUpload(this)">
           <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none" onchange="handlePhotoUpload(this)">
         </div>
 
         <div class="action-row">
-          <button class="btn btn-blue" onclick="runSmartAI()" id="uiAIBtn">✨ AI Reply & Pinyin</button>
-          <button class="btn btn-green" onclick="runDirectTranslate()" id="uiTransBtn">📝 Translate & Pinyin</button>
+          <button class="btn btn-blue" onclick="runSmartAI()">✨ AI Reply & Pinyin</button>
+          <button class="btn btn-green" onclick="runDirectTranslate()">📝 Translate & Pinyin</button>
           <button class="btn btn-soft" style="flex:0.45;" id="speakBtn" onclick="toggleSpeak()">🔊 Speak</button>
         </div>
       </section>
 
-      <!-- 2. 輸出畫布區（緊湊高度，下方提示一覽無遺） -->
-      <section class="sheet-card hide-std" id="sheetCard">
-        <div class="print-header-title" id="printHeaderTitle"></div>
-        <img id="previewImg" class="preview-img" alt="Preview">
-        <div class="ai-reply-box" id="aiReplyBox"></div>
-        <div class="empty-placeholder" id="emptyPlaceholder">
-          Enter text, upload a PDF/Word/Photo, or click "✨ AI Reply & Pinyin" above to see instant Trees Pinyin annotations here.
+      <!-- 2. 4-in-1 Display & Script Control Panel (100% English Buttons) -->
+      <section class="controls-panel hide-in-big">
+        <div class="controls-row">
+          <div style="font-size:0.82rem; font-weight:700; color:var(--accent);">
+            🔊 Left-click character to speak · ✍️ Right-click to edit Character / Standard Pinyin / Trees Pinyin · Highlight any text for popup
+          </div>
+          <div class="checkbox-group">
+            <label><input type="checkbox" id="chkEn" checked onchange="updateRowVisibility()"> English</label>
+            <label><input type="checkbox" id="chkTp" checked onchange="updateRowVisibility()"> Trees Pinyin</label>
+            <label><input type="checkbox" id="chkStd" checked onchange="updateRowVisibility()"> Standard Pinyin (ā á ǎ à)</label>
+            <label><input type="checkbox" id="chkTrad" checked onchange="switchScriptMode('trad')"> Traditional Chinese</label>
+            <label><input type="checkbox" id="chkSimp" onchange="switchScriptMode('simp')"> Simplified Chinese</label>
+          </div>
         </div>
+
+        <div class="controls-row" style="border-top:1px solid #f1f5f9; padding-top:8px;">
+          <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+            <button class="btn btn-dark" onclick="toggleBigFont()">🖥️ Live Projection</button>
+            <button class="btn btn-dark" onclick="exportCardImage()">💾 Save Photo</button>
+            <button class="btn btn-dark" onclick="window.print()">🖨️ Print / PDF</button>
+            <select class="layout-select" id="layoutSelect" onchange="updateLayoutMode()">
+              <option value="center">✨ Auto-Fit (Centered)</option>
+              <option value="left">📄 Left-Aligned Book Mode</option>
+            </select>
+            <span style="font-size:0.82rem; font-weight:700;">Font:</span>
+            <input type="range" min="14" max="36" value="20" oninput="updateFontSize(this.value)" style="accent-color:var(--accent);">
+            <span id="fontValDisplay" style="font-size:0.82rem;">20px</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. 4-in-1 Output Sheet Card -->
+      <section class="sheet-card" id="sheetCard">
+        <img id="previewImg" style="max-width:80%; max-height:150px; border-radius:10px; display:none;" alt="Preview">
+        <div class="ai-reply-box" id="aiReplyBox"></div>
         <div class="annotation-list" id="annotationList"></div>
       </section>
 
-      <!-- 3. 免責聲明 -->
-      <section class="disclaimer-banner" id="uiDisclaimer">
-        <b>Tip:</b> For optimal results, use your own free Gemini API Key or paste text directly. Or switch to the keyless PWA web app at <a href="https://www.treespinyin.com/app" target="_blank" style="color: var(--accent); font-weight: 700; text-decoration: underline;">www.treespinyin.com/app</a> (may be slower due to API limits). The author assumes no liability for the accuracy. Your support and shares will help me go full-time to make improvements and write a memory dictionary in the future!
-      </section>
-
-      <!-- 4. 四排顯示與列印排版控制面板 -->
-      <section class="controls-panel">
-        <div class="controls-row">
-          <div class="hint-group">
-            <span id="uiHintSpeak">🔊 Left-click character to speak</span>
-            <span>·</span>
-            <span id="uiHintEdit">✍️ Right-click to edit polyphone</span>
-          </div>
-
-          <div class="checkbox-group">
-            <label><input type="checkbox" id="chkEn" checked onchange="updateRowVisibility()"> <span id="uiChkEn">English</span></label>
-            <label><input type="checkbox" id="chkTp" checked onchange="updateRowVisibility()"> <span id="uiChkTp">Trees Pinyin</span></label>
-            <label><input type="checkbox" id="chkStd" onchange="updateRowVisibility()"> <span id="uiChkStd">Standard Pinyin (ā á ǎ à)</span></label>
-            <label><input type="checkbox" id="chkZh" checked onchange="updateRowVisibility()"> <span id="uiChkZh">漢字</span></label>
-          </div>
+      <!-- 4. 1-Click Publish Formatted Board as Homework -->
+      <section class="panel hide-in-big" style="background:#f1f8e9; border-color:#a5d6a7;">
+        <div style="font-weight:800; color:var(--accent); font-size:0.95rem;">
+          🚀 1-Click Publish Formatted Board as Student Homework (Saves to Daily Record)
         </div>
-
-        <div class="controls-row">
-          <div style="display:flex; gap:8px; flex-wrap:wrap;">
-            <button class="btn btn-dark" onclick="toggleBigFont()" id="uiBigBtn">🖥️ Big Screen</button>
-            <button class="btn btn-dark" onclick="exportCardImage()" id="uiSaveBtn">💾 Save Photo</button>
-            <button class="btn btn-dark" onclick="window.print()" id="uiPrintBtn">🖨️ Print / PDF</button>
-          </div>
-        </div>
-
-        <div class="layout-bar">
-          <span id="uiLayoutLabel">📐 Layout:</span>
-          <select class="layout-select" id="layoutSelect" onchange="updateLayoutMode()">
-            <option value="center" id="uiLayoutAuto">✨ Auto-Fit (Centered)</option>
-            <option value="left" id="uiLayoutLeft">📄 Left-Aligned Book Mode</option>
+        <div class="action-row">
+          <input type="text" id="pubClassCode" value="CLS-101" placeholder="Class Code" style="max-width:130px; padding:9px; border-radius:8px; border:1px solid #cbd5e1; font-weight:700;">
+          <input type="text" id="pubHwTitle" value="Daily Lesson Assignment" placeholder="Homework Title" style="flex:1; padding:9px; border-radius:8px; border:1px solid #cbd5e1;">
+          <select id="pubHwType" class="layout-select" style="padding:9px; font-weight:700;">
+            <option value="reading">🗣️ Type 1: Read Aloud & Tone Score</option>
+            <option value="mcq">🎯 Type 2: English-to-Hanzi MCQ Quiz</option>
+            <option value="mnemonic">🧠 Type 3: Vocabulary + Example Sentence</option>
+            <option value="poem">📜 Type 4: Classical Poem Recitation</option>
           </select>
-
-          <span id="uiFontLabel">Font:</span>
-          <input type="range" id="fontSlider" min="14" max="36" value="20" oninput="updateFontSize(this.value)" style="accent-color:var(--accent); cursor:pointer;">
-          <span id="fontValDisplay">20px</span>
-
-          <input type="text" class="print-title-input" id="printTitleInput" placeholder="Optional Print Title (選填標題)" oninput="updatePrintTitle(this.value)">
+          <button class="btn btn-green" style="flex:0.6;" onclick="publishBoardAsHomework()">📤 Publish Homework</button>
         </div>
+        <div id="pubConfirmMsg" style="font-size:0.84rem; font-weight:700; color:var(--accent);"></div>
       </section>
-
     </div>
 
-    <!-- ==================== 分頁 2：原書 45 詞記憶閃卡 + 打分與社交分享解鎖 ==================== -->
-    <div id="panel-mnemonics" class="tab-panel hidden">
-      <section class="reward-banner">
-        <div class="reward-row">
-          <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-            <b style="color:var(--accent);">📚 Select Pack:</b>
-            <select id="packSelect" class="layout-select" style="font-weight:700;" onchange="renderMnemonicsPack()">
-              <option value="1">Pack 1: Everyday Greetings & Polite Phrases (15 Words · Free)</option>
-              <option value="2">Pack 2: Pronouns, Family & Countries (15 Words · ⭐ Rate Unlock)</option>
-              <option value="3">Pack 3: Questions, Dining, Doctor & Services (15 Words · 📤 Referral Unlock)</option>
+    <!-- ==================== TAB 2: 45+ Memory Sentences & Classical Question Bank ==================== -->
+    <div id="panel-mnemonics" class="hidden" style="display:flex; flex-direction:column; gap:12px; width:100%;">
+      <section class="panel">
+        <div class="controls-row">
+          <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+            <b style="color:var(--accent);">📚 Select Bank:</b>
+            <select id="packSelect" class="layout-select" style="font-weight:700;" onchange="renderTeacherMnemonicBank()">
+              <option value="1">Pack 1: Greetings & Polite Expressions (15 Words · Free)</option>
+              <option value="2">Pack 2: Pronouns, Family & Countries (15 Words · Free)</option>
+              <option value="3">Pack 3: Questions, Dining & Services (15 Words · Free)</option>
+              <option value="4">Pack 4: +50 Memory Sentences & Classical Question Bank (🎁 Referral Unlock)</option>
             </select>
+            <input type="text" id="searchBankInput" placeholder="🔍 Search English, Hanzi or Pinyin..." oninput="renderTeacherMnemonicBank()" style="padding:6px 10px; border:1px solid #cbd5e1; border-radius:8px; font-size:0.84rem;">
           </div>
-
-          <div style="display:flex; gap:8px; flex-wrap:wrap;">
-            <button class="btn btn-soft" style="padding:7px 12px; font-size:0.84rem;" onclick="handleRateUnlock()">⭐ Rate 5-Stars (Unlock Pack 2)</button>
-            <button class="btn btn-green" style="padding:7px 12px; font-size:0.84rem;" onclick="openShareAppModal()">📤 Share to Friends (Unlock Pack 3)</button>
-          </div>
-        </div>
-
-        <div class="reward-row" style="border-top:1px dashed #e5e7eb; padding-top:8px; font-size:0.84rem;">
-          <div>
-            🎁 Your Referral Code: <b id="myInviteCodeText" style="color:var(--blue); font-family:monospace; font-size:0.95rem;">PIN9X2B</b>
-          </div>
-          <div style="display:flex; gap:6px; align-items:center;">
-            <input type="text" id="friendCodeInput" placeholder="Enter Friend's Code (e.g. PIN5A3D)" style="padding:5px 9px; border:1px solid #cbd5e1; border-radius:8px; font-size:0.82rem; width:210px;">
-            <button class="btn btn-dark" onclick="handleActivateFriendCode()">Activate</button>
+          <div style="display:flex; gap:8px;">
+            <button class="btn btn-soft" style="padding:7px 12px; font-size:0.82rem;" onclick="openAddCustomSentenceModal()">➕ Add Custom Memory Sentence</button>
+            <button class="btn btn-green" style="padding:7px 12px; font-size:0.82rem;" onclick="assignSelectedMnemonicCards()">📤 Assign Checked Cards to Class</button>
           </div>
         </div>
-
-        <div id="rewardStatusMsg" style="font-size:0.84rem; font-weight:700; color:var(--accent);"></div>
       </section>
 
-      <div id="mnemonicLockedBox" class="locked-pack-box hidden"></div>
       <div id="mnemonicCardsContainer" class="mnemonic-grid"></div>
+    </div>
+
+    <!-- ==================== TAB 3: Student Error Radar (4-in-1 Full Question View) & Daily History ==================== -->
+    <div id="panel-analytics" class="hidden" style="display:flex; flex-direction:column; gap:14px; width:100%;">
+      <section class="panel">
+        <div class="controls-row">
+          <div>
+            <h3 style="margin:0; color:#c62828;">🎯 Student Error Questions & Tricky Characters (4-in-1 Full Question View)</h3>
+            <p style="margin:4px 0 0; font-size:0.83rem; color:#555;">
+              Displays the exact questions students missed in full 4-in-1 format (English + Trees Pinyin + Standard Pinyin + Hanzi) with red highlights on mispronounced characters!
+            </p>
+          </div>
+          <div style="display:flex; gap:8px;">
+            <button class="btn btn-blue" style="padding:8px 12px; font-size:0.82rem;" onclick="republishMissedQuestions()">🔄 Re-Publish Missed Questions as Review Quiz</button>
+            <button class="btn btn-soft" style="padding:8px 12px; font-size:0.82rem;" onclick="loadDemoAnalyticsData()">📊 Load Sample Class Data</button>
+          </div>
+        </div>
+
+        <div id="missedQuestionsFourInOneList" class="four-in-one" style="display:flex; flex-direction:column; gap:12px; margin-top:8px;"></div>
+      </section>
+
+      <section class="panel">
+        <h3 style="margin:0; color:var(--accent);">📅 Daily Homework History Log</h3>
+        <table>
+          <thead>
+            <tr><th>Date</th><th>Class Code</th><th>Title</th><th>Type</th><th>Questions</th><th>Action</th></tr>
+          </thead>
+          <tbody id="dailyHwHistoryBody"></tbody>
+        </table>
+      </section>
+
+      <section class="panel">
+        <h3 style="margin:0; color:var(--accent);">📈 Student Submissions Log</h3>
+        <table>
+          <thead>
+            <tr><th>Class Code</th><th>Student Seat</th><th>Avg Score</th><th>Missed / Tone Error Characters</th><th>Time</th></tr>
+          </thead>
+          <tbody id="submissionsTableBody"></tbody>
+        </table>
+      </section>
     </div>
 
   </main>
 
-  <!-- ================= 彈窗：多平台社交 App 分享面板（WhatsApp / 微信 / iMessage / X / FB / Email） ================= -->
-  <div class="modal" id="shareAppModal" onclick="if(event.target===this)this.style.display='none'">
+  <!-- ✍️ Right-Click 3-in-1 Character & Pinyin Editor Modal -->
+  <div class="modal" id="editCharModal" onclick="if(event.target===this)this.style.display='none'">
     <div class="modal-box">
-      <h3 style="margin:0; font-size:1.05rem; color:var(--accent);">📤 Share Trees Pinyin & Unlock Pack 3</h3>
-      <div style="font-size:0.85rem; color:#444; background:#f8fafc; padding:10px 12px; border-radius:10px; border:1px solid #e2e8f0;">
-        Your code <b id="modalShareCode" style="color:var(--blue);">PIN9X2B</b> has been copied! Choose an app to send to your friends:
+      <h3 style="margin:0; color:var(--accent);">✍️ Edit Character, Standard Pinyin & Trees Pinyin</h3>
+      <div style="font-size:0.82rem; color:#555;">
+        Modify any of the 3 fields below. Changing the character or numbered Pinyin (e.g. <code>hang2</code>) auto-calculates the others, or you can customize Trees Pinyin directly!
       </div>
 
-      <button class="btn btn-green" id="nativeShareBtn" onclick="triggerNativeSystemShare()" style="width:100%;">
-        📱 Share via System Menu (iMessage / WeChat / AirDrop)
-      </button>
-
-      <div class="share-grid">
-        <a id="shareWhatsApp" target="_blank" class="share-app-btn">💬 WhatsApp</a>
-        <a id="shareTwitter" target="_blank" class="share-app-btn">🐦 X (Twitter)</a>
-        <a id="shareFacebook" target="_blank" class="share-app-btn">📘 Facebook</a>
-        <a id="shareTelegram" target="_blank" class="share-app-btn">✈️ Telegram</a>
-        <a id="shareEmail" class="share-app-btn">✉️ Email</a>
-        <button onclick="copyShareTextOnly()" class="share-app-btn">📋 Copy for WeChat</button>
+      <div>
+        <label style="font-size:0.8rem; font-weight:700;">1. Chinese Character (漢字):</label>
+        <input type="text" id="editZhInput" oninput="onEditZhOrNumChange('zh')" style="width:100%; padding:9px; border:1px solid #cbd5e1; border-radius:8px; font-size:1.1rem; font-weight:700; margin-top:4px;">
       </div>
 
-      <button class="nav-btn" style="width:100%; padding:8px; justify-content:center;" onclick="document.getElementById('shareAppModal').style.display='none'">Done</button>
+      <div>
+        <label style="font-size:0.8rem; font-weight:700;">2. Standard Pinyin (Enter tone number like <code>hang2</code> or tone mark <code>háng</code>):</label>
+        <input type="text" id="editStdInput" oninput="onEditZhOrNumChange('std')" style="width:100%; padding:9px; border:1px solid #cbd5e1; border-radius:8px; font-size:0.95rem; margin-top:4px;">
+      </div>
+
+      <div>
+        <label style="font-size:0.8rem; font-weight:700;">3. Trees Pinyin (Editable Custom Phonics):</label>
+        <input type="text" id="editTpInput" style="width:100%; padding:9px; border:1px solid #2e7d32; border-radius:8px; font-size:1rem; font-weight:700; color:#1b5e20; margin-top:4px;">
+      </div>
+
+      <div class="action-row">
+        <button class="btn btn-green" onclick="saveThreeInOneEdit()">✅ Save Changes</button>
+        <button class="btn btn-soft" onclick="document.getElementById('editCharModal').style.display='none'">Cancel</button>
+      </div>
     </div>
   </div>
 
-  <!-- ================= 彈窗 1：文件上傳與拍照選單 ================= -->
+  <!-- Modal 1: File & Camera Options -->
   <div class="modal" id="fileMenuModal" onclick="if(event.target===this)this.style.display='none'">
     <div class="modal-box">
-      <h3 style="margin:0; font-size:1.05rem;" id="uiFileMenuTitle">📁 File & Camera Options</h3>
-
-      <button class="option-card-btn" onclick="triggerDocUpload()">
+      <h3 style="margin:0; font-size:1.05rem;">📁 File & Camera Options</h3>
+      <button class="option-card-btn" onclick="document.getElementById('fileMenuModal').style.display='none'; document.getElementById('docFileInput').click();">
         <div>
-          <div id="uiOptDocTitle">📄 Upload File (PDF / Word / Docs / TXT)</div>
-          <div style="font-size:0.78rem; color:#555; font-weight:400; margin-top:3px;" id="uiOptDocSub">100% Client-side instant extraction & Pinyin</div>
+          <div>📄 Upload File (PDF / Word / Docs / TXT)</div>
+          <div style="font-size:0.78rem; color:#555; font-weight:400;">100% Client-side instant extraction & Pinyin</div>
         </div>
         <span>➔</span>
       </button>
-
-      <button class="option-card-btn" onclick="openCameraNoticeModal()">
+      <button class="option-card-btn" onclick="document.getElementById('fileMenuModal').style.display='none'; document.getElementById('galleryInput').click();">
         <div>
-          <div id="uiOptCamTitle">📷 Camera & Photo Library</div>
-          <div style="font-size:0.78rem; color:#555; font-weight:400; margin-top:3px;" id="uiOptCamSub">Recognize text or objects from photos</div>
+          <div>🖼️ Upload Photo / Menu / Sign</div>
+          <div style="font-size:0.78rem; color:#555; font-weight:400;">Recognize text or objects from photos</div>
         </div>
         <span>➔</span>
       </button>
-
-      <button class="nav-btn" style="width:100%; padding:9px; justify-content:center;" onclick="document.getElementById('fileMenuModal').style.display='none'" id="uiFileMenuCancel">Cancel</button>
+      <button class="nav-btn" style="width:100%; justify-content:center;" onclick="document.getElementById('fileMenuModal').style.display='none'">Cancel</button>
     </div>
   </div>
 
-  <!-- ================= 彈窗 2：拍照提速提示 ================= -->
-  <div class="modal" id="cameraNoticeModal" onclick="if(event.target===this)this.style.display='none'">
-    <div class="modal-box">
-      <h3 style="margin:0; font-size:1.05rem; color:#1b5e20;" id="uiCamNoticeTitle">⚡ Speed Tip for Photo Recognition</h3>
-      <div class="notice-box" id="uiCamNoticeBody">
-        <b>📱 Fastest Way on iPhone / iPad (0.1s):</b><br>
-        Take a photo with your <b>Apple Camera</b> first, tap to <b>Copy Text (Live Text)</b>, and paste it here for instant 0-delay annotation!<br><br>
-        <b>📷 Direct Photo Upload:</b><br>
-        Best for <b>short text, menus, signs, or single objects</b>.
-      </div>
-
-      <div class="action-row">
-        <button class="btn btn-green" onclick="triggerGalleryPick()" id="uiBtnGallery">🖼️ Photo Library</button>
-        <button class="btn btn-blue" onclick="triggerDirectCamera()" id="uiBtnTakePhoto">📸 Take Photo</button>
-      </div>
-
-      <button class="nav-btn" style="width:100%; padding:9px; justify-content:center;" onclick="document.getElementById('cameraNoticeModal').style.display='none'" id="uiCamNoticeClose">Back</button>
-    </div>
-  </div>
-
-  <!-- ================= 彈窗 3：安裝到手機/iPad/Mac桌面說明 ================= -->
-  <div class="modal" id="installModal" onclick="if(event.target===this)this.style.display='none'">
-    <div class="modal-box">
-      <div style="display:flex; align-items:center; gap:10px;">
-        <img src="/icon.png?v=3" alt="App Icon" style="width:44px; height:44px; border-radius:10px; border:1px solid #ddd;" onerror="this.src='icon.png'">
-        <h3 style="margin:0; font-size:1.05rem;" id="uiInstallTitle">Install Trees Pinyin to Desktop / Home Screen</h3>
-      </div>
-      <div id="uiInstallSteps" style="font-size:0.86rem; line-height:1.6; background:#f8f9fa; padding:14px; border-radius:10px;">
-        <b>📱 iPhone & iPad (Safari):</b><br>
-        1. Open <span style="color:#1b5e20; font-weight:700;">treespinyin.com</span> in <b>Safari</b>.<br>
-        2. Tap the <b>Share button [📤]</b> → <b>"Add to Home Screen [➕]"</b>.<br><br>
-        <b>💻 Mac (Safari / Chrome / Edge):</b><br>
-        • <b>Mac Safari:</b> Click <b>File</b> in top menu bar → <b>"Add to Dock..."</b><br>
-        • <b>Chrome / Edge:</b> Click the <b>Install icon [⊕]</b> on the right side of the address bar.
-      </div>
-      <button class="btn btn-green" id="pwaDirectInstallBtn" style="display:none;" onclick="triggerNativePWAInstall()">⚡ Install App Now</button>
-      <button class="btn btn-soft" onclick="document.getElementById('installModal').style.display='none'" id="uiGotItBtn">Got It</button>
-    </div>
-  </div>
-
-  <!-- ================= 彈窗 4：保存圖片預覽 ================= -->
-  <div class="modal" id="imgModal" onclick="if(event.target===this)this.style.display='none'">
-    <div class="modal-box" style="align-items:center; text-align:center;">
-      <h3 style="margin:0; font-size:0.98rem;" id="uiSaveModalTitle">Right-Click or Long-Press Image to Save</h3>
-      <img id="generatedImg" style="width:100%; max-height:60vh; object-fit:contain; border:1px solid #ccc; border-radius:8px;">
-      <button class="btn btn-green" style="width:100%;" onclick="document.getElementById('imgModal').style.display='none'" id="uiDoneBtn">Done</button>
-    </div>
-  </div>
-
-  <!-- ================= 彈窗 5：極簡 API Key 設置 ================= -->
+  <!-- Modal 2: API Key Setup -->
   <div class="modal" id="keyModal" onclick="if(event.target===this)this.style.display='none'">
     <div class="modal-box">
-      <h3 style="margin:0; font-size:1.02rem;" id="uiKeyTitle">🔑 Google Gemini API Key</h3>
-      <div id="uiKeyDesc" style="font-size:0.85rem; line-height:1.55; background:#f8f9fa; padding:12px; border-radius:8px;">
+      <h3 style="margin:0;">🔑 Google Gemini API Key</h3>
+      <div style="font-size:0.84rem; background:#f8f9fa; padding:10px; border-radius:8px;">
         <b>Cloudflare High-Speed AI & Global Cache are active by default!</b><br>
-        Enter your own free Google Gemini API Key (stored locally in your browser) or switch to www.treespinyin.com/app in Safari:<br>
+        Enter your own free Google Gemini API Key (stored locally in your browser) for unlimited instant AI responses:<br>
         <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:#1565c0; font-weight:700;">Get Free Key at Google AI Studio ↗</a>
       </div>
-      <input type="password" id="apiKeyInput" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;font-size:0.9rem;" placeholder="AIzaSy... (Optional)">
+      <input type="password" id="apiKeyInput" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:8px;" placeholder="AIzaSy... (Optional)">
       <div class="action-row">
-        <button class="btn btn-green" onclick="saveBackupKey()" id="uiKeySave">Save</button>
-        <button class="btn btn-soft" style="flex:0.45;" onclick="clearBackupKey()" id="uiKeyClear">Clear</button>
+        <button class="btn btn-green" onclick="saveBackupKey()">Save Key</button>
+        <button class="btn btn-soft" style="flex:0.45;" onclick="clearBackupKey()">Clear</button>
       </div>
-      <button class="nav-btn" style="width:100%;padding:8px;justify-content:center;" onclick="document.getElementById('keyModal').style.display='none'" id="uiKeyClose">Close</button>
+      <button class="nav-btn" style="width:100%; justify-content:center;" onclick="document.getElementById('keyModal').style.display='none'">Close</button>
+    </div>
+  </div>
+
+  <!-- Modal 3: Save Image Preview -->
+  <div class="modal" id="imgModal" onclick="if(event.target===this)this.style.display='none'">
+    <div class="modal-box" style="align-items:center;">
+      <h3 style="margin:0; font-size:0.95rem;">Right-Click or Long-Press Image to Save</h3>
+      <img id="generatedImg" style="width:100%; max-height:60vh; object-fit:contain; border:1px solid #ccc; border-radius:8px;">
+      <button class="btn btn-green" style="width:100%;" onclick="document.getElementById('imgModal').style.display='none'">Done</button>
+    </div>
+  </div>
+
+  <!-- Modal 4: Add Custom Memory Sentence -->
+  <div class="modal" id="addCustomModal" onclick="if(event.target===this)this.style.display='none'">
+    <div class="modal-box">
+      <h3 style="margin:0; color:var(--accent);">➕ Add Custom Memory Word & Sentence</h3>
+      <input type="text" id="custMeaning" placeholder="English Meaning (e.g. Delicious)" style="padding:8px; border:1px solid #ccc; border-radius:8px;">
+      <input type="text" id="custHanzi" placeholder="Chinese Characters (e.g. 好吃)" style="padding:8px; border:1px solid #ccc; border-radius:8px;">
+      <input type="text" id="custSound" placeholder="Sound Clue (e.g. Sounds like 'how chi')" style="padding:8px; border:1px solid #ccc; border-radius:8px;">
+      <input type="text" id="custMnemonic" placeholder="Memory Trick Story" style="padding:8px; border:1px solid #ccc; border-radius:8px;">
+      <input type="text" id="custExZh" placeholder="Example Sentence Chinese (e.g. 餃子非常好吃。)" style="padding:8px; border:1px solid #ccc; border-radius:8px;">
+      <input type="text" id="custExEn" placeholder="Example Sentence English (e.g. The dumplings are delicious.)" style="padding:8px; border:1px solid #ccc; border-radius:8px;">
+      <div class="action-row">
+        <button class="btn btn-green" onclick="saveCustomMnemonicCard()">💾 Save to Memory Bank</button>
+        <button class="btn btn-soft" onclick="document.getElementById('addCustomModal').style.display='none'">Cancel</button>
+      </div>
     </div>
   </div>
 
   <script>
     // =========================================================================
-    // 0. PWA 桌面安裝支持 & Cloudflare Worker 極速快取端點
+    // 0. True AI Engine from index.html (Cloudflare Worker + Gemini Multi-Model Racing + Built-in Cache)
     // =========================================================================
     const IS_LOCAL_FILE = window.location.protocol === 'file:';
     const CF_WORKER_ENDPOINTS = IS_LOCAL_FILE
       ? ['https://treespinyin-api.treespinyin.workers.dev', 'https://treespinyin.com/api']
       : ['https://treespinyin-api.treespinyin.workers.dev', '/api', 'https://treespinyin.com/api'];
 
-    // 商店評分直連網址（自動識別 Edge 或 Chrome 商店）
-    const CHROME_STORE_REVIEW_URL = 'https://chromewebstore.google.com/detail/trees-pinyin-universal-an/jlbjllgeebmhkdcgmcnlkbcaiobpheae/reviews';
-    const EDGE_STORE_REVIEW_URL = 'https://microsoftedge.microsoft.com/addons/detail/egmgaoogonmldicgbkpaofjffcdlcffm';
-
-    function getStoreReviewUrl() {
-      const isEdge = /Edg\//i.test(navigator.userAgent);
-      return isEdge ? EDGE_STORE_REVIEW_URL : CHROME_STORE_REVIEW_URL;
-    }
-
-    let deferredPrompt = null;
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      const btn = document.getElementById('pwaDirectInstallBtn');
-      if (btn) btn.style.display = 'inline-flex';
-    });
-
-    async function triggerNativePWAInstall() {
-      if (!deferredPrompt) return;
-      deferredPrompt.prompt();
-      await deferredPrompt.userChoice;
-      deferredPrompt = null;
-      document.getElementById('installModal').style.display = 'none';
-    }
-
-    (function injectManifestWithIconPng() {
-      try {
-        if (IS_LOCAL_FILE) return;
-        const iconUrl = window.location.origin + '/icon.png?v=3';
-        const manifest = {
-          name: "Trees Pinyin",
-          short_name: "Trees Pinyin",
-          start_url: window.location.pathname || "/",
-          display: "standalone",
-          background_color: "#f5f7f9",
-          theme_color: "#1b5e20",
-          icons: [
-            { src: iconUrl, sizes: "192x192", type: "image/png" },
-            { src: iconUrl, sizes: "512x512", type: "image/png" }
-          ]
-        };
-        const blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
-        const link = document.createElement('link');
-        link.rel = 'manifest';
-        link.href = URL.createObjectURL(blob);
-        document.head.appendChild(link);
-      } catch (e) {}
-    })();
-
-    function toggleDropdown(id, e) {
-      e.stopPropagation();
-      document.querySelectorAll('.dropdown').forEach(d => {
-        if (d.id !== id) d.classList.remove('open');
-      });
-      document.getElementById(id).classList.toggle('open');
-    }
-    document.addEventListener('click', () => {
-      document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('open'));
-    });
-
-    function switchMainTab(tabName) {
-      const isMnemonics = tabName === 'mnemonics';
-      document.getElementById('tabBtnWorkspace').classList.toggle('active', !isMnemonics);
-      document.getElementById('tabBtnMnemonics').classList.toggle('active', isMnemonics);
-      document.getElementById('panel-workspace').classList.toggle('hidden', isMnemonics);
-      document.getElementById('panel-mnemonics').classList.toggle('hidden', !isMnemonics);
-      if (isMnemonics) renderMnemonicsPack();
-    }
-
-    // =========================================================================
-    // 0.1 原書《Easy Mandarin Speaking》45 個非數字記憶閃卡 + 打分與多 App 分享解鎖
-    // =========================================================================
-    const EXACT_BOOK_MNEMONICS = {
-      packs: [
-        {
-          packId: 1,
-          title: "Pack 1: Everyday Greetings & Polite Expressions (15 Words · Free)",
-          free: true,
-          cards: [
-            { meaning: "Hello / How are you?", trees: "Nee3 haw3", hanzi: "你好", pinyin: "nǐ hǎo", sound: "Similar to '<b><u>knee</u> <u>how</u></b>'.", mnemonic: "<b>Knee</b>ling to show <b>how</b> much respect you have in serious moments. How could you <b><u>knee</u></b>(l) down just to say <b>hello</b>?" },
-            { meaning: "You (Second Person Singular)", trees: "nee3", hanzi: "你", pinyin: "nǐ", sound: "Sounds like '<b><u>Knee</u></b>'.", mnemonic: "Imagine '<b><u>Knee</u></b>(l) down while greeting <b>you</b>.'" },
-            { meaning: "Good", trees: "haw3", hanzi: "好", pinyin: "hǎo", sound: "Similar to '<b><u>how</u></b>'.", mnemonic: "'<b>Good</b>' is a standard response to a greeting ('<i><b>Nee3 haw3</b></i>' literally means '<b>You good</b>')." },
-            { meaning: "Good morning.", trees: "Dsaw3 (r)sang4 haw3", hanzi: "早上好", pinyin: "zǎo shang hǎo", sound: "'<i><b>dsaw3 (r)sang4</b></i>' (morning) sounds like '<b><u>jaw</u> <u>sang</u></b>'.", mnemonic: "The <b>morning</b> movements of yawning: your <b><u>jaw</u> <u>sang</u></b>!" },
-            { meaning: "Big", trees: "dah4", hanzi: "大", pinyin: "dà", sound: "'<i><b>dah4</b></i>' is similar to the first part of '<b><u>do</u></b>zen'.", mnemonic: "Our <b>big</b> family eats a <b><u>do</u></b>zen eggs every morning." },
-            { meaning: "Home / Family", trees: "jeeah", hanzi: "家", pinyin: "jiā", sound: "'<i><b>jeeah</b></i>' is a rapid contraction of '<b><u>Gee</u></b>' and '<b><u>Ah</u></b>', which is similar to '<b>jar</b>'.", mnemonic: "<b>Ah, gee</b>, our <b>big family</b> (<i><b>dah4 jeeah</b></i>) eats a <b><u>do</u></b>zen eggs in a <b>jar</b> every morning." },
-            { meaning: "Happy", trees: "kooie4 Ler4", hanzi: "快樂", pinyin: "kuài lè", sound: "Similar to the underlined parts: '<b><u>qui</u></b>(te) <b><u>lo</u></b>(vely)'.", mnemonic: "<b>Happy</b> kids are <b><u>qui</u></b>(te) <b><u>lo</u></b>(vely)!" },
-            { meaning: "New", trees: "seen", hanzi: "新", pinyin: "xīn", sound: "Sounds like English '<b><u>seen</u></b>'.", mnemonic: "Never <b><u>seen</u></b> before, so it's <b>new</b>!" },
-            { meaning: "Year", trees: "neean2", hanzi: "年", pinyin: "nián", sound: "Same as '<b><u>Knee</u> <u>an</u></b>', or similar to '<b>Neon</b>'.", mnemonic: "Chinese New <b>Year</b> traditionally involves the kowtow (<b><u>knee</u> <u>an</u></b>) ritual and the vibrant glow of <b>neon</b> lights." },
-            { meaning: "To be rich / Make a fortune", trees: "fah tsie2", hanzi: "發財", pinyin: "fā cái", sound: "Sounds like the underlined parts of \"<b><u>far</u></b> i<b><u>t's I</u></b>\". Similar to '<b>far try</b>'.", mnemonic: "Not <b><u>far</u></b> ago, i<b><u>t's I</u></b> who had a <b>far try</b> (bold attempt) to <b>make a fortune</b>." },
-            { meaning: "Could you tell me…? / Excuse me", trees: "Tsing3 wer-n4", hanzi: "請問", pinyin: "qǐng wèn", sound: "Le<b><u>t's sing</u></b> <b><u>when</u></b> we're happy. Sounds like the underlined parts.", mnemonic: "Associate '<i><b>tsing3</b></i>' (please) with \"Le<b><u>t's sing</u></b> happily\", and connect '<i><b>wer-n4</b></i>' (to ask) with '<b><u>when</u></b>'." },
-            { meaning: "Thank you! / I appreciate it.", trees: "Seer4 seer", hanzi: "謝謝", pinyin: "xiè xie", sound: "Sounds like '<b><u>See</u> <u>ye</u></b>(s), <b><u>See</u> <u>ye</u></b>(s)' (don't pronounce the 's' in 'yes').", mnemonic: "Use '<b>See ya</b>' as the bridge: in real life, '<i><b>seer4 seer</b></i>' (<b>Thank you</b>) and '<b>See ya</b>' always go hand in hand!" },
-            { meaning: "See you / Good-bye", trees: "Dsie4 jeean4", hanzi: "再見", pinyin: "zài jiàn", sound: "Same as the underlined parts of '<b><u>Xy</u></b>lophone, <b><u>Gee</u> <u>an</u></b>'.", mnemonic: "In ancient China, friends didn't just wave <b>goodbye</b>; they played the '<b><u>Xy</u></b>lophone' to express their deep emotions!" },
-            { meaning: "You are welcome.", trees: "Boo2 ker4 tsee", hanzi: "不客氣", pinyin: "bú kè qi", sound: "Sounds like '<b><u>Boo</u> <u>Cur</u>—<u>tsy</u></b>'.", mnemonic: "When someone thanks you, imagine she is performing a graceful curtsy and you say '<b><u>Boo</u> <u>Curtsy</u></b>' (\"Don't do this curtsy\")." },
-            { meaning: "I'm sorry. / Pardon me.", trees: "Dooay4 boo4 tsee3", hanzi: "對不起", pinyin: "duì bù qǐ", sound: "Sounds like: <b><u>Dway</u></b>ne says '<b><u>boo</u> <u>qi</u></b>'.", mnemonic: "<b><u>Dway</u></b>ne found the <b>right</b> way (<i><b>dooay4</b></i>); Don't get angry (<i><b>boo2 tsee4</b></i>); <b>I am sorry</b> (<i><b>dooay4 boo4 tsee3</b></i>)." }
-          ]
-        },
-        {
-          packId: 2,
-          title: "Pack 2: Core Conversation, Pronouns & Countries (15 Words · ⭐ Rate Unlock)",
-          free: false,
-          cards: [
-            { meaning: "It doesn't matter / It's OK.", trees: "May2 gooan see", hanzi: "沒關係", pinyin: "méi guān xi", sound: "Sounds like \"<b><u>May</u></b> 'gwon' <b><u>see</u></b>\". Similar to '<b><u>May</u></b> la<b><u>goon</u></b> <b><u>see</u></b>.'", mnemonic: "Dwayne's wife would forgive him if they could see the lagoon. <b><u>May</u></b> the la<b><u>goon</u></b> be <b><u>see</u></b>n when the tide goes out." },
-            { meaning: "Don't get angry.", trees: "Beer2 (r)ser-ng tsee4", hanzi: "別生氣", pinyin: "bié shēng qì", sound: "Sounds like '<b><u>Beer</u> <u>sung</u> <u>qi</u></b>'.", mnemonic: "With <b><u>beer</u></b>, Dwayne had <b><u>sung</u></b> the song full of <b><u>qi</u></b> (Vital Energy) to cheer his lover up." },
-            { meaning: "Doctor", trees: "yee (r)ser-ng", hanzi: "醫生", pinyin: "yī shēng", sound: "'<i><b>yee</b></i>' (homophone of one) + '<i><b>(r)ser-ng</b></i>' (similar to '<b><u>sung</u></b>' / birth / sound).", mnemonic: "If you're born in a hospital, the very <b>first</b> person you come into contact with is a <b>doctor</b>." },
-            { meaning: "Day / Sun", trees: "(r)th4", hanzi: "日", pinyin: "rì", sound: "Maintain the tongue position of '<b><u>r</u></b>ain' while making the first part of '<b><u>th</u></b>en'.", mnemonic: "Imagine it's your birthday (<i><b>(r)ser-ng</b></i> = sung), and <b>(r)<u>th</u>en</b>... the <b>day</b> begins!" },
-            { meaning: "I / Me", trees: "wer3", hanzi: "我", pinyin: "wǒ", sound: "Similar to the underlined part of '<b><u>wor</u></b>d' or '<b><u>wor</u></b>ld'.", mnemonic: "<b><u>Wor</u></b>d is the core of language, as <b>I</b> am the core of humanity. <b><u>Wor</u></b>d gives Life to the <b><u>Wor</u></b>ld." },
-            { meaning: "My / Mine", trees: "wer3 der", hanzi: "我的", pinyin: "wǒ de", sound: "Similar to '<b><u>word</u></b>' or '<b><u>wor</u>(l)<u>d</u></b>'.", mnemonic: "<b>My</b> <b><u>wor</u>(l)<u>d</u></b>! Adding '<i><b>der</b></i>' (sounds like '<b><u>d</u></b>' in wor<b><u>d</u></b>) after '<i><b>wer3</b></i>' (I) forms '<b>my / mine</b>'." },
-            { meaning: "Your / Yours (Singular)", trees: "nee3 der", hanzi: "你的", pinyin: "nǐ de", sound: "Sounds like '<b><u>need</u></b>'.", mnemonic: "<b>Yours</b> is what you <b><u>need</u></b>." },
-            { meaning: "It / He / She / Him / Her", trees: "tah", hanzi: "它 / 他 / 她", pinyin: "tā", sound: "Sounds like the first part of '<b><u>Ta</u></b>rget'.", mnemonic: "This product (<b>it</b>) is exclusive to <b><u>Ta</u></b>rget. <b>She</b> and <b>he</b> have to buy it at <b><u>Ta</u></b>rget." },
-            { meaning: "Its / Her / Hers / His", trees: "tah der", hanzi: "它的 / 她的 / 他的", pinyin: "tā de", sound: "Similar to '<b><u>tard</u></b>(y)'.", mnemonic: "<b>He</b> was <b><u>tard</u></b>(y) for <b>his</b> English class." },
-            { meaning: "Friend", trees: "per-ng2 yoh", hanzi: "朋友", pinyin: "péng yǒu", sound: "Sounds like the underlined parts of '<b><u>peng</u></b>uin <b><u>you</u></b>'.", mnemonic: "A cute <b><u>peng</u></b>uin is <b><u>you</u></b>r best <b>friend</b>!" },
-            { meaning: "Younger brother & Elder brother", trees: "dee4 dee / ger ger", hanzi: "弟弟 / 哥哥", pinyin: "dì di / gē ge", sound: "The first part of '<b><u>di</u></b>g' is '<i><b>dee4</b></i>' (younger brother), and the last '<b><u>g</u></b>' is '<i><b>ger</b></i>' (elder brother).", mnemonic: "'<b><u>dig</u></b>' is the teamwork of a <b>younger brother</b> (<i><b>dee4</b></i>) and an <b>elder brother</b> (<i><b>ger</b></i>)!" },
-            { meaning: "Country & The United States", trees: "gooer2 / may3 gooer2", hanzi: "國 / 美國", pinyin: "guó / měi guó", sound: "Rapid contraction of '<i><b>ger</b></i>' (brother) and '<i><b>wer3</b></i>' (me) ➔ '<i><b>gooer2</b></i>'. '<i><b>may3</b></i>' = <b><u>May</u></b>flower.", mnemonic: "No <b><u>May</u></b>flower, no <b>United States</b> (<i><b>may3 gooer2</b></i>)." },
-            { meaning: "Human / People / Person", trees: "(r)ther-n2", hanzi: "人", pinyin: "rén", sound: "Maintain the '<b><u>r</u></b>' tongue position of '<b><u>r</u></b>ain' while making the weak form of '<b><u>then</u></b>'. Also like 'human vi<b><u>sion</u></b>'.", mnemonic: "Placing '<i><b>(r)ther-n2</b></i>' (<b>people</b>) at the end of a country name turns it into the word for its people." },
-            { meaning: "China", trees: "(r)dser-oong gooer2", hanzi: "中國", pinyin: "zhōng guó", sound: "'<i><b>(r)dser-oong</b></i>' sounds like '<b><u>drone</u></b>'.", mnemonic: "Fly a <b><u>drone</u></b> across the country (<i><b>gooer2</b></i>) of <b>China</b>." },
-            { meaning: "Like / Love", trees: "see3 hooan", hanzi: "喜歡", pinyin: "xǐ huān", sound: "Sounds like: '<b><u>see</u> <u>Juan</u></b>' (Spanish).", mnemonic: "<b>Like</b> him when you <b><u>see</u></b> a Don <b><u>Juan</u></b>!" }
-          ]
-        },
-        {
-          packId: 3,
-          title: "Pack 3: Questions, Dining, Doctor & Public Services (15 Words · 📤 Referral Unlock)",
-          free: false,
-          cards: [
-            { meaning: "Can / Be able to", trees: "hooay4", hanzi: "會", pinyin: "huì", sound: "Sounds like '<b><u>hoo</u></b>(r)<b><u>ay</u></b>' without 'r'.", mnemonic: "If you <b>can</b> do it, we'll shout '<b><u>hoo</u></b>(r)<b><u>ay</u></b>'!" },
-            { meaning: "Book", trees: "(r)soo", hanzi: "書", pinyin: "shū", sound: "Sounds like '<b><u>sue</u></b>'.", mnemonic: "If you copy this <b>book</b>, <b><u>Sue</u></b> will <b><u>sue</u></b> you!" },
-            { meaning: "Who & Water", trees: "(r)sooay2 / (r)sooay3", hanzi: "誰 / 水", pinyin: "shuí / shuǐ", sound: "Contract '<b><u>sway</u></b>' into a single monosyllabic sound.", mnemonic: "<b>Who</b> (<i><b>(r)sooay2</b></i>) is gazing at the mermaid <b><u>sway</u></b>ing in the <b>water</b> (<i><b>(r)sooay3</b></i>)?" },
-            { meaning: "Look for / Be looking for", trees: "(r)dsaw3", hanzi: "找", pinyin: "zhǎo", sound: "Similar to '<b><u>jowl</u></b>' or '<b><u>jaw</u></b>'.", mnemonic: "I'll be <b>looking for</b> my <b><u>jaw</u></b> on the floor after seeing that performance!" },
-            { meaning: "From", trees: "Lie2 ds4", hanzi: "來自", pinyin: "lái zì", sound: "'<i><b>Lie2 ds4</b></i>' is similar to '<b><u>lies</u></b>'.", mnemonic: "The truth <b><u>LIES</u></b> in where you come <b>FROM</b>." },
-            { meaning: "Where", trees: "nah3 Lee3", hanzi: "哪裡", pinyin: "nǎ lǐ", sound: "Sounds like 'G<b><u>narly</u></b>' without 'G'.", mnemonic: "If you don't know <b>WHERE</b> you are, things are getting G<b><u>NARLY</u></b>." },
-            { meaning: "How", trees: "dser-n3 mer", hanzi: "怎麼", pinyin: "zěn me", sound: "Sounds like the underlined parts of 'Confi<b><u>sion</u></b>? <b><u>Mer</u></b>maid.'", mnemonic: "His confu<b><u>sion</u></b> is <b>how</b> the <b><u>mer</u></b>maid falls in love with a human." },
-            { meaning: "Supermarket", trees: "(r)tsaw (r)s4", hanzi: "超市", pinyin: "chāo shì", sound: "Sounds like an r-colored '<b><u>cho</u></b>(i)<b><u>ce</u></b>' without 'i'.", mnemonic: "So many <b><u>cho</u></b>(i)<b><u>ce</u></b>s in the <b>supermarket</b>!" },
-            { meaning: "(the) Menu & Check, please", trees: "tsie4 dan / mie3 dan", hanzi: "菜單 / 買單", pinyin: "cài dān / mǎi dān", sound: "'<i><b>tsie4</b></i>' = \"I<b><u>t's I</u></b>\"; '<i><b>dan</b></i>' = '<b><u>done</u></b>'; '<i><b>mie3 dan</b></i>' = '<b><u>My</u> <u>done</u></b>'.", mnemonic: "I<b><u>t's I</u></b> who have <b><u>done</u></b> the <b>menu</b> (<i><b>tsie4 dan</b></i>). <b>Check, please</b>—I'm all <b><u>done</u></b> (<i><b>mie3 dan</b></i>)!" },
-            { meaning: "Would like / Want", trees: "seeang3 yaw4", hanzi: "想要", pinyin: "xiǎng yào", sound: "Blend '<b><u>see</u></b>' and '<b><u>young</u></b>' into '<i><b>seeang3</b></i>'; '<i><b>yaw4</b></i>' sounds like '<b><u>your</u></b>'.", mnemonic: "I <b>want</b> to <b><u>see</u> <u>Young</u></b>'s Ordinary (a popular British beer)." },
-            { meaning: "Milk tea", trees: "nie3 (r)tsah2", hanzi: "奶茶", pinyin: "nǎi chá", sound: "'<i><b>nie3</b></i>' = first part of '<b><u>ni</u></b>ce'; '<i><b>(r)tsah2</b></i>' = underlined part of '<b><u>char</u></b>ge'.", mnemonic: "A cup of <b>milk tea</b> gives her a <b><u>ni</u></b>ce <b><u>char</u></b>ge!" },
-            { meaning: "Dumplings", trees: "jeeaw3 ds", hanzi: "餃子", pinyin: "jiǎo zi", sound: "Similar to the underlined parts of '<b><u>Gee, aw</u></b>esome foo<b><u>ds</u></b>.'", mnemonic: "<b><u>Gee, aw</u></b>esome foo<b><u>ds</u></b>—everyone loves <b>dumplings</b>!" },
-            { meaning: "Cold (Illness)", trees: "gan3 maw4", hanzi: "感冒", pinyin: "gǎn mào", sound: "Sounds like '<b><u>gun</u> <u>mall</u></b>'.", mnemonic: "Leo witnessed a <b><u>gun</u></b>fight at the <b><u>mall</u></b>; the shock weakened his immune system and he caught a <b>cold</b>." },
-            { meaning: "Telephone", trees: "deean4 hooah4", hanzi: "電話", pinyin: "diàn huà", sound: "'<i><b>deean4</b></i>' = rapid blend of '<b><u>the end</u></b>'; '<i><b>hooah4</b></i>' = '<b><u>who are</u></b>' linked together.", mnemonic: "Call on the <b>telephone</b> to ask: \"At <b><u>the end</u></b> of the movie, <b><u>who are</u></b> they?\"" },
-            { meaning: "Got it.", trees: "Ting der-oong3 Ler", hanzi: "聽懂了", pinyin: "tīng dǒng le", sound: "Sounds like the underlined parts: He is shou<b><u>ting</u></b>, \"I <b><u>don't</u></b> <b><u>love</u></b> math!\"", mnemonic: "Once you hear it, you've <b>got it</b> (<i><b>Ting der-oong3 Ler</b></i>)!" }
-          ]
-        }
-      ]
-    };
-
-    let unlockState = {
-      rateUnlocked: localStorage.getItem('tp_rate_unlocked') === 'true',
-      shareUnlocked: localStorage.getItem('tp_share_unlocked') === 'true',
-      myInviteCode: localStorage.getItem('tp_my_invite_code') || ''
-    };
-    if (!/^PIN[A-Z0-9]{4}$/.test(unlockState.myInviteCode)) {
-      const chars = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
-      let code = 'PIN';
-      for (let i = 0; i < 4; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
-      unlockState.myInviteCode = code;
-      localStorage.setItem('tp_my_invite_code', code);
-    }
-    document.getElementById('myInviteCodeText').innerText = unlockState.myInviteCode;
-
-    function getShareMessage() {
-      return `Learn Chinese pronunciation effortlessly with English phonics! Use my referral code ${unlockState.myInviteCode} on Trees Pinyin: https://www.treespinyin.com`;
-    }
-
-    function handleRateUnlock() {
-      unlockState.rateUnlocked = true;
-      localStorage.setItem('tp_rate_unlocked', 'true');
-      document.getElementById('rewardStatusMsg').innerText = '🎉 Thank you for your 5-star review! Pack 2 is now unlocked!';
-      document.getElementById('packSelect').value = '2';
-      renderMnemonicsPack();
-      window.open(getStoreReviewUrl(), '_blank');
-    }
-
-    function openShareAppModal() {
-      const msg = getShareMessage();
-      navigator.clipboard.writeText(msg).catch(() => {});
-      unlockState.shareUnlocked = true;
-      localStorage.setItem('tp_share_unlocked', 'true');
-      document.getElementById('rewardStatusMsg').innerText = `📋 Referral code (${unlockState.myInviteCode}) copied & Pack 3 unlocked!`;
-      document.getElementById('packSelect').value = '3';
-      renderMnemonicsPack();
-
-      document.getElementById('modalShareCode').innerText = unlockState.myInviteCode;
-      const encMsg = encodeURIComponent(msg);
-      const encUrl = encodeURIComponent('https://www.treespinyin.com');
-      document.getElementById('shareWhatsApp').href = `https://api.whatsapp.com/send?text=${encMsg}`;
-      document.getElementById('shareTwitter').href = `https://twitter.com/intent/tweet?text=${encMsg}`;
-      document.getElementById('shareFacebook').href = `https://www.facebook.com/sharer/sharer.php?u=${encUrl}"e=${encMsg}`;
-      document.getElementById('shareTelegram').href = `https://t.me/share/url?url=${encUrl}&text=${encMsg}`;
-      document.getElementById('shareEmail').href = `mailto:?subject=${encodeURIComponent('Learn Mandarin with Trees Pinyin')}&body=${encMsg}`;
-
-      document.getElementById('shareAppModal').style.display = 'flex';
-    }
-
-    async function triggerNativeSystemShare() {
-      const msg = getShareMessage();
-      if (navigator.share) {
-        try {
-          await navigator.share({
-            title: 'Trees Pinyin',
-            text: msg,
-            url: 'https://www.treespinyin.com'
-          });
-        } catch (e) {}
-      } else {
-        copyShareTextOnly();
-      }
-    }
-
-    function copyShareTextOnly() {
-      navigator.clipboard.writeText(getShareMessage()).catch(() => {});
-      alert(currentLang === 'en' ? 'Copied! Paste it in WeChat, iMessage, or any app to share with friends.' : '已複製分享口令！請打開微信、iMessage 或任意 App 貼上發送給朋友。');
-    }
-
-    function handleActivateFriendCode() {
-      const code = (document.getElementById('friendCodeInput').value || '').trim().toUpperCase();
-      if (!/^PIN[A-Z0-9]{4}$/.test(code)) {
-        document.getElementById('rewardStatusMsg').innerText = '⚠️ Please enter a valid 7-character referral code starting with PIN (e.g. PIN5A3D).';
-        return;
-      }
-      unlockState.rateUnlocked = true;
-      unlockState.shareUnlocked = true;
-      localStorage.setItem('tp_rate_unlocked', 'true');
-      localStorage.setItem('tp_share_unlocked', 'true');
-      document.getElementById('rewardStatusMsg').innerText = `🎉 Friend code ${code} activated! All Mnemonic Packs unlocked!`;
-      document.getElementById('packSelect').value = '3';
-      renderMnemonicsPack();
-    }
-
-    function renderMnemonicsPack() {
-      const selEl = document.getElementById('packSelect');
-      if (!selEl) return;
-      const packId = parseInt(selEl.value, 10) || 1;
-      const packs = EXACT_BOOK_MNEMONICS.packs;
-      const currentPack = packs.find(p => p.packId === packId) || packs[0];
-      const grid = document.getElementById('mnemonicCardsContainer');
-      const lockedBox = document.getElementById('mnemonicLockedBox');
-      if (!grid || !lockedBox) return;
-      grid.innerHTML = '';
-
-      const isLocked = (packId === 2 && !unlockState.rateUnlocked) || (packId === 3 && !unlockState.shareUnlocked);
-      if (isLocked) {
-        grid.classList.add('hidden');
-        lockedBox.classList.remove('hidden');
-        const actionBtn = packId === 2
-          ? `<button class="btn btn-green" style="margin-top:10px;" onclick="handleRateUnlock()">⭐ Click Here to Rate 5-Stars & Unlock Pack 2</button>`
-          : `<button class="btn btn-green" style="margin-top:10px;" onclick="openShareAppModal()">📤 Click Here to Share via App & Unlock Pack 3</button>`;
-        lockedBox.innerHTML = `<h3 style="margin:0 0 8px 0; color:#bf360c;">🔒 ${currentPack.title}</h3><p style="margin:0; font-size:0.9rem; color:#333;">Unlock 15 book mnemonic cards instantly with 1 click:</p>${actionBtn}`;
-        return;
-      }
-
-      lockedBox.classList.add('hidden');
-      grid.classList.remove('hidden');
-      currentPack.cards.slice(0, 15).forEach((card, i) => {
-        const el = document.createElement('div');
-        el.className = 'mnemonic-card';
-        el.style.cursor = 'pointer';
-        el.title = '🔊 Left-click to speak Chinese';
-        el.addEventListener('click', () => speakSingleChar(card.hanzi.split('/')[0].trim()));
-        el.innerHTML = `
-          <div class="mc-top">
-            <div class="mc-meaning">#${i + 1} ${card.meaning}</div>
-            <div style="display:flex; justify-content:space-between; width:100%; align-items:baseline;">
-              <span class="mc-trees"><i><b>${card.trees}</b></i></span>
-              <span class="mc-hanzi">🔊 (${card.hanzi} / ${card.pinyin})</span>
-            </div>
-          </div>
-          <div class="mc-sound"><b>Sound:</b> ${card.sound}</div>
-          <div class="mc-tip"><b>Mnemonic:</b> ${card.mnemonic}</div>
-        `;
-        grid.appendChild(el);
-      });
-    }
-
-    // =========================================================================
-    // 0.2 三級極速快取系統：第 1 級（內建經典題庫）+ 第 2 級（本地 localStorage）
-    // =========================================================================
-    const BUILTIN_QA_CACHE = {
-      "咏鹅": "《詠鵝》駱賓王 (Ode to the Goose by Luo Binwang)\n鵝，鵝，鵝， ||| Goose, goose, goose,\n曲項向天歌。 ||| You bend your neck and sing to the sky.\n白毛浮綠水， ||| Your white feathers float on the emerald water,\n紅掌撥清波。 ||| Your red webbed feet paddle the clear waves.",
-      "静夜思": "《靜夜思》李白 (Quiet Night Thought by Li Bai)\n床前明月光， ||| Before my bed, the bright moonlight shines,\n疑是地上霜。 ||| I wonder if it is frost upon the ground.\n舉頭望明月， ||| I raise my head to gaze at the bright moon,\n低頭思故鄉。 ||| And lower my head, longing for my hometown.",
-      "春晓": "《春曉》孟浩然 (Spring Morning by Meng Haoran)\n春眠不覺曉， ||| In spring sleep, I am unaware of the dawn,\n處處聞啼鳥。 ||| Everywhere I hear the singing of birds.\n夜來風雨聲， ||| Last night came the sound of wind and rain,\n花落知多少。 ||| Who knows how many blossoms have fallen."
-    };
-
-    function normalizeCacheKey(rawQ) {
-      if (!rawQ) return '';
-      return rawQ
-        .toLowerCase()
-        .replace(/請背誦|请背诵|背誦|背诵|唐詩|唐诗|古詩|古诗|並給出簡短解釋|并给出简短解释|是什麼|是什么/g, '')
-        .replace(/[\s,.?!，。？！、：:；;《》〈〉"“”'‘’()（）]/g, '')
-        .replace(/詠/g, '咏')
-        .replace(/鵝/g, '鹅')
-        .replace(/靜/g, '静')
-        .replace(/曉/g, '晓')
-        .slice(0, 100);
-    }
-
-    function getLocalCachedAnswer(q) {
-      const k = normalizeCacheKey(q);
-      if (!k) return '';
-      if (BUILTIN_QA_CACHE[k]) return BUILTIN_QA_CACHE[k];
-      try {
-        const store = JSON.parse(localStorage.getItem('tp_local_qa_cache_v2') || '{}');
-        return store[k] || '';
-      } catch (e) {
-        return '';
-      }
-    }
-
-    function saveLocalCachedAnswer(q, ans) {
-      const k = normalizeCacheKey(q);
-      if (!k || !ans) return;
-      try {
-        const store = JSON.parse(localStorage.getItem('tp_local_qa_cache_v2') || '{}');
-        const keys = Object.keys(store);
-        if (keys.length > 150) delete store[keys[0]];
-        store[k] = ans;
-        localStorage.setItem('tp_local_qa_cache_v2', JSON.stringify(store));
-      } catch (e) {}
-    }
-
-    // =========================================================================
-    // 0.3 中英文雙語介面字典
-    // =========================================================================
-    let currentLang = 'en';
     let backupKey = (localStorage.getItem('tp_v22_backup_key') || localStorage.getItem('tp_test_gemini_key') || '').trim();
     let availableFastModels = [
       'gemini-flash-lite-latest',
       'gemini-3.5-flash-lite',
-      'gemini-flash-latest'
+      'gemini-flash-latest',
+      'gemini-2.5-flash'
     ];
 
-    const UI_TEXT = {
-      en: {
-        subTitle: "Fast AI Q&A · Instant Docs/PDF/Photo Translator · Read English, Speak Chinese",
-        tabWorkspace: "✨ AI & File Translator",
-        tabMnemonics: "🧠 Book Mnemonic Cards (15/Pack)",
-        moreRes: "📚 More Resources",
-        menuAbout: "📖 About & 63 Rules Guide",
-        menuCards: "🧠 Book Mnemonic Cards (45 Words)",
-        menuGames: "🎮 Mini Games",
-        menuContact: "✉️ Contact & Support",
-        langBtn: "中文",
-        keyBtn: "🔑 API Key",
-        installBtnText: "Install",
-        loginBtnText: "👨‍🏫 Login",
-        loginStudent: "🌱 Student Login (Class Code)",
-        loginTeacher: "👩‍🏫 Teacher / Parent Dashboard",
-        placeholder: "Ask AI any question, or enter/paste/drag text, PDF, Word, Google Docs link, or photo to translate...",
-        aiBtn: "✨ AI Reply & Pinyin",
-        transBtn: "📝 Translate & Pinyin",
-        speakBtn: "🔊 Speak",
-        stopSpeakBtn: "⏹️ Stop",
-        disclaimer: '<b>Tip:</b> For optimal results, use your own free Gemini API Key or paste text directly. Or switch to the keyless PWA web app at <a href="https://www.treespinyin.com/app" target="_blank" style="color: var(--accent); font-weight: 700; text-decoration: underline;">www.treespinyin.com/app</a> (may be slower due to API limits). The author assumes no liability for the accuracy. Your support and shares will help me go full-time to make improvements and write a memory dictionary in the future!',
-        hintSpeak: "🔊 Left-click character to speak",
-        hintEdit: "✍️ Right-click to edit polyphone",
-        bigBtn: "🖥️ Big Screen",
-        saveBtn: "💾 Save Photo",
-        printBtn: "🖨️ Print / PDF",
-        exitBig: "✕ Exit Fullscreen",
-        emptyPlaceholder: "Enter text, upload a PDF/Word/Photo, or click \"✨ AI Reply & Pinyin\" above to see instant Trees Pinyin annotations here.",
-        installTitle: "Install Trees Pinyin to Desktop / Home Screen",
-        installSteps: '<b>📱 iPhone & iPad (Safari):</b><br>1. Open <span style="color:#1b5e20; font-weight:700;">treespinyin.com</span> in <b>Safari</b>.<br>2. Tap the <b>Share button [📤]</b> → <b>"Add to Home Screen [➕]"</b>.<br><br><b>💻 Mac (Safari / Chrome / Edge):</b><br>• <b>Mac Safari:</b> Click <b>File</b> in top menu bar → <b>"Add to Dock..."</b><br>• <b>Chrome / Edge:</b> Click the <b>Install icon [⊕]</b> on the right side of the address bar.',
-        gotItBtn: "Got It",
-        keyTitle: "🔑 Google Gemini API Key",
-        keyDesc: '<b>Cloudflare High-Speed AI & Global Cache are active by default!</b><br>Enter your own free Google Gemini API Key (stored locally in your browser) or switch to www.treespinyin.com/app in Safari:<br><a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:#1565c0; font-weight:700;">Get Free Key at Google AI Studio ↗</a>',
-        fileMenuTitle: "📁 File & Camera Options",
-        optDocTitle: "📄 Upload File (PDF / Word / Docs / TXT)",
-        optDocSub: "100% Client-side instant extraction & Pinyin",
-        optCamTitle: "📷 Camera & Photo Library",
-        optCamSub: "Recognize text or objects from photos",
-        fileMenuCancel: "Cancel"
-      },
-      zh: {
-        subTitle: "極速 AI 問答 · 文檔/PDF/照片秒速翻譯注音 · 像讀英語一樣開口說中文",
-        tabWorkspace: "✨ AI 問答與文件翻譯",
-        tabMnemonics: "🧠 原書記憶閃卡 (15字/包)",
-        moreRes: "📚 更多資源",
-        menuAbout: "📖 關於我們與 63 條拼讀規則",
-        menuCards: "🧠 原書記憶閃卡 (45核心詞)",
-        menuGames: "🎮 趣味小遊戲 (Mini Games)",
-        menuContact: "✉️ 聯絡我們與支持",
-        langBtn: "English",
-        keyBtn: "🔑 API Key",
-        installBtnText: "安裝桌面",
-        loginBtnText: "👨‍🏫 登錄",
-        loginStudent: "🌱 學生端入口 (輸入班級碼)",
-        loginTeacher: "👩‍🏫 教師 / 家長管理後台",
-        placeholder: "向 AI 提問，或輸入/貼上/拖入文字、PDF、Word、Google Docs 連結或照片直接翻譯注音...",
-        aiBtn: "✨ AI 回答並注音",
-        transBtn: "📝 翻譯並注音",
-        speakBtn: "🔊 朗讀",
-        stopSpeakBtn: "⏹️ 停止",
-        disclaimer: '<b>提示：</b>為獲得最佳體驗，建議使用您自己的免費 Gemini API Key 或直接貼上文字。也可切換至免 Key 手機網頁版 <a href="https://www.treespinyin.com/app" target="_blank" style="color: var(--accent); font-weight: 700; text-decoration: underline;">www.treespinyin.com/app</a>（受 API 限制可能較慢）。作者對拼音結果準確性不承擔法律責任。您的支持與分享將幫助作者全職投入改進與編寫記憶字典！',
-        hintSpeak: "🔊 左鍵點擊漢字發音",
-        hintEdit: "✍️ 右鍵點擊修改多音字",
-        bigBtn: "🖥️ 全屏大字",
-        saveBtn: "💾 保存圖片",
-        printBtn: "🖨️ 列印 / PDF",
-        exitBig: "✕ 退出全螢幕",
-        emptyPlaceholder: "請在上方輸入文字、上傳 PDF/Word/照片，或點擊「✨ AI 回答並注音」，此處將立即生成雙語自然拼讀注音。",
-        installTitle: "安裝 Trees Pinyin 到手機主屏幕 / Mac 桌面",
-        installSteps: '<b>📱 iPhone 與 iPad (必須用 Safari 瀏覽器)：</b><br>1. 用 <b>Safari</b> 打開 <span style="color:#1b5e20; font-weight:700;">treespinyin.com</span>。<br>2. 點擊底部 <b>分享按鈕 [📤]</b> → 選擇 <b>「加入主畫面 [➕]」</b>。<br><br><b>💻 Mac 電腦 (Safari / Chrome / Edge)：</b><br>• <b>Mac Safari：</b>點擊頂部選單「檔案 (File)」→ <b>「加入程序塢 (Add to Dock...)」</b><br>• <b>Chrome / Edge：</b>點擊網址列右側的 <b>安裝圖標 [⊕]</b> 即可安裝到桌面。',
-        gotItBtn: "知道了",
-        keyTitle: "🔑 Google Gemini API Key",
-        keyDesc: '<b>預設已啟用 Cloudflare 極速 AI 與全網共享快取！</b><br>若查詢量較大或遇訪問高峰，可在下方填入您免費的個人 Google Gemini Key（僅保存在您的瀏覽器本地）：<br><a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:#1565c0; font-weight:700;">點此前往 Google AI Studio 免費領取 Key ↗</a>',
-        fileMenuTitle: "📁 文件上傳與拍照識別",
-        optDocTitle: "📄 上傳文件 (PDF / Word / Docs / TXT)",
-        optDocSub: "100% 用戶端本地秒讀提取文字，0 伺服器延遲",
-        optCamTitle: "📷 拍照或從圖庫選圖",
-        optCamSub: "識別照片中的短文字、菜單或單個物品",
-        fileMenuCancel: "取消"
-      }
-    };
-
-    function toggleLang() {
-      currentLang = currentLang === 'en' ? 'zh' : 'en';
-      const t = UI_TEXT[currentLang];
-      document.getElementById('uiSubTitle').innerText = t.subTitle;
-      document.getElementById('uiTabWorkspace').innerText = t.tabWorkspace;
-      document.getElementById('uiTabMnemonics').innerText = t.tabMnemonics;
-      document.getElementById('uiMoreRes').innerText = t.moreRes;
-      document.getElementById('uiMenuAbout').innerText = t.menuAbout;
-      document.getElementById('uiMenuCards').innerText = t.menuCards;
-      document.getElementById('uiMenuGames').innerText = t.menuGames;
-      document.getElementById('uiMenuContact').innerText = t.menuContact;
-      document.getElementById('uiLangBtn').innerText = t.langBtn;
-      document.getElementById('uiKeyBtn').innerText = t.keyBtn;
-      document.getElementById('uiInstallBtnText').innerText = t.installBtnText;
-      document.getElementById('uiLoginBtnText').innerText = t.loginBtnText;
-      document.getElementById('uiLoginStudent').innerText = t.loginStudent;
-      document.getElementById('uiLoginTeacher').innerText = t.loginTeacher;
-      document.getElementById('userInput').placeholder = t.placeholder;
-      document.getElementById('uiAIBtn').innerText = t.aiBtn;
-      document.getElementById('uiTransBtn').innerText = t.transBtn;
-      if (!isSpeakingNow) document.getElementById('speakBtn').innerText = t.speakBtn;
-      document.getElementById('uiDisclaimer').innerHTML = t.disclaimer;
-      document.getElementById('uiHintSpeak').innerText = t.hintSpeak;
-      document.getElementById('uiHintEdit').innerText = t.hintEdit;
-      document.getElementById('uiBigBtn').innerText = t.bigBtn;
-      document.getElementById('uiSaveBtn').innerText = t.saveBtn;
-      document.getElementById('uiPrintBtn').innerText = t.printBtn;
-      document.getElementById('uiExitBig').innerText = t.exitBig;
-      document.getElementById('emptyPlaceholder').innerText = t.emptyPlaceholder;
-      document.getElementById('uiInstallTitle').innerText = t.installTitle;
-      document.getElementById('uiInstallSteps').innerHTML = t.installSteps;
-      document.getElementById('uiGotItBtn').innerText = t.gotItBtn;
-      document.getElementById('uiKeyTitle').innerText = t.keyTitle;
-      document.getElementById('uiKeyDesc').innerHTML = t.keyDesc;
-      document.getElementById('uiFileMenuTitle').innerText = t.fileMenuTitle;
-      document.getElementById('uiOptDocTitle').innerText = t.optDocTitle;
-      document.getElementById('uiOptDocSub').innerText = t.optDocSub;
-      document.getElementById('uiOptCamTitle').innerText = t.optCamTitle;
-      document.getElementById('uiOptCamSub').innerText = t.optCamSub;
-      document.getElementById('uiFileMenuCancel').innerText = t.fileMenuCancel;
-    }
-
-    // =========================================================================
-    // 0.4 四排顯示控制、字體滑塊、版面與列印標題
-    // =========================================================================
-    function updateRowVisibility() {
-      const card = document.getElementById('sheetCard');
-      card.classList.toggle('hide-en', !document.getElementById('chkEn').checked);
-      card.classList.toggle('hide-tp', !document.getElementById('chkTp').checked);
-      card.classList.toggle('hide-std', !document.getElementById('chkStd').checked);
-      card.classList.toggle('hide-zh', !document.getElementById('chkZh').checked);
-    }
-
-    function updateFontSize(val) {
-      document.getElementById('fontValDisplay').innerText = val + 'px';
-      document.getElementById('sheetCard').style.setProperty('--user-font-size', val + 'px');
-    }
-
-    function updateLayoutMode() {
-      const mode = document.getElementById('layoutSelect').value;
-      const card = document.getElementById('sheetCard');
-      card.classList.toggle('align-left', mode === 'left');
-    }
-
-    function updatePrintTitle(val) {
-      const el = document.getElementById('printHeaderTitle');
-      const v = (val || '').trim();
-      el.innerText = v;
-      el.classList.toggle('has-title', Boolean(v));
-      el.style.display = v ? 'block' : 'none';
-    }
-
-    // =========================================================================
-    // 0.5 極速多模型自動探測 + Cloudflare KV 全網共享快取 + 個人 Key 雙軌競速
-    // =========================================================================
     function refreshKeyBtnStyle() {
       const btn = document.getElementById('uiKeyBtn');
-      if (backupKey) btn.classList.add('has-key');
-      else btn.classList.remove('has-key');
+      if (btn) btn.classList.toggle('has-key', Boolean(backupKey));
     }
     refreshKeyBtnStyle();
 
@@ -1543,32 +566,16 @@
         const all = (data.models || [])
           .filter(m => (m.supportedGenerationMethods || []).includes('generateContent'))
           .map(m => m.name.replace('models/', ''))
-          .filter(n => !n.includes('tts') && !n.includes('image') && !n.includes('embedding') && !n.includes('veo') && !n.includes('robotics'));
+          .filter(n => !n.includes('tts') && !n.includes('image') && !n.includes('embedding') && !n.includes('veo'));
 
-        const priority = [
-          'gemini-flash-lite-latest',
-          'gemini-3.5-flash-lite',
-          'gemini-flash-latest',
-          'gemini-3.5-flash',
-          'gemini-2.5-flash',
-          'gemini-3.8-flash'
-        ];
+        const priority = ['gemini-flash-lite-latest', 'gemini-3.5-flash-lite', 'gemini-flash-latest', 'gemini-3.5-flash', 'gemini-2.5-flash'];
         const sorted = [];
-        for (const p of priority) {
-          if (all.includes(p)) sorted.push(p);
-        }
-        for (const m of all) {
-          if (m.includes('flash') && !sorted.includes(m)) sorted.push(m);
-        }
-        if (sorted.length > 0) {
-          availableFastModels = sorted;
-        }
+        for (const p of priority) { if (all.includes(p)) sorted.push(p); }
+        for (const m of all) { if (m.includes('flash') && !sorted.includes(m)) sorted.push(m); }
+        if (sorted.length > 0) availableFastModels = sorted;
       } catch (e) {}
     }
-
-    if (backupKey) {
-      discoverFastModels(backupKey);
-    }
+    if (backupKey) discoverFastModels(backupKey);
 
     function openKeyModal() {
       document.getElementById('apiKeyInput').value = backupKey;
@@ -1596,7 +603,44 @@
       refreshKeyBtnStyle();
     }
 
-    function fetchWithTimeout(url, options = {}, timeoutMs = 8000) {
+    const BUILTIN_QA_CACHE = {
+      "咏鹅": "《詠鵝》駱賓王 (Ode to the Goose by Luo Binwang)\n鵝，鵝，鵝， ||| Goose, goose, goose,\n曲項向天歌。 ||| You bend your neck and sing to the sky.\n白毛浮綠水， ||| Your white feathers float on the emerald water,\n紅掌撥清波。 ||| Your red webbed feet paddle the clear waves.",
+      "静夜思": "《靜夜思》李白 (Quiet Night Thought by Li Bai)\n床前明月光， ||| Before my bed, the bright moonlight shines,\n疑是地上霜。 ||| I wonder if it is frost upon the ground.\n舉頭望明月， ||| I raise my head to gaze at the bright moon,\n低頭思故鄉。 ||| And lower my head, longing for my hometown.",
+      "春晓": "《春曉》孟浩然 (Spring Morning by Meng Haoran)\n春眠不覺曉， ||| In spring sleep, I am unaware of the dawn,\n處處聞啼鳥。 ||| Everywhere I hear the singing of birds.\n夜來風雨聲， ||| Last night came the sound of wind and rain,\n花落知多少。 ||| Who knows how many blossoms have fallen."
+    };
+
+    function normalizeCacheKey(rawQ) {
+      if (!rawQ) return '';
+      return rawQ.toLowerCase()
+        .replace(/請背誦|请背诵|背誦|背诵|唐詩|唐诗|古詩|古诗|並給出簡短解釋|并给出简短解释|是什麼|是什么/g, '')
+        .replace(/[\s,.?!，。？！、：:；;《》〈〉"“”'‘’()（）]/g, '')
+        .replace(/詠/g, '咏').replace(/鵝/g, '鹅').replace(/靜/g, '静').replace(/曉/g, '晓')
+        .slice(0, 100);
+    }
+
+    function getLocalCachedAnswer(q) {
+      const k = normalizeCacheKey(q);
+      if (!k) return '';
+      if (BUILTIN_QA_CACHE[k]) return BUILTIN_QA_CACHE[k];
+      try {
+        const store = JSON.parse(localStorage.getItem('tp_local_qa_cache_v2') || '{}');
+        return store[k] || '';
+      } catch (e) { return ''; }
+    }
+
+    function saveLocalCachedAnswer(q, ans) {
+      const k = normalizeCacheKey(q);
+      if (!k || !ans) return;
+      try {
+        const store = JSON.parse(localStorage.getItem('tp_local_qa_cache_v2') || '{}');
+        const keys = Object.keys(store);
+        if (keys.length > 150) delete store[keys[0]];
+        store[k] = ans;
+        localStorage.setItem('tp_local_qa_cache_v2', JSON.stringify(store));
+      } catch (e) {}
+    }
+
+    function fetchWithTimeout(url, options = {}, timeoutMs = 8500) {
       const ctrl = new AbortController();
       const timer = setTimeout(() => ctrl.abort(), timeoutMs);
       return fetch(url, { ...options, signal: ctrl.signal }).finally(() => clearTimeout(timer));
@@ -1609,58 +653,38 @@
         const mime = dataUrl.substring(dataUrl.indexOf(':') + 1, dataUrl.indexOf(';'));
         parts.push({ inline_data: { mime_type: mime, data: dataUrl.split(',')[1] } });
       }
-
       let r = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents: [{ parts }],
-          generationConfig: {
-            temperature: 0.15,
-            thinkingConfig: { thinkingBudget: 0 }
-          }
+          generationConfig: { temperature: 0.15, thinkingConfig: { thinkingBudget: 0 } }
         }),
         signal
       });
-
       if (r.status === 400) {
         r = await fetch(url, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ parts }],
-            generationConfig: { temperature: 0.15 }
-          }),
+          body: JSON.stringify({ contents: [{ parts }], generationConfig: { temperature: 0.15 } }),
           signal
         });
       }
-
       const d = await r.json();
       if (!r.ok) throw new Error(d?.error?.message || `HTTP ${r.status}`);
-
       const resParts = d?.candidates?.[0]?.content?.parts || [];
-      const text = resParts
-        .filter(p => !p.thought && typeof p.text === 'string')
-        .map(p => p.text)
-        .join('')
-        .trim();
-
+      const text = resParts.filter(p => !p.thought && typeof p.text === 'string').map(p => p.text).join('').trim();
       if (!text) throw new Error('EMPTY');
       return text;
     }
 
     async function fetchFastAccurateAI(promptText, dataUrl = null, rawQuestionForCache = '') {
       const cleanCacheKey = normalizeCacheKey(rawQuestionForCache);
-
       const workerTasks = CF_WORKER_ENDPOINTS.map(async (ep) => {
         const r = await fetchWithTimeout(ep, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            prompt: promptText,
-            image: dataUrl,
-            cacheKey: cleanCacheKey
-          })
+          body: JSON.stringify({ prompt: promptText, image: dataUrl, cacheKey: cleanCacheKey })
         }, 8500);
         if (!r.ok) throw new Error('worker_err');
         const d = await r.json();
@@ -1672,7 +696,6 @@
       if (backupKey) {
         const modelsToRace = availableFastModels.slice(0, 3);
         const controllers = modelsToRace.map(() => new AbortController());
-
         const keyTasks = modelsToRace.map((mName, idx) =>
           callSingleGeminiModelFast(mName, promptText, dataUrl, controllers[idx].signal)
             .then(txt => {
@@ -1680,240 +703,199 @@
               return txt;
             })
         );
-
-        try {
-          return await Promise.any([...keyTasks, ...workerTasks]);
-        } catch (e) {
-          return '';
-        }
+        try { return await Promise.any([...keyTasks, ...workerTasks]); } catch (e) { return ''; }
       }
-
-      try {
-        return await Promise.any(workerTasks);
-      } catch (e) {
-        return '';
-      }
+      try { return await Promise.any(workerTasks); } catch (e) { return ''; }
     }
 
     // =========================================================================
-    // 0.6 客戶端本地讀取 PDF / Word / TXT / 拖拽文件
+    // 1. Clear Female Mandarin Voice Engine (Excludes Male Voices)
     // =========================================================================
-    function openFileMenuModal() {
-      document.getElementById('fileMenuModal').style.display = 'flex';
-    }
-    function triggerDocUpload() {
-      document.getElementById('fileMenuModal').style.display = 'none';
-      document.getElementById('docFileInput').click();
-    }
-    function openCameraNoticeModal() {
-      document.getElementById('fileMenuModal').style.display = 'none';
-      document.getElementById('cameraNoticeModal').style.display = 'flex';
-    }
-    function triggerGalleryPick() {
-      document.getElementById('cameraNoticeModal').style.display = 'none';
-      document.getElementById('galleryInput').click();
-    }
-    function triggerDirectCamera() {
-      document.getElementById('cameraNoticeModal').style.display = 'none';
-      document.getElementById('cameraInput').click();
-    }
+    let femaleZhVoices = [];
+    let selectedVoiceObj = null;
 
-    const dropZone = document.getElementById('dropZone');
-    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.style.borderColor = '#1b5e20'; });
-    dropZone.addEventListener('dragleave', () => { dropZone.style.borderColor = ''; });
-    dropZone.addEventListener('drop', (e) => {
-      e.preventDefault();
-      dropZone.style.borderColor = '';
-      if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-        const f = e.dataTransfer.files[0];
-        if (f.type.startsWith('image/')) {
-          handlePhotoUpload({ files: [f], value: '' });
-        } else {
-          handleDocFileUpload({ files: [f], value: '' });
-        }
-      }
-    });
+    function loadAndFilterFemaleVoices() {
+      if (!('speechSynthesis' in window)) return;
+      const all = window.speechSynthesis.getVoices();
+      const zhAll = all.filter(v => /zh|cmn|chi/i.test(v.lang) || /chinese|mandarin|taiwan|hong kong/i.test(v.name));
+      const maleKeywords = ['male', 'kangkang', 'yunxi', 'yunjian', 'yunyang', 'danny', 'wanlung'];
+      femaleZhVoices = zhAll.filter(v => !maleKeywords.some(m => v.name.toLowerCase().includes(m)));
+      if (femaleZhVoices.length === 0) femaleZhVoices = zhAll;
 
-    function loadScriptDynamic(src) {
-      return new Promise((resolve, reject) => {
-        if (document.querySelector(`script[src="${src}"]`)) return resolve();
-        const s = document.createElement('script');
-        s.src = src;
-        s.onload = resolve;
-        s.onerror = reject;
-        document.head.appendChild(s);
+      const priorityOrder = ['xiaoxiao', 'hsiaochen', 'meijia', 'ting-ting', 'tingting', 'sin-ji', 'google 國語', 'google 普通話', 'female'];
+      femaleZhVoices.sort((a, b) => {
+        const aScore = priorityOrder.findIndex(k => a.name.toLowerCase().includes(k));
+        const bScore = priorityOrder.findIndex(k => b.name.toLowerCase().includes(k));
+        return (aScore === -1 ? 99 : aScore) - (bScore === -1 ? 99 : bScore);
       });
-    }
 
-    async function extractPdfTextFast(file) {
-      await loadScriptDynamic('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js');
-      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-      const buf = await file.arrayBuffer();
-      const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
-      let out = [];
-      const maxPages = Math.min(pdf.numPages, 20);
-      for (let i = 1; i <= maxPages; i++) {
-        const page = await pdf.getPage(i);
-        const tc = await page.getTextContent();
-        const pageStr = tc.items.map(item => item.str).join(' ');
-        if (pageStr.trim()) out.push(pageStr.trim());
+      const sel = document.getElementById('voiceSelect');
+      if (sel && femaleZhVoices.length > 0) {
+        sel.innerHTML = femaleZhVoices.map((v, i) => `<option value="${i}">👩 ${v.name} (${v.lang})</option>`).join('');
+        selectedVoiceObj = femaleZhVoices[0];
       }
-      return out.join('\n');
+    }
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.onvoiceschanged = loadAndFilterFemaleVoices;
+      setTimeout(loadAndFilterFemaleVoices, 200);
     }
 
-    async function extractWordTextFast(file) {
-      await loadScriptDynamic('https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js');
-      const buf = await file.arrayBuffer();
-      const res = await mammoth.extractRawText({ arrayBuffer: buf });
-      return (res.value || '').trim();
-    }
-
-    async function handleDocFileUpload(input) {
-      if (!input.files || !input.files[0]) return;
-      const file = input.files[0];
-      const name = (file.name || '').toLowerCase();
-      input.value = '';
-
-      prepareOutputCanvas();
-      const replyBox = document.getElementById('aiReplyBox');
-      replyBox.style.display = 'block';
-      replyBox.innerText = currentLang === 'en' ? `📄 Reading ${file.name} locally...` : `📄 正在本地極速讀取 ${file.name}...`;
-
-      try {
-        let extractedText = '';
-        if (name.endsWith('.pdf') || file.type === 'application/pdf') {
-          extractedText = await extractPdfTextFast(file);
-        } else if (name.endsWith('.docx') || file.type.includes('wordprocessingml')) {
-          extractedText = await extractWordTextFast(file);
-        } else {
-          extractedText = await file.text();
-          if (name.endsWith('.html') || name.endsWith('.htm')) {
-            const tmp = document.createElement('div');
-            tmp.innerHTML = extractedText;
-            extractedText = tmp.innerText || tmp.textContent || '';
-          }
-        }
-
-        const clean = (extractedText || '').trim();
-        if (!clean) {
-          replyBox.innerText = currentLang === 'en'
-            ? '⚠️ No selectable text found in this file (it may be a scanned image PDF).'
-            : '⚠️ 未能從該文件中提取到文字（可能是純圖片掃描版 PDF）。';
-          return;
-        }
-
-        const clipped = clean.slice(0, 3500);
-        document.getElementById('userInput').value = clipped;
-        await runDirectTranslate(clipped);
-      } catch (err) {
-        replyBox.innerText = currentLang === 'en'
-          ? '⚠️ Failed to read file. Please upload standard .txt, .docx, or text-based .pdf.'
-          : '⚠️ 讀取文件失敗，請確認為標準 .txt、.docx 或文字版 .pdf 文件。';
+    function onVoiceSelectChange() {
+      const idx = parseInt(document.getElementById('voiceSelect').value, 10);
+      if (femaleZhVoices[idx]) {
+        selectedVoiceObj = femaleZhVoices[idx];
+        speakSingleChar('你好');
       }
     }
 
-    // =========================================================================
-    // 1. 數字、時間、百分比與化學符號自動轉中文口語
-    // =========================================================================
-    const DIGITS_ZH = ['零','一','二','三','四','五','六','七','八','九'];
-
-    function intToChinese(numStr) {
-      let n = parseInt(numStr, 10);
-      if (isNaN(n)) return numStr;
-      if (n === 0) return '零';
-      if (n < 0) return '負' + intToChinese(String(-n));
-      if (numStr.length === 4 && n >= 1900 && n <= 2099) {
-        return numStr.split('').map(d => DIGITS_ZH[parseInt(d, 10)]).join('');
+    function speakSingleChar(text) {
+      if (!('speechSynthesis' in window) || !text) return;
+      window.speechSynthesis.cancel();
+      if (!selectedVoiceObj) loadAndFilterFemaleVoices();
+      const u = new SpeechSynthesisUtterance(text);
+      if (selectedVoiceObj) {
+        u.voice = selectedVoiceObj;
+        u.lang = selectedVoiceObj.lang;
+      } else {
+        u.lang = 'zh-TW';
       }
-      if (n < 10) return DIGITS_ZH[n];
-      if (n < 100) {
-        let ten = Math.floor(n / 10), rem = n % 10;
-        return (ten === 1 ? '十' : DIGITS_ZH[ten] + '十') + (rem > 0 ? DIGITS_ZH[rem] : '');
-      }
-      if (n < 1000) {
-        let hun = Math.floor(n / 100), rem = n % 100;
-        if (rem === 0) return DIGITS_ZH[hun] + '百';
-        if (rem < 10) return DIGITS_ZH[hun] + '百零' + DIGITS_ZH[rem];
-        return DIGITS_ZH[hun] + '百' + intToChinese(String(rem));
-      }
-      if (n < 10000) {
-        let th = Math.floor(n / 1000), rem = n % 1000;
-        if (rem === 0) return DIGITS_ZH[th] + '千';
-        if (rem < 100) return DIGITS_ZH[th] + '千零' + intToChinese(String(rem));
-        return DIGITS_ZH[th] + '千' + intToChinese(String(rem));
-      }
-      return numStr.split('').map(d => DIGITS_ZH[parseInt(d, 10)] || d).join('');
+      u.rate = 0.85;
+      u.pitch = 1.12;
+      window.speechSynthesis.speak(u);
     }
 
-    function numberToChinese(str) {
-      if (str.includes('.')) {
-        let parts = str.split('.');
-        let intPart = intToChinese(parts[0] || '0');
-        let decPart = parts[1].split('').map(d => DIGITS_ZH[parseInt(d, 10)]).join('');
-        return intPart + '點' + decPart;
+    let isSpeakingNow = false;
+    function toggleSpeak() {
+      if (!('speechSynthesis' in window)) return;
+      const btn = document.getElementById('speakBtn');
+      if (window.speechSynthesis.speaking || isSpeakingNow) {
+        window.speechSynthesis.cancel();
+        isSpeakingNow = false;
+        btn.innerText = '🔊 Speak';
+        return;
       }
-      return intToChinese(str);
-    }
+      const blocks = document.querySelectorAll('#annotationList .sentence-block');
+      let allZh = Array.from(blocks).map(b => b.dataset.zh).join('。');
+      if (!allZh) allZh = document.getElementById('userInput').value;
+      if (!allZh) return;
 
-    function expandNumbersAndSymbolsToZh(text) {
-      if (!text) return '';
-      let s = text;
-      s = s.replace(/\bH2O\b/gi, '水').replace(/\bCO2\b/gi, '二氧化碳').replace(/\bO2\b/gi, '氧氣');
-      s = s.replace(/°C|℃/g, '攝氏度').replace(/°F|℉/g, '華氏度');
-      s = s.replace(/\b(\d{1,2}):(\d{2})\b/g, (_, h, m) => intToChinese(h) + '點' + (m === '00' ? '整' : intToChinese(m) + '分'));
-      s = s.replace(/(\d+(?:\.\d+)?)\s*%/g, (_, num) => '百分之' + numberToChinese(num));
-      s = s.replace(/\$\s*(\d+(?:\.\d+)?)/g, (_, num) => numberToChinese(num) + '美元');
-      s = s.replace(/[¥￥]\s*(\d+(?:\.\d+)?)/g, (_, num) => numberToChinese(num) + '元');
-      s = s.replace(/\+/g, '加').replace(/=/g, '等於').replace(/&/g, '和');
-      s = s.replace(/\d+(?:\.\d+)?/g, (match) => numberToChinese(match));
-      return s;
+      if (!selectedVoiceObj) loadAndFilterFemaleVoices();
+      const u = new SpeechSynthesisUtterance(allZh);
+      if (selectedVoiceObj) {
+        u.voice = selectedVoiceObj;
+        u.lang = selectedVoiceObj.lang;
+      } else {
+        u.lang = 'zh-TW';
+      }
+      u.rate = 0.85;
+      u.pitch = 1.12;
+      isSpeakingNow = true;
+      btn.innerText = '⏹️ Stop';
+      u.onend = () => { isSpeakingNow = false; btn.innerText = '🔊 Speak'; };
+      u.onerror = u.onend;
+      window.speechSynthesis.speak(u);
     }
 
     // =========================================================================
-    // 2. 100% 嚴格校準 Trees Pinyin (v25) 編譯器 + 聲調符號轉換器
+    // 2. Traditional / Simplified Chinese Script Converter
+    // =========================================================================
+    const TRAD_TO_SIMP = {
+      '請':'请','問':'问','謝':'谢','再':'再','見':'见','對':'对','氣':'气','沒':'没','關':'关','係':'系',
+      '別':'别','醫':'医','生':'生','國':'国','們':'们','個':'个','來':'来','自':'自','哪':'哪','裡':'里',
+      '怎':'怎','麼':'么','買':'买','單':'单','菜':'菜','歡':'欢','愛':'爱','會':'会','說':'说','話':'话',
+      '電':'电','視':'视','聽':'听','懂':'懂','學':'学','習':'习','書':'书','寫':'写','讀':'读','認':'认',
+      '識':'识','師':'师','長':'长','開':'开','門':'门','車':'车','馬':'马','鳥':'鸟','魚':'鱼','鵝':'鹅',
+      '詠':'咏','項':'项','綠':'绿','紅':'红','撥':'拨','靜':'静','舉':'举','頭':'头','鄉':'乡','曉':'晓',
+      '覺':'觉','處':'处','聞':'闻','聲':'声','風':'风','雲':'云','發':'发','財':'财','樂':'乐','歲':'岁',
+      '時':'时','間':'间','點':'点','現':'现','錢':'钱','塊':'块','號':'号','碼':'码','機':'机','場':'场',
+      '飯':'饭','館':'馆','麵':'面','湯':'汤','雞':'鸡','豬':'猪','牛':'牛','茶':'茶','餃':'饺','飽':'饱'
+    };
+    const SIMP_TO_TRAD = {};
+    Object.keys(TRAD_TO_SIMP).forEach(t => { SIMP_TO_TRAD[TRAD_TO_SIMP[t]] = t; });
+
+    let currentScriptMode = 'trad'; // Default Traditional Chinese
+
+    function convertScript(str, mode = currentScriptMode) {
+      if (!str) return '';
+      return str.split('').map(ch => mode === 'simp' ? (TRAD_TO_SIMP[ch] || ch) : (SIMP_TO_TRAD[ch] || ch)).join('');
+    }
+
+    function switchScriptMode(mode) {
+      const chkTrad = document.getElementById('chkTrad');
+      const chkSimp = document.getElementById('chkSimp');
+      if (mode === 'trad' && chkTrad.checked) {
+        chkSimp.checked = false;
+        currentScriptMode = 'trad';
+      } else if (mode === 'simp' && chkSimp.checked) {
+        chkTrad.checked = false;
+        currentScriptMode = 'simp';
+      }
+      updateRowVisibility();
+      document.querySelectorAll('.tp-zh').forEach(el => {
+        const raw = el.dataset.raw || el.innerText;
+        el.dataset.raw = raw;
+        el.innerText = convertScript(raw, currentScriptMode);
+      });
+      renderTeacherMnemonicBank();
+    }
+
+    function quickFlipScript() {
+      const next = currentScriptMode === 'trad' ? 'simp' : 'trad';
+      document.getElementById('chkTrad').checked = (next === 'trad');
+      document.getElementById('chkSimp').checked = (next === 'simp');
+      switchScriptMode(next);
+    }
+
+    function updateRowVisibility() {
+      const card = document.getElementById('sheetCard');
+      const hideZh = !document.getElementById('chkTrad').checked && !document.getElementById('chkSimp').checked;
+      card.classList.toggle('hide-en', !document.getElementById('chkEn').checked);
+      card.classList.toggle('hide-tp', !document.getElementById('chkTp').checked);
+      card.classList.toggle('hide-std', !document.getElementById('chkStd').checked);
+      card.classList.toggle('hide-zh', hideZh);
+    }
+
+    function updateFontSize(val) {
+      document.getElementById('fontValDisplay').innerText = val + 'px';
+      document.getElementById('sheetCard').style.setProperty('--user-font-size', val + 'px');
+    }
+
+    function updateLayoutMode() {
+      const mode = document.getElementById('layoutSelect').value;
+      document.getElementById('sheetCard').classList.toggle('align-left', mode === 'left');
+    }
+
+    function toggleBigFont() {
+      document.body.classList.toggle('big-mode');
+    }
+
+    // =========================================================================
+    // 3. Trees Pinyin v25 Compiler + 3-in-1 Right-Click Editor (Hanzi + Std Pinyin + Trees Pinyin)
     // =========================================================================
     const OVERALL_16 = {
-      'zhi': '(r)ds', 'chi': '(r)ts', 'shi': '(r)s', 'ri': '(r)th',
-      'zi': 'ds', 'ci': 'ts', 'si': 's', 'yi': 'yee',
-      'wu': 'woo', 'yu': 'yee(oo)', 'ye': 'yer', 'yue': 'yee(oo)er',
-      'yuan': 'yee(oo)an', 'yin': 'yeen', 'yun': 'yee(oo)n', 'ying': 'ying'
+      'zhi': '(r)ds', 'chi': '(r)ts', 'shi': '(r)s', 'ri': '(r)th', 'zi': 'ds', 'ci': 'ts', 'si': 's', 'yi': 'yee',
+      'wu': 'woo', 'yu': 'yee(oo)', 'ye': 'yer', 'yue': 'yee(oo)er', 'yuan': 'yee(oo)an', 'yin': 'yeen', 'yun': 'yee(oo)n', 'ying': 'ying'
     };
-
     const LOCKED_MAP = {
-      'wo': 'wer', 'de': 'der', 'le': 'Ler',
-      'ren': '(r)ther-n', 'wen': 'wer-n', 'shun': 'soon', 'zun': 'dsoon',
-      'guo': 'gooer', 'o': 'oh',
-      'qi': 'tsee', 'qing': 'tsing', 'qie': 'tseer', 'qian': 'tseean', 'qiao': 'tseeaw',
-      'qiang': 'tseeang', 'qiong': 'tseer-oong', 'qu': 'tsee(oo)', 'que': 'tsee(oo)er',
-      'quan': 'tsee(oo)an', 'qun': 'tsee(oo)n', 'qin': 'tseen', 'qia': 'tseeah',
-      'xi': 'see', 'xing': 'sing', 'xie': 'seer', 'xian': 'seean', 'xiao': 'seeaw',
-      'xiang': 'seeang', 'xiong': 'seer-oong', 'xu': 'see(oo)', 'xue': 'see(oo)er',
-      'xuan': 'see(oo)an', 'xun': 'see(oo)n', 'xin': 'seen', 'xia': 'seeah',
-      'ji': 'jee', 'jing': 'jing', 'jie': 'jeer', 'jian': 'jeean', 'jiao': 'jeeaw',
-      'jiang': 'jeeang', 'jiong': 'jeer-oong', 'ju': 'jee(oo)', 'jue': 'jee(oo)er',
-      'juan': 'jee(oo)an', 'jun': 'jee(oo)n', 'jin': 'jeen', 'jia': 'jeeah',
-      'lv': 'Lee(oo)', 'lü': 'Lee(oo)', 'lve': 'Lee(oo)er', 'lüe': 'Lee(oo)er',
-      'nv': 'nee(oo)', 'nü': 'nee(oo)', 'nve': 'nee(oo)er', 'nüe': 'nee(oo)er'
+      'wo': 'wer', 'de': 'der', 'le': 'Ler', 'ren': '(r)ther-n', 'wen': 'wer-n', 'shun': 'soon', 'zun': 'dsoon',
+      'guo': 'gooer', 'o': 'oh', 'qi': 'tsee', 'qing': 'tsing', 'qie': 'tseer', 'qian': 'tseean', 'qiao': 'tseeaw',
+      'qiang': 'tseeang', 'qiong': 'tseer-oong', 'qu': 'tsee(oo)', 'que': 'tsee(oo)er', 'quan': 'tsee(oo)an',
+      'qun': 'tsee(oo)n', 'qin': 'tseen', 'qia': 'tseeah', 'xi': 'see', 'xing': 'sing', 'xie': 'seer', 'xian': 'seean',
+      'xiao': 'seeaw', 'xiang': 'seeang', 'xiong': 'seer-oong', 'xu': 'see(oo)', 'xue': 'see(oo)er', 'xuan': 'see(oo)an',
+      'xun': 'see(oo)n', 'xin': 'seen', 'xia': 'seeah', 'ji': 'jee', 'jing': 'jing', 'jie': 'jeer', 'jian': 'jeean',
+      'jiao': 'jeeaw', 'jiang': 'jeeang', 'jiong': 'jeer-oong', 'ju': 'jee(oo)', 'jue': 'jee(oo)er', 'juan': 'jee(oo)an',
+      'jun': 'jee(oo)n', 'jin': 'jeen', 'jia': 'jeeah'
     };
-
     const INITIALS = {
-      'b':'b', 'p':'p', 'm':'m', 'f':'f',
-      'd':'d', 't':'t', 'n':'n', 'l':'L',
-      'g':'g', 'k':'k', 'h':'h', 'j':'j',
-      'q':'tsee', 'x':'see',
-      'zh':'(r)ds', 'ch':'(r)ts', 'sh':'(r)s', 'r':'(r)th',
-      'z':'ds', 'c':'ts', 's':'s', 'y':'y', 'w':'w'
+      'b':'b', 'p':'p', 'm':'m', 'f':'f', 'd':'d', 't':'t', 'n':'n', 'l':'L', 'g':'g', 'k':'k', 'h':'h', 'j':'j',
+      'q':'tsee', 'x':'see', 'zh':'(r)ds', 'ch':'(r)ts', 'sh':'(r)s', 'r':'(r)th', 'z':'ds', 'c':'ts', 's':'s', 'y':'y', 'w':'w'
     };
-
     const FINALS = {
-      'a':'ah', 'o':'ooer', 'e':'er', 'i':'ee', 'u':'oo', 'v':'ee(oo)', 'ü':'ee(oo)',
-      'ai':'ie', 'ei':'ay', 'ui':'ooay', 'ao':'aw', 'ou':'oh', 'iu':'eeoh',
-      'ie':'eer', 've':'ee(oo)er', 'üe':'ee(oo)er', 'er':'(uh)-er',
-      'an':'an', 'en':'er-n', 'in':'een', 'un':'oon', 'vn':'ee(oo)n', 'ün':'ee(oo)n',
-      'ang':'ang', 'eng':'er-ng', 'ing':'ing', 'ong':'er-oong',
-      'ia':'eeah', 'ian':'eean', 'iao':'eeaw', 'iang':'eeang', 'iong':'eer-oong',
-      'ua':'ooah', 'uai':'ooie', 'uan':'ooan', 'uang':'ooang', 'uo':'ooer',
-      'van':'ee(oo)an', 'üan':'ee(oo)an'
+      'a':'ah', 'o':'ooer', 'e':'er', 'i':'ee', 'u':'oo', 'v':'ee(oo)', 'ü':'ee(oo)', 'ai':'ie', 'ei':'ay', 'ui':'ooay',
+      'ao':'aw', 'ou':'oh', 'iu':'eeoh', 'ie':'eer', 've':'ee(oo)er', 'üe':'ee(oo)er', 'er':'(uh)-er', 'an':'an', 'en':'er-n',
+      'in':'een', 'un':'oon', 'vn':'ee(oo)n', 'ün':'ee(oo)n', 'ang':'ang', 'eng':'er-ng', 'ing':'ing', 'ong':'er-oong',
+      'ia':'eeah', 'ian':'eean', 'iao':'eeaw', 'iang':'eeang', 'iong':'eer-oong', 'ua':'ooah', 'uai':'ooie', 'uan':'ooan',
+      'uang':'ooang', 'uo':'ooer', 'van':'ee(oo)an', 'üan':'ee(oo)an'
     };
 
     function compileToTreesPinyin(pyNum) {
@@ -1922,38 +904,22 @@
       if (!m) return pyNum;
       let syl = m[1].toLowerCase().replace('ü', 'v').replace('u:', 'v');
       let tone = m[2] || '';
-
       let mapped = '';
-      if (syl === 'er') {
-        mapped = (tone === '4') ? 'uh-er' : '(uh)-er';
-      } else if (OVERALL_16[syl]) {
-        mapped = OVERALL_16[syl];
-      } else if (LOCKED_MAP[syl]) {
-        mapped = LOCKED_MAP[syl];
-      } else {
+      if (syl === 'er') mapped = (tone === '4') ? 'uh-er' : '(uh)-er';
+      else if (OVERALL_16[syl]) mapped = OVERALL_16[syl];
+      else if (LOCKED_MAP[syl]) mapped = LOCKED_MAP[syl];
+      else {
         let init = '', fin = syl;
-        for (let l of ['zh', 'ch', 'sh']) {
-          if (syl.startsWith(l)) { init = l; fin = syl.slice(2); break; }
-        }
-        if (!init && syl.length > 1 && 'bpmfdtnlgkhjqxzcsryw'.includes(syl[0])) {
-          init = syl[0]; fin = syl.slice(1);
-        }
+        for (let l of ['zh', 'ch', 'sh']) { if (syl.startsWith(l)) { init = l; fin = syl.slice(2); break; } }
+        if (!init && syl.length > 1 && 'bpmfdtnlgkhjqxzcsryw'.includes(syl[0])) { init = syl[0]; fin = syl.slice(1); }
         let mappedInit = INITIALS[init] || init;
         let mappedFin = FINALS[fin] || fin;
-
-        if (mappedInit.endsWith('ee') && mappedFin.startsWith('ee')) {
-          mapped = mappedInit + mappedFin.slice(2);
-        } else if (mappedInit.endsWith('ee') && mappedFin.startsWith('i')) {
-          mapped = mappedInit.slice(0, -2) + mappedFin;
-        } else if (init === 'y' && mappedFin.startsWith('ee')) {
-          mapped = 'y' + mappedFin;
-        } else if (init === 'w' && mappedFin.startsWith('oo')) {
-          mapped = 'w' + mappedFin;
-        } else {
-          mapped = mappedInit + mappedFin;
-        }
+        if (mappedInit.endsWith('ee') && mappedFin.startsWith('ee')) mapped = mappedInit + mappedFin.slice(2);
+        else if (mappedInit.endsWith('ee') && mappedFin.startsWith('i')) mapped = mappedInit.slice(0, -2) + mappedFin;
+        else if (init === 'y' && mappedFin.startsWith('ee')) mapped = 'y' + mappedFin;
+        else if (init === 'w' && mappedFin.startsWith('oo')) mapped = 'w' + mappedFin;
+        else mapped = mappedInit + mappedFin;
       }
-
       let toneSuffix = (tone === '2' || tone === '3' || tone === '4') ? tone : '';
       return mapped + toneSuffix;
     }
@@ -1965,171 +931,193 @@
       let s = m[1].toLowerCase().replace('v', 'ü').replace('u:', 'ü');
       const t = parseInt(m[2] || '5', 10);
       if (t < 1 || t > 4) return s;
-      const marks = {
-        a: ['ā','á','ǎ','à'], e: ['ē','é','ě','è'], i: ['ī','í','ǐ','ì'],
-        o: ['ō','ó','ǒ','ò'], u: ['ū','ú','ǔ','ù'], ü: ['ǖ','ǘ','ǚ','ǜ']
-      };
+      const marks = { a:['ā','á','ǎ','à'], e:['ē','é','ě','è'], i:['ī','í','ǐ','ì'], o:['ō','ó','ǒ','ò'], u:['ū','ú','ǔ','ù'], ü:['ǖ','ǘ','ǚ','ǜ'] };
       if (s.includes('a')) return s.replace('a', marks.a[t-1]);
       if (s.includes('e')) return s.replace('e', marks.e[t-1]);
       if (s.includes('ou')) return s.replace('o', marks.o[t-1]);
-      for (let i = s.length - 1; i >= 0; i--) {
-        if (marks[s[i]]) return s.slice(0, i) + marks[s[i]][t-1] + s.slice(i + 1);
-      }
+      for (let i = s.length - 1; i >= 0; i--) { if (marks[s[i]]) return s.slice(0, i) + marks[s[i]][t-1] + s.slice(i + 1); }
       return s;
     }
 
-    const CUSTOM_POLYPHONES = {
-      "銀行": "yin2 hang2", "银行": "yin2 hang2", "行業": "hang2 ye4", "行业": "hang2 ye4", "一行": "yi4 hang2",
-      "便宜": "pian2 yi5", "方便": "fang1 bian4",
-      "音樂": "yin1 yue4", "音乐": "yin1 yue4", "快樂": "kuai4 le4", "快乐": "kuai4 le4",
-      "看著": "kan4 zhe5", "看着": "kan4 zhe5", "著急": "zhao2 ji2", "着急": "zhao2 ji2", "睡著": "shui4 zhao2", "睡着": "shui4 zhao2",
-      "長大": "zhang3 da4", "长大": "zhang3 da4", "長城": "chang2 cheng2", "长城": "chang2 cheng2", "多長": "duo1 chang2", "多长": "duo1 chang2",
-      "了解": "liao3 jie3", "好了": "hao3 le5", "太好了": "tai4 hao3 le5",
-      "覺得": "jue2 de5", "觉得": "jue2 de5", "睡覺": "shui4 jiao4", "睡觉": "shui4 jiao4",
-      "重慶": "chong2 qing4", "重庆": "chong2 qing4", "重要": "zhong4 yao4",
-      "還錢": "huan2 qian2", "还钱": "huan2 qian2", "還有": "hai2 you3", "还有": "hai2 you3",
-      "食物": "shi2 wu4", "美食": "mei3 shi2",
-      "我的": "wo3 de5", "你的": "ni3 de5", "好的": "hao3 de5", "微辣": "wei1 la4", "少鹽": "shao3 yan2", "少盐": "shao3 yan2",
-      "曲項": "qu1 xiang4", "曲项": "qu1 xiang4", "朝辭": "zhao1 ci2", "朝辞": "zhao1 ci2",
-      "水調歌頭": "shui3 diao4 ge1 tou2", "水调歌头": "shui3 diao4 ge1 tou2"
-    };
+    // Custom Memory for 3-in-1 Edits
+    const userCustomEdits = JSON.parse(localStorage.getItem('tp_custom_char_edits_v2') || '{}');
+    let activeEditCol = null;
 
-    const userPolyphoneMemory = JSON.parse(localStorage.getItem('tp_polyphone_mem') || '{}');
+    function openThreeInOneEditor(colEl) {
+      activeEditCol = colEl;
+      const zhEl = colEl.querySelector('.tp-zh');
+      const stdEl = colEl.querySelector('.tp-std');
+      const tpEl = colEl.querySelector('.tp-py');
 
-    function getAccuratePinyinArray(zhText) {
-      let pyArr = pinyinPro.pinyin(zhText, { type: 'array', toneType: 'num' });
-      for (let i = 0; i < zhText.length; i++) {
-        if (userPolyphoneMemory[zhText[i]]) pyArr[i] = userPolyphoneMemory[zhText[i]];
-      }
-      for (let word in CUSTOM_POLYPHONES) {
-        let idx = zhText.indexOf(word);
-        while (idx !== -1) {
-          let fixedPys = CUSTOM_POLYPHONES[word].split(' ');
-          for (let k = 0; k < fixedPys.length; k++) {
-            pyArr[idx + k] = fixedPys[k];
-          }
-          idx = zhText.indexOf(word, idx + 1);
+      document.getElementById('editZhInput').value = zhEl ? zhEl.innerText : '';
+      document.getElementById('editStdInput').value = colEl.dataset.pynum || (stdEl ? stdEl.innerText : '');
+      document.getElementById('editTpInput').value = tpEl ? tpEl.innerText : '';
+      document.getElementById('editCharModal').style.display = 'flex';
+    }
+
+    function onEditZhOrNumChange(source) {
+      if (source === 'zh') {
+        const newCh = document.getElementById('editZhInput').value.trim();
+        if (newCh && /[\u4e00-\u9fa5]/.test(newCh)) {
+          const pyNum = pinyinPro.pinyin(newCh[0], { toneType: 'num' });
+          document.getElementById('editStdInput').value = pyNum;
+          document.getElementById('editTpInput').value = compileToTreesPinyin(pyNum);
+        }
+      } else if (source === 'std') {
+        const rawStd = document.getElementById('editStdInput').value.trim();
+        if (/^[a-züv:]+[0-5]?$/i.test(rawStd)) {
+          document.getElementById('editTpInput').value = compileToTreesPinyin(rawStd);
         }
       }
-      return pyArr;
     }
 
-    // =========================================================================
-    // 3. 漸進式極速四排渲染
-    // =========================================================================
-    function prepareOutputCanvas() {
-      document.getElementById('emptyPlaceholder').style.display = 'none';
+    function saveThreeInOneEdit() {
+      if (!activeEditCol) return;
+      const newZh = document.getElementById('editZhInput').value.trim();
+      const rawStd = document.getElementById('editStdInput').value.trim();
+      const newTp = document.getElementById('editTpInput').value.trim();
+
+      const zhEl = activeEditCol.querySelector('.tp-zh');
+      const stdEl = activeEditCol.querySelector('.tp-std');
+      const tpEl = activeEditCol.querySelector('.tp-py');
+
+      if (newZh && zhEl) {
+        zhEl.innerText = newZh;
+        zhEl.dataset.raw = convertScript(newZh, 'trad');
+      }
+      if (rawStd && stdEl) {
+        activeEditCol.dataset.pynum = rawStd;
+        stdEl.innerText = /^[a-züv:]+[1-5]$/i.test(rawStd) ? numPinyinToToneMark(rawStd) : rawStd;
+      }
+      if (newTp && tpEl) {
+        tpEl.innerText = newTp;
+      }
+
+      if (newZh) {
+        userCustomEdits[convertScript(newZh, 'trad')] = {
+          std: stdEl ? stdEl.innerText : '',
+          tp: tpEl ? tpEl.innerText : '',
+          pynum: rawStd
+        };
+        localStorage.setItem('tp_custom_char_edits_v2', JSON.stringify(userCustomEdits));
+      }
+
+      document.getElementById('editCharModal').style.display = 'none';
     }
 
-    function nextPaintTick() {
-      return new Promise(resolve => requestAnimationFrame(() => setTimeout(resolve, 10)));
-    }
-
-    function speakSingleChar(char) {
-      if (!('speechSynthesis' in window)) return;
-      window.speechSynthesis.cancel();
-      const u = new SpeechSynthesisUtterance(char);
-      u.lang = 'zh-CN';
-      u.rate = 0.85;
-      window.speechSynthesis.speak(u);
-    }
-
-    function appendSentenceProgressive(rawZhText, enTranslation = '') {
-      prepareOutputCanvas();
-      const list = document.getElementById('annotationList');
+    function createFourInOneBlock(rawZhText, enTranslation = '', highlightChars = []) {
       const block = document.createElement('div');
       block.className = 'sentence-block';
-
-      const zhText = expandNumbersAndSymbolsToZh(rawZhText);
-      block.dataset.zh = zhText;
+      const tradZh = convertScript(rawZhText, 'trad');
+      block.dataset.zh = tradZh;
+      block.dataset.en = enTranslation;
 
       const enDiv = document.createElement('div');
       enDiv.className = 'en-line';
-      const hasLockedEn = Boolean(enTranslation && enTranslation.trim());
-      enDiv.innerText = hasLockedEn ? enTranslation.trim() : '...';
+      enDiv.contentEditable = 'true';
+      enDiv.title = 'Click to edit English line';
+      enDiv.innerText = enTranslation || '...';
+      enDiv.oninput = () => { block.dataset.en = enDiv.innerText; };
       block.appendChild(enDiv);
 
       const charRow = document.createElement('div');
       charRow.className = 'char-row';
-      const pinyinList = getAccuratePinyinArray(zhText);
+      const pyArr = pinyinPro.pinyin(tradZh, { type: 'array', toneType: 'num' });
 
-      for (let i = 0; i < zhText.length; i++) {
-        const char = zhText[i];
-        const isChinese = /[\u4e00-\u9fa5]/.test(char);
-        const isPunct = /[，。！？；：、,.!?;:"'“”‘’（）()《》【】]/.test(char);
+      for (let i = 0; i < tradZh.length; i++) {
+        const ch = tradZh[i];
+        const dispCh = convertScript(ch, currentScriptMode);
         const col = document.createElement('div');
         col.className = 'tp-col';
+        if (highlightChars.includes(ch) || highlightChars.includes(dispCh)) {
+          col.classList.add('err-highlight');
+        }
 
-        if (isChinese) {
-          let pyNum = pinyinList[i] || '';
-          let tp = compileToTreesPinyin(pyNum);
-          let stdTone = numPinyinToToneMark(pyNum);
-          col.innerHTML = `<span class="tp-py">${tp}</span><span class="tp-std">${stdTone}</span><span class="tp-zh">${char}</span>`;
+        if (/[\u4e00-\u9fa5]/.test(ch)) {
+          let pyNum = pyArr[i] || '';
+          const savedCustom = userCustomEdits[ch];
+          const tpStr = savedCustom?.tp || compileToTreesPinyin(pyNum);
+          const stdStr = savedCustom?.std || numPinyinToToneMark(pyNum);
+          col.dataset.pynum = savedCustom?.pynum || pyNum;
 
-          col.onclick = function() {
-            speakSingleChar(char);
-          };
-
-          col.oncontextmenu = function(e) {
+          col.innerHTML = `
+            <span class="tp-py">${tpStr}</span>
+            <span class="tp-std">${stdStr}</span>
+            <span class="tp-zh" data-raw="${ch}">${dispCh}</span>
+          `;
+          col.onclick = () => speakSingleChar( col.querySelector('.tp-zh').innerText );
+          col.oncontextmenu = (e) => {
             e.preventDefault();
-            let edited = prompt(currentLang === 'en' ? `Edit Pinyin for "${char}" (e.g. hang2, le5):` : `修改「${char}」的拼音（如 hang2, le5）：`, pyNum);
-            if (edited && edited.trim()) {
-              pyNum = edited.trim();
-              userPolyphoneMemory[char] = pyNum;
-              localStorage.setItem('tp_polyphone_mem', JSON.stringify(userPolyphoneMemory));
-              col.querySelector('.tp-py').innerText = compileToTreesPinyin(pyNum);
-              col.querySelector('.tp-std').innerText = numPinyinToToneMark(pyNum);
-            }
+            openThreeInOneEditor(col);
           };
-        } else if (isPunct) {
-          col.innerHTML = `<span class="tp-py">${char}</span><span class="tp-std"> </span><span class="tp-zh"> </span>`;
         } else {
-          col.innerHTML = `<span class="tp-py"> </span><span class="tp-std"> </span><span class="tp-zh">${char}</span>`;
+          col.innerHTML = `<span class="tp-py">${ch}</span><span class="tp-std"> </span><span class="tp-zh"> </span>`;
         }
         charRow.appendChild(col);
       }
-
       block.appendChild(charRow);
-      list.appendChild(block);
 
-      if (!hasLockedEn) {
-        translateFast(zhText, 'zh', 'en').then(en => {
-          enDiv.innerText = en;
+      if (!enTranslation) {
+        translateFast(tradZh, 'zh', 'en').then(tr => {
+          if (tr) { enDiv.innerText = tr; block.dataset.en = tr; }
         });
       }
       return block;
     }
 
     // =========================================================================
-    // 4. 精準雙向翻譯引擎
+    // 4. 🪄 Extension-Style Floating Text Selection Popup (Translate, Annotate, Print & Speak)
+    // =========================================================================
+    let selectedPageText = '';
+    const floatingBtn = document.getElementById('selectionFloatingBtn');
+
+    document.addEventListener('mouseup', (e) => {
+      if (floatingBtn.contains(e.target)) return;
+      setTimeout(() => {
+        const sel = window.getSelection();
+        const text = (sel ? sel.toString() : '').trim();
+        if (text && text.length >= 1 && text.length <= 600) {
+          selectedPageText = text;
+          const rect = sel.getRangeAt(0).getBoundingClientRect();
+          floatingBtn.style.left = Math.max(12, Math.min(window.innerWidth - 290, rect.left + window.scrollX)) + 'px';
+          floatingBtn.style.top = Math.max(12, rect.top + window.scrollY - 46) + 'px';
+          floatingBtn.style.display = 'inline-flex';
+        } else {
+          floatingBtn.style.display = 'none';
+        }
+      }, 20);
+    });
+
+    async function handleSelectionAction(action) {
+      floatingBtn.style.display = 'none';
+      if (!selectedPageText) return;
+      if (action === 'speak') {
+        speakSingleChar(selectedPageText);
+        return;
+      }
+      switchTeacherTab('workspace');
+      document.getElementById('userInput').value = selectedPageText;
+      await runDirectTranslate(selectedPageText);
+      document.getElementById('sheetCard').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      if (action === 'print') {
+        setTimeout(() => window.print(), 500);
+      }
+    }
+
+    // =========================================================================
+    // 5. True AI Q&A & Direct Translation Engine (Ported 100% from index.html)
     // =========================================================================
     async function translateFast(text, fromLang, toLang) {
       const isZhToEn = fromLang.startsWith('zh');
       const src = isZhToEn ? 'zh-CN' : 'en';
-      const tgt = isZhToEn ? 'en' : 'zh-CN';
-
-      const tasks = [
-        fetchWithTimeout(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=${src}&tl=${tgt}&dt=t&q=${encodeURIComponent(text)}`, {}, 4000)
-          .then(r => r.json())
-          .then(d => {
-            const j = d?.[0]?.map(x => x[0]).join('');
-            if (j && j.trim() && j.trim() !== text) return j.trim();
-            throw new Error('empty');
-          }),
-        fetchWithTimeout(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${src}|${tgt}`, {}, 4500)
-          .then(r => r.json())
-          .then(d => {
-            const t = d?.responseData?.translatedText;
-            if (t && !t.includes('MYMEMORY WARNING') && t.toLowerCase() !== text.toLowerCase()) return t.trim();
-            throw new Error('empty');
-          })
-      ];
-
+      const tgt = isZhToEn ? 'en' : 'zh-TW';
       try {
-        return await Promise.any(tasks);
-      } catch (e) {
-        return text;
-      }
+        const r = await fetchWithTimeout(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=${src}&tl=${tgt}&dt=t&q=${encodeURIComponent(text)}`, {}, 4500);
+        const d = await r.json();
+        const j = d?.[0]?.map(x => x[0]).join('');
+        if (j && j.trim()) return j.trim();
+      } catch (e) {}
+      return text;
     }
 
     function cleanChineseSentence(line) {
@@ -2140,8 +1128,6 @@
         .replace(/\([^)]*[A-Za-zāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ][^)]*\)/g, '')
         .replace(/（[^）]*[A-Za-zāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ][^）]*）/g, '')
         .replace(/[A-Za-zāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ]{2,}/g, '')
-        .replace(/([，。！？；：、,.!?;:])\s*[，。！？；：、,.!?;:]+/g, '$1')
-        .replace(/^[，。！？；：、,.!?;:\s]+/, '')
         .replace(/\s+/g, '')
         .trim();
       return /[\u4e00-\u9fa5]/.test(s) ? s : '';
@@ -2154,15 +1140,12 @@
       if (parts.length < 2) return null;
 
       let zhPart = '', enPart = '';
-      if (/[\u4e00-\u9fa5]/.test(parts[0]) && !/[\u4e00-\u9fa5]/.test(parts[1])) {
+      if (/[\u4e00-\u9fa5]/.test(parts[0])) {
         zhPart = cleanChineseSentence(parts[0]) || parts[0];
         enPart = parts[1];
       } else if (/[\u4e00-\u9fa5]/.test(parts[1])) {
         enPart = parts[0];
         zhPart = cleanChineseSentence(parts[1]) || parts[1];
-      } else {
-        zhPart = cleanChineseSentence(parts[0]) || parts[0];
-        enPart = parts[1];
       }
       if (!/[\u4e00-\u9fa5]/.test(zhPart)) return null;
       return { zh: zhPart, en: enPart };
@@ -2170,6 +1153,7 @@
 
     async function renderBilingualAIOutput(aiText) {
       const replyBox = document.getElementById('aiReplyBox');
+      const list = document.getElementById('annotationList');
       const rawLines = aiText.split(/\n+/).map(l => l.trim()).filter(Boolean);
       if (rawLines.length === 0) return false;
 
@@ -2179,7 +1163,6 @@
         replyBox.style.display = 'block';
         replyBox.innerHTML = `<b>${headerLine}</b>`;
         startIdx = 1;
-        await nextPaintTick();
       } else {
         replyBox.style.display = 'none';
       }
@@ -2189,115 +1172,27 @@
         const pair = parseBilingualPairLine(rawLines[i]);
         if (pair) {
           renderedPairs++;
-          appendSentenceProgressive(pair.zh, pair.en);
-          await nextPaintTick();
+          list.appendChild(createFourInOneBlock(pair.zh, pair.en));
         } else {
           const fallbackZh = cleanChineseSentence(rawLines[i]);
           if (fallbackZh) {
             renderedPairs++;
-            appendSentenceProgressive(fallbackZh, '');
-            await nextPaintTick();
+            list.appendChild(createFourInOneBlock(fallbackZh, ''));
           }
         }
       }
       return renderedPairs > 0;
     }
 
-    async function runDirectTranslate(inputOverride) {
-      let raw = (inputOverride !== undefined ? inputOverride : document.getElementById('userInput').value).trim();
-      if (!raw) return;
-
-      prepareOutputCanvas();
-      document.getElementById('previewImg').style.display = 'none';
-      const replyBox = document.getElementById('aiReplyBox');
-      replyBox.style.display = 'none';
-      const list = document.getElementById('annotationList');
-      list.innerHTML = '';
-
-      const gdocMatch = raw.match(/https:\/\/docs\.google\.com\/document\/d\/([a-zA-Z0-9_-]+)/);
-      if (gdocMatch) {
-        replyBox.style.display = 'block';
-        replyBox.innerText = '📄 Fetching Google Doc text...';
-        try {
-          const docId = gdocMatch[1];
-          const r = await fetch(`https://docs.google.com/document/d/${docId}/export?format=txt`);
-          if (r.ok) {
-            raw = (await r.text()).slice(0, 3500).trim();
-            replyBox.style.display = 'none';
-          }
-        } catch (e) {
-          replyBox.innerText = '⚠️ Please make sure the Google Doc is shared as "Anyone with the link can view", or copy & paste the text directly.';
-          return;
-        }
-      }
-
-      if (backupKey && raw.length <= 1800) {
-        replyBox.style.display = 'block';
-        replyBox.innerText = currentLang === 'en' ? '⚡ Translating accurately...' : '⚡ 正在精準翻譯並注音...';
-
-        const transPrompt = `Translate the following text sentence by sentence between Chinese and English.
-CRITICAL RULES:
-1. NEVER alter or re-translate the user's original text!
-   - If a sentence is in English, keep the EXACT original English sentence on the right side of "|||", and provide its accurate Mandarin Chinese translation on the left side.
-   - If a sentence is in Chinese, keep the EXACT original Chinese sentence on the left side of "|||", and provide its accurate, natural English translation on the right side.
-2. Output strictly one sentence pair per line in this exact format:
-Chinese_Sentence ||| English_Sentence
-Do NOT output any extra intro, numbering, or markdown.
-
-Text to translate:
-${raw}`;
-
-        const aiTrans = await fetchFastAccurateAI(transPrompt);
-        if (aiTrans && aiTrans.includes('|||')) {
-          replyBox.style.display = 'none';
-          const pairLines = aiTrans.split(/\n+/).map(l => l.trim()).filter(Boolean);
-          let renderedCount = 0;
-          for (const pl of pairLines) {
-            const pair = parseBilingualPairLine(pl);
-            if (pair) {
-              renderedCount++;
-              appendSentenceProgressive(pair.zh, pair.en);
-              await nextPaintTick();
-            }
-          }
-          if (renderedCount > 0) return;
-        }
-        replyBox.style.display = 'none';
-      }
-
-      const lines = raw.split(/\n+|(?<=[。！？.!?])\s*/).map(l => l.trim()).filter(Boolean);
-      for (let line of lines) {
-        const hasChinese = /[\u4e00-\u9fa5]/.test(line);
-        if (hasChinese) {
-          appendSentenceProgressive(line, '');
-          await nextPaintTick();
-        } else {
-          const tempBlock = document.createElement('div');
-          tempBlock.className = 'sentence-block';
-          tempBlock.innerHTML = `<div class="en-line">${line}</div><div style="font-size:0.85rem;color:#666;">⚡ Translating...</div>`;
-          list.appendChild(tempBlock);
-
-          const zhTrans = await translateFast(line, 'en', 'zh');
-          tempBlock.remove();
-          appendSentenceProgressive(zhTrans, line);
-          await nextPaintTick();
-        }
-      }
-    }
-
-    // =========================================================================
-    // 5. 極速 AI 問答並注音
-    // =========================================================================
     async function runSmartAI(overrideInput) {
       const q = (overrideInput !== undefined ? overrideInput : document.getElementById('userInput').value).trim();
       if (!q) return;
 
-      prepareOutputCanvas();
       document.getElementById('previewImg').style.display = 'none';
       const replyBox = document.getElementById('aiReplyBox');
       const list = document.getElementById('annotationList');
       replyBox.style.display = 'block';
-      replyBox.innerText = currentLang === 'en' ? '⚡ AI Thinking...' : '⚡ AI 正在極速思考...';
+      replyBox.innerText = '⚡ AI Thinking & Generating Bilingual Lesson...';
       list.innerHTML = '';
 
       const localHit = getLocalCachedAnswer(q);
@@ -2306,19 +1201,18 @@ ${raw}`;
         if (ok) return;
       }
 
-      const directPrompt = `You are an authoritative bilingual scholar and assistant.
+      const directPrompt = `You are an authoritative bilingual Mandarin teacher and scholar.
 User question/request: "${q}"
 
 CRITICAL ACCURACY RULES:
-1. First, determine the authoritative standard answer or authentic classic text:
-   - If the user asks about an English poem, quote, speech, or asks a question in English: First formulate the exact, authentic English original lines or standard English answer, and then translate each sentence into natural Mandarin Chinese.
-   - If the user asks about a Chinese poem/classic (e.g., 詠鵝, 水調歌頭) or Chinese recipe/question: First formulate the exact, authentic Chinese original lines or standard Chinese answer, and then translate each sentence into accurate, poetic/natural English.
-   - NEVER back-translate from a translation! Both the Chinese and English must be direct, authentic, and faithful.
+1. Formulate a helpful, natural, educational answer or dialogue (3 to 5 sentences) addressing the user's question:
+   - Never just repeat the user's question! Actually answer the question or create the requested lesson content.
+   - Provide both authentic Traditional Chinese and natural English for every sentence.
 2. Output Format:
-   - Line 1: A concise 1-line title or summary (in both English & Chinese).
+   - Line 1: A concise 1-line title or summary (in English & Chinese).
    - Line 2 onwards: Output each sentence pair strictly on its own line separated by "|||" in this exact order:
      Pure_Chinese_Sentence ||| Authentic_English_Sentence
-   - IMPORTANT: On Lines 2+, the left side of "|||" must contain ONLY Chinese characters and Chinese punctuation (NO Pinyin, NO English letters on the left side).`;
+   - IMPORTANT: On Lines 2+, the left side of "|||" must contain ONLY Chinese characters and Chinese punctuation.`;
 
       const aiText = await fetchFastAccurateAI(directPrompt, null, q);
       if (aiText) {
@@ -2329,89 +1223,34 @@ CRITICAL ACCURACY RULES:
         }
       }
 
-      replyBox.innerHTML = currentLang === 'en'
-        ? `💡 High traffic on the free public channel! Please enter your own free Google Gemini API Key in <b>[🔑 API Key]</b> for unlimited instant responses, or ask your browser's AI and paste the reply above.`
-        : `💡 當前免費公共通道訪問量較大！請在右上角 <b>[🔑 API Key]</b> 填入您免費的個人 Google Gemini Key 即可享受專屬極速無限通道，或先詢問瀏覽器 AI 並貼回上方點擊「📝 翻譯並注音」。`;
+      replyBox.innerHTML = `💡 Public AI channel is busy! Please enter your free Google Gemini API Key in <b>[🔑 API Key]</b> at the top right for unlimited instant AI responses.`;
       openKeyModal();
     }
 
-    // =========================================================================
-    // 6. 照片與圖片極速識別
-    // =========================================================================
-    async function handlePhotoUpload(input) {
-      if (!input.files || !input.files[0]) return;
-      const file = input.files[0];
-
-      prepareOutputCanvas();
-      const replyBox = document.getElementById('aiReplyBox');
+    async function runDirectTranslate(overrideText) {
+      const raw = (overrideText !== undefined ? overrideText : document.getElementById('userInput').value).trim();
+      if (!raw) return;
       const list = document.getElementById('annotationList');
-      replyBox.style.display = 'block';
-      replyBox.innerText = currentLang === 'en' ? '📷 Analyzing photo...' : '📷 正在極速識別照片...';
+      const replyBox = document.getElementById('aiReplyBox');
+      replyBox.style.display = 'none';
       list.innerHTML = '';
 
-      const dataUrl = await compressImg(file, 560, 0.68);
-      const prev = document.getElementById('previewImg');
-      prev.src = dataUrl;
-      prev.style.display = 'block';
-
-      const vPrompt = `Look at this image:
-Line 1: Briefly identify what text, dish, or object is in the image (in English & Chinese).
-Line 2+: Output the text or 1-2 descriptive sentences strictly in this paired format (one pair per line):
-Pure_Chinese_Sentence ||| Authentic_English_Sentence`;
-
-      const aiRes = await fetchFastAccurateAI(vPrompt, dataUrl);
-      if (aiRes) {
-        const ok = await renderBilingualAIOutput(aiRes);
-        if (ok) {
-          input.value = '';
-          return;
+      const lines = raw.split(/\n+|(?<=[。！？.!?])\s*/).map(s => s.trim()).filter(Boolean);
+      for (const line of lines) {
+        if (line.includes('|||')) {
+          const [zh, en] = line.split('|||').map(s => s.trim());
+          list.appendChild(createFourInOneBlock(zh, en));
+        } else if (/[\u4e00-\u9fa5]/.test(line)) {
+          list.appendChild(createFourInOneBlock(line, ''));
+        } else {
+          const zhTw = await translateFast(line, 'en', 'zh');
+          list.appendChild(createFourInOneBlock(zhTw, line));
         }
       }
-
-      try {
-        const fd = new FormData();
-        fd.append('base64Image', dataUrl);
-        fd.append('language', 'chs');
-        fd.append('apikey', 'helloworld');
-        const r = await fetchWithTimeout('https://api.ocr.space/parse/image', { method: 'POST', body: fd }, 6500);
-        const d = await r.json();
-        const ocrText = d?.ParsedResults?.[0]?.ParsedText?.trim() || '';
-        if (ocrText && ocrText.length >= 1) {
-          const clean = ocrText.replace(/\r\n/g, '\n').trim();
-          document.getElementById('userInput').value = clean;
-          replyBox.innerText = `📄 ${clean.slice(0, 65)}`;
-          await runDirectTranslate(clean);
-        } else {
-          replyBox.innerText = currentLang === 'en'
-            ? '💡 No clear text found. On iPhone/iPad, use Apple Camera Live Text to copy text in 0.1s and paste here!'
-            : '💡 未識別到清晰文字。若使用 iPhone/iPad，建議直接用蘋果相機拍照提取文字貼上！';
-        }
-      } catch (e) {}
-
-      input.value = '';
-    }
-
-    function compressImg(file, maxW, quality) {
-      return new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          const img = new Image();
-          img.onload = () => {
-            const c = document.createElement('canvas');
-            let w = img.width, h = img.height;
-            if (w > maxW) { h = Math.round((h * maxW) / w); w = maxW; }
-            c.width = w; c.height = h;
-            c.getContext('2d').drawImage(img, 0, 0, w, h);
-            resolve(c.toDataURL('image/jpeg', quality));
-          };
-          img.src = e.target.result;
-        };
-        reader.readAsDataURL(file);
-      });
     }
 
     // =========================================================================
-    // 7. 專為外國人優化的語音輸入（英文優先 en-US + 持續錄音不早斷 + 2.8秒停頓自動送出）
+    // 6. Voice Input (Default English) & File / Photo Upload
     // =========================================================================
     let activeRec = null;
     let voiceSilenceTimer = null;
@@ -2419,7 +1258,7 @@ Pure_Chinese_Sentence ||| Authentic_English_Sentence`;
     function toggleVoice() {
       const btn = document.getElementById('micBtn');
       const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SR) return alert(currentLang === 'en' ? 'Voice input is not supported in this browser.' : '當前瀏覽器不支援語音輸入。');
+      if (!SR) return alert('Voice input is supported in Chrome, Edge, and Safari.');
 
       if (activeRec) {
         clearTimeout(voiceSilenceTimer);
@@ -2428,37 +1267,27 @@ Pure_Chinese_Sentence ||| Authentic_English_Sentence`;
       }
 
       activeRec = new SR();
-      activeRec.lang = currentLang === 'zh' ? 'zh-CN' : 'en-US';
+      activeRec.lang = document.getElementById('micLangSelect').value || 'en-US';
       activeRec.interimResults = true;
-      activeRec.maxAlternatives = 3;
       activeRec.continuous = true;
       btn.classList.add('recording');
 
       let finalTranscript = '';
-
-      function resetSilenceTimer() {
+      function resetTimer() {
         clearTimeout(voiceSilenceTimer);
-        voiceSilenceTimer = setTimeout(() => {
-          if (activeRec) activeRec.stop();
-        }, 2800);
+        voiceSilenceTimer = setTimeout(() => { if (activeRec) activeRec.stop(); }, 2800);
       }
-
-      resetSilenceTimer();
+      resetTimer();
 
       activeRec.onresult = (e) => {
-        resetSilenceTimer();
+        resetTimer();
         let interim = '';
         for (let i = e.resultIndex; i < e.results.length; i++) {
-          const res = e.results[i];
-          const seg = res[0].transcript;
-          if (res.isFinal) {
-            finalTranscript += (finalTranscript && !finalTranscript.endsWith(' ') ? ' ' : '') + seg.trim();
-          } else {
-            interim += seg;
-          }
+          const seg = e.results[i][0].transcript;
+          if (e.results[i].isFinal) finalTranscript += ' ' + seg.trim();
+          else interim += seg;
         }
-        const combined = (finalTranscript + (interim ? ' ' + interim : '')).trim();
-        document.getElementById('userInput').value = combined;
+        document.getElementById('userInput').value = (finalTranscript + ' ' + interim).trim();
       };
 
       activeRec.onend = () => {
@@ -2474,69 +1303,411 @@ Pure_Chinese_Sentence ||| Authentic_English_Sentence`;
         btn.classList.remove('recording');
         activeRec = null;
       };
-
       activeRec.start();
     }
 
-    let isSpeakingNow = false;
+    function openFileMenuModal() {
+      document.getElementById('fileMenuModal').style.display = 'flex';
+    }
 
-    function toggleSpeak() {
-      if (!('speechSynthesis' in window)) return;
-      const btn = document.getElementById('speakBtn');
-      const t = UI_TEXT[currentLang];
+    function loadScriptDynamic(src) {
+      return new Promise((resolve, reject) => {
+        if (document.querySelector(`script[src="${src}"]`)) return resolve();
+        const s = document.createElement('script');
+        s.src = src; s.onload = resolve; s.onerror = reject;
+        document.head.appendChild(s);
+      });
+    }
 
-      if (window.speechSynthesis.speaking || isSpeakingNow) {
-        window.speechSynthesis.cancel();
-        isSpeakingNow = false;
-        btn.innerText = t.speakBtn;
-        btn.style.background = '';
-        btn.style.color = '';
+    async function handleDocFileUpload(input) {
+      if (!input.files || !input.files[0]) return;
+      const file = input.files[0];
+      const name = (file.name || '').toLowerCase();
+      input.value = '';
+      const replyBox = document.getElementById('aiReplyBox');
+      replyBox.style.display = 'block';
+      replyBox.innerText = `📄 Extracting text from ${file.name}...`;
+
+      try {
+        let text = '';
+        if (name.endsWith('.pdf')) {
+          await loadScriptDynamic('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js');
+          pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+          const pdf = await pdfjsLib.getDocument({ data: await file.arrayBuffer() }).promise;
+          let out = [];
+          for (let i = 1; i <= Math.min(pdf.numPages, 15); i++) {
+            const p = await pdf.getPage(i);
+            const tc = await p.getTextContent();
+            out.push(tc.items.map(it => it.str).join(' '));
+          }
+          text = out.join('\n');
+        } else if (name.endsWith('.docx')) {
+          await loadScriptDynamic('https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js');
+          const res = await mammoth.extractRawText({ arrayBuffer: await file.arrayBuffer() });
+          text = res.value || '';
+        } else {
+          text = await file.text();
+        }
+        replyBox.style.display = 'none';
+        document.getElementById('userInput').value = text.slice(0, 2500);
+        runDirectTranslate(text.slice(0, 2500));
+      } catch (e) {
+        replyBox.innerText = '⚠️ Could not extract text from file.';
+      }
+    }
+
+    async function handlePhotoUpload(input) {
+      if (!input.files || !input.files[0]) return;
+      const file = input.files[0];
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const dataUrl = e.target.result;
+        const prev = document.getElementById('previewImg');
+        prev.src = dataUrl; prev.style.display = 'block';
+        const fd = new FormData();
+        fd.append('base64Image', dataUrl);
+        fd.append('language', 'chs');
+        fd.append('apikey', 'helloworld');
+        const r = await fetch('https://api.ocr.space/parse/image', { method: 'POST', body: fd });
+        const d = await r.json();
+        const ocr = d?.ParsedResults?.[0]?.ParsedText?.trim() || '';
+        if (ocr) {
+          document.getElementById('userInput').value = ocr;
+          runDirectTranslate(ocr);
+        }
+      };
+      reader.readAsDataURL(file);
+      input.value = '';
+    }
+
+    // =========================================================================
+    // 7. Full 45 Book Mnemonics + Referral Unlock (+50 Sentences & Classical Bank)
+    // =========================================================================
+    const FULL_45_MNEMONICS = [
+      { pack: 1, meaning: "Hello / How are you?", trees: "Nee3 haw3", hanzi: "你好", pinyin: "nǐ hǎo", sound: "Similar to '<b><u>knee</u> <u>how</u></b>'.", mnemonic: "<b>Knee</b>ling to show <b>how</b> much respect you have.", exZh: "你好，很高興認識你！", exEn: "Hello, nice to meet you!" },
+      { pack: 1, meaning: "You (Singular)", trees: "nee3", hanzi: "你", pinyin: "nǐ", sound: "Sounds like '<b><u>Knee</u></b>'.", mnemonic: "<b><u>Knee</u></b>(l) down while greeting <b>you</b>.", exZh: "請問你叫什麼名字？", exEn: "May I ask what your name is?" },
+      { pack: 1, meaning: "Good", trees: "haw3", hanzi: "好", pinyin: "hǎo", sound: "Similar to '<b><u>how</u></b>'.", mnemonic: "'Nee3 haw3' literally means 'You good'.", exZh: "今天天氣真好！", exEn: "The weather is really good today!" },
+      { pack: 1, meaning: "Good morning.", trees: "Dsaw3 (r)sang4 haw3", hanzi: "早上好", pinyin: "zǎo shang hǎo", sound: "Sounds like '<b><u>jaw</u> <u>sang</u></b>'.", mnemonic: "Morning yawning: your <b><u>jaw</u> <u>sang</u></b>!", exZh: "老師早上好！", exEn: "Good morning, teacher!" },
+      { pack: 1, meaning: "Big", trees: "dah4", hanzi: "大", pinyin: "dà", sound: "First part of '<b><u>do</u></b>zen'.", mnemonic: "Our <b>big</b> family eats a <b><u>do</u></b>zen eggs.", exZh: "這個蘋果非常大。", exEn: "This apple is very big." },
+      { pack: 1, meaning: "Home / Family", trees: "jeeah", hanzi: "家", pinyin: "jiā", sound: "Contraction of '<b><u>Gee</u></b>' and '<b><u>Ah</u></b>' (like 'jar').", mnemonic: "Our <b>big family</b> (dah4 jeeah) eats eggs in a <b>jar</b>.", exZh: "歡迎來到我家！", exEn: "Welcome to my home!" },
+      { pack: 1, meaning: "Happy", trees: "kooie4 Ler4", hanzi: "快樂", pinyin: "kuài lè", sound: "'<b><u>qui</u></b>(te) <b><u>lo</u></b>(vely)'.", mnemonic: "<b>Happy</b> kids are <b><u>qui</u></b>(te) <b><u>lo</u></b>(vely)!", exZh: "祝你生日快樂！", exEn: "Wish you a happy birthday!" },
+      { pack: 1, meaning: "New", trees: "seen", hanzi: "新", pinyin: "xīn", sound: "Sounds like '<b><u>seen</u></b>'.", mnemonic: "Never <b><u>seen</u></b> before, so it's <b>new</b>!", exZh: "這是一本新書。", exEn: "This is a new book." },
+      { pack: 1, meaning: "Year", trees: "neean2", hanzi: "年", pinyin: "nián", sound: "'<b><u>Knee</u> <u>an</u></b>' or '<b>Neon</b>'.", mnemonic: "New <b>Year</b> involves kowtow (knee an) and <b>neon</b> lights.", exZh: "祝大家新年快樂！", exEn: "Happy New Year, everyone!" },
+      { pack: 1, meaning: "Make a fortune", trees: "fah tsie2", hanzi: "發財", pinyin: "fā cái", sound: "\"<b><u>far</u></b> i<b><u>t's I</u></b>\" / 'far try'.", mnemonic: "A bold 'far try' to <b>make a fortune</b>.", exZh: "恭喜發財，萬事如意！", exEn: "Wishing you prosperity and all the best!" },
+      { pack: 1, meaning: "Excuse me / Could you tell me...?", trees: "Tsing3 wer-n4", hanzi: "請問", pinyin: "qǐng wèn", sound: "Le<b><u>t's sing</u></b> <b><u>when</u></b> happy.", mnemonic: "tsing3 = Let's sing; wer-n4 = when.", exZh: "請問洗手間在哪裡？", exEn: "Excuse me, where is the restroom?" },
+      { pack: 1, meaning: "Thank you!", trees: "Seer4 seer", hanzi: "謝謝", pinyin: "xiè xie", sound: "'<b><u>See</u> <u>ye</u></b>(s)' / 'See ya'.", mnemonic: "'Thank you' and 'See ya' go hand in hand!", exZh: "非常謝謝你的幫忙！", exEn: "Thank you very much for your help!" },
+      { pack: 1, meaning: "See you / Good-bye", trees: "Dsie4 jeean4", hanzi: "再見", pinyin: "zài jiàn", sound: "'<b><u>Xy</u></b>lophone, <b><u>Gee</u> <u>an</u></b>'.", mnemonic: "Playing the <b><u>Xy</u></b>lophone to say <b>goodbye</b>.", exZh: "我們明天學校見，再見！", exEn: "See you at school tomorrow, goodbye!" },
+      { pack: 1, meaning: "You are welcome.", trees: "Boo2 ker4 tsee", hanzi: "不客氣", pinyin: "bú kè qi", sound: "'<b><u>Boo</u> <u>Cur</u>—<u>tsy</u></b>'.", mnemonic: "No need to do a curtsy ('Boo Curtsy').", exZh: "不客氣，這是我應該做的。", exEn: "You're welcome, it's my pleasure." },
+      { pack: 1, meaning: "I'm sorry.", trees: "Dooay4 boo4 tsee3", hanzi: "對不起", pinyin: "duì bù qǐ", sound: "<b><u>Dway</u></b>ne says '<b><u>boo</u> <u>qi</u></b>'.", mnemonic: "Dwayne apologizes: I'm sorry!", exZh: "對不起，我今天遲到了。", exEn: "I'm sorry, I am late today." },
+
+      { pack: 2, meaning: "It doesn't matter / It's OK.", trees: "May2 gooan see", hanzi: "沒關係", pinyin: "méi guān xi", sound: "'<b><u>May</u></b> la<b><u>goon</u></b> <b><u>see</u></b>.'", mnemonic: "May the lagoon be seen when the tide goes out.", exZh: "沒關係，下次注意就好了。", exEn: "It's OK, just be careful next time." },
+      { pack: 2, meaning: "Don't get angry.", trees: "Beer2 (r)ser-ng tsee4", hanzi: "別生氣", pinyin: "bié shēng qì", sound: "'<b><u>Beer</u> <u>sung</u> <u>qi</u></b>'.", mnemonic: "With beer, Dwayne sung a song full of qi.", exZh: "別生氣，我們一起想辦法。", exEn: "Don't get angry, let's figure it out together." },
+      { pack: 2, meaning: "Doctor", trees: "yee (r)ser-ng", hanzi: "醫生", pinyin: "yī shēng", sound: "yee (one) + (r)ser-ng (sung/birth).", mnemonic: "The very first person you see at birth is a doctor.", exZh: "他是一位非常有名的醫生。", exEn: "He is a very famous doctor." },
+      { pack: 2, meaning: "Day / Sun", trees: "(r)th4", hanzi: "日", pinyin: "rì", sound: "Tongue of '<b><u>r</u></b>ain' + '<b><u>th</u></b>en'.", mnemonic: "And (r)then... the day begins!", exZh: "今天是個好日子。", exEn: "Today is a great day." },
+      { pack: 2, meaning: "I / Me", trees: "wer3", hanzi: "我", pinyin: "wǒ", sound: "Part of '<b><u>wor</u></b>d' or '<b><u>wor</u></b>ld'.", mnemonic: "I am the core of my world.", exZh: "我非常喜歡學習中文。", exEn: "I really like learning Chinese." },
+      { pack: 2, meaning: "My / Mine", trees: "wer3 der", hanzi: "我的", pinyin: "wǒ de", sound: "Similar to '<b><u>word</u></b>'.", mnemonic: "My world! Adding 'der' after 'wer3'.", exZh: "這本書是我的。", exEn: "This book is mine." },
+      { pack: 2, meaning: "Your / Yours", trees: "nee3 der", hanzi: "你的", pinyin: "nǐ de", sound: "Sounds like '<b><u>need</u></b>'.", mnemonic: "Yours is what you need.", exZh: "你的發音非常標準！", exEn: "Your pronunciation is very accurate!" },
+      { pack: 2, meaning: "It / He / She", trees: "tah", hanzi: "他", pinyin: "tā", sound: "First part of '<b><u>Ta</u></b>rget'.", mnemonic: "He and she buy it at Target.", exZh: "他是我們班的好學生。", exEn: "He is a good student in our class." },
+      { pack: 2, meaning: "His / Her / Its", trees: "tah der", hanzi: "他的", pinyin: "tā de", sound: "Similar to '<b><u>tard</u></b>(y)'.", mnemonic: "He was tardy for his English class.", exZh: "他的中文說得很好。", exEn: "He speaks Chinese very well." },
+      { pack: 2, meaning: "Friend", trees: "per-ng2 yoh", hanzi: "朋友", pinyin: "péng yǒu", sound: "'<b><u>peng</u></b>uin <b><u>you</u></b>'.", mnemonic: "A cute penguin is your best friend!", exZh: "我們是最好的朋友。", exEn: "We are best friends." },
+      { pack: 2, meaning: "Younger & Elder Brother", trees: "dee4 dee / ger ger", hanzi: "弟弟哥哥", pinyin: "dì di gē ge", sound: "'<b><u>di</u></b>g' = dee4 + ger.", mnemonic: "'dig' is teamwork of younger and elder brother!", exZh: "哥哥和弟弟一起去公園。", exEn: "The elder and younger brothers go to the park together." },
+      { pack: 2, meaning: "Country & USA", trees: "may3 gooer2", hanzi: "美國", pinyin: "měi guó", sound: "<b><u>May</u></b>flower + gooer2.", mnemonic: "No Mayflower, no United States.", exZh: "我來自美國加州。", exEn: "I come from California, USA." },
+      { pack: 2, meaning: "Human / People", trees: "(r)ther-n2", hanzi: "人", pinyin: "rén", sound: "'r' tongue + weak '<b><u>then</u></b>'.", mnemonic: "Add (r)ther-n2 after a country for its people.", exZh: "這裡的人都非常熱情。", exEn: "The people here are very warm and friendly." },
+      { pack: 2, meaning: "China", trees: "(r)dser-oong gooer2", hanzi: "中國", pinyin: "zhōng guó", sound: "Sounds like '<b><u>drone</u></b>'.", mnemonic: "Fly a drone across China.", exZh: "中國有很多歷史古蹟。", exEn: "China has many historical sites." },
+      { pack: 2, meaning: "Like / Love", trees: "see3 hooan", hanzi: "喜歡", pinyin: "xǐ huān", sound: "'<b><u>see</u> <u>Juan</u></b>'.", mnemonic: "Like him when you see Don Juan!", exZh: "你喜歡吃什麼水果？", exEn: "What fruit do you like to eat?" },
+
+      { pack: 3, meaning: "Can / Be able to", trees: "hooay4", hanzi: "會", pinyin: "huì", sound: "'<b><u>hoo</u></b>(r)<b><u>ay</u></b>' without r.", mnemonic: "If you can do it, shout hooray!", exZh: "我會說一點點中文。", exEn: "I can speak a little bit of Chinese." },
+      { pack: 3, meaning: "Book", trees: "(r)soo", hanzi: "書", pinyin: "shū", sound: "Sounds like '<b><u>sue</u></b>'.", mnemonic: "Copy this book and Sue will sue you!", exZh: "我喜歡在圖書館看書。", exEn: "I like reading books in the library." },
+      { pack: 3, meaning: "Who & Water", trees: "(r)sooay2 / (r)sooay3", hanzi: "誰喝水", pinyin: "shuí hē shuǐ", sound: "Contract '<b><u>sway</u></b>'.", mnemonic: "Who sees the mermaid swaying in the water?", exZh: "請問誰想喝水？", exEn: "Excuse me, who would like to drink water?" },
+      { pack: 3, meaning: "Look for", trees: "(r)dsaw3", hanzi: "找", pinyin: "zhǎo", sound: "Similar to '<b><u>jaw</u></b>'.", mnemonic: "Looking for my jaw on the floor!", exZh: "你在找什麼東西？", exEn: "What are you looking for?" },
+      { pack: 3, meaning: "From", trees: "Lie2 ds4", hanzi: "來自", pinyin: "lái zì", sound: "Similar to '<b><u>lies</u></b>'.", mnemonic: "The truth lies in where you come from.", exZh: "我的老師來自台灣。", exEn: "My teacher comes from Taiwan." },
+      { pack: 3, meaning: "Where", trees: "nah3 Lee3", hanzi: "哪裡", pinyin: "nǎ lǐ", sound: "G<b><u>narly</u></b> without G.", mnemonic: "Don't know where you are? Gnarly!", exZh: "你週末想去哪裡玩？", exEn: "Where do you want to go for fun this weekend?" },
+      { pack: 3, meaning: "How", trees: "dser-n3 mer", hanzi: "怎麼", pinyin: "zěn me", sound: "Confu<b><u>sion</u></b> <b><u>Mer</u></b>maid.", mnemonic: "How the mermaid falls in love.", exZh: "這道題應該怎麼做？", exEn: "How should we solve this question?" },
+      { pack: 3, meaning: "Supermarket", trees: "(r)tsaw (r)s4", hanzi: "超市", pinyin: "chāo shì", sound: "r-colored '<b><u>cho</u></b>(i)<b><u>ce</u></b>'.", mnemonic: "So many choices in the supermarket!", exZh: "媽媽去超市買水果了。", exEn: "Mom went to the supermarket to buy fruit." },
+      { pack: 3, meaning: "Menu & Check, please", trees: "tsie4 dan / mie3 dan", hanzi: "菜單買單", pinyin: "cài dān mǎi dān", sound: "I<b><u>t's I</u></b> <b><u>done</u></b> / <b><u>My</u> <u>done</u></b>.", mnemonic: "Done with the menu; check, please!", exZh: "服務員，請給我菜單。", exEn: "Waiter, please give me the menu." },
+      { pack: 3, meaning: "Would like / Want", trees: "seeang3 yaw4", hanzi: "想要", pinyin: "xiǎng yào", sound: "'<b><u>see</u> <u>young</u></b>' + '<b><u>your</u></b>'.", mnemonic: "Want to see Young's beer.", exZh: "我想要一杯熱咖啡。", exEn: "I would like a cup of hot coffee." },
+      { pack: 3, meaning: "Milk tea", trees: "nie3 (r)tsah2", hanzi: "奶茶", pinyin: "nǎi chá", sound: "'<b><u>ni</u></b>ce <b><u>char</u></b>ge'.", mnemonic: "Milk tea gives a nice charge!", exZh: "珍珠奶茶非常好喝。", exEn: "Boba milk tea is very delicious." },
+      { pack: 3, meaning: "Dumplings", trees: "jeeaw3 ds", hanzi: "餃子", pinyin: "jiǎo zi", sound: "'<b><u>Gee, aw</u></b>esome foo<b><u>ds</u></b>.'", mnemonic: "Everyone loves dumplings!", exZh: "我們今天晚上吃餃子。", exEn: "We are eating dumplings tonight." },
+      { pack: 3, meaning: "Cold (Illness)", trees: "gan3 maw4", hanzi: "感冒", pinyin: "gǎn mào", sound: "'<b><u>gun</u> <u>mall</u></b>'.", mnemonic: "Shock at the mall caused a cold.", exZh: "天冷了，小心別感冒。", exEn: "It's cold, be careful not to catch a cold." },
+      { pack: 3, meaning: "Telephone", trees: "deean4 hooah4", hanzi: "電話", pinyin: "diàn huà", sound: "'<b><u>the end</u></b>' + '<b><u>who are</u></b>'.", mnemonic: "Call on the telephone to ask who they are.", exZh: "請給我打個電話。", exEn: "Please give me a phone call." },
+      { pack: 3, meaning: "Got it.", trees: "Ting der-oong3 Ler", hanzi: "聽懂了", pinyin: "tīng dǒng le", sound: "Shou<b><u>ting</u></b> '<b><u>don't</u></b> <b><u>love</u></b>'.", mnemonic: "Once you hear it, you've got it!", exZh: "老師講的課我都聽懂了！", exEn: "I understood everything the teacher taught!" },
+
+      { pack: 4, meaning: "[Classical Poem] Ode to the Goose 《詠鵝》", trees: "er2 er2 er2", hanzi: "鵝鵝鵝曲項向天歌白毛浮綠水紅掌撥清波", pinyin: "é é é, qū xiàng xiàng tiān gē", sound: "Tang Dynasty Classic by Luo Binwang", mnemonic: "Unlocked via Teacher Referral!", exZh: "鵝，鵝，鵝，曲項向天歌。白毛浮綠水，紅掌撥清波。", exEn: "Goose, goose, goose, bending your neck to sing to the sky. White feathers float on emerald water, red feet paddle clear waves." },
+      { pack: 4, meaning: "[Classical Poem] Quiet Night Thought 《靜夜思》", trees: "tswang2 tseean2 ming2", hanzi: "床前明月光疑是地上霜舉頭望明月低頭思故鄉", pinyin: "chuáng qián míng yuè guāng", sound: "Tang Dynasty Classic by Li Bai", mnemonic: "Unlocked via Teacher Referral!", exZh: "床前明月光，疑是地上霜。舉頭望明月，低頭思故鄉。", exEn: "Before my bed, bright moonlight shines. I raise my head to gaze at the moon, and lower it, thinking of home." },
+      { pack: 4, meaning: "[Classical Poem] Spring Morning 《春曉》", trees: "tsoon meean2 boo4", hanzi: "春眠不覺曉處處聞啼鳥夜來風雨聲花落知多少", pinyin: "chūn mián bù jué xiǎo", sound: "Tang Dynasty Classic by Meng Haoran", mnemonic: "Unlocked via Teacher Referral!", exZh: "春眠不覺曉，處處聞啼鳥。夜來風雨聲，花落知多少。", exEn: "In spring sleep I am unaware of dawn; everywhere I hear singing birds." }
+    ];
+
+    const localCustomCards = JSON.parse(localStorage.getItem('tp_custom_mnemonics_v1') || '[]');
+    FULL_45_MNEMONICS.push(...localCustomCards);
+
+    function shareTeacherReferral() {
+      const msg = `Join me on Trees Pinyin Teacher Workspace! Free for 1 full year with 45 core memory sentences. Use my Teacher Referral Code TCH-8829 to unlock +50 bonus memory sentences & the Classical Question Bank: https://www.treespinyin.com/dashboard.html`;
+      navigator.clipboard.writeText(msg).catch(() => {});
+      localStorage.setItem('tp_teacher_ref_unlocked', 'true');
+      document.getElementById('unlockedBankStatus').innerText = '95+ Memory Sentences & Classical Bank Unlocked 🎉';
+      document.getElementById('packSelect').value = '4';
+      renderTeacherMnemonicBank();
+      alert('🎁 Referral message copied! You have unlocked +50 Memory Sentences & the Classical Question Bank!');
+    }
+
+    function renderTeacherMnemonicBank() {
+      const container = document.getElementById('mnemonicCardsContainer');
+      if (!container) return;
+      const packId = parseInt(document.getElementById('packSelect').value, 10) || 1;
+      const query = (document.getElementById('searchBankInput').value || '').trim().toLowerCase();
+      const refUnlocked = localStorage.getItem('tp_teacher_ref_unlocked') === 'true';
+
+      if (packId === 4 && !refUnlocked) {
+        container.innerHTML = `
+          <div style="grid-column:1/-1; background:#fff8e1; border:1.5px dashed #ffb300; border-radius:14px; padding:24px; text-align:center;">
+            <h3 style="margin:0 0 8px; color:#bf360c;">🔒 Pack 4: +50 Memory Sentences & Classical Question Bank</h3>
+            <p style="margin:0 0 12px; font-size:0.9rem;">Refer a fellow teacher to unlock 50 additional memory sentences and the Classical Question Bank instantly!</p>
+            <button class="btn btn-green" style="max-width:340px;" onclick="shareTeacherReferral()">📤 Share Referral & Unlock Now</button>
+          </div>`;
         return;
       }
 
-      const blocks = document.querySelectorAll('.sentence-block');
-      let allZh = Array.from(blocks).map(b => b.dataset.zh).join('。');
-      if (!allZh) allZh = document.getElementById('userInput').value;
-      if (!allZh) return;
+      const list = FULL_45_MNEMONICS.filter(c => {
+        if (query) {
+          return c.meaning.toLowerCase().includes(query) || c.hanzi.includes(query) || c.exZh.includes(query) || c.exEn.toLowerCase().includes(query);
+        }
+        return c.pack === packId;
+      });
 
-      const utter = new SpeechSynthesisUtterance(allZh);
-      utter.lang = 'zh-CN';
-      utter.rate = 0.85;
-      isSpeakingNow = true;
-      btn.innerText = t.stopSpeakBtn;
-      btn.style.background = '#d32f2f';
-      btn.style.color = '#fff';
+      container.innerHTML = list.map((card, idx) => {
+        const dispHanzi = convertScript(card.hanzi, currentScriptMode);
+        const dispExZh = convertScript(card.exZh, currentScriptMode);
+        return `
+          <div class="mnemonic-card">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px dashed #e5e7eb; padding-bottom:6px;">
+              <label style="display:flex; align-items:center; gap:6px; font-weight:800; color:var(--accent); cursor:pointer;">
+                <input type="checkbox" class="mnemonic-assign-chk" data-hanzi="${card.hanzi}" data-en="${card.meaning}" data-sound="${card.sound.replace(/"/g, '"')}" data-mnemonic="${card.mnemonic.replace(/"/g, '"')}" data-exzh="${card.exZh}" data-exen="${card.exEn}" checked style="width:16px; height:16px;">
+                <span>#${idx + 1} ${card.meaning}</span>
+              </label>
+              <button class="nav-btn" style="padding:3px 8px; font-size:0.78rem;" onclick="speakSingleChar('${card.exZh}')">🔊 Speak</button>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:baseline;">
+              <span style="font-size:1.05rem; color:#1b5e20;"><i><b>${card.trees}</b></i></span>
+              <span style="font-weight:700; font-size:1.1rem;">${dispHanzi} <small style="color:#666;">(${card.pinyin})</small></span>
+            </div>
+            <div style="font-size:0.83rem;"><b>Sound:</b> ${card.sound}</div>
+            <div style="font-size:0.83rem;"><b>Mnemonic:</b> ${card.mnemonic}</div>
+            <div style="background:#f8fafc; padding:8px; border-radius:8px; border:1px dashed #cbd5e1; font-size:0.83rem;">
+              <div style="color:var(--blue); font-weight:700;">📖 Example Sentence:</div>
+              <div><b>${dispExZh}</b></div>
+              <div style="color:#444;">${card.exEn}</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
 
-      utter.onend = () => {
-        isSpeakingNow = false;
-        btn.innerText = UI_TEXT[currentLang].speakBtn;
-        btn.style.background = '';
-        btn.style.color = '';
-      };
-      utter.onerror = utter.onend;
-      window.speechSynthesis.speak(utter);
+    function openAddCustomSentenceModal() {
+      document.getElementById('addCustomModal').style.display = 'flex';
+    }
+
+    function saveCustomMnemonicCard() {
+      const meaning = document.getElementById('custMeaning').value.trim();
+      const hanzi = document.getElementById('custHanzi').value.trim();
+      const sound = document.getElementById('custSound').value.trim();
+      const mnemonic = document.getElementById('custMnemonic').value.trim();
+      const exZh = document.getElementById('custExZh').value.trim() || hanzi;
+      const exEn = document.getElementById('custExEn').value.trim() || meaning;
+      if (!meaning || !hanzi) return alert('Please enter English Meaning and Chinese Characters.');
+
+      const pyArr = pinyinPro.pinyin(hanzi, { type: 'array', toneType: 'num' });
+      const trees = pyArr.map(p => compileToTreesPinyin(p)).join(' ');
+      const std = pinyinPro.pinyin(hanzi);
+
+      const newCard = { pack: 1, meaning, trees, hanzi, pinyin: std, sound, mnemonic, exZh, exEn };
+      FULL_45_MNEMONICS.unshift(newCard);
+      const saved = JSON.parse(localStorage.getItem('tp_custom_mnemonics_v1') || '[]');
+      saved.unshift(newCard);
+      localStorage.setItem('tp_custom_mnemonics_v1', JSON.stringify(saved));
+
+      document.getElementById('addCustomModal').style.display = 'none';
+      renderTeacherMnemonicBank();
+    }
+
+    function assignSelectedMnemonicCards() {
+      const chks = Array.from(document.querySelectorAll('.mnemonic-assign-chk:checked'));
+      if (chks.length === 0) return alert('Please check at least 1 card to assign!');
+      const items = chks.map(c => ({
+        type: 'mnemonic',
+        zh: c.dataset.hanzi,
+        en: c.dataset.en,
+        sound: c.dataset.sound,
+        mnemonic: c.dataset.mnemonic,
+        exampleZh: c.dataset.exzh,
+        exampleEn: c.dataset.exen
+      }));
+      recordAndSaveAssignment('CLS-101', 'Vocabulary Mnemonics & Example Sentences', 'mnemonic', items);
+      alert(`✅ Assigned ${items.length} Vocabulary Mnemonic Cards to Class Code CLS-101!`);
     }
 
     // =========================================================================
-    // 8. 全屏大字、保存長圖與安裝彈窗
+    // 8. Homework Publisher & 4-in-1 Student Error Question Analytics
     // =========================================================================
-    function toggleBigFont() {
-      document.body.classList.toggle('big-mode');
+    function publishBoardAsHomework() {
+      const blocks = Array.from(document.querySelectorAll('#annotationList .sentence-block'));
+      if (blocks.length === 0) return alert('Please generate or enter content on the board first!');
+      const code = (document.getElementById('pubClassCode').value || 'CLS-101').trim().toUpperCase();
+      const title = (document.getElementById('pubHwTitle').value || 'Daily Assignment').trim();
+      const hwType = document.getElementById('pubHwType').value;
+
+      const items = blocks.map(b => {
+        const zh = b.dataset.zh;
+        const en = b.dataset.en || 'Read aloud accurately';
+        if (hwType === 'mcq') return { type: 'mcq', zh, en: `Select the Chinese for: "${en}"`, options: [zh, '你好', '謝謝', '請問'] };
+        if (hwType === 'poem') return { type: 'poem', title, zh, en };
+        return { type: hwType, zh, en, exampleZh: zh, exampleEn: en };
+      });
+
+      recordAndSaveAssignment(code, title, hwType, items);
+      document.getElementById('pubConfirmMsg').innerHTML = `✅ Published <b>${items.length} question(s)</b> to Class Code <b>${code}</b> & saved to Daily History!`;
+    }
+
+    function recordAndSaveAssignment(code, title, type, items) {
+      const store = JSON.parse(localStorage.getItem('tp_teacher_assignments_v1') || '{}');
+      store[code] = { classCode: code, title, items };
+      localStorage.setItem('tp_teacher_assignments_v1', JSON.stringify(store));
+
+      const hist = JSON.parse(localStorage.getItem('tp_daily_hw_history_v1') || '[]');
+      hist.unshift({ date: new Date().toLocaleString(), classCode: code, title, type, items });
+      localStorage.setItem('tp_daily_hw_history_v1', JSON.stringify(hist.slice(0, 50)));
+      renderAnalyticsAndFourInOneErrors();
+    }
+
+    function renderAnalyticsAndFourInOneErrors() {
+      const hist = JSON.parse(localStorage.getItem('tp_daily_hw_history_v1') || '[]');
+      const hBody = document.getElementById('dailyHwHistoryBody');
+      if (hBody) {
+        hBody.innerHTML = hist.length === 0
+          ? `<tr><td colspan="6" style="text-align:center;color:#888;">No saved daily homework yet.</td></tr>`
+          : hist.map((h, i) => `
+            <tr>
+              <td>${h.date}</td>
+              <td><b>${h.classCode}</b></td>
+              <td>${h.title}</td>
+              <td>${(h.type || 'mixed').toUpperCase()}</td>
+              <td>${(h.items || []).length} items</td>
+              <td><button class="nav-btn" onclick="reAssignHistory(${i})">🔄 Re-Assign</button></td>
+            </tr>`).join('');
+      }
+
+      const subs = JSON.parse(localStorage.getItem('tp_student_submissions_v1') || '[]');
+      const sBody = document.getElementById('submissionsTableBody');
+      const missedQuestionMap = {};
+
+      if (sBody) {
+        sBody.innerHTML = subs.length === 0
+          ? `<tr><td colspan="5" style="text-align:center;color:#888;">No student submissions yet. Click "📊 Load Sample Class Data" above!</td></tr>`
+          : subs.map(s => {
+            (s.missedQuestions || []).forEach(mq => {
+              if (!missedQuestionMap[mq.zh]) {
+                missedQuestionMap[mq.zh] = { zh: mq.zh, en: mq.en, chars: new Set(), count: 0 };
+              }
+              missedQuestionMap[mq.zh].count++;
+              (mq.missedChars || []).forEach(c => missedQuestionMap[mq.zh].chars.add(c));
+            });
+            return `
+              <tr>
+                <td><b>${s.classCode}</b></td>
+                <td>${s.seatAlias}</td>
+                <td><b style="color:${s.avgScore >= 80 ? '#1b5e20' : '#d97706'}">${s.avgScore}%</b></td>
+                <td>${(s.missedChars || []).join(', ') || '✨ Perfect'}</td>
+                <td>${s.timestamp}</td>
+              </tr>`;
+          }).join('');
+      }
+
+      const fourInOneBox = document.getElementById('missedQuestionsFourInOneList');
+      if (fourInOneBox) {
+        fourInOneBox.innerHTML = '';
+        const missedArr = Object.values(missedQuestionMap).sort((a, b) => b.count - a.count);
+        if (missedArr.length === 0) {
+          fourInOneBox.innerHTML = `<div style="padding:14px; background:#f1f8e9; color:#1b5e20; border-radius:10px; font-weight:700;">✨ No missed questions recorded yet! Click "📊 Load Sample Class Data" to preview how missed questions appear in 4-in-1 format.</div>`;
+        } else {
+          missedArr.forEach(mq => {
+            const wrap = document.createElement('div');
+            wrap.style.cssText = 'border:1.5px solid #ffcdd2; background:#fffafa; border-radius:14px; padding:14px; display:flex; flex-direction:column; align-items:center; gap:8px;';
+            const header = document.createElement('div');
+            header.style.cssText = 'width:100%; display:flex; justify-content:space-between; font-size:0.82rem; font-weight:800; color:#c62828;';
+            header.innerHTML = `<span>⚠️ Missed / Tone Error by ${mq.count} Student(s) — Red characters need review</span><button class="nav-btn" style="padding:3px 10px;" onclick="speakSingleChar('${mq.zh}')">🔊 Speak Question</button>`;
+            wrap.appendChild(header);
+            wrap.appendChild(createFourInOneBlock(mq.zh, mq.en, Array.from(mq.chars)));
+            fourInOneBox.appendChild(wrap);
+          });
+        }
+      }
+    }
+
+    function loadDemoAnalyticsData() {
+      const demoSubs = [
+        {
+          classCode: "CLS-101", seatAlias: "Panda 02", avgScore: 82, timestamp: "Today 10:20 AM",
+          missedChars: ["請 (Tone)", "問"],
+          missedQuestions: [
+            { zh: "請問洗手間在哪裡？", en: "Excuse me, where is the restroom?", missedChars: ["請", "問"] }
+          ]
+        },
+        {
+          classCode: "CLS-101", seatAlias: "Tiger 05", avgScore: 76, timestamp: "Today 10:22 AM",
+          missedChars: ["曲", "項", "請"],
+          missedQuestions: [
+            { zh: "請問洗手間在哪裡？", en: "Excuse me, where is the restroom?", missedChars: ["請"] },
+            { zh: "鵝，鵝，鵝，曲項向天歌。", en: "Goose, goose, goose, bending your neck to sing to the sky.", missedChars: ["曲", "項"] }
+          ]
+        }
+      ];
+      localStorage.setItem('tp_student_submissions_v1', JSON.stringify(demoSubs));
+      renderAnalyticsAndFourInOneErrors();
+    }
+
+    function republishMissedQuestions() {
+      const subs = JSON.parse(localStorage.getItem('tp_student_submissions_v1') || '[]');
+      const map = {};
+      subs.forEach(s => (s.missedQuestions || []).forEach(mq => { map[mq.zh] = { type: 'reading', zh: mq.zh, en: mq.en }; }));
+      const items = Object.values(map);
+      if (items.length === 0) return alert('Click "Load Sample Class Data" first to test!');
+      recordAndSaveAssignment('CLS-101', 'Targeted Review: Missed Questions', 'reading', items);
+      alert(`✅ Re-published ${items.length} missed question(s) to Class Code CLS-101!`);
+    }
+
+    function reAssignHistory(idx) {
+      const hist = JSON.parse(localStorage.getItem('tp_daily_hw_history_v1') || '[]');
+      if (!hist[idx]) return;
+      recordAndSaveAssignment(hist[idx].classCode, hist[idx].title, hist[idx].type, hist[idx].items);
+      alert(`✅ Re-assigned "${hist[idx].title}"!`);
+    }
+
+    function switchTeacherTab(tab) {
+      document.getElementById('tabBtnWorkspace').classList.toggle('active', tab === 'workspace');
+      document.getElementById('tabBtnMnemonics').classList.toggle('active', tab === 'mnemonics');
+      document.getElementById('tabBtnAnalytics').classList.toggle('active', tab === 'analytics');
+      document.getElementById('panel-workspace').classList.toggle('hidden', tab !== 'workspace');
+      document.getElementById('panel-mnemonics').classList.toggle('hidden', tab !== 'mnemonics');
+      document.getElementById('panel-analytics').classList.toggle('hidden', tab !== 'analytics');
+      if (tab === 'mnemonics') renderTeacherMnemonicBank();
+      if (tab === 'analytics') renderAnalyticsAndFourInOneErrors();
     }
 
     async function exportCardImage() {
-      const card = document.getElementById('sheetCard');
-      try {
-        const canvas = await html2canvas(card, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
-        const dataUrl = canvas.toDataURL('image/png');
-        document.getElementById('generatedImg').src = dataUrl;
-        document.getElementById('imgModal').style.display = 'flex';
-      } catch (err) {}
+      const canvas = await html2canvas(document.getElementById('sheetCard'), { scale: 2, backgroundColor: '#ffffff' });
+      document.getElementById('generatedImg').src = canvas.toDataURL('image/png');
+      document.getElementById('imgModal').style.display = 'flex';
     }
 
-    function openInstallModal() {
-      document.getElementById('installModal').style.display = 'flex';
+    function copySchoolWhitelistLetter() {
+      navigator.clipboard.writeText(`Subject: Whitelist Request for Trees Pinyin (Zero-PII / COPPA & FERPA Compliant)\n\nPlease whitelist *.treespinyin.com for classroom instruction.`);
+      alert('🛡️ School IT Whitelist Letter copied!');
     }
+
+    // Default Initialization
+    document.getElementById('userInput').value = '請問洗手間在哪裡？ ||| Excuse me, where is the restroom?\n鵝，鵝，鵝，曲項向天歌。 ||| Goose, goose, goose, bending your neck to sing to the sky.';
+    runDirectTranslate();
+    renderTeacherMnemonicBank();
+    renderAnalyticsAndFourInOneErrors();
   </script>
 </body>
 </html>
