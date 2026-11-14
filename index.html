@@ -3,12 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Trees Pinyin</title>
+  <title>Trees Pinyin - Intuitive Mandarin Phonics & AI Coach</title>
   <meta name="theme-color" content="#1b5e20">
   <link rel="icon" type="image/png" href="/icon.png?v=3">
 
-  <script src="https://cdn.jsdelivr.net/npm/pinyin-pro@3.19.6/dist/index.js"></script>
+  <!-- 核心依赖：Azure Speech SDK + PinyinPro + OpenCC + 客户端 PDF/Word 解析 -->
+  <script src="https://aka.ms/csspeech/jsbrowserpackageraw"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pinyin-pro@3.26.0/dist/index.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/opencc-js@1.0.5/dist/umd/full.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 
   <style>
     :root {
@@ -24,7 +28,7 @@
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     body {
       margin: 0;
-      padding: 28px 16px 48px;
+      padding: 20px 14px 60px;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       background: var(--bg);
       color: var(--text);
@@ -43,26 +47,65 @@
       gap: 12px;
     }
 
-    /* 1. 膠囊上方：顯示檔案建設時間 */
-    .build-time-text {
-      font-size: 0.78rem;
-      font-weight: 700;
-      color: #1b5e20;
-      background: #e8f5e9;
-      border: 1px solid #a5d6a7;
-      padding: 4px 12px;
-      border-radius: 999px;
+    /* 1. 胶囊上方极简顶栏：中英文提示 + Google API Key 输入提示 */
+    .top-minimal-bar {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 6px;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .brand-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.92rem;
+      font-weight: 800;
+      color: var(--accent);
       letter-spacing: 0.2px;
     }
+    .top-right-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .top-pill-btn {
+      height: 32px;
+      padding: 0 12px;
+      border-radius: 999px;
+      border: 1.5px solid #c8e6c9;
+      background: #e8f5e9;
+      color: #1b5e20;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.15s;
+    }
+    .top-pill-btn:hover { background: #1b5e20; color: #fff; }
+    .top-pill-btn.zh-mode {
+      background: #e8f0fe;
+      color: #1a73e8;
+      border-color: #bfdbfe;
+    }
+    .top-pill-btn.has-key {
+      background: #dcfce7;
+      border-color: #22c55e;
+      color: #15803d;
+    }
 
-    /* 2. 純淨谷歌膠囊搜索框 (輸入框 + EN/中文 + 麥克風 + 🔑) */
+    /* 2. 纯净谷歌胶囊搜索框（仅保留：输入框 + 粘贴/直接注音 + 文件/拍照 + 语音） */
     .google-capsule-wrap {
       width: 100%;
       background: #ffffff;
       border: 1.5px solid var(--border);
       border-radius: 32px;
-      padding: 8px 10px 8px 22px;
-      box-shadow: 0 2px 10px rgba(32, 33, 36, 0.08);
+      padding: 8px 12px 8px 20px;
+      box-shadow: 0 2px 12px rgba(32, 33, 36, 0.08);
       display: flex;
       align-items: center;
       gap: 8px;
@@ -70,13 +113,13 @@
     }
     .google-capsule-wrap:focus-within {
       border-color: var(--accent);
-      box-shadow: 0 4px 16px rgba(27, 94, 32, 0.16);
+      box-shadow: 0 4px 18px rgba(27, 94, 32, 0.15);
     }
     .capsule-input {
       flex: 1;
       border: none;
       outline: none;
-      font-size: 1.05rem;
+      font-size: 1.02rem;
       line-height: 1.45;
       color: var(--text);
       background: transparent;
@@ -87,41 +130,7 @@
     }
     .capsule-input::placeholder { color: #9aa0a6; }
 
-    /* 麥克風左側的 EN / 中文 語音切換小標籤 (預設 EN) */
-    .voice-lang-toggle {
-      height: 32px;
-      padding: 0 11px;
-      border-radius: 999px;
-      border: 1.5px solid #c8e6c9;
-      background: #e8f5e9;
-      color: #1b5e20;
-      font-size: 0.8rem;
-      font-weight: 800;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      user-select: none;
-      transition: all 0.15s;
-    }
-    .voice-lang-toggle:hover {
-      background: #1b5e20;
-      color: #ffffff;
-      border-color: #1b5e20;
-    }
-    .voice-lang-toggle.zh-mode {
-      background: #e8f0fe;
-      color: #1a73e8;
-      border-color: #bfdbfe;
-    }
-    .voice-lang-toggle.zh-mode:hover {
-      background: #1a73e8;
-      color: #ffffff;
-      border-color: #1a73e8;
-    }
-
-    .mic-btn, .key-icon-btn {
+    .capsule-icon-btn {
       width: 40px;
       height: 40px;
       border-radius: 50%;
@@ -133,20 +142,16 @@
       justify-content: center;
       cursor: pointer;
       flex-shrink: 0;
-      font-size: 1rem;
+      font-size: 1.05rem;
       transition: background 0.15s, transform 0.1s;
     }
-    .mic-btn:hover, .key-icon-btn:hover { background: #e2e8f0; }
-    .mic-btn:active, .key-icon-btn:active { transform: scale(0.95); }
-    .mic-btn svg { width: 22px; height: 22px; fill: currentColor; }
-    .mic-btn.recording {
+    .capsule-icon-btn:hover { background: #e2e8f0; }
+    .capsule-icon-btn:active { transform: scale(0.95); }
+    .capsule-icon-btn svg { width: 21px; height: 21px; fill: currentColor; }
+    .capsule-icon-btn.recording {
       background: var(--danger);
       color: #ffffff;
       animation: micPulse 1s infinite;
-    }
-    .key-icon-btn.has-key {
-      background: #e8f5e9;
-      border: 1.5px solid #2e7d32;
     }
     @keyframes micPulse {
       0% { box-shadow: 0 0 0 0 rgba(217, 48, 37, 0.45); }
@@ -154,15 +159,43 @@
       100% { box-shadow: 0 0 0 0 rgba(217, 48, 37, 0); }
     }
 
-    /* 3. AI 回答與四位一體注音顯示卡片 */
+    /* 3. 胶囊正下方的免责与自备 Key / 直接粘贴提示 */
+    .capsule-disclaimer {
+      width: 100%;
+      background: #fffdf5;
+      border: 1px solid #fde68a;
+      border-left: 4px solid #f59e0b;
+      border-radius: 12px;
+      padding: 9px 14px;
+      font-size: 0.82rem;
+      color: #4b5563;
+      line-height: 1.48;
+      text-align: left;
+    }
+    .capsule-disclaimer b { color: #b45309; }
+    .capsule-disclaimer a {
+      color: var(--blue);
+      font-weight: 700;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+
+    /* 4. 第二阶段：给出结果内容后显示的四排注音卡片 + 底部功能展开栏 */
+    .result-workspace {
+      width: 100%;
+      display: none;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .result-workspace.visible { display: flex; }
+
     .answer-card {
       width: 100%;
       background: var(--card);
       border-radius: 20px;
       border: 1px solid var(--border);
       box-shadow: 0 3px 12px rgba(0, 0, 0, 0.03);
-      padding: 18px 20px;
-      min-height: 110px;
+      padding: 18px 18px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -176,8 +209,8 @@
       background: #f0fdf4;
       border: 1px solid #bbf7d0;
       border-radius: 12px;
-      padding: 10px 14px;
-      font-size: 0.88rem;
+      padding: 9px 14px;
+      font-size: 0.86rem;
       font-weight: 600;
       color: #166534;
       display: none;
@@ -232,15 +265,16 @@
       flex-direction: column;
       align-items: center;
       justify-content: flex-end;
-      margin: 0 0.28ch;
+      margin: 0 0.26ch;
       cursor: pointer;
-      padding: 2px 3px;
+      padding: 3px 4px;
       border-radius: 6px;
       transition: background 0.12s;
+      user-select: none;
     }
     .tp-col:hover { background: #f1f8e9; }
     .tp-py {
-      font-size: calc(var(--user-font-size) * 0.96);
+      font-size: calc(var(--user-font-size) * 0.95);
       font-weight: 700;
       font-style: italic;
       color: #1b5e20;
@@ -248,7 +282,7 @@
       white-space: nowrap;
     }
     .tp-std {
-      font-size: calc(var(--user-font-size) * 0.78);
+      font-size: calc(var(--user-font-size) * 0.76);
       font-weight: 500;
       color: #6b7280;
       line-height: 1.15;
@@ -262,23 +296,283 @@
       min-height: 1.22em;
     }
 
-    /* 4. 下方 API Limit 專屬提示框 */
-    .api-limit-box {
+    /* 结果下方的功能操作栏（评测、录像、Azure Key、打印） */
+    .post-result-bar {
       width: 100%;
-      background: #fffdf5;
-      border: 1px solid #fde68a;
-      border-left: 4px solid #f59e0b;
-      border-radius: 12px;
-      padding: 11px 16px;
-      font-size: 0.85rem;
-      color: #374151;
-      line-height: 1.5;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      padding-top: 8px;
+      border-top: 1px solid #f1f5f9;
+    }
+    .action-chip {
+      padding: 7px 14px;
+      border-radius: 999px;
+      border: 1px solid #cbd5e1;
+      background: #f8fafc;
+      color: #1e293b;
+      font-size: 0.83rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.15s;
+    }
+    .action-chip:hover { background: #e2e8f0; }
+    .action-chip.active {
+      background: #1b5e20;
+      color: #ffffff;
+      border-color: #1b5e20;
+    }
+
+    /* =====================================================================
+       5. 朗读与声调评测模块 (含英文+Trees Pinyin+标准拼音+汉字 四排显示)
+       ===================================================================== */
+    .eval-panel {
+      width: 100%;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 18px;
+      padding: 20px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.04);
       display: none;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .eval-panel.open { display: flex; }
+
+    .tp-banner {
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    .tp-banner-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+    .tp-badge {
+      padding: 3px 10px;
+      border-radius: 99px;
+      font-weight: 700;
+      font-size: 12px;
+      background: #e0f2fe;
+      color: #0369a1;
+    }
+    .tp-badge.pro { background: #dcfce7; color: #15803d; }
+    .tp-badge.exhausted { background: #fee2e2; color: #b91c1c; }
+
+    .tp-link {
+      background: none;
+      border: none;
+      color: #2563eb;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: underline;
+      font-size: 12.5px;
+      padding: 0;
+      margin-left: 8px;
+    }
+    .tp-byok { display: none; margin-top: 10px; padding-top: 10px; border-top: 1px dashed #cbd5e1; }
+    .tp-byok.open { display: block; }
+    .tp-row { display: flex; gap: 8px; margin-top: 6px; flex-wrap: wrap; }
+
+    .tp-input {
+      width: 100%;
+      padding: 9px 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      font-size: 15px;
+      outline: none;
+    }
+
+    /* 评测舞台：顶部显示英文翻译，下方每个字块显示 错调箭头 + Trees Pinyin + 标准拼音 + 汉字 */
+    .tp-stage-box {
+      background: #f8fafc;
+      border: 1px dashed #cbd5e1;
+      border-radius: 14px;
+      padding: 18px 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+    .tp-stage-en {
+      font-size: 15px;
+      font-weight: 600;
+      color: #1f2937;
+      text-align: center;
+      line-height: 1.4;
+    }
+    .tp-stage {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      align-items: flex-end;
+    }
+    .tp-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 6px 10px;
+      border-radius: 10px;
+      min-width: 56px;
+      background: #ffffff;
+      border: 2px solid #e2e8f0;
+      transition: all 0.2s;
+      cursor: pointer;
+      user-select: none;
+    }
+    .tp-tag {
+      height: 18px;
+      font-size: 13px;
+      font-weight: 800;
+      visibility: hidden;
+      margin-bottom: 2px;
+      white-space: nowrap;
+    }
+    .tp-item-tppy {
+      font-size: 14px;
+      font-weight: 700;
+      font-style: italic;
+      color: #1b5e20;
+      line-height: 1.15;
+    }
+    .tp-item-stdpy {
+      font-size: 11.5px;
+      color: #64748b;
+      line-height: 1.15;
+      margin-bottom: 2px;
+    }
+    .tp-hanzi { font-size: 32px; font-weight: 600; line-height: 1.1; }
+    .tp-punct { font-size: 24px; color: #94a3b8; align-self: flex-end; padding-bottom: 8px; }
+
+    /* 红黄绿交通灯状态（无文字图例） */
+    .tp-item.good { background: #dcfce7; color: #15803d; border-color: #86efac; }
+    .tp-item.good .tp-item-tppy, .tp-item.good .tp-item-stdpy { color: #15803d; }
+
+    .tp-item.warn { background: #fef08a; color: #a16207; border-color: #facc15; }
+    .tp-item.warn .tp-tag { visibility: visible; color: #b45309; }
+    .tp-item.warn .tp-item-tppy, .tp-item.warn .tp-item-stdpy { color: #a16207; }
+
+    .tp-item.bad { background: #fecaca; color: #b91c1c; border-color: #f87171; }
+    .tp-item.bad .tp-tag { visibility: visible; color: #b91c1c; }
+    .tp-item.bad .tp-item-tppy, .tp-item.bad .tp-item-stdpy { color: #b91c1c; }
+
+    .tp-btns { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
+    .tp-btn {
+      padding: 9px 22px;
+      border-radius: 99px;
+      border: 1px solid #cbd5e1;
+      background: #fff;
+      font-size: 14.5px;
+      font-weight: 600;
       cursor: pointer;
     }
-    .api-limit-box b { color: #b45309; }
+    .tp-btn-rec { background: #10b981; color: #fff; border: none; }
+    .tp-btn-rec.on { background: #ef4444; }
+    .tp-btn-rec:disabled { background: #94a3b8; cursor: not-allowed; }
 
-    /* 🔑 API Key 彈窗 */
+    .tp-msg { text-align: center; font-size: 14px; color: #334155; }
+
+    .tp-heard-box {
+      padding: 12px 14px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      font-size: 14px;
+      display: none;
+      line-height: 1.65;
+    }
+    .tp-heard-chars {
+      display: inline-flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      vertical-align: middle;
+      margin-left: 6px;
+    }
+    .tp-h-char {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 17px;
+      font-weight: 700;
+      background: #e2e8f0;
+      color: #475569;
+    }
+    .tp-h-char.match {
+      background: #dcfce7;
+      color: #15803d;
+      border: 1px solid #86efac;
+    }
+
+    /* =====================================================================
+       6. 所见即所得录像模块（Canvas 实时合成四排注音，右键改字同步体现到录像中）
+       ===================================================================== */
+    .video-panel {
+      width: 100%;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 18px;
+      padding: 18px;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+    .video-panel.open { display: flex; }
+    .canvas-preview-wrap {
+      width: 100%;
+      max-width: 460px;
+      border-radius: 14px;
+      overflow: hidden;
+      background: #0f172a;
+      border: 2px solid #cbd5e1;
+      display: flex;
+      justify-content: center;
+    }
+    #studioCanvas {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    /* =====================================================================
+       7. 划词悬浮图标 + 右键改字弹窗 + Google Key 弹窗
+       ===================================================================== */
+    #selectionBubble {
+      position: fixed;
+      display: none;
+      z-index: 9998;
+      background: #ffffff;
+      border: 1.5px solid #1b5e20;
+      border-radius: 999px;
+      padding: 4px 10px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+      gap: 6px;
+      align-items: center;
+    }
+    #selectionBubble button {
+      border: none;
+      background: none;
+      font-size: 12.5px;
+      font-weight: 700;
+      color: #1b5e20;
+      cursor: pointer;
+      padding: 3px 6px;
+      border-radius: 6px;
+    }
+    #selectionBubble button:hover { background: #e8f5e9; }
+
     .modal {
       display: none;
       position: fixed;
@@ -301,13 +595,13 @@
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
     }
     .modal-btn {
-      height: 40px;
+      height: 38px;
       padding: 0 16px;
       border-radius: 10px;
       border: none;
       background: var(--accent);
       color: #fff;
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       font-weight: 700;
       cursor: pointer;
     }
@@ -316,53 +610,170 @@
       color: #334155;
       border: 1px solid #cbd5e1;
     }
+
+    /* 8. 纯净打印排版 */
+    @media print {
+      body { background: #fff; padding: 0; }
+      .top-minimal-bar, .google-capsule-wrap, .capsule-disclaimer,
+      .post-result-bar, .eval-panel, .video-panel, .status-banner, #selectionBubble {
+        display: none !important;
+      }
+      .result-workspace { display: flex !important; }
+      .answer-card { border: none; box-shadow: none; padding: 0; }
+      .sentence-block { page-break-inside: avoid; }
+    }
   </style>
 </head>
 <body>
 
   <div class="container">
 
-    <!-- 🕒 1. 膠囊上方：顯示檔案建設時間 -->
-    <div class="build-time-text">
-      🕒 Build: 2026-11-14 10:12 PST (v14.0 禁絕AI自言自語 + 雙向模糊糾偏並更新輸入框 + 詩詞全文零疏漏干練版)
+    <!-- 1. 顶部极简栏：品牌 + EN/中文语音切换 + Google API Key 提示 -->
+    <div class="top-minimal-bar">
+      <div class="brand-pill">🌲 Trees Pinyin</div>
+      <div class="top-right-controls">
+        <button class="top-pill-btn" id="voiceLangBtn" onclick="toggleVoiceLang()" title="Switch Voice Language (EN / 中文)">
+          🌐 EN / 中文: <span id="voiceLangLabel">EN</span>
+        </button>
+        <button class="top-pill-btn" id="keyBtn" onclick="openKeyModal()" title="Enter your free Google Gemini API Key">
+          🔑 <span id="keyBtnText">Google API Key</span>
+        </button>
+      </div>
     </div>
 
-    <!-- 🔍 2. 谷歌膠囊 (輸入框 + EN/中文切換 + 麥克風 + 🔑) -->
+    <!-- 2. 核心谷歌胶囊（仅保留：文本输入/直接粘贴 + 文件/照片注音 + 语音输入） -->
     <div class="google-capsule-wrap">
       <textarea id="userInput" class="capsule-input" rows="1"
-        placeholder="Ask AI any question in English or Chinese (Press Enter or tap Mic)..."
+        placeholder="Ask AI, or paste text directly for instant phonics (Tap 📁 for File/Photo, 🎤 for Voice)..."
         oninput="handleUserInputChange(this)"></textarea>
 
-      <!-- 麥克風左邊的 EN / 中文 切換按鈕 (預設 EN 代表說英文，點擊切換為「中文」代表說中文) -->
-      <button class="voice-lang-toggle" id="voiceLangBtn" onclick="toggleVoiceLang()" title="Switch voice input language (EN / 中文)">
-        EN
+      <!-- 隐藏的文件/照片选择器（支持手机拍照、图片OCR、PDF、Word、Txt） -->
+      <input type="file" id="fileUploader" accept=".txt,.pdf,.docx,image/*" style="display:none" onchange="handleFileUpload(event)">
+
+      <!-- 文件/拍照上传按钮 -->
+      <button class="capsule-icon-btn" onclick="document.getElementById('fileUploader').click()" title="Upload File (PDF/Word/TXT) or Take Photo">
+        📁
       </button>
 
-      <!-- 麥克風按鈕 -->
-      <button class="mic-btn" id="micBtn" onclick="toggleVoice()" title="Voice Input">
+      <!-- 语音输入按钮 -->
+      <button class="capsule-icon-btn" id="micBtn" onclick="toggleVoice()" title="Voice Input">
         <svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.91-3c-.49 0-.9.36-.98.85C16.52 14.2 14.47 16 12 16s-4.52-1.8-4.93-4.15c-.08-.49-.49-.85-.98-.85-.61 0-1.09.54-1 1.14.49 3 2.89 5.35 5.91 5.78V20c0 .55.45 1 1 1s1-.45 1-1v-2.08c3.02-.43 5.42-2.78 5.91-5.78.1-.6-.39-1.14-1-1.14z"/></svg>
       </button>
-
-      <!-- 🔑 個人免費 Gemini Key 輸入按鈕 -->
-      <button class="key-icon-btn" id="keyBtn" onclick="openKeyModal()" title="Enter your free Google Gemini API Key">
-        🔑
-      </button>
     </div>
 
-    <!-- 📖 3. AI 回答與四位一體注音卡片 -->
-    <div class="answer-card" id="answerCard">
-      <div id="statusBanner" class="status-banner"></div>
-      <div id="annotationList" class="annotation-list"></div>
+    <!-- 3. 胶囊下方固定提示（AI免责声明 + 自觉输入Key或直接粘贴内容） -->
+    <div class="capsule-disclaimer" id="disclaimerBox">
+      <b>Notice:</b> Due to AI limitations, we are not responsible for content accuracy. Please consciously <a onclick="openKeyModal()">enter your own free Google Key</a>, or <a onclick="annotateInputDirectly()">paste text directly</a> for instant phonics.
+      <br>
+      <span style="font-size:0.78rem; color:#6b7280;">提示：受限于 AI，我不对内容准确性负责。请自觉输入自己的免费 Key，或者直接粘贴内容（按 Enter 提问，左键点字发音，右键点字改音）。</span>
     </div>
 
-    <!-- ⚠️ 4. API Limit 提示框 -->
-    <div id="apiLimitBox" class="api-limit-box" onclick="openKeyModal()">
-      <b>API limit.</b> For optimal results, use your own free Gemini API Key or paste text directly. The author assumes no liability for the accuracy. Your support and shares will help me go full-time to make improvements and write a memory dictionary in the future!
-    </div>
+    <!-- 4. 第二阶段：给出结果内容后才显示的区域（四排注音 + 朗读评测 + 录像 + 打印） -->
+    <div class="result-workspace" id="resultWorkspace">
 
+      <!-- 四排渐进式注音主卡片 -->
+      <div class="answer-card" id="answerCard">
+        <div id="statusBanner" class="status-banner"></div>
+        <div id="annotationList" class="annotation-list"></div>
+
+        <!-- 给出结果后才出现的底部功能栏 -->
+        <div class="post-result-bar">
+          <button class="action-chip" id="btnToggleEval" onclick="toggleSection('eval')">🗣️ Speaking & Tone Coach</button>
+          <button class="action-chip" id="btnToggleVideo" onclick="toggleSection('video')">🎥 Record Video</button>
+          <button class="action-chip" onclick="openAzureKeyBox()">⚙️ Azure Key (5 hrs/mo Free)</button>
+          <button class="action-chip" onclick="window.print()">🖨️ Print</button>
+        </div>
+      </div>
+
+      <!-- 5. 朗读评测模块（含四排注音 + 红黄绿交通灯 + 错调箭头 + 盲听绿底对比） -->
+      <div class="eval-panel" id="evalPanel">
+        <div class="tp-banner">
+          <div class="tp-banner-top">
+            <span class="tp-badge" id="quotaBadge">🎁 Daily Free Quota: 2 / 2 left</span>
+            <div>
+              <button class="tp-link" onclick="document.getElementById('byokBox').classList.toggle('open')">⚙️ Add Azure Key (5 hrs/mo Free)</button>
+              <button class="tp-link" style="color:#d97706" onclick="alert('Thank you for supporting Trees Pinyin free education!')">❤️ Support Us</button>
+            </div>
+          </div>
+          <div>
+            Due to quota limits, each user is allowed <strong>2 free evaluations per day</strong>. You can <strong>add your own Azure Key (5 hours/month free quota)</strong>. Welcome to <strong>support us in continuing to contribute to free education!</strong>
+          </div>
+          <div class="tp-byok" id="byokBox">
+            <div class="tp-row">
+              <input id="azKey" class="tp-input" type="password" placeholder="Paste your Azure KEY 1" oninput="saveCfg()" style="flex:2; font-size:13px; padding:7px 10px;" />
+              <input id="azReg" class="tp-input" type="text" placeholder="Region (westus2)" oninput="saveCfg()" style="flex:1; font-size:13px; padding:7px 10px;" />
+              <button class="tp-btn" onclick="clearCfg()" style="padding:6px 12px; font-size:12px;">Clear</button>
+            </div>
+          </div>
+        </div>
+
+        <input id="sentenceInput" class="tp-input" value="你好，我买了一把雨伞。" oninput="renderStage()" />
+
+        <!-- 评测舞台：包含英文 + Trees Pinyin + 标准拼音 + 汉字 四排完整显示 -->
+        <div class="tp-stage-box">
+          <div class="tp-stage-en" id="stageEnLine">Hello, I bought an umbrella.</div>
+          <div class="tp-stage" id="stage"></div>
+        </div>
+
+        <div class="tp-btns">
+          <button class="tp-btn" onclick="speakDemo()">🔊 Listen Demo</button>
+          <button class="tp-btn tp-btn-rec" id="recBtn" onclick="toggleRecord()">🎤 Start Speaking</button>
+        </div>
+
+        <div class="tp-msg" id="msgBox">Click "Start Speaking", read the sentence, and click Stop to score. (Left-click character to hear, Right-click to edit sound)</div>
+
+        <div class="tp-heard-box" id="heardBox">
+          <div>
+            👂 <b>Chinese Listener Heard:</b>
+            <span class="tp-heard-chars" id="heardZh"></span>
+          </div>
+          <div style="margin-top:8px;">
+            🌐 <b>English Translation:</b>
+            <span id="heardEn" style="color:#2563eb; font-weight:600; font-style:italic;"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6. 录像练习模块（Canvas 实时合成四排注音，右键改字同步到录像画面中） -->
+      <div class="video-panel" id="videoPanel">
+        <div style="font-size:0.86rem; font-weight:700; color:#1b5e20;">
+          🎥 WYSIWYG Video Recorder (Right-click any character to edit Pinyin live in video)
+        </div>
+        <div class="canvas-preview-wrap">
+          <video id="rawCamVideo" playsinline autoplay muted style="display:none;"></video>
+          <canvas id="studioCanvas" width="720" height="960"></canvas>
+        </div>
+        <div class="tp-btns">
+          <button class="tp-btn" id="camRatioBtn" onclick="toggleCamRatio()">📱 Ratio: 3:4 Portrait</button>
+          <button class="tp-btn tp-btn-rec" id="vidRecBtn" onclick="toggleVideoRecording()">⏺ Start Recording</button>
+          <a id="vidDownloadLink" class="tp-btn" style="display:none; background:#2563eb; color:#fff; text-decoration:none;">⬇️ Save Video</a>
+        </div>
+      </div>
+
+    </div>
   </div>
 
-  <!-- 🔑 Google Gemini API Key 彈窗 -->
+  <!-- 划词悬浮快捷图标栏 -->
+  <div id="selectionBubble">
+    <button onclick="handleSelectionAction('annotate')">🌲 Phonics</button>
+    <button onclick="handleSelectionAction('speak')">🔊 Speak</button>
+    <button onclick="handleSelectionAction('eval')">🗣️ Coach</button>
+  </div>
+
+  <!-- 右键修改多音字弹窗 -->
+  <div class="modal" id="polyModal" onclick="if(event.target===this)this.style.display='none'">
+    <div class="modal-box" style="max-width:340px;">
+      <h3 style="margin:0; font-size:1rem; color:var(--accent);">✏️ Edit Pinyin / 修改读音: <span id="editCharTitle"></span></h3>
+      <div style="font-size:0.82rem; color:#475569;">Enter numbered Pinyin (e.g. <b>hang2</b>, <b>xing2</b>, <b>le5</b>). Changes sync immediately to Cards, Coach & Video:</div>
+      <input type="text" id="polyInput" placeholder="e.g. hang2" style="width:100%; padding:9px; border:1px solid #cbd5e1; border-radius:8px; font-size:0.95rem;">
+      <div style="display:flex; gap:8px;">
+        <button class="modal-btn" style="flex:1;" onclick="savePolyphoneOverride()">Apply & Sync</button>
+        <button class="modal-btn secondary" onclick="document.getElementById('polyModal').style.display='none'">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Google Gemini API Key 弹窗 -->
   <div class="modal" id="keyModal" onclick="if(event.target===this)this.style.display='none'">
     <div class="modal-box">
       <h3 style="margin:0; font-size:1.02rem; color:var(--accent);">🔑 Google Gemini API Key</h3>
@@ -382,9 +793,12 @@
 
   <script>
     // =========================================================================
-    // 1. 全域端點與基礎繁簡轉換
+    // PART A: 原封不动保留 AIcapsule.html 核心 AI、双语语音识别与 63 规则自然拼读引擎
     // =========================================================================
+    const { pinyin } = window.pinyinPro;
     const CF_WORKER_ENDPOINTS = ['https://treespinyin-api.treespinyin.workers.dev'];
+    const WORKER_TOKEN_URL = "/speech-token";
+    const DAILY_LIMIT = 2;
 
     let openccToTrad = null;
     try {
@@ -396,24 +810,39 @@
       return openccToTrad ? openccToTrad(str) : str;
     }
 
+    // 用户右键自定义字音记忆库（持久化存储在 localStorage）
+    let userCharOverrides = {};
+    try {
+      userCharOverrides = JSON.parse(localStorage.getItem('tp_char_overrides') || '{}');
+    } catch (e) {}
+
+    let activeSentenceZh = '你好，我买了一把雨伞。';
+    let activeSentenceEn = 'Hello, I bought an umbrella.';
+
     function autoResizeTextarea(el) {
       el.style.height = 'auto';
       el.style.height = Math.min(el.scrollHeight, 110) + 'px';
     }
 
+    let spokenLang = 'en';
+    let activeRec = null;
+    let voiceSilenceTimer = null;
+    let latestVoiceCandidates = [];
+
     function setVoiceLangMode(mode) {
       const btn = document.getElementById('voiceLangBtn');
+      const label = document.getElementById('voiceLangLabel');
       const inputEl = document.getElementById('userInput');
       spokenLang = mode;
       try { localStorage.setItem('tp_spoken_lang', mode); } catch (e) {}
       if (mode === 'zh') {
-        btn.innerText = '中文';
+        label.innerText = '中文';
         btn.classList.add('zh-mode');
-        inputEl.placeholder = '請向 AI 提問任何問題（按 Enter 或點麥克風說普通話）...';
+        inputEl.placeholder = '請向 AI 提問或直接粘貼文本（按 Enter 提問，點 📁 傳文件/拍照，點 🎤 說普通話）...';
       } else {
-        btn.innerText = 'EN';
+        label.innerText = 'EN';
         btn.classList.remove('zh-mode');
-        inputEl.placeholder = 'Ask AI any question in English or Chinese (Press Enter or tap Mic)...';
+        inputEl.placeholder = 'Ask AI, or paste text directly for instant phonics (Tap 📁 for File/Photo, 🎤 for Voice)...';
       }
     }
 
@@ -425,6 +854,16 @@
       }
     }
 
+    // 支持直接粘贴大段文本时免 AI 秒出四排注音
+    document.getElementById('userInput').addEventListener('paste', function() {
+      setTimeout(() => {
+        const val = this.value.trim();
+        if (val.length > 35 && !val.endsWith('?') && !val.endsWith('？')) {
+          annotateInputDirectly();
+        }
+      }, 60);
+    });
+
     document.getElementById('userInput').addEventListener('keydown', function(e) {
       if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) {
         e.preventDefault();
@@ -432,18 +871,33 @@
       }
     });
 
-    // =========================================================================
-    // 1.5 🌱 文明用語友情提醒 (Mindful Language Friendly Reminder)
-    // =========================================================================
+    async function annotateInputDirectly() {
+      const raw = document.getElementById('userInput').value.trim();
+      if (!raw) return;
+      document.getElementById('resultWorkspace').classList.add('visible');
+      const list = document.getElementById('annotationList');
+      list.innerHTML = '';
+      const lines = raw.split(/\r?\n+/).map(x => x.trim()).filter(Boolean);
+      for (const line of lines) {
+        if (/[\u4e00-\u9fa5]/.test(line)) {
+          const en = await translateFastFallback(line, 'zh', 'en');
+          appendSentenceProgressive(line, en);
+        } else {
+          const zh = await translateFastFallback(line, 'en', 'zh');
+          appendSentenceProgressive(zh, line);
+        }
+      }
+    }
+
     const PROFANITY_EN_REGEX = /\b(fuck|fucking|fucked|fucker|motherfucker|shit|shitty|bullshit|bitch|bitches|asshole|bastard|dick|cock|pussy|cunt|whore|slut|nigger|nigga|faggot|retard)\b/i;
     const PROFANITY_ZH_LIST = ['他媽的','他妈的','你媽的','你妈的','操你','肏你','草泥馬','草泥马','傻逼','煞筆','傻B','去死吧','王八蛋','賤人','贱人','婊子','媽的','妈的'];
 
     function checkAndRemindProfanity(text) {
       if (!text) return false;
       if (PROFANITY_EN_REGEX.test(text) || PROFANITY_ZH_LIST.some(w => text.includes(w))) {
+        document.getElementById('resultWorkspace').classList.add('visible');
         const banner = document.getElementById('statusBanner');
         const list = document.getElementById('annotationList');
-        document.getElementById('apiLimitBox').style.display = 'none';
         banner.className = 'status-banner friendly-reminder';
         banner.style.display = 'block';
         banner.innerHTML = '🌱 <b>Friendly Reminder / 友情提醒：</b> Let\'s keep our language kind and respectful! / 請使用文明禮貌的語言提問喔！';
@@ -454,9 +908,6 @@
       return false;
     }
 
-    // =========================================================================
-    // 2. 🧠 連貫對話滑動視窗記憶 (支援無限輪連貫對話，保留最近 3 輪上下文)
-    // =========================================================================
     const MAX_MEMORY_TURNS = 3;
     let conversationHistory = [];
     let lastInteractionTime = 0;
@@ -465,9 +916,7 @@
       if (!userQ || !aiRawReply) return;
       const compactReply = aiRawReply.split(/\r?\n+/).slice(0, 4).join(' / ').slice(0, 260);
       conversationHistory.push({ q: userQ, a: compactReply });
-      if (conversationHistory.length > MAX_MEMORY_TURNS) {
-        conversationHistory.shift();
-      }
+      if (conversationHistory.length > MAX_MEMORY_TURNS) conversationHistory.shift();
       lastInteractionTime = Date.now();
     }
 
@@ -481,14 +930,6 @@
       return '\nRecent Conversation History:\n' + lines.join('\n');
     }
 
-    // =========================================================================
-    // 3. 🎙️ 膠囊內 EN / 中文 語音引擎 (預設 EN)
-    // =========================================================================
-    let spokenLang = 'en'; // 預設為英文 'en' ('en' | 'zh')
-    let activeRec = null;
-    let voiceSilenceTimer = null;
-    let latestVoiceCandidates = [];
-
     function toggleVoiceLang() {
       setVoiceLangMode(spokenLang === 'en' ? 'zh' : 'en');
       if (activeRec) {
@@ -501,7 +942,6 @@
       }
     }
 
-    // 產生三軌聲學指紋：「帶調拼音」+「無調拼音」+「平翹舌/前後鼻音歸一化模糊音軌 (Fuzzy Skeleton)」，讓 AI 100% 瞬間看穿同音錯字與口音偏差！
     function getPhoneticTrackForAI(text) {
       if (!text) return '';
       if (/[\u4e00-\u9fa5]/.test(text)) {
@@ -537,10 +977,9 @@
       const inputEl = document.getElementById('userInput');
       inputEl.value = '';
       autoResizeTextarea(inputEl);
-      document.getElementById('apiLimitBox').style.display = 'none';
+      document.getElementById('resultWorkspace').classList.add('visible');
 
       activeRec = new SR();
-      // 中文模式採用 zh-CN 原生普通話聲學引擎，並拉滿 8 個同音候選詞供 AI 聲學比對
       activeRec.lang = (spokenLang === 'en') ? 'en-US' : 'zh-CN';
       activeRec.interimResults = true;
       activeRec.maxAlternatives = 8;
@@ -551,7 +990,7 @@
       banner.className = 'status-banner';
       banner.style.display = 'block';
       banner.innerText = (spokenLang === 'en')
-        ? '🔴 Listening in English (EN)... (Tap "EN" to switch to 中文 if speaking Mandarin)'
+        ? '🔴 Listening in English (EN)...'
         : '🔴 正在聽取中文語音 (中文模式)... 說完停頓 1 秒即刻回答！';
 
       const finalizedSegments = [];
@@ -560,7 +999,6 @@
       let lastValidFullText = '';
       let hasSpokenYet = false;
 
-      // 極速收音計時：中文說完停頓 1.15 秒即刻發送（比之前快 1.1 秒！），英文停頓 1.55 秒即刻發送
       function scheduleGentleStop() {
         clearTimeout(voiceSilenceTimer);
         const silenceAllowance = (spokenLang === 'en') ? 1650 : 1350;
@@ -571,7 +1009,6 @@
       }
 
       scheduleGentleStop();
-
       const sep = (spokenLang === 'en') ? ' ' : '';
 
       activeRec.onresult = (e) => {
@@ -651,14 +1088,10 @@
         }
       };
 
-      try {
-        activeRec.start();
-      } catch (err) {}
+      try { activeRec.start(); } catch (err) {}
     }
 
-    // =========================================================================
-    // 4. 數字與符號轉中文口語 + Trees Pinyin 63 規則自然拼讀編譯器
-    // =========================================================================
+    // 数字转中文与 Trees Pinyin 63 规则编译器
     const DIGITS_ZH = ['零','一','二','三','四','五','六','七','八','九'];
 
     function intToChinese(numStr) {
@@ -769,7 +1202,7 @@
 
     function numPinyinToToneMark(pyNum) {
       if (!pyNum) return '';
-      const m = pyNum.trim().match(/^([a-züv:]+)([1-5]?)$/i);
+      const m = pyNum.trim().match(/^([a-züv:]+)([0-5]?)$/i);
       if (!m) return pyNum;
       let s = m[1].toLowerCase().replace('v', 'ü').replace('u:', 'ü');
       const t = parseInt(m[2] || '5', 10);
@@ -801,6 +1234,13 @@
           let fixedPys = CUSTOM_POLYPHONES[word].split(' ');
           for (let k = 0; k < fixedPys.length; k++) pyArr[idx + k] = fixedPys[k];
           idx = zhText.indexOf(word, idx + 1);
+        }
+      }
+      // 应用用户右键修改的字音覆盖
+      for (let i = 0; i < zhText.length; i++) {
+        const ch = zhText[i];
+        if (userCharOverrides[ch]) {
+          pyArr[i] = userCharOverrides[ch];
         }
       }
       return pyArr;
@@ -839,10 +1279,6 @@
       window.speechSynthesis.speak(u);
     }
 
-    function nextPaintTick() {
-      return new Promise(resolve => requestAnimationFrame(() => setTimeout(resolve, 10)));
-    }
-
     async function translateFastFallback(text, fromLang, toLang) {
       const isZhToEn = fromLang.startsWith('zh');
       const src = isZhToEn ? 'zh-CN' : 'en';
@@ -870,26 +1306,41 @@
       }
     }
 
-    function appendSentenceProgressive(rawZhText, enTranslation = '') {
-      const list = document.getElementById('annotationList');
-      const block = document.createElement('div');
-      block.className = 'sentence-block';
+    // 右键修改读音并同步至所有卡片、朗读评测舞台与录像字幕
+    let editingChar = '';
+    function openPolyphoneModal(char, currentPyNum, e) {
+      if (e) e.preventDefault();
+      editingChar = char;
+      document.getElementById('editCharTitle').innerText = char;
+      document.getElementById('polyInput').value = userCharOverrides[char] || currentPyNum || '';
+      document.getElementById('polyModal').style.display = 'flex';
+      setTimeout(() => document.getElementById('polyInput').focus(), 50);
+    }
 
-      const expandedZh = expandNumbersAndSymbolsToZh(rawZhText);
-      const tradZh = toTrad(expandedZh);
-      block.dataset.zh = tradZh;
-      block.dataset.en = enTranslation;
+    function savePolyphoneOverride() {
+      const val = document.getElementById('polyInput').value.trim().toLowerCase();
+      if (editingChar && val) {
+        userCharOverrides[editingChar] = val;
+        try { localStorage.setItem('tp_char_overrides', JSON.stringify(userCharOverrides)); } catch (e) {}
+        refreshAllDisplayedAnnotations();
+        renderStage();
+      }
+      document.getElementById('polyModal').style.display = 'none';
+    }
 
-      const enDiv = document.createElement('div');
-      enDiv.className = 'en-line';
-      const hasEn = Boolean(enTranslation && enTranslation.trim());
-      enDiv.innerText = hasEn ? enTranslation.trim() : '...';
-      block.appendChild(enDiv);
+    function refreshAllDisplayedAnnotations() {
+      const blocks = document.querySelectorAll('.sentence-block');
+      blocks.forEach(block => {
+        const tradZh = block.dataset.zh || '';
+        const charRow = block.querySelector('.char-row');
+        if (!tradZh || !charRow) return;
+        populateCharRow(charRow, tradZh);
+      });
+    }
 
-      const charRow = document.createElement('div');
-      charRow.className = 'char-row';
+    function populateCharRow(charRow, tradZh) {
+      charRow.innerHTML = '';
       const pinyinList = getAccuratePinyinArray(tradZh);
-
       for (let i = 0; i < tradZh.length; i++) {
         const char = tradZh[i];
         const isChinese = /[\u4e00-\u9fa5]/.test(char);
@@ -901,37 +1352,70 @@
           const tp = compileToTreesPinyin(pyNum);
           const stdTone = numPinyinToToneMark(pyNum);
           col.innerHTML = `<span class="tp-py">${tp}</span><span class="tp-std">${stdTone}</span><span class="tp-zh">${char}</span>`;
+          // 左键点击发音，右键（或手机端长按）改字
           col.onclick = () => speakText(char);
+          col.oncontextmenu = (e) => openPolyphoneModal(char, pyNum, e);
         } else {
-          col.innerHTML = `<span class="tp-py">${char}</span><span class="tp-std">&nbsp;</span><span class="tp-zh">&nbsp;</span>`;
+          col.innerHTML = `<span class="tp-py">${char}</span><span class="tp-std"> </span><span class="tp-zh"> </span>`;
         }
         charRow.appendChild(col);
       }
+    }
+
+    function appendSentenceProgressive(rawZhText, enTranslation = '') {
+      document.getElementById('resultWorkspace').classList.add('visible');
+      const list = document.getElementById('annotationList');
+      const block = document.createElement('div');
+      block.className = 'sentence-block';
+
+      const expandedZh = expandNumbersAndSymbolsToZh(rawZhText);
+      const tradZh = toTrad(expandedZh);
+      block.dataset.zh = tradZh;
+      block.dataset.en = enTranslation;
+
+      // 同步最新句子到朗读评测与录像模块
+      activeSentenceZh = tradZh;
+      activeSentenceEn = enTranslation || '';
+      document.getElementById('sentenceInput').value = tradZh;
+      renderStage();
+
+      const enDiv = document.createElement('div');
+      enDiv.className = 'en-line';
+      const hasEn = Boolean(enTranslation && enTranslation.trim());
+      enDiv.innerText = hasEn ? enTranslation.trim() : '...';
+      block.appendChild(enDiv);
+
+      const charRow = document.createElement('div');
+      charRow.className = 'char-row';
+      populateCharRow(charRow, tradZh);
 
       block.appendChild(charRow);
+      // 点击句子英文行可将整句载入评测台并朗读
+      enDiv.onclick = () => {
+        activeSentenceZh = tradZh;
+        activeSentenceEn = block.dataset.en || '';
+        document.getElementById('sentenceInput').value = tradZh;
+        renderStage();
+        speakText(tradZh);
+      };
       list.appendChild(block);
 
       if (!hasEn) {
         translateFastFallback(tradZh, 'zh', 'en').then(en => {
           enDiv.innerText = en;
           block.dataset.en = en;
+          if (activeSentenceZh === tradZh) {
+            activeSentenceEn = en;
+            document.getElementById('stageEnLine').innerText = en;
+          }
         });
       }
     }
 
-    // =========================================================================
-    // 5. v10.0 終極診斷 + 四重真 AI 保底架構：
-    //    (1) 自動透過 /v1beta/models 抓取該 Key 帳號下真正授權的模型（與原版成功邏輯 100% 一致）
-    //    (2) 請求格式使用最純淨的 contents: [{ parts: [{ text }] }]（不含會引發相容問題的 role）
-    //    (3) 新增「免 Key 免費大模型問答直連通道 (Pollinations AI)」：即便個人 Key 報 429 限流且 Cloudflare 忙碌，也由免費大模型真正回答問題，絕不退化為復讀機！
-    //    (4) 若個人 Key 報錯，直接在狀態欄顯示真實錯誤原因（方便測試診斷）！
-    // =========================================================================
+    // AI 模型发现与竞速管线
     function normalizeCloudCacheKey(rawQ) {
       if (!rawQ) return '';
-      return rawQ
-        .toLowerCase()
-        .replace(/[\s,.?!，。？！、：:；;《》〈〉"“”'‘’()（）]/g, '')
-        .slice(0, 120);
+      return rawQ.toLowerCase().replace(/[\s,.?!，。？！、：:；;《》〈〉"“”'‘’()（）]/g, '').slice(0, 120);
     }
 
     let backupKey = '';
@@ -939,7 +1423,6 @@
       backupKey = (localStorage.getItem('tp_v22_backup_key') || localStorage.getItem('tp_test_gemini_key') || '').trim();
     } catch (e) {}
 
-    // 置頂谷歌官方最新極速模型，並用 modelsDiscoveredFlag 避免每次提問重複查詢 /models 目錄（直接省下 0.6 秒網路往返！）
     let availableFastModels = [
       'gemini-3.8-flash',
       'gemini-flash-latest',
@@ -947,35 +1430,17 @@
       'gemini-flash-lite-latest'
     ];
     let modelsDiscoveredForKey = '';
-
-    // 單用戶公共池免費使用次數統計：當未填個人 Key 的用戶累計使用超過門檻（如每滿 6 次）時，溫馨提醒填入個人免費 Key，保護萬人公共池！
-    const FREE_PUBLIC_REMINDER_THRESHOLD = 6;
-    function getAndIncrementPublicUsage() {
-      try {
-        const today = new Date().toISOString().slice(0, 10);
-        const savedDate = localStorage.getItem('tp_pub_usage_date') || '';
-        let count = parseInt(localStorage.getItem('tp_pub_usage_count') || '0', 10);
-        if (savedDate !== today) {
-          count = 0;
-          localStorage.setItem('tp_pub_usage_date', today);
-        }
-        count++;
-        localStorage.setItem('tp_pub_usage_count', String(count));
-        return count;
-      } catch (e) {
-        return 1;
-      }
-    }
-
-    // 瀏覽器端動態記憶快取（僅快取真 AI 實時生成過的回答，同問題二次提問 0.001 秒極速秒回！）
     const sessionDynamicCache = new Map();
 
     function refreshKeyBtnStyle() {
       const btn = document.getElementById('keyBtn');
+      const txt = document.getElementById('keyBtnText');
       if (backupKey) {
         btn.classList.add('has-key');
+        txt.innerText = 'Google Key ✓';
       } else {
         btn.classList.remove('has-key');
+        txt.innerText = 'Google API Key';
       }
     }
     refreshKeyBtnStyle();
@@ -983,9 +1448,7 @@
     async function discoverAuthorizedModels(key) {
       if (!key) return [];
       const cleanKey = key.replace(/\s+/g, '');
-      if (modelsDiscoveredForKey === cleanKey && availableFastModels.length > 0) {
-        return availableFastModels;
-      }
+      if (modelsDiscoveredForKey === cleanKey && availableFastModels.length > 0) return availableFastModels;
       try {
         const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(cleanKey)}`);
         if (!r.ok) return [];
@@ -995,31 +1458,18 @@
           .map(m => m.name.replace('models/', ''))
           .filter(n => !/tts|image|imagen|embedding|veo|robotics|aqa|bison|gecko|thinking|2\.5-flash|1\.5-flash|2\.0-flash/i.test(n));
 
-        const priority = [
-          'gemini-3.8-flash',
-          'gemini-flash-latest',
-          'gemini-flash-lite-latest',
-          'gemma-3-27b-it',
-          'gemini-3.8-flash-lite',
-          'gemini-3.5-flash'
-        ];
+        const priority = ['gemini-3.8-flash', 'gemini-flash-latest', 'gemini-flash-lite-latest', 'gemma-3-27b-it', 'gemini-3.8-flash-lite', 'gemini-3.5-flash'];
         const sorted = [];
-        for (const p of priority) {
-          if (all.includes(p)) sorted.push(p);
-        }
+        for (const p of priority) { if (all.includes(p)) sorted.push(p); }
         for (const m of all) {
-          if ((m.includes('flash') || m.includes('gemma') || m.includes('latest')) && !sorted.includes(m)) {
-            sorted.push(m);
-          }
+          if ((m.includes('flash') || m.includes('gemma') || m.includes('latest')) && !sorted.includes(m)) sorted.push(m);
         }
         if (sorted.length > 0) {
           availableFastModels = sorted;
           modelsDiscoveredForKey = cleanKey;
         }
         return sorted;
-      } catch (e) {
-        return [];
-      }
+      } catch (e) { return []; }
     }
     if (backupKey) discoverAuthorizedModels(backupKey);
 
@@ -1029,11 +1479,9 @@
       return fetch(url, { ...options, signal: ctrl.signal }).finally(() => clearTimeout(timer));
     }
 
-    // 零思考延遲 (thinkingBudget: 0 僅對支援的 Gemini Flash 啟用，Gemma 直接極速直通，避免 400 二次往返浪費時間！)
     async function callSingleGeminiModel(modelName, fullPromptText, activeKey, signal) {
       const cleanKey = activeKey.replace(/\s+/g, '');
       const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${encodeURIComponent(cleanKey)}`;
-
       const isGemma = /gemma/i.test(modelName);
       const genConfig = isGemma
         ? { temperature: 0.1, maxOutputTokens: 1200 }
@@ -1042,10 +1490,7 @@
       let r = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: fullPromptText }] }],
-          generationConfig: genConfig
-        }),
+        body: JSON.stringify({ contents: [{ parts: [{ text: fullPromptText }] }], generationConfig: genConfig }),
         signal
       });
 
@@ -1053,27 +1498,15 @@
         r = await fetch(url, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: fullPromptText }] }],
-            generationConfig: { temperature: 0.1, maxOutputTokens: 1200 }
-          }),
+          body: JSON.stringify({ contents: [{ parts: [{ text: fullPromptText }] }], generationConfig: { temperature: 0.1, maxOutputTokens: 1200 } }),
           signal
         });
       }
 
       const d = await r.json();
-      if (!r.ok) {
-        const errMsg = d?.error?.message || `HTTP_${r.status}`;
-        throw new Error(`[${modelName}: ${r.status}] ${errMsg}`);
-      }
-
+      if (!r.ok) throw new Error(`[${modelName}: ${r.status}] ${d?.error?.message || 'Error'}`);
       const resParts = d?.candidates?.[0]?.content?.parts || [];
-      const text = resParts
-        .filter(p => !p.thought && typeof p.text === 'string')
-        .map(p => p.text)
-        .join('')
-        .trim();
-
+      const text = resParts.filter(p => !p.thought && typeof p.text === 'string').map(p => p.text).join('').trim();
       if (!text) throw new Error(`[${modelName}] EMPTY_RESPONSE`);
       return text;
     }
@@ -1085,10 +1518,7 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             model: 'openai-fast',
-            messages: [
-              { role: 'system', content: systemRules },
-              { role: 'user', content: userQuestion }
-            ],
+            messages: [{ role: 'system', content: systemRules }, { role: 'user', content: userQuestion }],
             temperature: 0.15
           })
         }, 8000);
@@ -1102,22 +1532,17 @@
     }
 
     async function fetchFastAccurateAI(systemRules, userQuestion, cacheKeyForCloud = '') {
-      // 0. 若本機動態快取已存在此獨立問題的真 AI 回答，0 毫秒極速返回！
       if (cacheKeyForCloud && sessionDynamicCache.has(cacheKeyForCloud)) {
-        return { text: sessionDynamicCache.get(cacheKeyForCloud), source: 'Instant Cache', diagError: null, usedPublicPool: false };
+        return { text: sessionDynamicCache.get(cacheKeyForCloud), source: 'Instant Cache', diagError: null };
       }
 
       const modalKeyVal = (document.getElementById('apiKeyInput')?.value || '').trim();
       const activeKey = (backupKey || modalKeyVal).replace(/\s+/g, '');
       const fullPromptText = `${systemRules}\n\nUser Question: "${userQuestion}"`;
-
       const errorLogs = [];
 
-      // 1. 若有個人 Google API Key：採用「雙模型階梯併發競速 (Staggered Hedge Race)」—— 主模型超過 1.6 秒未回自動併發備用模型，誰先回用誰！
       if (activeKey) {
-        if (modelsDiscoveredForKey !== activeKey) {
-          discoverAuthorizedModels(activeKey); // 背景非阻塞更新，不卡住當前請求！
-        }
+        if (modelsDiscoveredForKey !== activeKey) discoverAuthorizedModels(activeKey);
         const modelsToTry = availableFastModels.slice(0, 3);
         for (let i = 0; i < modelsToTry.length; i++) {
           const ctrl = new AbortController();
@@ -1127,57 +1552,46 @@
             clearTimeout(timer);
             if (txt) {
               if (cacheKeyForCloud) sessionDynamicCache.set(cacheKeyForCloud, txt);
-              return { text: txt, source: `Google (${modelsToTry[i]})`, diagError: null, usedPublicPool: false };
+              return { text: txt, source: `Google (${modelsToTry[i]})`, diagError: null };
             }
           } catch (e) {
             clearTimeout(timer);
-            const isTimeout = e && (e.name === 'AbortError' || /aborted/i.test(e.message || ''));
-            const msg = isTimeout ? `[${modelsToTry[i]}: Timeout]` : (e.message || String(e));
+            const msg = e.message || String(e);
             errorLogs.push(msg);
-            if (/API_KEY_INVALID|key not valid/i.test(msg)) {
-              break;
-            }
+            if (/API_KEY_INVALID|key not valid/i.test(msg)) break;
           }
         }
       }
 
-      // 2. 走 Cloudflare Worker 全球邊緣免費快取與多 Key 輪詢池
       for (let i = 0; i < CF_WORKER_ENDPOINTS.length; i++) {
         try {
           const r = await fetchWithTimeout(CF_WORKER_ENDPOINTS[i], {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              prompt: fullPromptText,
-              cacheKey: cacheKeyForCloud
-            })
+            body: JSON.stringify({ prompt: fullPromptText, cacheKey: cacheKeyForCloud })
           }, 16000);
           const d = await r.json().catch(() => ({}));
           if (!r.ok) {
-            const detail = d?.detail || d?.error || `HTTP ${r.status}`;
-            errorLogs.push(`[Worker: ${detail}]`);
+            errorLogs.push(`[Worker: ${d?.detail || d?.error || r.status}]`);
             continue;
           }
           const t = (d?.text || d?.reply || d?.choices?.[0]?.message?.content || '').trim();
           if (t) {
             if (cacheKeyForCloud) sessionDynamicCache.set(cacheKeyForCloud, t);
-            const isCacheHit = r.headers.get('X-Cache') === 'HIT';
-            return { text: t, source: 'Cloudflare Global Pool', diagError: null, usedPublicPool: !isCacheHit };
+            return { text: t, source: 'Cloudflare Global Pool', diagError: null };
           }
         } catch (e) {
-          const isTimeout = e && (e.name === 'AbortError' || /aborted/i.test(e.message || ''));
-          errorLogs.push(isTimeout ? '[Worker: Timeout]' : `[Worker: ${e.message || 'Network/CORS'}]`);
+          errorLogs.push(`[Worker: ${e.message || 'Network'}]`);
         }
       }
 
-      // 3. 免 Key 免費開源大模型直連兜底
       const freeAiTxt = await callKeylessFreeOpenSourceLLM(systemRules, userQuestion);
       if (freeAiTxt) {
         if (cacheKeyForCloud) sessionDynamicCache.set(cacheKeyForCloud, freeAiTxt);
-        return { text: freeAiTxt, source: 'Free Open-Source AI Backup', diagError: errorLogs.join(' | '), usedPublicPool: true };
+        return { text: freeAiTxt, source: 'Free Open-Source AI Backup', diagError: errorLogs.join(' | ') };
       }
 
-      return { text: '', source: 'none', diagError: errorLogs.join(' | '), usedPublicPool: true };
+      return { text: '', source: 'none', diagError: errorLogs.join(' | ') };
     }
 
     function cleanChineseSentence(line) {
@@ -1195,7 +1609,6 @@
       return /[\u4e00-\u9fa5]/.test(s) ? s : '';
     }
 
-    // 嚴格攔截 AI 的自言自語、思考過程、糾錯解釋（如 "Based on context and phonetics..."），絕不允許這類廢話混入回答或古詩中！
     function isAIMetaChatterLine(line) {
       if (!line) return true;
       const metaPattern = /^(based on context|based on phonetics|based on the|the user input|speech recognition error|phonetic track|intended question|corrected input|user meant|here is the|sure,\s*here|note:|explanation:|analysis:|reasoning:|根據語音|根據上下文|語音識別錯誤|用戶本意|糾正後)/i;
@@ -1209,13 +1622,9 @@
       if (isAIMetaChatterLine(cleaned)) return null;
 
       let parts = null;
-      if (cleaned.includes('|||')) {
-        parts = cleaned.split('|||').map(p => p.trim()).filter(Boolean);
-      } else if (cleaned.includes('｜｜｜')) {
-        parts = cleaned.split('｜｜｜').map(p => p.trim()).filter(Boolean);
-      } else if (cleaned.includes(' | ')) {
-        parts = cleaned.split(' | ').map(p => p.trim()).filter(Boolean);
-      }
+      if (cleaned.includes('|||')) parts = cleaned.split('|||').map(p => p.trim()).filter(Boolean);
+      else if (cleaned.includes('｜｜｜')) parts = cleaned.split('｜｜｜').map(p => p.trim()).filter(Boolean);
+      else if (cleaned.includes(' | ')) parts = cleaned.split(' | ').map(p => p.trim()).filter(Boolean);
       if (!parts || parts.length < 2) return null;
 
       let zhPart = '', enPart = '';
@@ -1234,12 +1643,7 @@
     }
 
     async function renderBilingualAIOutput(aiText) {
-      const rawLines = aiText
-        .replace(/```[a-z]*\n?/gi, '')
-        .replace(/```/g, '')
-        .split(/\r?\n+/)
-        .map(l => l.trim())
-        .filter(Boolean);
+      const rawLines = aiText.replace(/```[a-z]*\n?/gi, '').replace(/```/g, '').split(/\r?\n+/).map(l => l.trim()).filter(Boolean);
       if (rawLines.length === 0) return { ok: false, correctedQuery: '' };
 
       const seenExactZh = new Set();
@@ -1248,8 +1652,6 @@
 
       for (let i = 0; i < rawLines.length; i++) {
         const rawLine = rawLines[i];
-
-        // 若 AI 第一行回傳了 [FIXED_INPUT]: 糾偏後的用戶真實問題，自動更新膠囊輸入框顯示並記住真實意圖，但不渲染到下方回答區！
         const fixedMatch = rawLine.match(/^\[?FIXED_INPUT\]?\s*[:：]\s*(.+)$/i);
         if (fixedMatch) {
           correctedQuery = fixedMatch[1].replace(/^["'「『]|["'」』]$/g, '').trim();
@@ -1309,13 +1711,9 @@
       inputEl.value = q;
       autoResizeTextarea(inputEl);
 
-      const limitBox = document.getElementById('apiLimitBox');
-      limitBox.style.display = 'none';
+      if (checkAndRemindProfanity(q)) return;
 
-      if (checkAndRemindProfanity(q)) {
-        return;
-      }
-
+      document.getElementById('resultWorkspace').classList.add('visible');
       const banner = document.getElementById('statusBanner');
       const list = document.getElementById('annotationList');
       banner.className = 'status-banner';
@@ -1324,7 +1722,6 @@
       list.innerHTML = '';
 
       const memoryContext = buildMemoryContextString();
-
       const acousticInfo = `[Speech Recognition Data] Selected Mode: ${spokenLang === 'en' ? 'EN' : '中文'} | Raw Transcript: "${q}" | ${getPhoneticTrackForAI(q)} | Alternative Speech Candidates: ${JSON.stringify(altsToUse)}`;
 
       const systemRules = [
@@ -1339,22 +1736,20 @@
         '   - NEVER output explanations like "Based on context and phonetics..." or "The user input is a speech recognition error"! ZERO meta-commentary!',
         '   - If the raw transcript had a speech recognition typo, output ONLY this tag on the very first line: [FIXED_INPUT]: Corrected_Question_Text',
         '2. POEMS, SONGS & CLASSICS (COMPLETE & PURE):',
-        '   - When the user asks for ANY poem, classic, or lyric (or follows up asking for another poem by the same poet), output ONLY:',
+        '   - When the user asks for ANY poem, classic, or lyric, output ONLY:',
         '     Line 1: 《詩詞名稱》朝代・作者 ||| English Title by Author',
-        '     Line 2+: Every single verse of the FULL original text in exact order (一字不漏、完整全篇), one verse per line.',
+        '     Line 2+: Every single verse of the FULL original text in exact order, one verse per line.',
         '   - DO NOT include background intro, appreciation, analysis, or extra chatter!',
         '3. GENERAL QUESTIONS & FOLLOW-UPS (CRISP & CONCISE):',
-        '   - Use Recent Conversation History to resolve pronouns ("他", "這首", "第二句", "還有嗎", "why", "another one", "what does it mean").',
         '   - Answer directly and concisely in 1 to 3 crisp sentences. No filler or pleasantries.',
         '4. STRICT BILINGUAL LINE FORMAT:',
         '   - Every content line MUST use "|||":',
         '     Pure_Traditional_Chinese ||| Authentic_English',
-        '   - Left side of "|||" must contain ONLY Traditional Chinese characters and Chinese punctuation (write numbers in Chinese characters; NO Pinyin or English letters on the left side).'
+        '   - Left side of "|||" must contain ONLY Traditional Chinese characters and Chinese punctuation.'
       ].filter(Boolean).join('\n');
 
-      // 只要處於連續對話中 (conversationHistory.length > 0) 或帶有語音候選詞，強制結合上下文即時推理，不走靜態快取避免答非所問
       const cloudCacheKey = (conversationHistory.length === 0 && !fromVoice) ? normalizeCloudCacheKey(q) : '';
-      const { text: aiText, source, diagError, usedPublicPool } = await fetchFastAccurateAI(systemRules, q, cloudCacheKey);
+      const { text: aiText, source, diagError } = await fetchFastAccurateAI(systemRules, q, cloudCacheKey);
 
       if (aiText) {
         const { ok, correctedQuery } = await renderBilingualAIOutput(aiText);
@@ -1363,22 +1758,15 @@
           if (backupKey && diagError) {
             banner.className = 'status-banner diag-info';
             banner.style.display = 'block';
-            banner.innerText = `ℹ️ Answered via ${source} (Google Key Note: ${diagError.slice(0, 140)})`;
+            banner.innerText = `ℹ️ Answered via ${source}`;
           } else {
             banner.style.display = 'none';
-          }
-          // 若用戶未填個人 Key 且當日累計使用公共免費池達 6 次以上，在回答下方自動顯示 API Key 建議框，引導高頻用戶使用個人免費 Key！
-          if (!backupKey && usedPublicPool) {
-            const pubCount = getAndIncrementPublicUsage();
-            if (pubCount >= FREE_PUBLIC_REMINDER_THRESHOLD) {
-              limitBox.style.display = 'block';
-            }
           }
           return;
         }
       }
 
-      // 4. 當所有 AI 通道皆無法連線時，給出原句雙語注音保底，並顯示具體診斷信息與 API Limit 提示框
+      // 兜底直接翻译注音
       const hasZh = /[\u4e00-\u9fa5]/.test(q);
       if (hasZh) {
         const enTrans = await translateFastFallback(q, 'zh', 'en');
@@ -1387,21 +1775,830 @@
         const zhTrans = await translateFastFallback(q, 'en', 'zh');
         appendSentenceProgressive(zhTrans, q);
       }
+      banner.style.display = 'none';
+    }
 
-      if (diagError) {
-        banner.className = 'status-banner friendly-reminder';
-        banner.style.display = 'block';
-        banner.innerText = `🔍 API 診斷信息 (Diagnostic): ${diagError.slice(0, 180)}`;
-      } else {
-        banner.style.display = 'none';
+    // 文件与照片上传解析（支持 TXT / PDF / Word / 手机拍照与图片 OCR）
+    async function handleFileUpload(e) {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      e.target.value = '';
+
+      document.getElementById('resultWorkspace').classList.add('visible');
+      const banner = document.getElementById('statusBanner');
+      const list = document.getElementById('annotationList');
+      banner.className = 'status-banner';
+      banner.style.display = 'block';
+      banner.innerText = `📄 Processing ${file.name}...`;
+      list.innerHTML = '';
+
+      const ext = file.name.split('.').pop().toLowerCase();
+      try {
+        if (ext === 'txt') {
+          const txt = await file.text();
+          document.getElementById('userInput').value = txt.slice(0, 600);
+          banner.style.display = 'none';
+          await annotateInputDirectly();
+        } else if (ext === 'docx' && window.mammoth) {
+          const buf = await file.arrayBuffer();
+          const res = await window.mammoth.extractRawText({ arrayBuffer: buf });
+          document.getElementById('userInput').value = (res.value || '').trim().slice(0, 600);
+          banner.style.display = 'none';
+          await annotateInputDirectly();
+        } else if (ext === 'pdf' && window.pdfjsLib) {
+          window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+          const buf = await file.arrayBuffer();
+          const pdf = await window.pdfjsLib.getDocument({ data: buf }).promise;
+          let fullTxt = '';
+          for (let p = 1; p <= Math.min(pdf.numPages, 3); p++) {
+            const page = await pdf.getPage(p);
+            const content = await page.getTextContent();
+            fullTxt += content.items.map(it => it.str).join(' ') + '\n';
+          }
+          document.getElementById('userInput').value = fullTxt.trim().slice(0, 600);
+          banner.style.display = 'none';
+          await annotateInputDirectly();
+        } else if (file.type.startsWith('image/')) {
+          await extractImageWithVision(file);
+        }
+      } catch (err) {
+        banner.innerText = `⚠️ File error: ${err.message || 'Could not parse file'}`;
       }
-      limitBox.style.display = 'block';
+    }
+
+    async function extractImageWithVision(file) {
+      const banner = document.getElementById('statusBanner');
+      const base64 = await new Promise((res, rej) => {
+        const reader = new FileReader();
+        reader.onload = () => res(reader.result.split(',')[1]);
+        reader.onerror = rej;
+        reader.readAsDataURL(file);
+      });
+
+      const activeKey = backupKey.replace(/\s+/g, '');
+      if (!activeKey) {
+        banner.className = 'status-banner friendly-reminder';
+        banner.innerText = '🔑 Photo OCR requires your free Google Gemini API Key. Please click "Google API Key" at the top right.';
+        openKeyModal();
+        return;
+      }
+
+      const model = availableFastModels[0] || 'gemini-flash-latest';
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(activeKey)}`;
+      const prompt = 'Extract the key Chinese or English text from this image and provide bilingual lines in exact format: Traditional_Chinese ||| English_Translation (one sentence per line, no meta-chatter).';
+
+      const r = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{
+            parts: [
+              { text: prompt },
+              { inlineData: { mimeType: file.type, data: base64 } }
+            ]
+          }]
+        })
+      });
+      const d = await r.json();
+      const text = d?.candidates?.[0]?.content?.parts?.map(p => p.text || '').join('\n').trim() || '';
+      banner.style.display = 'none';
+      if (text) {
+        await renderBilingualAIOutput(text);
+      }
+    }
+
+    // =========================================================================
+    // PART B: 原封不动整合 azure-tone_2.html 三合一语音评测模块（升级四排注音显示）
+    // =========================================================================
+    let targets = [];
+    let recording = false;
+    let webSr = null;
+    let azRecognizer = null;
+    let blindText = '';
+    let pronWords = [];
+    let azWaitResolve = null;
+    let usedWorkerToken = false;
+
+    let pitchAudioCtx = null;
+    let pitchStream = null;
+    let pitchTimer = null;
+    let pitchFrames = [];
+
+    function saveCfg() {
+      localStorage.setItem('tp_az_k', document.getElementById('azKey').value.trim());
+      localStorage.setItem('tp_az_r', document.getElementById('azReg').value.trim());
+      updateQuota();
+    }
+
+    function clearCfg() {
+      document.getElementById('azKey').value = '';
+      localStorage.removeItem('tp_az_k');
+      localStorage.removeItem('az_k');
+      updateQuota();
+    }
+
+    function todayKey() {
+      const d = new Date();
+      return `tp_q_${d.getFullYear()}_${d.getMonth()+1}_${d.getDate()}`;
+    }
+
+    function getUsed() { return parseInt(localStorage.getItem(todayKey()) || '0', 10); }
+    function addUsed() { localStorage.setItem(todayKey(), String(getUsed() + 1)); updateQuota(); }
+    function hasKey() { return Boolean(document.getElementById('azKey').value.trim()); }
+
+    function updateQuota() {
+      const b = document.getElementById('quotaBadge');
+      const btn = document.getElementById('recBtn');
+      if (hasKey()) {
+        b.className = 'tp-badge pro';
+        b.textContent = '⚡ Custom Azure Key: Unlimited Free Practice';
+        btn.disabled = false;
+        return;
+      }
+      const rem = Math.max(0, DAILY_LIMIT - getUsed());
+      b.className = rem > 0 ? 'tp-badge' : 'tp-badge exhausted';
+      b.textContent = rem > 0 ? `🎁 Daily Free Quota: ${rem} / ${DAILY_LIMIT} left` : `🔒 Daily Free Quota Used (0 / ${DAILY_LIMIT} left)`;
+      btn.disabled = (rem <= 0);
+    }
+
+    // 渲染评测舞台：完整显示 英文 + 错调箭头 + Trees Pinyin + 标准拼音 + 汉字
+    function renderStage() {
+      const s = document.getElementById('sentenceInput').value.trim();
+      const stage = document.getElementById('stage');
+      const enEl = document.getElementById('stageEnLine');
+      stage.innerHTML = '';
+      targets = [];
+      document.getElementById('heardBox').style.display = 'none';
+      if (!s) return;
+
+      activeSentenceZh = s;
+      if (enEl) {
+        translateFastFallback(s, 'zh', 'en').then(en => {
+          activeSentenceEn = en;
+          enEl.innerText = en;
+        });
+      }
+
+      const pySandhi = getAccuratePinyinArray(s);
+      const pyOrig = pinyin(s, { type: 'array', toneType: 'num', v: true, toneSandhi: false });
+
+      Array.from(s).forEach((ch, i) => {
+        if (!/[\u4e00-\u9fa5]/.test(ch)) {
+          stage.insertAdjacentHTML('beforeend', `<span class="tp-punct">${ch}</span>`);
+          return;
+        }
+        const p1 = userCharOverrides[ch] || pySandhi[i] || '';
+        const p2 = userCharOverrides[ch] || pyOrig[i] || p1;
+        const tone = parseInt((p1.match(/([0-5])$/) || [0,1])[1], 10) % 5;
+        const origTone = parseInt((p2.match(/([0-5])$/) || [0,1])[1], 10) % 5;
+        const base = p1.replace(/[0-5]/g, '');
+        const idx = targets.length;
+
+        const tpStr = compileToTreesPinyin(p1);
+        const stdStr = numPinyinToToneMark(p1);
+        const skipTone = (tone === 1 || tone === 0 || origTone === 1 || origTone === 0);
+
+        targets.push({ idx, char: ch, base, tone, origTone, skipTone, pyNum: p1 });
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'tp-item';
+        itemDiv.id = `c-${idx}`;
+        itemDiv.innerHTML = `
+          <div class="tp-tag" id="t-${idx}"></div>
+          <div class="tp-item-tppy">${tpStr}</div>
+          <div class="tp-item-stdpy">${stdStr}</div>
+          <div class="tp-hanzi">${ch}</div>
+        `;
+        itemDiv.onclick = () => speakText(ch);
+        itemDiv.oncontextmenu = (e) => openPolyphoneModal(ch, p1, e);
+        stage.appendChild(itemDiv);
+      });
+    }
+
+    function speakDemo() {
+      speakText(document.getElementById('sentenceInput').value);
+    }
+
+    function fuzzySound(b) {
+      if (!b) return '';
+      return b.toLowerCase().replace(/[0-5\s]/g, '')
+        .replace(/^zh/, 'z').replace(/^ch/, 'c').replace(/^sh/, 's')
+        .replace(/ing$/, 'in').replace(/eng$/, 'en').replace(/ang$/, 'an')
+        .replace(/uang$/, 'uan').replace(/iong$/, 'ion')
+        .replace(/^w/, '').replace(/^y/, '');
+    }
+
+    function isSameSyllable(b1, b2) {
+      if (!b1 || !b2) return false;
+      return b1 === b2 || fuzzySound(b1) === fuzzySound(b2);
+    }
+
+    function detectPitchHz(buf, sampleRate) {
+      let size = buf.length;
+      let rms = 0;
+      for (let i = 0; i < size; i++) rms += buf[i] * buf[i];
+      rms = Math.sqrt(rms / size);
+      if (rms < 0.012) return { f0: -1, rms };
+
+      const minLag = Math.floor(sampleRate / 420);
+      const maxLag = Math.floor(sampleRate / 75);
+      let bestLag = -1;
+      let bestCorr = 0;
+
+      for (let lag = minLag; lag <= maxLag; lag++) {
+        let sum = 0;
+        for (let i = 0; i < size - lag; i++) sum += buf[i] * buf[i + lag];
+        if (sum > bestCorr) {
+          bestCorr = sum;
+          bestLag = lag;
+        }
+      }
+      const f0 = bestLag > 0 ? sampleRate / bestLag : -1;
+      return { f0, rms };
+    }
+
+    async function startPitchTracker() {
+      pitchFrames = [];
+      try {
+        pitchStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        pitchAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const src = pitchAudioCtx.createMediaStreamSource(pitchStream);
+        const analyser = pitchAudioCtx.createAnalyser();
+        analyser.fftSize = 1024;
+        src.connect(analyser);
+        const buf = new Float32Array(analyser.fftSize);
+        const t0 = performance.now();
+
+        pitchTimer = setInterval(() => {
+          analyser.getFloatTimeDomainData(buf);
+          const { f0, rms } = detectPitchHz(buf, pitchAudioCtx.sampleRate);
+          if (f0 > 75 && f0 < 420) {
+            pitchFrames.push({ t: performance.now() - t0, f0, rms });
+          }
+        }, 25);
+      } catch (e) {}
+    }
+
+    function stopPitchTracker() {
+      if (pitchTimer) { clearInterval(pitchTimer); pitchTimer = null; }
+      if (pitchStream) { pitchStream.getTracks().forEach(t => t.stop()); pitchStream = null; }
+      if (pitchAudioCtx) { pitchAudioCtx.close().catch(()=>{}); pitchAudioCtx = null; }
+    }
+
+    function classifyPhysicalTone(charIdx, totalChars, wordOffsetMs, wordDurationMs) {
+      if (pitchFrames.length < 6) return null;
+      let slice = [];
+      if (wordDurationMs > 0) {
+        slice = pitchFrames.filter(f => f.t >= wordOffsetMs - 60 && f.t <= wordOffsetMs + wordDurationMs + 60);
+      }
+      if (slice.length < 3) {
+        const startIdx = Math.floor((charIdx / totalChars) * pitchFrames.length);
+        const endIdx = Math.max(startIdx + 2, Math.floor(((charIdx + 1) / totalChars) * pitchFrames.length));
+        slice = pitchFrames.slice(startIdx, endIdx);
+      }
+      if (slice.length < 3) return null;
+
+      const toSemi = hz => 12 * Math.log2(hz / 100);
+      const allSemis = pitchFrames.map(f => toSemi(f.f0));
+      const speakerMean = allSemis.reduce((a, b) => a + b, 0) / allSemis.length;
+
+      const semis = slice.map(f => toSemi(f.f0));
+      const n = semis.length;
+      const firstHalf = semis.slice(0, Math.ceil(n / 2));
+      const secondHalf = semis.slice(Math.floor(n / 2));
+      const avgFirst = firstHalf.reduce((a, b) => a + b, 0) / firstHalf.length;
+      const avgSecond = secondHalf.reduce((a, b) => a + b, 0) / secondHalf.length;
+      const meanVal = semis.reduce((a, b) => a + b, 0) / n;
+      const delta = avgSecond - avgFirst;
+      const spread = Math.max(...semis) - Math.min(...semis);
+
+      if (delta < -1.3) return 4;
+      if (delta > 1.1) return 2;
+      if (Math.abs(delta) <= 1.1 && spread < 2.0 && meanVal >= speakerMean - 0.8) return 1;
+      return 3;
+    }
+
+    async function getAzureSpeechConfig() {
+      usedWorkerToken = false;
+      if (hasKey()) {
+        return SpeechSDK.SpeechConfig.fromSubscription(
+          document.getElementById('azKey').value.trim(),
+          document.getElementById('azReg').value.trim() || 'westus2'
+        );
+      }
+      if (getUsed() >= DAILY_LIMIT) {
+        document.getElementById('byokBox').classList.add('open');
+        throw new Error('Daily free limit (2/2) reached. Please add your own Azure Key or support us!');
+      }
+      const res = await fetch(WORKER_TOKEN_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'speech-token' })
+      });
+      const d = await res.json();
+      if (!res.ok || d.error === 'LIMIT_REACHED') {
+        localStorage.setItem(todayKey(), String(DAILY_LIMIT));
+        updateQuota();
+        document.getElementById('byokBox').classList.add('open');
+        throw new Error('Daily free limit (2/2) reached. Please add your own Azure Key!');
+      }
+      if (d.token && d.region) {
+        usedWorkerToken = true;
+        return SpeechSDK.SpeechConfig.fromAuthorizationToken(d.token, d.region);
+      }
+      throw new Error('Token error');
+    }
+
+    async function finishAndEvaluate() {
+      if (!recording) return;
+      recording = false;
+      const btn = document.getElementById('recBtn');
+      btn.classList.remove('on');
+      btn.textContent = '⏳ Scoring...';
+
+      stopPitchTracker();
+      if (webSr) {
+        try { webSr.stop(); } catch (e) {}
+        webSr = null;
+      }
+
+      const countValidAz = () => pronWords.filter(w => /[\u4e00-\u9fa5]/.test(w.Word) && w.PronunciationAssessment?.ErrorType !== 'Insertion').length;
+      if (azRecognizer && countValidAz() < targets.length) {
+        await Promise.race([
+          new Promise(r => { azWaitResolve = r; }),
+          new Promise(r => setTimeout(r, 1200))
+        ]);
+      }
+
+      if (azRecognizer) {
+        await new Promise(r => azRecognizer.stopContinuousRecognitionAsync(r, r));
+        azRecognizer.close();
+        azRecognizer = null;
+      }
+
+      btn.textContent = '🎤 Start Speaking';
+      evaluateAll();
+    }
+
+    async function toggleRecord() {
+      if (recording) {
+        await finishAndEvaluate();
+        return;
+      }
+
+      if (!hasKey() && getUsed() >= DAILY_LIMIT) {
+        document.getElementById('byokBox').classList.add('open');
+        return setMsg('⚠️ Daily free limit (2/2) reached. Please add your own Azure Key or support us!');
+      }
+
+      renderStage();
+      blindText = '';
+      pronWords = [];
+      azWaitResolve = null;
+      recording = true;
+
+      const btn = document.getElementById('recBtn');
+      btn.classList.add('on');
+      btn.textContent = '⏹ Stop & Score';
+      setMsg('🎙️ Listening... Speak naturally in Chinese.');
+
+      startPitchTracker();
+
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (SR) {
+        webSr = new SR();
+        webSr.lang = 'zh-CN';
+        webSr.continuous = true;
+        webSr.interimResults = true;
+        webSr.onresult = (e) => {
+          let s = '';
+          for (let i = 0; i < e.results.length; i++) s += e.results[i][0].transcript;
+          blindText = s;
+          if (recording && s) setMsg(`👂 Hearing: <b>${s}</b>`);
+        };
+        try { webSr.start(); } catch (e) {}
+      }
+
+      setTimeout(async () => {
+        if (!recording) return;
+        try {
+          const speechConfig = await getAzureSpeechConfig();
+          if (!recording) return;
+
+          speechConfig.speechRecognitionLanguage = "zh-CN";
+          speechConfig.outputFormat = SpeechSDK.OutputFormat.Detailed;
+          speechConfig.setProperty(SpeechSDK.PropertyId.SpeechServiceConnection_InitialSilenceTimeoutMs, "8000");
+          speechConfig.setProperty(SpeechSDK.PropertyId.SpeechServiceConnection_EndSilenceTimeoutMs, "1200");
+          speechConfig.setProperty(SpeechSDK.PropertyId.Speech_SegmentationSilenceTimeoutMs, "1000");
+
+          const pronCfg = SpeechSDK.PronunciationAssessmentConfig.fromJSON(JSON.stringify({
+            referenceText: document.getElementById('sentenceInput').value.trim(),
+            gradingSystem: "HundredMark",
+            granularity: "Phoneme",
+            dimension: "Comprehensive",
+            enableMiscue: true,
+            phonemeAlphabet: "SAPI",
+            nBestPhonemeCount: 5
+          }));
+
+          azRecognizer = new SpeechSDK.SpeechRecognizer(speechConfig, SpeechSDK.AudioConfig.fromDefaultMicrophoneInput());
+          pronCfg.applyTo(azRecognizer);
+
+          azRecognizer.recognized = (s, e) => {
+            if (e.result.reason === SpeechSDK.ResultReason.RecognizedSpeech) {
+              try {
+                const json = JSON.parse(e.result.properties.getProperty(SpeechSDK.PropertyId.SpeechServiceResponse_JsonResult));
+                const words = json?.NBest?.[0]?.Words || [];
+                pronWords.push(...words);
+                if (!blindText && e.result.text) blindText = e.result.text;
+              } catch (err) {}
+
+              const validCount = pronWords.filter(w => /[\u4e00-\u9fa5]/.test(w.Word) && w.PronunciationAssessment?.ErrorType !== 'Insertion').length;
+              if (validCount >= targets.length && azWaitResolve) {
+                azWaitResolve();
+                azWaitResolve = null;
+              }
+            }
+          };
+
+          azRecognizer.startContinuousRecognitionAsync();
+        } catch (e) {}
+      }, 120);
+    }
+
+    function extractAzureAcousticTone(pw, targetObj) {
+      if (!pw) return null;
+      const wordAcc = pw.PronunciationAssessment?.AccuracyScore ?? 90;
+      const phonemes = pw.Phonemes || [];
+      const offsetMs = (pw.Offset || 0) / 10000;
+      const durationMs = (pw.Duration || 0) / 10000;
+
+      let vowelScore = wordAcc;
+      let detectedSpokenTone = null;
+
+      for (const p of phonemes) {
+        const exp = (p.Phoneme || '').trim();
+        const pAcc = p.PronunciationAssessment?.AccuracyScore ?? wordAcc;
+        const nbest = p.PronunciationAssessment?.NBestPhonemes || [];
+        const top = nbest[0]?.Phoneme ? nbest[0].Phoneme.trim() : exp;
+
+        if (exp.match(/([1-5])\s*$/)) {
+          vowelScore = pAcc;
+          const topMatch = top.match(/([1-5])\s*$/);
+          if (topMatch) detectedSpokenTone = parseInt(topMatch[1], 10) % 5;
+          if ((detectedSpokenTone === targetObj.tone || detectedSpokenTone === targetObj.origTone) && pAcc < 92 && nbest.length > 1) {
+            for (let k = 1; k < nbest.length; k++) {
+              const cand = (nbest[k].Phoneme || '').trim();
+              const m = cand.match(/([1-5])\s*$/);
+              if (m) {
+                const altTone = parseInt(m[1], 10) % 5;
+                if (altTone !== targetObj.tone && altTone !== targetObj.origTone && altTone !== 0) {
+                  detectedSpokenTone = altTone;
+                  break;
+                }
+              }
+            }
+          }
+        }
+      }
+
+      return {
+        wordAcc,
+        vowelScore,
+        detectedSpokenTone,
+        offsetMs,
+        durationMs,
+        omitted: (pw.PronunciationAssessment?.ErrorType === 'Omission' || wordAcc < 20)
+      };
+    }
+
+    function evaluateAll() {
+      const cleanBlind = blindText.replace(/[^\u4e00-\u9fa5]/g, '');
+      const alignedAz = pronWords.filter(w =>
+        /[\u4e00-\u9fa5]/.test(w.Word) &&
+        w.PronunciationAssessment?.ErrorType !== 'Insertion'
+      );
+
+      if (!cleanBlind && !alignedAz.length) {
+        return setMsg('⚠️ No speech detected. Please speak clearly until "👂 Hearing: ..." appears.');
+      }
+
+      if (!hasKey()) addUsed();
+
+      const blindPy = cleanBlind ? pinyin(cleanBlind, { type: 'array', toneType: 'num', v: true, toneSandhi: false }) : [];
+      const blindChars = Array.from(cleanBlind).map((ch, idx) => {
+        const p = blindPy[idx] || '';
+        return {
+          char: ch,
+          base: p.replace(/[0-5]/g, ''),
+          tone: parseInt((p.match(/([0-5])$/) || [0,1])[1], 10) % 5,
+          matchedTarget: false
+        };
+      });
+
+      let totalPoints = 0;
+      let cursor = 0;
+
+      targets.forEach((t, i) => {
+        const azInfo = extractAzureAcousticTone(alignedAz[i], t);
+        const physicalTone = classifyPhysicalTone(i, targets.length, azInfo?.offsetMs || 0, azInfo?.durationMs || 0);
+
+        let blindMatch = null;
+        let matchIdx = -1;
+        for (let k = cursor; k < Math.min(cursor + 3, blindChars.length); k++) {
+          if (blindChars[k].char === t.char || isSameSyllable(t.base, blindChars[k].base)) {
+            blindMatch = blindChars[k];
+            matchIdx = k;
+            cursor = k + 1;
+            break;
+          }
+        }
+
+        if (!blindMatch) {
+          if (cursor < blindChars.length && blindChars.length >= targets.length) cursor++;
+          setLight(i, 'bad', null, null);
+          return;
+        }
+
+        const heardExactChar = (blindMatch.char === t.char);
+        if (heardExactChar) blindChars[matchIdx].matchedTarget = true;
+
+        if (t.skipTone) {
+          setLight(i, 'good', null, null);
+          blindChars[matchIdx].matchedTarget = true;
+          totalPoints += 1;
+          return;
+        }
+
+        let wrongSpokenTone = null;
+        const isToneAcceptable = (toneVal) => (toneVal === t.tone || toneVal === t.origTone);
+
+        if (!heardExactChar && !isToneAcceptable(blindMatch.tone)) {
+          wrongSpokenTone = blindMatch.tone;
+        } else if (azInfo && !azInfo.omitted && azInfo.detectedSpokenTone !== null && !isToneAcceptable(azInfo.detectedSpokenTone)) {
+          wrongSpokenTone = azInfo.detectedSpokenTone;
+        } else if (physicalTone !== null && !isToneAcceptable(physicalTone)) {
+          if ((t.origTone === 3 || t.tone === 2 || t.tone === 3) && (physicalTone === 1 || physicalTone === 4)) {
+            wrongSpokenTone = physicalTone;
+          } else if (t.tone === 4 && (physicalTone === 1 || physicalTone === 2 || physicalTone === 3)) {
+            wrongSpokenTone = physicalTone;
+          }
+        } else if (azInfo && !azInfo.omitted && (azInfo.vowelScore < 82 || azInfo.wordAcc < 80)) {
+          wrongSpokenTone = physicalTone || '?';
+        }
+
+        if (!heardExactChar && wrongSpokenTone !== null) {
+          setLight(i, 'bad', wrongSpokenTone, t.origTone);
+          totalPoints += 0.3;
+          return;
+        }
+
+        if (wrongSpokenTone !== null) {
+          setLight(i, 'warn', wrongSpokenTone, t.origTone);
+          totalPoints += 0.8;
+          return;
+        }
+
+        setLight(i, 'good', null, null);
+        blindChars[matchIdx].matchedTarget = true;
+        totalPoints += 1;
+      });
+
+      const pct = Math.round((totalPoints / targets.length) * 100);
+      setMsg(`Intelligibility Score: <b>${pct}%</b>`);
+
+      const heardContainer = document.getElementById('heardZh');
+      heardContainer.innerHTML = blindChars.map(c =>
+        `<span class="tp-h-char ${c.matchedTarget ? 'match' : ''}">${c.char}</span>`
+      ).join('');
+
+      document.getElementById('heardBox').style.display = 'block';
+      translateToEn(cleanBlind);
+    }
+
+    function setLight(i, status, wrongTone, rightTone) {
+      const box = document.getElementById(`c-${i}`);
+      const tag = document.getElementById(`t-${i}`);
+      box.className = `tp-item ${status}`;
+      tag.textContent = (wrongTone !== null && rightTone !== null) ? `${wrongTone}→${rightTone}` : '';
+    }
+
+    async function translateToEn(zh) {
+      const el = document.getElementById('heardEn');
+      if (!zh) { el.textContent = '--'; return; }
+      el.textContent = 'Translating...';
+      try {
+        const r = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=zh-CN&tl=en&dt=t&q=${encodeURIComponent(zh)}`);
+        const d = await r.json();
+        el.textContent = `"${(d?.[0] || []).map(x => x?.[0] || '').join('')}"`;
+      } catch (e) {
+        el.textContent = '';
+      }
+    }
+
+    function setMsg(t) { document.getElementById('msgBox').innerHTML = t; }
+
+    // =========================================================================
+    // PART C: 所见即所得录像模块 (Canvas 合成摄像头 + 实时四排注音，右键改字同步进视频)
+    // =========================================================================
+    let camStream = null;
+    let canvasAnimId = null;
+    let mediaRecorder = null;
+    let recordedChunks = [];
+    let isPortraitRatio = true;
+
+    function toggleSection(which) {
+      const evalP = document.getElementById('evalPanel');
+      const vidP = document.getElementById('videoPanel');
+      const btnEval = document.getElementById('btnToggleEval');
+      const btnVid = document.getElementById('btnToggleVideo');
+
+      if (which === 'eval') {
+        const open = evalP.classList.toggle('open');
+        btnEval.classList.toggle('active', open);
+        if (open) renderStage();
+      } else if (which === 'video') {
+        const open = vidP.classList.toggle('open');
+        btnVid.classList.toggle('active', open);
+        if (open) startCameraCanvas();
+        else stopCameraCanvas();
+      }
+    }
+
+    function openAzureKeyBox() {
+      const evalP = document.getElementById('evalPanel');
+      evalP.classList.add('open');
+      document.getElementById('btnToggleEval').classList.add('active');
+      document.getElementById('byokBox').classList.add('open');
+      renderStage();
+      evalP.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function toggleCamRatio() {
+      isPortraitRatio = !isPortraitRatio;
+      const cvs = document.getElementById('studioCanvas');
+      const btn = document.getElementById('camRatioBtn');
+      if (isPortraitRatio) {
+        cvs.width = 720; cvs.height = 960;
+        btn.innerText = '📱 Ratio: 3:4 Portrait';
+      } else {
+        cvs.width = 960; cvs.height = 540;
+        btn.innerText = '💻 Ratio: 16:9 Landscape';
+      }
+    }
+
+    async function startCameraCanvas() {
+      const video = document.getElementById('rawCamVideo');
+      const canvas = document.getElementById('studioCanvas');
+      const ctx = canvas.getContext('2d');
+      try {
+        camStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: true });
+        video.srcObject = camStream;
+        await video.play();
+      } catch (e) {
+        alert('Camera & Microphone permission is required for video recording.');
+        return;
+      }
+
+      function drawFrame() {
+        const W = canvas.width, H = canvas.height;
+        ctx.fillStyle = '#0f172a';
+        ctx.fillRect(0, 0, W, H);
+
+        if (video.readyState >= 2) {
+          const vw = video.videoWidth || 640, vh = video.videoHeight || 480;
+          const scale = Math.max(W / vw, H / vh);
+          const dw = vw * scale, dh = vh * scale;
+          ctx.save();
+          ctx.translate(W, 0);
+          ctx.scale(-1, 1); // 镜像自拍
+          ctx.drawImage(video, (W - dw) / 2, (H - dh) / 2, dw, dh);
+          ctx.restore();
+        }
+
+        // 在视频底部实时绘制半透明四排注音卡片（右键改字后下一帧立即更新进录像！）
+        const boxH = 210;
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.90)';
+        ctx.fillRect(0, H - boxH, W, boxH);
+
+        ctx.fillStyle = '#1f2937';
+        ctx.font = 'bold 20px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText((activeSentenceEn || '').slice(0, 62), W / 2, H - boxH + 34);
+
+        const zhChars = Array.from(activeSentenceZh || '').slice(0, 14);
+        const pyArr = getAccuratePinyinArray(activeSentenceZh || '');
+        const step = Math.min(62, (W - 40) / Math.max(1, zhChars.length));
+        const startX = (W - step * (zhChars.length - 1)) / 2;
+
+        zhChars.forEach((ch, idx) => {
+          const x = startX + idx * step;
+          if (/[\u4e00-\u9fa5]/.test(ch)) {
+            const pNum = userCharOverrides[ch] || pyArr[idx] || '';
+            const tp = compileToTreesPinyin(pNum);
+            const std = numPinyinToToneMark(pNum);
+
+            ctx.fillStyle = '#1b5e20';
+            ctx.font = 'italic bold 19px sans-serif';
+            ctx.fillText(tp, x, H - boxH + 78);
+
+            ctx.fillStyle = '#64748b';
+            ctx.font = '15px sans-serif';
+            ctx.fillText(std, x, H - boxH + 105);
+
+            ctx.fillStyle = '#000000';
+            ctx.font = 'bold 34px sans-serif';
+            ctx.fillText(ch, x, H - boxH + 150);
+          } else {
+            ctx.fillStyle = '#64748b';
+            ctx.font = 'bold 28px sans-serif';
+            ctx.fillText(ch, x, H - boxH + 150);
+          }
+        });
+
+        canvasAnimId = requestAnimationFrame(drawFrame);
+      }
+      drawFrame();
+    }
+
+    function stopCameraCanvas() {
+      if (canvasAnimId) { cancelAnimationFrame(canvasAnimId); canvasAnimId = null; }
+      if (camStream) { camStream.getTracks().forEach(t => t.stop()); camStream = null; }
+    }
+
+    function toggleVideoRecording() {
+      const btn = document.getElementById('vidRecBtn');
+      const dl = document.getElementById('vidDownloadLink');
+      const canvas = document.getElementById('studioCanvas');
+
+      if (mediaRecorder && mediaRecorder.state === 'recording') {
+        mediaRecorder.stop();
+        btn.classList.remove('on');
+        btn.innerText = '⏺ Start Recording';
+        return;
+      }
+
+      if (!camStream) return;
+      recordedChunks = [];
+      dl.style.display = 'none';
+
+      const canvasStream = canvas.captureStream(30);
+      const audioTracks = camStream.getAudioTracks();
+      if (audioTracks.length > 0) canvasStream.addTrack(audioTracks[0]);
+
+      mediaRecorder = new MediaRecorder(canvasStream);
+      mediaRecorder.ondataavailable = e => { if (e.data.size > 0) recordedChunks.push(e.data); };
+      mediaRecorder.onstop = () => {
+        const blob = new Blob(recordedChunks, { type: 'video/webm' });
+        dl.href = URL.createObjectURL(blob);
+        dl.download = `trees-pinyin-${Date.now()}.webm`;
+        dl.style.display = 'inline-block';
+      };
+
+      mediaRecorder.start();
+      btn.classList.add('on');
+      btn.innerText = '⏹ Stop Video';
+    }
+
+    // =========================================================================
+    // PART D: 划词出图标 (Selection Bubble) & Google API Key Modal
+    // =========================================================================
+    let selectedTextCache = '';
+    document.addEventListener('mouseup', (e) => {
+      setTimeout(() => {
+        const sel = window.getSelection().toString().trim();
+        const bubble = document.getElementById('selectionBubble');
+        if (sel && sel.length >= 1 && sel.length <= 150 && !bubble.contains(e.target)) {
+          selectedTextCache = sel;
+          bubble.style.display = 'inline-flex';
+          bubble.style.left = Math.min(window.innerWidth - 210, Math.max(10, e.clientX - 70)) + 'px';
+          bubble.style.top = Math.max(10, e.clientY - 46) + 'px';
+        } else if (!bubble.contains(e.target)) {
+          bubble.style.display = 'none';
+        }
+      }, 20);
+    });
+
+    function handleSelectionAction(act) {
+      const bubble = document.getElementById('selectionBubble');
+      bubble.style.display = 'none';
+      if (!selectedTextCache) return;
+      if (act === 'speak') {
+        speakText(selectedTextCache);
+      } else if (act === 'annotate') {
+        document.getElementById('userInput').value = selectedTextCache;
+        annotateInputDirectly();
+      } else if (act === 'eval') {
+        document.getElementById('resultWorkspace').classList.add('visible');
+        document.getElementById('evalPanel').classList.add('open');
+        document.getElementById('btnToggleEval').classList.add('active');
+        document.getElementById('sentenceInput').value = selectedTextCache;
+        renderStage();
+      }
     }
 
     function openKeyModal() {
       document.getElementById('apiKeyInput').value = backupKey;
-      const st = document.getElementById('keyTestStatus');
-      st.style.display = 'none';
+      document.getElementById('keyTestStatus').style.display = 'none';
       document.getElementById('keyModal').style.display = 'flex';
     }
 
@@ -1432,12 +2629,10 @@
         st.innerText = `✅ Key Verified! Active models: ${models.slice(0, 3).join(', ')}`;
         setTimeout(() => {
           document.getElementById('keyModal').style.display = 'none';
-          const pendingQ = document.getElementById('userInput').value.trim();
-          if (pendingQ) runSmartAI(pendingQ);
         }, 600);
       } else {
         st.style.color = '#b91c1c';
-        st.innerText = '⚠️ Could not verify key (check if key is valid or network blocks googleapis.com).';
+        st.innerText = '⚠️ Could not verify key (check if key is valid).';
       }
     }
 
@@ -1456,8 +2651,11 @@
       try {
         const savedLang = localStorage.getItem('tp_spoken_lang');
         if (savedLang === 'zh' || savedLang === 'en') setVoiceLangMode(savedLang);
+        document.getElementById('azKey').value = localStorage.getItem('tp_az_k') || localStorage.getItem('az_k') || '';
+        document.getElementById('azReg').value = localStorage.getItem('tp_az_r') || localStorage.getItem('az_r') || 'westus2';
       } catch (e) {}
-      appendSentenceProgressive('請問你想向人工智慧提問什麼問題？', 'What question would you like to ask AI today?');
+      updateQuota();
+      renderStage();
     });
   </script>
 </body>
