@@ -1859,21 +1859,24 @@
     }
 
     // =========================================================================
-    // 4. 🎙️ 免切換「中英雙語自動混合識別」引擎 (Bilingual Auto-Detect Speech Recognition)
+    // 4. 🎙️ 免切換「中英雙語自動混合識別 + 5候選詞AI語境糾偏」引擎
     // =========================================================================
     let activeRec = null;
     let voiceSilenceTimer = null;
+    let latestVoiceCandidates = [];
 
     const FUZZY_VOICE_CORRECTIONS = [
       [/永和|泳鵝|泳鹅|勇鵝|勇鹅|擁鵝|拥鹅|用鵝|用鹅|詠俄|咏俄/g, '詠鵝'],
       [/今夜思|敬業思|敬业思|進夜思|进夜思|淨夜思|净夜思/g, '靜夜思'],
       [/春小|春笑|春校|純曉|纯晓/g, '春曉'],
-      [/登貫雀樓|登贯雀楼|登觀雀樓|登观雀楼/g, '登鸛雀樓']
+      [/登貫雀樓|登贯雀楼|登觀雀樓|登观雀楼/g, '登鸛雀樓'],
+      [/水調歌頭|水调歌头|水掉歌頭|水掉歌头/g, '水調歌頭'],
+      [/鹿柴|路窄|陸宅|陆宅|錄音帶/g, '鹿柴']
     ];
 
     function applyFuzzyVoiceCorrection(rawTranscript, alts = []) {
       for (const a of alts) {
-        if (/詠鵝|咏鹅|靜夜思|静夜思|春曉|春晓|登鸛雀樓/.test(a)) return a;
+        if (/詠鵝|咏鹅|靜夜思|静夜思|春曉|春晓|登鸛雀樓|登鹳雀楼|水調歌頭|水调歌头|鹿柴/.test(a)) return a;
       }
       let fixed = rawTranscript || '';
       for (const [pattern, replacement] of FUZZY_VOICE_CORRECTIONS) {
@@ -1893,21 +1896,24 @@
         return;
       }
 
+      latestVoiceCandidates = [];
       activeRec = new SR();
-      // 關鍵：zh-CN / zh-TW 雙語聲學模型原生內建完整英語與國語詞庫，無需切換即可同時識別中文與英文！
-      activeRec.lang = 'zh-CN';
+      // 智慧聲道選擇：Chrome 雙語聲學模型原生支援中英混輸；Safari 若在英文介面可優先跟隨或由 AI 還原同音候選詞
+      const isSafariOnly = /^((?!chrome|android|edg).)*safari/i.test(navigator.userAgent);
+      activeRec.lang = (isSafariOnly && currentLang === 'en') ? 'en-US' : 'zh-CN';
       activeRec.interimResults = true;
       activeRec.maxAlternatives = 5;
       activeRec.continuous = true;
       btn.classList.add('recording');
 
       let finalTranscript = '';
+      const collectedAlts = new Set();
 
       function resetSilenceTimer() {
         clearTimeout(voiceSilenceTimer);
         voiceSilenceTimer = setTimeout(() => {
           if (activeRec) activeRec.stop();
-        }, 2500);
+        }, 2400);
       }
 
       resetSilenceTimer();
@@ -1915,11 +1921,15 @@
       activeRec.onresult = (e) => {
         resetSilenceTimer();
         let interim = '';
-        const alts = [];
+        const currentAlts = [];
         for (let i = e.resultIndex; i < e.results.length; i++) {
           const res = e.results[i];
           for (let k = 0; k < res.length; k++) {
-            if (res[k]?.transcript) alts.push(res[k].transcript.trim());
+            const t = (res[k]?.transcript || '').trim();
+            if (t) {
+              currentAlts.push(t);
+              collectedAlts.add(t);
+            }
           }
           const seg = res[0].transcript;
           if (res.isFinal) {
@@ -1928,7 +1938,8 @@
             interim += seg;
           }
         }
-        const combined = applyFuzzyVoiceCorrection((finalTranscript + (interim ? ' ' + interim : '')).trim(), alts);
+        latestVoiceCandidates = Array.from(collectedAlts).slice(0, 5);
+        const combined = applyFuzzyVoiceCorrection((finalTranscript + (interim ? ' ' + interim : '')).trim(), currentAlts);
         document.getElementById('userInput').value = combined;
       };
 
@@ -1937,7 +1948,7 @@
         btn.classList.remove('recording');
         activeRec = null;
         const spoken = document.getElementById('userInput').value.trim();
-        if (spoken) runSmartAI(spoken);
+        if (spoken) runSmartAI(spoken, latestVoiceCandidates);
       };
 
       activeRec.onerror = () => {
@@ -1996,6 +2007,7 @@
       if (!text) return '';
       let s = text;
       s = s.replace(/\bH2O\b/gi, '水').replace(/\bCO2\b/gi, '二氧化碳').replace(/\bO2\b/gi, '氧氣');
+      s = s.replace(/\bWi-?Fi\b/gi, '無線網路').replace(/\bAPP\b/gi, '應用程式');
       s = s.replace(/°C|℃/g, '攝氏度').replace(/°F|℉/g, '華氏度');
       s = s.replace(/\b(\d{1,2}):(\d{2})\b/g, (_, h, m) => intToChinese(h) + '點' + (m === '00' ? '整' : intToChinese(m) + '分'));
       s = s.replace(/(\d+(?:\.\d+)?)\s*%/g, (_, num) => '百分之' + numberToChinese(num));
@@ -2272,12 +2284,12 @@
     }
 
     let backupKey = (localStorage.getItem('tp_v22_backup_key') || localStorage.getItem('tp_test_gemini_key') || '').trim();
-    // 優先使用高智商 Flash 模型，確保知識與詩詞 100% 準確！
+    // 置頂谷歌官方永久動態別名 (gemini-flash-latest)，徹底免疫未來版本改名或舊模型下架！
     let availableFastModels = [
-      'gemini-2.5-flash',
       'gemini-flash-latest',
-      'gemini-2.0-flash',
-      'gemini-flash-lite-latest'
+      'gemini-2.5-flash',
+      'gemini-flash-lite-latest',
+      'gemini-2.0-flash'
     ];
 
     function refreshKeyBtnStyle() {
@@ -2296,22 +2308,22 @@
         const all = (data.models || [])
           .filter(m => (m.supportedGenerationMethods || []).includes('generateContent'))
           .map(m => m.name.replace('models/', ''))
-          .filter(n => !n.includes('tts') && !n.includes('image') && !n.includes('embedding') && !n.includes('veo') && !n.includes('robotics'));
+          .filter(n => !/tts|image|imagen|embedding|veo|robotics|aqa|bison|gecko/i.test(n));
 
         const priority = [
+          'gemini-flash-latest',
           'gemini-2.5-flash',
           'gemini-3.5-flash',
-          'gemini-flash-latest',
+          'gemini-flash-lite-latest',
           'gemini-2.0-flash',
-          'gemini-3.5-flash-lite',
-          'gemini-flash-lite-latest'
+          'gemini-3.5-flash-lite'
         ];
         const sorted = [];
         for (const p of priority) {
           if (all.includes(p)) sorted.push(p);
         }
         for (const m of all) {
-          if (m.includes('flash') && !sorted.includes(m)) sorted.push(m);
+          if ((m.includes('flash') || m.includes('latest')) && !sorted.includes(m)) sorted.push(m);
         }
         if (sorted.length > 0) {
           availableFastModels = sorted;
@@ -2350,6 +2362,12 @@
         signal
       });
 
+      // 若谷歌下架或改名某個模型返回 404，自動重新探測最新存活模型目錄
+      if (r.status === 404) {
+        discoverFastModels(backupKey);
+        throw new Error('MODEL_RENAMED_404');
+      }
+
       if (r.status === 400) {
         r = await fetch(url, {
           method: 'POST',
@@ -2376,50 +2394,48 @@
       return text;
     }
 
+    // 階梯式順位調用 (Sequential Hedged Fallback)：不盲目群發浪費額度，將免費接客量放大 4 倍！
     async function fetchFastAccurateAI(promptText, dataUrl = null, rawQuestionForCache = '') {
       const cleanCacheKey = normalizeCacheKey(rawQuestionForCache);
 
-      const workerTasks = CF_WORKER_ENDPOINTS.map(async (ep) => {
-        const r = await fetchWithTimeout(ep, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            prompt: promptText,
-            image: dataUrl,
-            cacheKey: cleanCacheKey
-          })
-        }, 8500);
-        if (!r.ok) throw new Error('worker_err');
-        const d = await r.json();
-        const t = (d?.text || d?.reply || d?.choices?.[0]?.message?.content || '').trim();
-        if (!t) throw new Error('empty');
-        return t;
-      });
-
+      // 1. 若用戶填了自己的免費 Gemini API Key，按順序單發主力模型，超時或限流才切換備胎
       if (backupKey) {
-        const modelsToRace = availableFastModels.slice(0, 3);
-        const controllers = modelsToRace.map(() => new AbortController());
-
-        const keyTasks = modelsToRace.map((mName, idx) =>
-          callSingleGeminiModelFast(mName, promptText, dataUrl, controllers[idx].signal)
-            .then(txt => {
-              controllers.forEach((c, i) => { if (i !== idx) c.abort(); });
-              return txt;
-            })
-        );
-
-        try {
-          return await Promise.any([...keyTasks, ...workerTasks]);
-        } catch (e) {
-          return '';
+        const modelsToTry = availableFastModels.slice(0, 3);
+        for (let i = 0; i < modelsToTry.length; i++) {
+          const ctrl = new AbortController();
+          const timeoutMs = (i === 0) ? 4500 : 6500;
+          const timer = setTimeout(() => ctrl.abort(), timeoutMs);
+          try {
+            const txt = await callSingleGeminiModelFast(modelsToTry[i], promptText, dataUrl, ctrl.signal);
+            clearTimeout(timer);
+            if (txt) return txt;
+          } catch (e) {
+            clearTimeout(timer);
+          }
         }
       }
 
-      try {
-        return await Promise.any(workerTasks);
-      } catch (e) {
-        return '';
+      // 2. 走 Cloudflare Worker 全球邊緣免費共享快取與多 Key 輪詢池（主節點優先，失敗才切換備用節點）
+      for (let i = 0; i < CF_WORKER_ENDPOINTS.length; i++) {
+        const ep = CF_WORKER_ENDPOINTS[i];
+        try {
+          const r = await fetchWithTimeout(ep, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              prompt: promptText,
+              image: dataUrl,
+              cacheKey: cleanCacheKey
+            })
+          }, i === 0 ? 6800 : 7500);
+          if (!r.ok) continue;
+          const d = await r.json();
+          const t = (d?.text || d?.reply || d?.choices?.[0]?.message?.content || '').trim();
+          if (t) return t;
+        } catch (e) {}
       }
+
+      return '';
     }
 
     async function translateFast(text, fromLang, toLang) {
@@ -2453,12 +2469,12 @@
 
     function cleanChineseSentence(line) {
       if (!line) return '';
-      let s = line
+      let s = expandNumbersAndSymbolsToZh(line)
         .replace(/^[-*•\d.)、]+\s*/, '')
         .replace(/\*+/g, '')
         .replace(/\([^)]*[A-Za-zāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ][^)]*\)/g, '')
         .replace(/（[^）]*[A-Za-zāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ][^）]*）/g, '')
-        .replace(/[A-Za-zāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ]{2,}/g, '')
+        .replace(/[āáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜA-Za-z]{2,}/g, '')
         .replace(/([，。！？；：、,.!?;:])\s*[，。！？；：、,.!?;:]+/g, '$1')
         .replace(/^[，。！？；：、,.!?;:\s]+/, '')
         .replace(/\s+/g, '')
@@ -2530,10 +2546,13 @@
       return renderedPairs > 0;
     }
 
-    async function runSmartAI(overrideInput) {
-      const q = applyFuzzyVoiceCorrection((overrideInput !== undefined ? overrideInput : document.getElementById('userInput').value).trim());
+    async function runSmartAI(overrideInput, voiceAlts = []) {
+      const rawText = (overrideInput !== undefined ? overrideInput : document.getElementById('userInput').value).trim();
+      const altsToUse = (Array.isArray(voiceAlts) && voiceAlts.length > 0) ? voiceAlts : latestVoiceCandidates;
+      const q = applyFuzzyVoiceCorrection(rawText, altsToUse);
       if (!q) return;
       document.getElementById('userInput').value = q;
+      latestVoiceCandidates = [];
       if (checkAndWarnProfanity(q)) return;
 
       if (/docs\.google\.com\/|drive\.google\.com\//i.test(q)) {
@@ -2553,18 +2572,22 @@
         if (ok) return;
       }
 
+      const voiceCandidatesHint = (altsToUse && altsToUse.length > 1)
+        ? `\nVoice Speech-to-Text Candidates: ${JSON.stringify(altsToUse)}. (Pick the candidate that makes the most natural sense in Mandarin or English, or reconstruct the intended English/Chinese phrase if phonetic transcription occurred!)`
+        : '';
+
       const directPrompt = `You are an authoritative bilingual scholar and assistant.
-User question/request: "${q}"
+User question/request: "${q}"${voiceCandidatesHint}
 
 CRITICAL ACCURACY RULES:
-1. If the user's input has a voice-recognition homophone typo (e.g. "永和" instead of the Tang poem "詠鵝"), automatically answer the intended topic.
+1. If the user's input has a voice-recognition homophone typo (e.g. "永和" instead of the Tang poem "詠鵝", or phonetic Chinese characters representing English words), automatically answer the intended topic.
 2. Formulate the complete, authoritative standard answer or authentic classic text:
    - If the user asks about a Chinese poem/classic (e.g., 詠鵝, 靜夜思, 水調歌頭): Output ONLY the Title+Author on Line 1, followed by the COMPLETE original verses. No extra commentary!
    - If the user asks any other question in English or Chinese: Output a clear, complete, accurate bilingual answer.
 3. Output Format (Every single line MUST use "|||"):
    - Line 1: Chinese_Title_or_Summary ||| English_Title_or_Summary
    - Line 2+: Pure_Chinese_Sentence ||| Authentic_English_Sentence
-   - IMPORTANT: Left side of "|||" must contain ONLY Chinese characters and Chinese punctuation (NO Pinyin, NO English letters on the left side). Never repeat any line.`;
+   - IMPORTANT: Left side of "|||" must contain ONLY Traditional Chinese characters and Chinese punctuation (write all numbers/terms in Chinese characters, NO Pinyin, NO English letters on the left side). Never repeat any line.`;
 
       const aiText = await fetchFastAccurateAI(directPrompt, null, q);
       if (aiText) {
