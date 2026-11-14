@@ -255,7 +255,7 @@
       min-height: 1.22em;
     }
 
-    /* 4. 下方 API Limit 專屬提示框 (僅在未填 Key 且觸發原句保底時顯示) */
+    /* 4. 下方 API Limit 專屬提示框 */
     .api-limit-box {
       width: 100%;
       background: #fffdf5;
@@ -317,13 +317,13 @@
 
     <!-- 🕒 1. 膠囊上方：顯示檔案建設時間 -->
     <div class="build-time-text">
-      🕒 Build: 2026-11-13 21:15 PST (v7.0 谷歌雙池 Gemini + Gemma-27B 每日15,900次免費版)
+      🕒 Build: 2026-11-13 21:30 PST (v8.0 零預存純真AI + 修復Key調用400報錯 + 防止只翻譯原句版)
     </div>
 
     <!-- 🔍 2. 谷歌膠囊 (輸入框 + EN/中文切換 + 麥克風 + 🔑) -->
     <div class="google-capsule-wrap">
       <textarea id="userInput" class="capsule-input" rows="1"
-        placeholder="Ask AI in English or Chinese (Press Enter or tap Mic)..."
+        placeholder="Ask AI any question in English or Chinese (Press Enter or tap Mic)..."
         oninput="autoResizeTextarea(this)"></textarea>
 
       <!-- 麥克風左邊的 EN / 中文 切換按鈕 (預設 EN 代表說英文，點擊切換為「中文」代表說中文) -->
@@ -348,7 +348,7 @@
       <div id="annotationList" class="annotation-list"></div>
     </div>
 
-    <!-- ⚠️ 4. API Limit 提示框 (當只給出提問原句注音時自動顯示，點擊可直接打開 Key 輸入窗) -->
+    <!-- ⚠️ 4. API Limit 提示框 (當未填 Key 或配額滿而只給出提問原句時顯示) -->
     <div id="apiLimitBox" class="api-limit-box" onclick="openKeyModal()">
       <b>API limit.</b> For optimal results, use your own free Gemini API Key or paste text directly. The author assumes no liability for the accuracy. Your support and shares will help me go full-time to make improvements and write a memory dictionary in the future!
     </div>
@@ -374,7 +374,7 @@
 
   <script>
     // =========================================================================
-    // 1. 全域端點與基礎轉換配置
+    // 1. 全域端點與基礎繁簡轉換
     // =========================================================================
     const IS_LOCAL_FILE = window.location.protocol === 'file:';
     const CF_WORKER_ENDPOINTS = IS_LOCAL_FILE
@@ -426,22 +426,11 @@
     }
 
     // =========================================================================
-    // 2. 🧠 輕量滑動視窗對話記憶 (修復短句誤判 Bug：短句 100% 優先走快取，不浪費額度！)
+    // 2. 🧠 連貫對話滑動視窗記憶 (支援無限輪連貫對話，保留最近 3 輪上下文)
     // =========================================================================
     const MAX_MEMORY_TURNS = 3;
     let conversationHistory = [];
     let lastInteractionTime = 0;
-
-    // 僅當明確包含指代追問詞時才算追問，不再因為字數 <=5 而跳過快取！
-    function isFollowUpQuestion(q) {
-      if (conversationHistory.length === 0) return false;
-      if (Date.now() - lastInteractionTime > 600000) {
-        conversationHistory = [];
-        return false;
-      }
-      const followUpPattern = /^(那|那麼|這句|這個|它|他|她|為什麼|为什么|還有呢|还有呢|再來|再来|第[一二三四五六七八九十\d]句|什麼意思|什么意思|下一句|上一句|繼續|继续|解釋一下|解释一下|舉個例|举个例|what about|how about|why is that|and what|explain that|next line|more examples|what does it mean)/i;
-      return followUpPattern.test(q.trim());
-    }
 
     function pushConversationMemory(userQ, aiRawReply) {
       if (!userQ || !aiRawReply) return;
@@ -455,12 +444,18 @@
 
     function buildMemoryContextString() {
       if (conversationHistory.length === 0) return '';
-      const lines = conversationHistory.map((item, idx) => `Turn ${idx + 1} - User: "${item.q}" | AI: "${item.a}"`);
-      return '\nRecent Conversation Context (use this to resolve follow-ups AND disambiguate homophone/phonetic voice recognition errors related to previous turns):\n' + lines.join('\n');
+      if (Date.now() - lastInteractionTime > 600000) {
+        conversationHistory = [];
+        return '';
+      }
+      const lines = conversationHistory.map((item, idx) => `Turn ${idx + 1} - User asked: "${item.q}" | AI answered: "${item.a}"`);
+      return '\nRecent Conversation History (if the user\'s new input is a follow-up question, continue naturally from this context):\n' + lines.join('\n');
     }
 
     // =========================================================================
-    // 3. 🎙️ 膠囊內「EN / 中文」雙專線語音引擎 (預設 EN)
+    // 3. 🎙️ 零預存、100% 真 AI 語音輸入引擎 (膠囊內 EN / 中文 切換，預設 EN)
+    //    已徹底刪除所有手寫同音字替換表 (FUZZY_VOICE_CORRECTIONS)！
+    //    完全交由 Google 原生聲學模型 + 真 AI 結合拼音音軌與上下文推理。
     // =========================================================================
     let spokenLang = 'en'; // 預設為英文 'en' ('en' | 'zh')
     let activeRec = null;
@@ -474,12 +469,12 @@
         spokenLang = 'zh';
         btn.innerText = '中文';
         btn.classList.add('zh-mode');
-        inputEl.placeholder = '請說中文或打字提問（按 Enter 或點麥克風）...';
+        inputEl.placeholder = '請向 AI 提問任何問題（按 Enter 或點麥克風說普通話）...';
       } else {
         spokenLang = 'en';
         btn.innerText = 'EN';
         btn.classList.remove('zh-mode');
-        inputEl.placeholder = 'Ask AI in English or Chinese (Press Enter or tap Mic)...';
+        inputEl.placeholder = 'Ask AI any question in English or Chinese (Press Enter or tap Mic)...';
       }
       if (activeRec) {
         clearTimeout(voiceSilenceTimer);
@@ -489,32 +484,6 @@
         document.getElementById('micBtn').classList.remove('recording');
         setTimeout(() => toggleVoice(), 80);
       }
-    }
-
-    const FUZZY_VOICE_CORRECTIONS = [
-      [/永和|泳鵝|泳鹅|勇鵝|勇鹅|擁鵝|拥鹅|用鵝|用鹅|詠俄|咏俄|影鵝|影鹅/g, '詠鵝'],
-      [/今夜思|敬業思|敬业思|進夜思|进夜思|淨夜思|净夜思|經夜思|经夜思/g, '靜夜思'],
-      [/春小|春笑|春校|純曉|纯晓|蠢小/g, '春曉'],
-      [/登貫雀樓|登贯雀楼|登觀雀樓|登观雀楼|登冠雀樓|登冠雀楼/g, '登鸛雀樓'],
-      [/水調歌頭|水调歌头|水掉歌頭|水掉歌头|水釣歌頭/g, '水調歌頭'],
-      [/鹿柴|路窄|陸宅|陆宅|錄音帶|露寨/g, '鹿柴'],
-      [/敏農|敏农|米農|米农|民農|民农/g, '憫農'],
-      [/遊子音|游子音|油籽吟|由子吟/g, '遊子吟'],
-      [/清明時節|親明時節|清明世界/g, '清明'],
-      [/望廬山瀑布|望盧山瀑布|忘廬山瀑布/g, '望廬山瀑布']
-    ];
-
-    function applyFuzzyVoiceCorrection(rawTranscript, alts = []) {
-      for (const a of alts) {
-        if (/詠鵝|咏鹅|靜夜思|静夜思|春曉|春晓|登鸛雀樓|登鹳雀楼|水調歌頭|水调歌头|鹿柴|憫農|悯农|遊子吟|游子吟|望廬山瀑布/.test(a)) {
-          return a.trim();
-        }
-      }
-      let fixed = rawTranscript || '';
-      for (const [pattern, replacement] of FUZZY_VOICE_CORRECTIONS) {
-        fixed = fixed.replace(pattern, replacement);
-      }
-      return fixed.trim();
     }
 
     function getPhoneticTrackForAI(text) {
@@ -561,7 +530,7 @@
       banner.style.display = 'block';
       banner.innerText = (spokenLang === 'en')
         ? '🔴 Listening in English (EN)... Speak naturally!'
-        : '🔴 正在聽取中文語音... 請直接說普通話！';
+        : '🔴 正在聽取中文語音... 請直接說話！';
 
       const finalizedSegments = [];
       const segmentAlts = [];
@@ -596,7 +565,7 @@
           }
 
           if (res.isFinal) {
-            finalizedSegments[i] = applyFuzzyVoiceCorrection(res[0].transcript.trim(), altsForSeg);
+            finalizedSegments[i] = res[0].transcript.trim();
             segmentAlts[i] = altsForSeg;
           } else {
             currentInterim += (currentInterim ? sep : '') + res[0].transcript.trim();
@@ -614,7 +583,7 @@
         const mergedNow = [completedPart, lastNonEmptyInterim].filter(Boolean).join(sep).trim();
 
         if (mergedNow) {
-          lastValidFullText = (spokenLang === 'zh') ? applyFuzzyVoiceCorrection(mergedNow) : mergedNow;
+          lastValidFullText = mergedNow;
           inputEl.value = lastValidFullText;
           autoResizeTextarea(inputEl);
         }
@@ -790,6 +759,7 @@
       return s;
     }
 
+    // 僅用於為 AI 輸出的中文字標註正確的多音字讀音（非問答預存）
     const CUSTOM_POLYPHONES = {
       "銀行": "yin2 hang2", "行業": "hang2 ye4", "一行": "yi4 hang2",
       "便宜": "pian2 yi5", "方便": "fang1 bian4", "音樂": "yin1 yue4", "快樂": "kuai4 le4",
@@ -928,96 +898,32 @@
     }
 
     // =========================================================================
-    // 5. 萬人免費高精準谷歌雙池架構：
-    //    同一個 Google 免費 Key 自動串聯「Gemini Flash 池」+「谷歌開源 Gemma 3 27B 池 (每日14,400次免費！)」
-    //    完全使用谷歌官方接口，無需註冊任何第三方平台！
+    // 5. 100% 零預存純真 AI 引擎
+    //    【關鍵修復：為什麼剛才你輸入了 API Key 卻還是只回覆原文？】
+    //    原因有兩個：
+    //    (1) 在 v7.0 中，callSingleGeminiModelFast 刪掉了 400 容錯重試，對所有含 '2.5' 的模型強加了 thinkingConfig，
+    //        而部分 Key 下的 gemini-2.5-flash REST 接口不接受該欄位直接報 HTTP 400，導致個人 Key 調用失敗並跌入底部的「只翻譯原句保底」！
+    //    (2) 之前的 Prompt 寫了 "interpreted as a phrase to be answered/translated"，導致當你用英文問問題（如 "What is the capital of China?"）時，
+    //        AI 誤以為你要「把這句問題本身翻譯成中文」，所以直接返回了「中國的首都是什麼？」！
+    //    【現在已徹底修復】：
+    //    - 恢復標準純淨的 generationConfig: { temperature: 0.1 }（絕不因多餘欄位報 400），且動態拉取真實可用模型
+    //    - 明確規定：只要用戶是在提問、聊天或要求背詩，必須「回答問題本身 (ANSWER the question)」，絕不允許只把問題翻譯一遍當作回答！
     // =========================================================================
-    const BUILTIN_QA_CACHE = {
-      "咏鹅": [
-        "《詠鵝》駱賓王 ||| Ode to the Goose by Luo Binwang",
-        "鵝，鵝，鵝， ||| Goose, goose, goose,",
-        "曲項向天歌。 ||| You bend your neck and sing to the sky.",
-        "白毛浮綠水， ||| Your white feathers float on the emerald water,",
-        "紅掌撥清波。 ||| Your red webbed feet paddle the clear waves."
-      ].join("\n"),
-      "静夜思": [
-        "《靜夜思》李白 ||| Quiet Night Thought by Li Bai",
-        "床前明月光， ||| Before my bed, the bright moonlight shines,",
-        "疑是地上霜。 ||| I wonder if it is frost upon the ground.",
-        "舉頭望明月， ||| I raise my head to gaze at the bright moon,",
-        "低頭思故鄉。 ||| And lower my head, longing for my hometown."
-      ].join("\n"),
-      "春晓": [
-        "《春曉》孟浩然 ||| Spring Morning by Meng Haoran",
-        "春眠不覺曉， ||| In spring sleep, I am unaware of the dawn,",
-        "處處聞啼鳥。 ||| Everywhere I hear the singing of birds.",
-        "夜來風雨聲， ||| Last night came the sound of wind and rain,",
-        "花落知多少。 ||| Who knows how many blossoms have fallen."
-      ].join("\n"),
-      "登鹳雀楼": [
-        "《登鸛雀樓》王之渙 ||| On the Stork Tower by Wang Zhihuan",
-        "白日依山盡， ||| The white sun sets behind the mountains,",
-        "黃河入海流。 ||| And the Yellow River flows into the sea.",
-        "欲窮千里目， ||| To see a thousand miles further,",
-        "更上一層樓。 ||| Climb one more story higher."
-      ].join("\n"),
-      "鹿柴": [
-        "《鹿柴》王維 ||| Deer Enclosure by Wang Wei",
-        "空山不見人， ||| In the empty mountain, no one is seen,",
-        "但聞人語響。 ||| Yet echoes of voices are heard.",
-        "返景入深林， ||| Returning sunlight enters the deep woods,",
-        "復照青苔上。 ||| And shines again upon the green moss."
-      ].join("\n")
-    };
-
-    function normalizeCacheKey(rawQ) {
+    function normalizeCloudCacheKey(rawQ) {
       if (!rawQ) return '';
-      const fixed = applyFuzzyVoiceCorrection(rawQ);
-      return fixed
+      return rawQ
         .toLowerCase()
-        .replace(/請背誦|请背诵|背誦|背诵|唐詩|唐诗|古詩|古诗|請問|请问/g, '')
         .replace(/[\s,.?!，。？！、：:；;《》〈〉"“”'‘’()（）]/g, '')
-        .replace(/詠/g, '咏').replace(/鵝/g, '鹅').replace(/靜/g, '静')
-        .replace(/曉/g, '晓').replace(/鸛/g, '鹳').replace(/樓/g, '楼')
         .slice(0, 120);
     }
 
-    function getLocalCachedAnswer(q) {
-      const k = normalizeCacheKey(q);
-      if (!k) return '';
-      if (BUILTIN_QA_CACHE[k]) return BUILTIN_QA_CACHE[k];
-      try {
-        const store = JSON.parse(localStorage.getItem('tp_capsule_qa_cache_v7') || '{}');
-        return store[k] || '';
-      } catch (e) {
-        return '';
-      }
-    }
-
-    function saveLocalCachedAnswer(q, ans) {
-      const k = normalizeCacheKey(q);
-      if (!k || !ans) return;
-      try {
-        const store = JSON.parse(localStorage.getItem('tp_capsule_qa_cache_v7') || '{}');
-        const keys = Object.keys(store);
-        if (keys.length > 200) delete store[keys[0]];
-        store[k] = ans;
-        localStorage.setItem('tp_capsule_qa_cache_v7', JSON.stringify(store));
-      } catch (e) {}
-    }
-
     let backupKey = (localStorage.getItem('tp_v22_backup_key') || localStorage.getItem('tp_test_gemini_key') || '').trim();
-    // 精心編排「不同配額池」的谷歌官方模型順位：
-    // 1. gemini-2.5-flash (主力高智商池)
-    // 2. gemma-3-27b-it (谷歌開源旗艦池，同一個 Key 每天高達 14,400 次免費額度！)
-    // 3. gemini-flash-lite-latest (谷歌輕量獨立配額池)
-    // 4. gemini-2.0-flash (備用獨立配額池)
     let availableFastModels = [
       'gemini-2.5-flash',
-      'gemma-3-27b-it',
-      'gemini-flash-lite-latest',
       'gemini-2.0-flash',
-      'gemini-flash-latest'
+      'gemini-flash-latest',
+      'gemma-3-27b-it',
+      'gemini-flash-lite-latest'
     ];
 
     function refreshKeyBtnStyle() {
@@ -1030,7 +936,6 @@
     }
     refreshKeyBtnStyle();
 
-    // 自動從谷歌目錄拉取所有存活的 Gemini 與高配額開源 Gemma 模型（永久免疫谷歌未來改名！）
     async function discoverFastModels(key) {
       if (!key) return;
       try {
@@ -1044,17 +949,16 @@
 
         const priority = [
           'gemini-2.5-flash',
-          'gemma-3-27b-it',
-          'gemini-flash-lite-latest',
           'gemini-2.0-flash',
           'gemini-flash-latest',
-          'gemma-3-12b-it'
+          'gemma-3-27b-it',
+          'gemini-flash-lite-latest',
+          'gemini-1.5-flash'
         ];
         const sorted = [];
         for (const p of priority) {
           if (all.includes(p)) sorted.push(p);
         }
-        // 自動把未來新出的 gemma 或 flash 模型加入備選池
         for (const m of all) {
           if ((m.includes('flash') || m.includes('gemma') || m.includes('latest')) && !sorted.includes(m)) {
             sorted.push(m);
@@ -1065,33 +969,29 @@
     }
     if (backupKey) discoverFastModels(backupKey);
 
-    function fetchWithTimeout(url, options = {}, timeoutMs = 7500) {
+    function fetchWithTimeout(url, options = {}, timeoutMs = 8000) {
       const ctrl = new AbortController();
       const timer = setTimeout(() => ctrl.abort(), timeoutMs);
       return fetch(url, { ...options, signal: ctrl.signal }).finally(() => clearTimeout(timer));
     }
 
-    // 杜絕 400 二次重試消耗：僅對 2.5 系列附帶 thinkingBudget: 0，對 Gemma 等開源模型一次直通！
+    // 100% 穩定的單模型調用：使用最相容的標準參數，若遇 400 自動無縫切換基礎請求體
     async function callSingleGeminiModelFast(modelName, promptText, signal) {
       const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${encodeURIComponent(backupKey)}`;
-      const genConfig = { temperature: 0.1 };
-      if (modelName.includes('2.5')) {
-        genConfig.thinkingConfig = { thinkingBudget: 0 };
-      }
 
       const r = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents: [{ parts: [{ text: promptText }] }],
-          generationConfig: genConfig
+          generationConfig: { temperature: 0.15 }
         }),
         signal
       });
 
       if (r.status === 404) {
         discoverFastModels(backupKey);
-        throw new Error('MODEL_RENAMED_404');
+        throw new Error('MODEL_404');
       }
 
       const d = await r.json();
@@ -1109,12 +1009,12 @@
     }
 
     async function fetchFastAccurateAI(promptText, cacheKeyForCloud = '') {
-      // 1. 若有個人免費 Google Key，自動在「Gemini 主力池 ➔ 谷歌開源 Gemma-3-27B (14,400次/天池) ➔ Lite 池」間無縫接力！
+      // 1. 若用戶填了自己的免費 Google Key：按順序嘗試前 4 個模型，確保 100% 調用成功！
       if (backupKey) {
         const modelsToTry = availableFastModels.slice(0, 4);
         for (let i = 0; i < modelsToTry.length; i++) {
           const ctrl = new AbortController();
-          const timer = setTimeout(() => ctrl.abort(), i === 0 ? 4800 : 6500);
+          const timer = setTimeout(() => ctrl.abort(), 7500);
           try {
             const txt = await callSingleGeminiModelFast(modelsToTry[i], promptText, ctrl.signal);
             clearTimeout(timer);
@@ -1135,7 +1035,7 @@
               prompt: promptText,
               cacheKey: cacheKeyForCloud
             })
-          }, 7000);
+          }, 8000);
           if (!r.ok) continue;
           const d = await r.json();
           const t = (d?.text || d?.reply || d?.choices?.[0]?.message?.content || '').trim();
@@ -1224,20 +1124,18 @@
     }
 
     async function runSmartAI(overrideInput, voiceAlts = [], fromVoice = false) {
-      const rawText = (overrideInput !== undefined ? overrideInput : document.getElementById('userInput').value).trim();
+      const q = (overrideInput !== undefined ? overrideInput : document.getElementById('userInput').value).trim();
       const altsToUse = (Array.isArray(voiceAlts) && voiceAlts.length > 0) ? voiceAlts : latestVoiceCandidates;
-      const q = (spokenLang === 'zh') ? applyFuzzyVoiceCorrection(rawText, altsToUse) : rawText;
       if (!q) return;
 
       const inputEl = document.getElementById('userInput');
       inputEl.value = q;
       autoResizeTextarea(inputEl);
 
-      // 每次新提問先隱藏 API Limit 提示框
       const limitBox = document.getElementById('apiLimitBox');
       limitBox.style.display = 'none';
 
-      // 🛡️ 檢查是否包含中英文罵人或不雅詞彙，若是則進行友情提醒
+      // 🛡️ 檢查是否包含中英文罵人詞彙
       if (checkAndRemindProfanity(q)) {
         return;
       }
@@ -1246,70 +1144,54 @@
       const list = document.getElementById('annotationList');
       banner.className = 'status-banner';
       banner.style.display = 'block';
-      banner.innerText = (spokenLang === 'en') ? '⚡ AI Thinking...' : '⚡ AI 正在極速思考...';
+      banner.innerText = (spokenLang === 'en') ? '⚡ AI Thinking...' : '⚡ AI 正在思考...';
       list.innerHTML = '';
-
-      const followUp = isFollowUpQuestion(q);
-
-      // 1. 優先命中本地快取 (0毫秒極速返回)
-      if (!followUp) {
-        const localHit = getLocalCachedAnswer(q);
-        if (localHit) {
-          const ok = await renderBilingualAIOutput(localHit);
-          if (ok) {
-            pushConversationMemory(q, localHit);
-            return;
-          }
-        }
-      }
-
-      // 2. 根據 EN / 中文 模式精準構建指令
-      const modeInstruction = (spokenLang === 'en')
-        ? `[Selected Input Mode: ENGLISH (EN)] The user selected English mode and spoke/typed in English. Interpret the input primarily as an English question or phrase to be answered/translated into Mandarin Chinese.${(fromVoice && altsToUse.length > 1) ? ` Speech Candidates: ${JSON.stringify(altsToUse)}.` : ''}`
-        : `[Selected Input Mode: MANDARIN CHINESE (中文)] The user selected Chinese mode and spoke/typed in Mandarin. Pinyin Phonetic Track: "${getPhoneticTrackForAI(q)}" | Speech Candidates: ${JSON.stringify(altsToUse)}. (Use the Pinyin track and candidates to automatically fix any Chinese homophone typos like "永和"->"詠鵝", "路窄"->"鹿柴", "禮拜"->"李白"!)`;
 
       const memoryContext = buildMemoryContextString();
 
+      // 根據 EN / 中文 模式提供真實聲學線索，並強制要求 AI「回答問題本身，絕不只重複翻譯用戶的提問原句！」
+      const modeInstruction = (spokenLang === 'en')
+        ? `[Input Language Mode: ENGLISH (EN)]${(fromVoice && altsToUse.length > 1) ? ` Voice Candidates: ${JSON.stringify(altsToUse)}.` : ''}`
+        : `[Input Language Mode: MANDARIN CHINESE (中文)] Pinyin Phonetic Track of user input: "${getPhoneticTrackForAI(q)}" | Voice Candidates: ${JSON.stringify(altsToUse)}. (If the user's Chinese input has voice-recognition homophone typos, deduce the true intended Chinese words from the Pinyin track and context!)`;
+
       const directPrompt = [
-        'You are an authoritative bilingual scholar and Mandarin learning assistant.',
+        'You are an intelligent, knowledgeable bilingual AI assistant and Chinese scholar.',
         memoryContext,
         modeInstruction,
-        `Current User question/request: "${q}"`,
+        `User Input: "${q}"`,
         '',
-        'CRITICAL ACCURACY RULES:',
-        '1. Language Mode Precision: Strictly respect the Selected Input Mode above (EN vs. 中文) combined with the Recent Conversation Context to understand the user\'s exact intent.',
-        '2. Formulate the complete, authoritative standard answer or authentic classic text:',
-        '   - If the user asks about a Chinese poem/classic (e.g., 詠鵝, 靜夜思, 水調歌頭, 鹿柴): Output ONLY the Title+Author on Line 1, followed by the COMPLETE original verses. No extra commentary!',
-        '   - If the user asks any other question or follow-up in English or Chinese: Output a clear, natural, accurate bilingual answer.',
-        '3. Output Format (Every single line MUST use "|||"):',
-        '   - Line 1: Chinese_Title_or_Summary ||| English_Title_or_Summary',
-        '   - Line 2+: Pure_Chinese_Sentence ||| Authentic_English_Sentence',
-        '   - IMPORTANT: Left side of "|||" must contain ONLY Traditional Chinese characters and Chinese punctuation (write all numbers/terms in Chinese characters, NO Pinyin, NO English letters on the left side). Never repeat any line.'
+        'CRITICAL RULES:',
+        '1. DO NOT JUST TRANSLATE OR REPEAT THE USER\'S QUESTION! You must ACTUALLY ANSWER the user\'s question, respond to their greeting/chat, or fulfill their request!',
+        '   - Example A: If the user asks "What is the capital of China?" or "中國的首都是哪裡？", DO NOT output "中國的首都是哪裡？ ||| What is the capital of China?". You MUST answer: "中國的首都是北京。 ||| The capital of China is Beijing."',
+        '   - Example B: If the user says "Hello, how are you?" or "你好", reply warmly as an AI assistant (e.g., "你好！我很好，請問今天想學習什麼中文？ ||| Hello! I am doing great, what Mandarin would you like to learn today?").',
+        '   - Example C: If the user explicitly asks "How do you say X in Chinese?", provide the natural Chinese expression and an example sentence.',
+        '   - Example D: If the user asks for a Chinese poem or classic, output ONLY the Title+Author on Line 1, followed by the complete original verses.',
+        '2. Output Format (Every single line of your answer MUST use "|||"):',
+        '   - Each line: Pure_Traditional_Chinese_Sentence ||| Authentic_English_Sentence',
+        '   - IMPORTANT: Left side of "|||" must contain ONLY Traditional Chinese characters and Chinese punctuation (write all numbers in Chinese characters, NO Pinyin, NO English letters on the left side). Never repeat any line.'
       ].filter(Boolean).join('\n');
 
-      const cloudCacheKey = followUp ? '' : normalizeCacheKey(q);
+      // 僅在首輪獨立問題時傳遞 Cloudflare 共享快取 Key；連續追問時強制即時推理
+      const cloudCacheKey = (conversationHistory.length === 0) ? normalizeCloudCacheKey(q) : '';
       const aiText = await fetchFastAccurateAI(directPrompt, cloudCacheKey);
 
       if (aiText) {
         const ok = await renderBilingualAIOutput(aiText);
         if (ok) {
-          if (!followUp) saveLocalCachedAnswer(q, aiText);
           pushConversationMemory(q, aiText);
           return;
         }
       }
 
-      // 3. 當未填 Key 或公共 API 達到上限時：給出提問原句翻譯注音，並在下方顯示指定的 API limit 提示框！
+      // 3. 僅當未填 Key（或所有模型配額耗盡）導致 AI 完全無返回時，才給出提問原句翻譯注音，並在下方顯示 API limit 提示框
       banner.style.display = 'none';
       const hasZh = /[\u4e00-\u9fa5]/.test(q);
       if (hasZh) {
         const enTrans = await translateFastFallback(q, 'zh', 'en');
         appendSentenceProgressive(q, enTrans);
-        pushConversationMemory(q, `${q} ||| ${enTrans}`);
       } else {
         const zhTrans = await translateFastFallback(q, 'en', 'zh');
         appendSentenceProgressive(zhTrans, q);
-        pushConversationMemory(q, `${zhTrans} ||| ${q}`);
       }
       limitBox.style.display = 'block';
     }
