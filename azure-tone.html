@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trees Pinyin - 智能口语与声调评测模块</title>
+  <script src="https://aka.ms/csspeech/jsbrowserpackageraw"></script>
+  <script src="https://unpkg.com/pinyin-pro@3.26.0/dist/index.js"></script>
+  <style>
+    .tp-tone-wrap {
+      font-family: system-ui, -apple-system, sans-serif;
+      width: 100%;
+      max-width: 660px;
+      margin: 24px auto;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 18px;
+      padding: 24px;
+      box-shadow: 0 6px 20px rgba(15, 23, 42, 0.05);
+      box-sizing: border-box;
+      color: #1e293b;
+    }
+    .tp-tone-wrap * { box-sizing: border-box; }
+
+    .tp-quota-banner {
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-bottom: 16px;
+      font-size: 13.5px;
+      line-height: 1.55;
+      color: #334155;
+    }
+    .tp-quota-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+    .tp-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 10px;
+      border-radius: 99px;
+      font-weight: 700;
+      font-size: 12.5px;
+      background: #e0f2fe;
+      color: #0369a1;
+    }
+    .tp-badge.pro { background: #dcfce7; color: #15803d; }
+    .tp-badge.exhausted { background: #fee2e2; color: #b91c1c; }
+
+    .tp-actions-links { display: flex; gap: 12px; font-size: 13px; }
+    .tp-link-btn {
+      background: none;
+      border: none;
+      color: #2563eb;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 0;
+      text-decoration: underline;
+    }
+    .tp-link-btn.sub { color: #d97706; }
+
+    .tp-byok-panel {
+      display: none;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px dashed #cbd5e1;
+    }
+    .tp-byok-panel.open { display: block; }
+    .tp-byok-row { display: flex; gap: 8px; margin-top: 6px; }
+
+    .tp-input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      font-size: 15px;
+      outline: none;
+    }
+    .tp-input:focus { border-color: #3b82f6; }
+
+    .tp-stage {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      padding: 28px 14px;
+      background: #f8fafc;
+      border: 1px dashed #cbd5e1;
+      border-radius: 14px;
+      margin: 16px 0;
+      min-height: 135px;
+      align-items: center;
+    }
+    .tp-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 6px 12px;
+      border-radius: 10px;
+      min-width: 52px;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      transition: all 0.2s;
+    }
+    .tp-err-tag {
+      height: 20px;
+      font-size: 13.5px;
+      font-weight: 800;
+      color: #ea580c;
+      visibility: hidden;
+      margin-bottom: 2px;
+      white-space: nowrap;
+    }
+    .tp-hanzi { font-size: 36px; font-weight: 600; line-height: 1.15; }
+    .tp-punct { font-size: 28px; color: #94a3b8; align-self: flex-end; padding-bottom: 6px; }
+
+    /* 四级视觉反馈状态 */
+    .tp-item.good { background: #dcfce7; color: #15803d; border-color: #bbf7d0; }
+    /* 白底 + 错误声调→正确声调（不影响理解） */
+    .tp-item.tone-soft { background: #ffffff; color: #1e293b; border-color: #cbd5e1; box-shadow: 0 2px 5px rgba(0,0,0,0.04); }
+    .tp-item.tone-soft .tp-err-tag { visibility: visible; color: #d97706; }
+    /* 黄底 + 错误声调→正确声调（引起歧义） */
+    .tp-item.tone-hard { background: #fef3c7; color: #b45309; border-color: #fde68a; }
+    .tp-item.tone-hard .tp-err-tag { visibility: visible; color: #b45309; }
+    /* 红底（读错字/漏读） */
+    .tp-item.bad { background: #fee2e2; color: #dc2626; border-color: #fecaca; }
+
+    .tp-legend {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 14px;
+      font-size: 12px;
+      color: #64748b;
+      margin-bottom: 16px;
+    }
+    .tp-legend span { display: inline-flex; align-items: center; gap: 5px; }
+    .tp-dot { width: 12px; height: 12px; border-radius: 4px; display: inline-block; border: 1px solid #cbd5e1; }
+
+    .tp-btns { display: flex; justify-content: center; gap: 12px; }
+    .tp-btn {
+      padding: 10px 24px;
+      border-radius: 99px;
+      border: 1px solid #cbd5e1;
+      background: #fff;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .tp-btn-rec { background: #10b981; color: #fff; border: none; }
+    .tp-btn-rec.on { background: #ef4444; }
+    .tp-btn-rec:disabled { background: #94a3b8; cursor: not-allowed; }
+
+    .tp-msg { text-align: center; margin-top: 14px; font-size: 14px; color: #475569; line-height: 1.6; }
+    .tp-debug { margin-top: 10px; padding: 8px 12px; background: #f1f5f9; border-radius: 8px; font-size: 13px; color: #475569; text-align: center; display: none; }
+  </style>
+</head>
+<body style="background:#f1f5f9; margin:0; padding:20px 12px;">
+
+<div class="tp-tone-wrap" id="tp-tone-module">
+
+  <!-- 顶部配额说明与商业化横幅 -->
+  <div class="tp-quota-banner">
+    <div class="tp-quota-top">
+      <span class="tp-badge" id="tpQuotaBadge">🎁 今日免费额度：剩余 2 / 2 次</span>
+      <div class="tp-actions-links">
+        <button class="tp-link-btn" onclick="toggleByokPanel()">⚙️ 添加 Azure Key (免费大量使用)</button>
+        <button class="tp-link-btn sub" onclick="openSubscribeModal()">💎 订阅我们的会员</button>
+      </div>
+    </div>
+    <div>
+      由于额度限制，每人每天仅允许两次免费评测。您可以<strong>自己添加 Azure Key 免费大量使用</strong>，也可以<strong>订阅我们的会员</strong>。
+    </div>
+
+    <!-- 自带 Key 折叠设置区 -->
+    <div class="tp-byok-panel" id="tpByokPanel">
+      <div style="font-size:12px; color:#64748b;">
+        填入您的微软 Azure Speech Key（如 Free F0 免费密钥），仅保存在您的浏览器本地，即可无限次免费评测：
+      </div>
+      <div class="tp-byok-row">
+        <input id="tpUserKey" class="tp-input" type="password" placeholder="粘贴您的 Azure KEY 1" oninput="saveByok()" style="flex:2; font-size:13px; padding:7px 10px;" />
+        <input id="tpUserRegion" class="tp-input" type="text" placeholder="Region (如 westus2)" oninput="saveByok()" style="flex:1; font-size:13px; padding:7px 10px;" />
+        <button class="tp-btn" onclick="clearByok()" style="padding:6px 12px; font-size:12px;">清除</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 句子输入 -->
+  <div>
+    <input id="tpTxt" class="tp-input" value="你好，我买了一把雨伞。" oninput="renderSentence()" />
+  </div>
+
+  <!-- 汉字舞台 -->
+  <div class="tp-stage" id="tpStage"></div>
+
+  <!-- 图例说明 -->
+  <div class="tp-legend">
+    <span><i class="tp-dot" style="background:#dcfce7; border-color:#bbf7d0;"></i> 读音声调全对</span>
+    <span><i class="tp-dot" style="background:#ffffff;"></i> 白底 + <b>4→3</b>：声调微瑕(不影响理解)</span>
+    <span><i class="tp-dot" style="background:#fef3c7; border-color:#fde68a;"></i> 黄底 + <b>4→3</b>：声调错误(影响理解)</span>
+    <span><i class="tp-dot" style="background:#fee2e2; border-color:#fecaca;"></i> 红底：读错字/漏读</span>
+  </div>
+
+  <!-- 按钮 -->
+  <div class="tp-btns">
+    <button class="tp-btn" onclick="playDemo()">🔊 示范朗读</button>
+    <button class="tp-btn tp-btn-rec" id="tpRecBtn" onclick="toggleEvaluation()">🎤 开始朗读</button>
+  </div>
+
+  <div class="tp-msg" id="tpMsg">点击「开始朗读」，读完一整句后点击停止即可出分</div>
+  <div class="tp-debug" id="tpDbg"></div>
+</div>
+
+<script>
+  const { pinyin } = window.pinyinPro;
+
+  // 合并到主站后，填你的 Cloudflare Worker 地址（例如 "https://你的worker域名/speech-token"）
+  const WORKER_TOKEN_URL = "/speech-token";
+  const DAILY_FREE_LIMIT = 2;
+
+  let targets = [];
+  let isRecording = false;
+  let recognizer = null;
+  let heardTextSegments = []; // 累积已确认的盲听文本
+  let interimText = '';       // 正在说但还没停顿收尾的实时文本（防丢字兜底）
+  let pronWords = [];         // 累积声学评测词组
+
+  window.addEventListener('DOMContentLoaded', () => {
+    // 自动兼容读取你之前保存过的 az_k 或 tp_az_k
+    const savedKey = localStorage.getItem('tp_az_k') || localStorage.getItem('az_k') || '';
+    const savedReg = localStorage.getItem('tp_az_r') || localStorage.getItem('az_r') || 'westus2';
+    document.getElementById('tpUserKey').value = savedKey;
+    document.getElementById('tpUserRegion').value = savedReg;
+    updateQuotaUI();
+    renderSentence();
+  });
+
+  function toggleByokPanel() {
+    document.getElementById('tpByokPanel').classList.toggle('open');
+  }
+
+  function openSubscribeModal() {
+    alert('💎 Trees Pinyin 会员订阅：\n\n升级会员后无需配置任何 Key，即可每日无限次使用中文发音与声调评测！\n（合并入主站后此处直接对接您的订阅支付链接）');
+  }
+
+  function saveByok() {
+    const k = document.getElementById('tpUserKey').value.trim();
+    const r = document.getElementById('tpUserRegion').value.trim();
+    localStorage.setItem('tp_az_k', k);
+    localStorage.setItem('az_k', k);
+    localStorage.setItem('tp_az_r', r);
+    localStorage.setItem('az_r', r);
+    updateQuotaUI();
+  }
+
+  function clearByok() {
+    document.getElementById('tpUserKey').value = '';
+    localStorage.removeItem('tp_az_k');
+    localStorage.removeItem('az_k');
+    updateQuotaUI();
+  }
+
+  function getTodayStorageKey() {
+    const d = new Date();
+    return `tp_free_used_${d.getFullYear()}_${d.getMonth()+1}_${d.getDate()}`;
+  }
+
+  function getUsedFreeCount() {
+    return parseInt(localStorage.getItem(getTodayStorageKey()) || '0', 10);
+  }
+
+  function incrementUsedFreeCount() {
+    const next = getUsedFreeCount() + 1;
+    localStorage.setItem(getTodayStorageKey(), String(next));
+    updateQuotaUI();
+  }
+
+  function hasCustomKey() {
+    return Boolean(document.getElementById('tpUserKey').value.trim() && document.getElementById('tpUserRegion').value.trim());
+  }
+
+  function updateQuotaUI() {
+    const badge = document.getElementById('tpQuotaBadge');
+    const recBtn = document.getElementById('tpRecBtn');
+
+    if (hasCustomKey()) {
+      badge.className = 'tp-badge pro';
+      badge.textContent = '⚡ 已启用自有 Azure Key：无限免费评测';
+      recBtn.disabled = false;
+      return;
+    }
+
+    const used = getUsedFreeCount();
+    const rem = Math.max(0, DAILY_FREE_LIMIT - used);
+    if (rem > 0) {
+      badge.className = 'tp-badge';
+      badge.textContent = `🎁 今日免费额度：剩余 ${rem} / ${DAILY_FREE_LIMIT} 次`;
+      recBtn.disabled = false;
+    } else {
+      badge.className = 'tp-badge exhausted';
+      badge.textContent = `🔒 今日免费额度已用完 (0 / ${DAILY_FREE_LIMIT} 次)`;
+    }
+  }
+
+  function renderSentence() {
+    const s = document.getElementById('tpTxt').value.trim();
+    const stage = document.getElementById('tpStage');
+    stage.innerHTML = '';
+    targets = [];
+    document.getElementById('tpDbg').style.display = 'none';
+    if (!s) return;
+
+    const pyList = pinyin(s, { type: 'array', toneType: 'num', v: true });
+    const origPyList = pinyin(s, { type: 'array', toneType: 'num', v: true, toneSandhi: false });
+
+    Array.from(s).forEach((ch, i) => {
+      if (!/[\u4e00-\u9fa5]/.test(ch)) {
+        stage.insertAdjacentHTML('beforeend', `<span class="tp-punct">${ch}</span>`);
+        return;
+      }
+      const py = pyList[i] || '';
+      const origPy = origPyList[i] || py;
+      const t = parseInt((py.match(/([0-5])$/) || [0,1])[1], 10) % 5;
+      const origT = parseInt((origPy.match(/([0-5])$/) || [0,1])[1], 10) % 5;
+      const base = py.replace(/[0-5]/g, '');
+      const idx = targets.length;
+
+      targets.push({ idx, char: ch, base, tone: t, origTone: origT });
+      stage.insertAdjacentHTML('beforeend', `
+        <div class="tp-item" id="tp-c-${idx}">
+          <div class="tp-err-tag" id="tp-t-${idx}"></div>
+          <div class="tp-hanzi">${ch}</div>
+        </div>`);
+    });
+  }
+
+  function playDemo() {
+    const u = new SpeechSynthesisUtterance(document.getElementById('tpTxt').value);
+    u.lang = 'zh-CN';
+    u.rate = 0.85;
+    speechSynthesis.cancel();
+    speechSynthesis.speak(u);
+  }
+
+  function normalizeBase(b) {
+    if (!b) return '';
+    return b
+      .replace(/^zh/, 'z').replace(/^ch/, 'c').replace(/^sh/, 's')
+      .replace(/ing$/, 'in').replace(/eng$/, 'en').replace(/uang$/, 'uan')
+      .replace(/^w/, '').replace(/^y/, '');
+  }
+
+  function isBaseAcceptable(expected, actual) {
+    if (!expected || !actual) return false;
+    return expected === actual || normalizeBase(expected) === normalizeBase(actual);
+  }
+
+  async function createAzureSpeechConfig() {
+    if (hasCustomKey()) {
+      const k = document.getElementById('tpUserKey').value.trim();
+      const r = document.getElementById('tpUserRegion').value.trim();
+      return SpeechSDK.SpeechConfig.fromSubscription(k, r);
+    }
+
+    if (getUsedFreeCount() >= DAILY_FREE_LIMIT) {
+      document.getElementById('tpByokPanel').classList.add('open');
+      throw new Error('由于额度限制，每人每天仅允许两次免费评测。您可以自己添加Azure Key免费大量使用，也可以订阅我们的会员！');
+    }
+
+    try {
+      const res = await fetch(WORKER_TOKEN_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'speech-token' })
+      });
+      const data = await res.json();
+      if (!res.ok || data.error === 'LIMIT_REACHED') {
+        localStorage.setItem(getTodayStorageKey(), String(DAILY_FREE_LIMIT));
+        updateQuotaUI();
+        document.getElementById('tpByokPanel').classList.add('open');
+        throw new Error(data.message || '由于额度限制，每人每天仅允许两次免费评测。');
+      }
+      if (data.token && data.region) {
+        incrementUsedFreeCount();
+        return SpeechSDK.SpeechConfig.fromAuthorizationToken(data.token, data.region);
+      }
+      throw new Error('Token 获取异常');
+    } catch (err) {
+      if (err.message.includes('每天仅允许两次')) throw err;
+      document.getElementById('tpByokPanel').classList.add('open');
+      throw new Error('本地测试尚未连接线上 Worker，请点击上方「⚙️ 添加 Azure Key」填入您的 KEY 1 测试。');
+    }
+  }
+
+  async function toggleEvaluation() {
+    const txt = document.getElementById('tpTxt').value.trim();
+    const btn = document.getElementById('tpRecBtn');
+
+    // 停止录音并出分（加入 450ms 收尾缓冲，确保最后半秒的尾音完整返回）
+    if (isRecording && recognizer) {
+      isRecording = false;
+      btn.classList.remove('on');
+      btn.textContent = '⏳ 正在出分...';
+
+      await new Promise(r => setTimeout(r, 450));
+      await new Promise(res => recognizer.stopContinuousRecognitionAsync(res, res));
+      recognizer.close();
+      recognizer = null;
+
+      btn.textContent = '🎤 重新朗读';
+      evaluateSingleStream();
+      return;
+    }
+
+    let speechConfig;
+    try {
+      speechConfig = await createAzureSpeechConfig();
+    } catch (e) {
+      setMsg(`⚠️ ${e.message}`);
+      return;
+    }
+
+    renderSentence();
+    heardTextSegments = [];
+    interimText = '';
+    pronWords = [];
+    isRecording = true;
+    btn.classList.add('on');
+    btn.textContent = '⏹ 读完点击打分';
+    setMsg('🎙️ 正在聆听，请完整朗读句子...');
+
+    speechConfig.speechRecognitionLanguage = "zh-CN";
+    speechConfig.outputFormat = SpeechSDK.OutputFormat.Detailed;
+    speechConfig.setProperty(SpeechSDK.PropertyId.SpeechServiceConnection_EndSilenceTimeoutMs, "3000");
+    speechConfig.setProperty(SpeechSDK.PropertyId.Speech_SegmentationSilenceTimeoutMs, "2000");
+
+    const audioConfig = SpeechSDK.AudioConfig.fromDefaultMicrophoneInput();
+    const pronConfig = new SpeechSDK.PronunciationAssessmentConfig(
+      txt,
+      SpeechSDK.PronunciationAssessmentGradingSystem.HundredMark,
+      SpeechSDK.PronunciationAssessmentGranularity.Phoneme,
+      true
+    );
+    pronConfig.phonemeAlphabet = "SAPI";
+
+    recognizer = new SpeechSDK.SpeechRecognizer(speechConfig, audioConfig);
+    pronConfig.applyTo(recognizer);
+
+    recognizer.recognizing = (s, e) => {
+      if (e.result.text) {
+        interimText = e.result.text;
+        setMsg('正在听：<b>' + heardTextSegments.join('') + interimText + '</b>');
+      }
+    };
+
+    recognizer.recognized = (s, e) => {
+      if (e.result.reason === SpeechSDK.ResultReason.RecognizedSpeech) {
+        interimText = '';
+        if (e.result.text) heardTextSegments.push(e.result.text);
+        try {
+          const json = JSON.parse(e.result.properties.getProperty(SpeechSDK.PropertyId.SpeechServiceResponse_JsonResult));
+          const words = json?.NBest?.[0]?.Words || [];
+          pronWords.push(...words);
+        } catch (err) {}
+        setMsg('已听取：<b>' + heardTextSegments.join('') + '</b>（读完请点红色按钮打分）');
+      }
+    };
+
+    recognizer.canceled = (s, e) => {
+      isRecording = false;
+      btn.classList.remove('on');
+      btn.textContent = '🎤 开始朗读';
+      setMsg(`❌ Azure 连接中断：${e.errorDetails || '请检查 Key 和 westus2 是否正确'}`);
+      if (recognizer) { recognizer.close(); recognizer = null; }
+    };
+
+    recognizer.startContinuousRecognitionAsync();
+  }
+
+  // 从音素列表中提取实际发出的声调（1~4，轻声0）
+  function getSpokenToneFromPhonemes(w) {
+    const phonemes = w?.Phonemes || [];
+    for (const p of phonemes) {
+      const m = (p.Phoneme || '').match(/([1-5])\s*$/);
+      if (m) return parseInt(m[1], 10) % 5;
+    }
+    const syl = w?.Syllables?.[0]?.Syllable || '';
+    const sm = syl.match(/([1-5])$/);
+    if (sm) return parseInt(sm[1], 10) % 5;
+    return null;
+  }
+
+  function evaluateSingleStream() {
+    const fullHeardText = (heardTextSegments.join('') + interimText).replace(/[^\u4e00-\u9fa5]/g, '');
+    if (!fullHeardText && !pronWords.length) {
+      return setMsg('⚠️ 未检测到语音，请检查麦克风后重试');
+    }
+
+    // 1. 解析“中国人盲听文本”的真实字音与声调
+    const heardPyList = fullHeardText ? pinyin(fullHeardText, { type: 'array', toneType: 'num', v: true, toneSandhi: false }) : [];
+    const heardList = Array.from(fullHeardText).map((ch, idx) => {
+      const p = heardPyList[idx] || '';
+      return {
+        char: ch,
+        base: p.replace(/[0-5]/g, ''),
+        tone: parseInt((p.match(/([0-5])$/) || [0,1])[1], 10) % 5
+      };
+    });
+
+    // 2. 过滤掉多读的 Insertion 词，使声学评测词与目标字严格对齐
+    const alignedPron = pronWords.filter(w =>
+      /[\u4e00-\u9fa5]/.test(w.Word) &&
+      w.PronunciationAssessment?.ErrorType !== 'Insertion'
+    );
+
+    let passCount = 0;
+    let hIdx = 0;
+
+    targets.forEach((t, i) => {
+      const pw = alignedPron[i];
+      const wordAcc = pw?.PronunciationAssessment?.AccuracyScore ?? 85;
+      const errType = pw?.PronunciationAssessment?.ErrorType || 'None';
+      const phonemes = pw?.Phonemes || [];
+      const minPhonemeAcc = phonemes.length
+        ? Math.min(...phonemes.map(p => p.PronunciationAssessment?.AccuracyScore ?? 80))
+        : wordAcc;
+      const acousticTone = getSpokenToneFromPhonemes(pw);
+
+      // 在盲听序列窗口查找声韵母能听懂的字
+      let matchedHeard = null;
+      for (let k = hIdx; k < Math.min(hIdx + 3, heardList.length); k++) {
+        if (isBaseAcceptable(t.base, heardList[k].base)) {
+          matchedHeard = heardList[k];
+          hIdx = k + 1;
+          break;
+        }
+      }
+
+      // 判定 1：如果盲听没听出这个音节（如把“我 wo”读成“他 ta”），或者声学评定漏读/音素严重错读 (<45分) -> 红底
+      if (!matchedHeard || errType === 'Omission' || minPhonemeAcc < 45 || wordAcc < 45) {
+        if (!matchedHeard && hIdx < heardList.length && heardList.length >= targets.length) {
+          hIdx++;
+        }
+        paintChar(i, 'bad');
+        return;
+      }
+
+      // 判定 2：声母韵母过关（中国人能听出这个音节），现在判断声调！
+      const heardSameChar = (matchedHeard.char === t.char);
+      const userSpokenTone = (acousticTone !== null && acousticTone !== t.tone)
+        ? acousticTone
+        : matchedHeard.tone;
+
+      const isToneCorrect = (userSpokenTone === t.tone || userSpokenTone === t.origTone);
+
+      // 情况 2A：声调错导致盲听直接听成了别的同音异调字（如“买3”听成了“卖4”），影响理解 -> 黄底 + 错调→正调 (4→3)
+      if (!isToneCorrect && !heardSameChar) {
+        paintChar(i, 'tone-hard', userSpokenTone, t.tone);
+        passCount += 0.6;
+        return;
+      }
+
+      // 情况 2B：盲听已经听出了正确的汉字（不影响中国人理解），但声调有偏差（或声学分在 45~78 之间） -> 白底 + 错调→正调 (4→3)
+      if (!isToneCorrect || errType === 'Mispronunciation' || wordAcc < 78) {
+        const wrongLabel = (userSpokenTone !== t.tone) ? userSpokenTone : '偏';
+        paintChar(i, 'tone-soft', wrongLabel, t.tone);
+        passCount += 0.85;
+        return;
+      }
+
+      // 判定 3：读音与声调全部过关 -> 绿底
+      paintChar(i, 'good');
+      passCount += 1;
+    });
+
+    const finalScore = Math.round((passCount / targets.length) * 100) || 0;
+    setMsg(`评测完成！中国人可懂度得分：<b>${finalScore} 分</b>`);
+
+    const dbg = document.getElementById('tpDbg');
+    dbg.style.display = 'block';
+    dbg.innerHTML = `👂 中国人盲听识别结果：「<b>${fullHeardText || '无'}</b>」`;
+  }
+
+  // 格式严格为：错误声调 → 正确声调（如 4→3）
+  function paintChar(i, status, wrongTone, correctTone) {
+    const box = document.getElementById(`tp-c-${i}`);
+    const tag = document.getElementById(`tp-t-${i}`);
+    box.className = `tp-item ${status}`;
+    if (status === 'tone-soft' || status === 'tone-hard') {
+      tag.textContent = `${wrongTone}→${correctTone}`;
+    } else {
+      tag.textContent = '';
+    }
+  }
+
+  function setMsg(t) { document.getElementById('tpMsg').innerHTML = t; }
+</script>
+</body>
+</html>
