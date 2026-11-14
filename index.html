@@ -324,7 +324,7 @@
 
     <!-- 🕒 1. 膠囊上方：顯示檔案建設時間 -->
     <div class="build-time-text">
-      🕒 Build: 2026-11-13 21:58 PST (v10.0 真實狀態診斷 + 免Key免費大模型直連兜底版)
+      🕒 Build: 2026-11-13 22:05 PST (v11.0 動態鎖定最新 3.8/Flash-Latest + 剔除下架2.5版)
     </div>
 
     <!-- 🔍 2. 谷歌膠囊 (輸入框 + EN/中文切換 + 麥克風 + 🔑) -->
@@ -922,12 +922,13 @@
       backupKey = (localStorage.getItem('tp_v22_backup_key') || localStorage.getItem('tp_test_gemini_key') || '').trim();
     } catch (e) {}
 
+    // 置頂谷歌官方永久動態別名 gemini-flash-latest 與最新 3.8 系列，徹底避開已對新用戶關閉的 2.5-flash！
     let availableFastModels = [
-      'gemini-2.5-flash',
       'gemini-flash-latest',
-      'gemini-2.0-flash',
+      'gemini-3.8-flash',
       'gemma-3-27b-it',
-      'gemini-flash-lite-latest'
+      'gemini-flash-lite-latest',
+      'gemini-3.5-flash'
     ];
 
     function refreshKeyBtnStyle() {
@@ -950,22 +951,22 @@
         const all = (data.models || [])
           .filter(m => (m.supportedGenerationMethods || []).includes('generateContent'))
           .map(m => m.name.replace('models/', ''))
-          .filter(n => !/tts|image|imagen|embedding|veo|robotics|aqa|bison|gecko|thinking/i.test(n));
+          .filter(n => !/tts|image|imagen|embedding|veo|robotics|aqa|bison|gecko|thinking|2\.5-flash|1\.5-flash|2\.0-flash/i.test(n));
 
         const priority = [
-          'gemini-2.5-flash',
           'gemini-flash-latest',
-          'gemini-2.0-flash',
+          'gemini-3.8-flash',
+          'gemini-3.5-flash',
           'gemma-3-27b-it',
           'gemini-flash-lite-latest',
-          'gemini-1.5-flash'
+          'gemini-3.8-flash-lite'
         ];
         const sorted = [];
         for (const p of priority) {
           if (all.includes(p)) sorted.push(p);
         }
         for (const m of all) {
-          if ((m.includes('flash') || m.includes('gemma')) && !sorted.includes(m)) {
+          if ((m.includes('flash') || m.includes('gemma') || m.includes('latest')) && !sorted.includes(m)) {
             sorted.push(m);
           }
         }
@@ -1073,8 +1074,11 @@
 
       const errorLogs = [];
 
-      // 1. 若有個人 Google API Key：優先使用該帳號授權的模型池
+      // 1. 若有個人 Google API Key：先確保已取得該 Key 帳號下最新授權模型列表，再按順序調用
       if (activeKey) {
+        if (availableFastModels[0] === 'gemini-flash-latest') {
+          await discoverAuthorizedModels(activeKey);
+        }
         const modelsToTry = availableFastModels.slice(0, 4);
         for (let i = 0; i < modelsToTry.length; i++) {
           const ctrl = new AbortController();
