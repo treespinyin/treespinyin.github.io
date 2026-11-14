@@ -94,7 +94,7 @@
       background: #f8fafc;
       border: 1px dashed #cbd5e1;
       border-radius: 14px;
-      margin: 16px 0;
+      margin: 16px 0 12px;
       min-height: 135px;
       align-items: center;
     }
@@ -123,14 +123,28 @@
 
     /* 四级视觉反馈状态 */
     .tp-item.good { background: #dcfce7; color: #15803d; border-color: #bbf7d0; }
-    /* 白底 + 错误声调→正确声调（不影响理解） */
     .tp-item.tone-soft { background: #ffffff; color: #1e293b; border-color: #cbd5e1; box-shadow: 0 2px 5px rgba(0,0,0,0.04); }
     .tp-item.tone-soft .tp-err-tag { visibility: visible; color: #d97706; }
-    /* 黄底 + 错误声调→正确声调（引起歧义） */
     .tp-item.tone-hard { background: #fef3c7; color: #b45309; border-color: #fde68a; }
     .tp-item.tone-hard .tp-err-tag { visibility: visible; color: #b45309; }
-    /* 红底（读错字/漏读） */
     .tp-item.bad { background: #fee2e2; color: #dc2626; border-color: #fecaca; }
+
+    /* 麦克风实时音量指示条 */
+    .tp-mic-meter-wrap {
+      width: 220px;
+      height: 6px;
+      background: #e2e8f0;
+      border-radius: 99px;
+      margin: 0 auto 14px;
+      overflow: hidden;
+      display: none;
+    }
+    .tp-mic-meter-bar {
+      height: 100%;
+      width: 0%;
+      background: #10b981;
+      transition: width 0.08s ease;
+    }
 
     .tp-legend {
       display: flex;
@@ -200,6 +214,11 @@
   <!-- 汉字舞台 -->
   <div class="tp-stage" id="tpStage"></div>
 
+  <!-- 实时麦克风音量绿条（确认声音是否进入浏览器） -->
+  <div class="tp-mic-meter-wrap" id="tpMeterWrap">
+    <div class="tp-mic-meter-bar" id="tpMeterBar"></div>
+  </div>
+
   <!-- 图例说明 -->
   <div class="tp-legend">
     <span><i class="tp-dot" style="background:#dcfce7; border-color:#bbf7d0;"></i> 读音声调全对</span>
@@ -214,26 +233,30 @@
     <button class="tp-btn tp-btn-rec" id="tpRecBtn" onclick="toggleEvaluation()">🎤 开始朗读</button>
   </div>
 
-  <div class="tp-msg" id="tpMsg">点击「开始朗读」，读完一整句后点击停止即可出分</div>
+  <div class="tp-msg" id="tpMsg">点击「开始朗读」，读完一整句停顿 1 秒会自动出分（或手动点停止）</div>
   <div class="tp-debug" id="tpDbg"></div>
 </div>
 
 <script>
   const { pinyin } = window.pinyinPro;
 
-  // 合并到主站后，填你的 Cloudflare Worker 地址（例如 "https://你的worker域名/speech-token"）
+  // 合并到主站后替换为你的 Cloudflare Worker URL
   const WORKER_TOKEN_URL = "/speech-token";
   const DAILY_FREE_LIMIT = 2;
 
   let targets = [];
   let isRecording = false;
   let recognizer = null;
-  let heardTextSegments = []; // 累积已确认的盲听文本
-  let interimText = '';       // 正在说但还没停顿收尾的实时文本（防丢字兜底）
-  let pronWords = [];         // 累积声学评测词组
+  let webSr = null;            // 浏览器原生实时盲听辅助（0延迟实时看到自己说的字）
+  let webSrTranscript = '';    // 原生盲听捕获的汉字
+  let azureDisplaySegments = [];
+  let pronWords = [];
+  let gotResultPromiseResolve = null;
+
+  // 麦克风音量监测器
+  let audioCtx = null, micStream = null, meterTimer = null;
 
   window.addEventListener('DOMContentLoaded', () => {
-    // 自动兼容读取你之前保存过的 az_k 或 tp_az_k
     const savedKey = localStorage.getItem('tp_az_k') || localStorage.getItem('az_k') || '';
     const savedReg = localStorage.getItem('tp_az_r') || localStorage.getItem('az_r') || 'westus2';
     document.getElementById('tpUserKey').value = savedKey;
@@ -247,7 +270,7 @@
   }
 
   function openSubscribeModal() {
-    alert('💎 Trees Pinyin 会员订阅：\n\n升级会员后无需配置任何 Key，即可每日无限次使用中文发音与声调评测！\n（合并入主站后此处直接对接您的订阅支付链接）');
+    alert('💎 Trees Pinyin 会员订阅：\n\n升级会员后无需配置任何 Key，即可每日无限次使用中文发音与声调评测！');
   }
 
   function saveByok() {
@@ -362,6 +385,67 @@
     return expected === actual || normalizeBase(expected) === normalizeBase(actual);
   }
 
+  // 启动麦克风实时音量绿条（一眼看出麦克风有没有声音进去）
+  async function startMicMeter() {
+    try {
+      micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const source = audioCtx.createMediaStreamSource(micStream);
+      const analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 256;
+      source.connect(analyser);
+      const data = new Uint8Array(analyser.frequencyBinCount);
+      document.getElementById('tpMeterWrap').style.display = 'block';
+      const bar = document.getElementById('tpMeterBar');
+      meterTimer = setInterval(() => {
+        analyser.getByteFrequencyData(data);
+        let sum = 0;
+        for (let i = 0; i < data.length; i++) sum += data[i];
+        const avg = sum / data.length;
+        const pct = Math.min(100, Math.round(avg * 2.2));
+        bar.style.width = pct + '%';
+      }, 60);
+    } catch (e) {}
+  }
+
+  function stopMicMeter() {
+    if (meterTimer) { clearInterval(meterTimer); meterTimer = null; }
+    if (micStream) { micStream.getTracks().forEach(t => t.stop()); micStream = null; }
+    if (audioCtx) { audioCtx.close().catch(()=>{}); audioCtx = null; }
+    document.getElementById('tpMeterWrap').style.display = 'none';
+    document.getElementById('tpMeterBar').style.width = '0%';
+  }
+
+  // 启动浏览器原生实时盲听（与 Azure 并行工作，提供 0 延迟盲听文本）
+  function startNativeBlindASR() {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) return;
+    try {
+      webSr = new SR();
+      webSr.lang = 'zh-CN';
+      webSr.continuous = true;
+      webSr.interimResults = true;
+      webSr.onresult = (e) => {
+        let s = '';
+        for (let i = 0; i < e.results.length; i++) {
+          s += e.results[i][0].transcript;
+        }
+        webSrTranscript = s;
+        if (isRecording && s) {
+          setMsg(`👂 正在听：<b>${s}</b>（读完停顿 1 秒自动出分，或点红色按钮结束）`);
+        }
+      };
+      webSr.start();
+    } catch (e) {}
+  }
+
+  function stopNativeBlindASR() {
+    if (webSr) {
+      try { webSr.stop(); } catch (e) {}
+      webSr = null;
+    }
+  }
+
   async function createAzureSpeechConfig() {
     if (hasCustomKey()) {
       const k = document.getElementById('tpUserKey').value.trim();
@@ -395,27 +479,44 @@
     } catch (err) {
       if (err.message.includes('每天仅允许两次')) throw err;
       document.getElementById('tpByokPanel').classList.add('open');
-      throw new Error('本地测试尚未连接线上 Worker，请点击上方「⚙️ 添加 Azure Key」填入您的 KEY 1 测试。');
+      throw new Error('请先在上方展开栏填入您的 Azure KEY 1 和 westus2。');
     }
+  }
+
+  async function finishAndScore() {
+    if (!isRecording) return;
+    isRecording = false;
+    const btn = document.getElementById('tpRecBtn');
+    btn.classList.remove('on');
+    btn.textContent = '⏳ 正在出分...';
+
+    stopMicMeter();
+    stopNativeBlindASR();
+
+    // 如果用户刚读完立刻点了停止，给 Azure 最多 1.2 秒时间把刚说的话打包返回
+    if (pronWords.length === 0 && recognizer) {
+      await Promise.race([
+        new Promise(res => { gotResultPromiseResolve = res; }),
+        new Promise(res => setTimeout(res, 1200))
+      ]);
+    }
+
+    if (recognizer) {
+      await new Promise(res => recognizer.stopContinuousRecognitionAsync(res, res));
+      recognizer.close();
+      recognizer = null;
+    }
+
+    btn.textContent = '🎤 重新朗读';
+    evaluateResults();
   }
 
   async function toggleEvaluation() {
     const txt = document.getElementById('tpTxt').value.trim();
     const btn = document.getElementById('tpRecBtn');
 
-    // 停止录音并出分（加入 450ms 收尾缓冲，确保最后半秒的尾音完整返回）
-    if (isRecording && recognizer) {
-      isRecording = false;
-      btn.classList.remove('on');
-      btn.textContent = '⏳ 正在出分...';
-
-      await new Promise(r => setTimeout(r, 450));
-      await new Promise(res => recognizer.stopContinuousRecognitionAsync(res, res));
-      recognizer.close();
-      recognizer = null;
-
-      btn.textContent = '🎤 重新朗读';
-      evaluateSingleStream();
+    if (isRecording) {
+      await finishAndScore();
       return;
     }
 
@@ -428,18 +529,24 @@
     }
 
     renderSentence();
-    heardTextSegments = [];
-    interimText = '';
+    azureDisplaySegments = [];
+    webSrTranscript = '';
     pronWords = [];
+    gotResultPromiseResolve = null;
     isRecording = true;
+
     btn.classList.add('on');
     btn.textContent = '⏹ 读完点击打分';
-    setMsg('🎙️ 正在聆听，请完整朗读句子...');
+    setMsg('⏳ 正在连接麦克风...');
+
+    await startMicMeter();
+    startNativeBlindASR();
 
     speechConfig.speechRecognitionLanguage = "zh-CN";
     speechConfig.outputFormat = SpeechSDK.OutputFormat.Detailed;
-    speechConfig.setProperty(SpeechSDK.PropertyId.SpeechServiceConnection_EndSilenceTimeoutMs, "3000");
-    speechConfig.setProperty(SpeechSDK.PropertyId.Speech_SegmentationSilenceTimeoutMs, "2000");
+    // 设置为 1500ms：中间逗号短暂停顿不断开，整句读完停顿 1.5 秒即快速吐出评分包
+    speechConfig.setProperty(SpeechSDK.PropertyId.SpeechServiceConnection_EndSilenceTimeoutMs, "1500");
+    speechConfig.setProperty(SpeechSDK.PropertyId.Speech_SegmentationSilenceTimeoutMs, "1200");
 
     const audioConfig = SpeechSDK.AudioConfig.fromDefaultMicrophoneInput();
     const pronConfig = new SpeechSDK.PronunciationAssessmentConfig(
@@ -453,38 +560,55 @@
     recognizer = new SpeechSDK.SpeechRecognizer(speechConfig, audioConfig);
     pronConfig.applyTo(recognizer);
 
+    recognizer.sessionStarted = () => {
+      if (isRecording) setMsg('🎙️ 麦克风已就绪！请开始朗读（观察上方绿条跳动）...');
+    };
+
     recognizer.recognizing = (s, e) => {
-      if (e.result.text) {
-        interimText = e.result.text;
-        setMsg('正在听：<b>' + heardTextSegments.join('') + interimText + '</b>');
+      if (e.result.text && isRecording) {
+        setMsg(`👂 正在听：<b>${azureDisplaySegments.join('') + e.result.text}</b>`);
       }
     };
 
     recognizer.recognized = (s, e) => {
       if (e.result.reason === SpeechSDK.ResultReason.RecognizedSpeech) {
-        interimText = '';
-        if (e.result.text) heardTextSegments.push(e.result.text);
         try {
           const json = JSON.parse(e.result.properties.getProperty(SpeechSDK.PropertyId.SpeechServiceResponse_JsonResult));
+          const lexical = json?.NBest?.[0]?.Lexical || json?.DisplayText || e.result.text || '';
+          if (lexical) azureDisplaySegments.push(lexical);
           const words = json?.NBest?.[0]?.Words || [];
           pronWords.push(...words);
-        } catch (err) {}
-        setMsg('已听取：<b>' + heardTextSegments.join('') + '</b>（读完请点红色按钮打分）');
+        } catch (err) {
+          if (e.result.text) azureDisplaySegments.push(e.result.text);
+        }
+
+        if (gotResultPromiseResolve) {
+          gotResultPromiseResolve();
+          gotResultPromiseResolve = null;
+        }
+
+        // 如果已经收集到了差不多整句话的字数，自动完成打分，无需再手动点停止！
+        const validCount = pronWords.filter(w => /[\u4e00-\u9fa5]/.test(w.Word) && w.PronunciationAssessment?.ErrorType !== 'Insertion').length;
+        if (isRecording && validCount >= Math.max(1, targets.length - 1)) {
+          finishAndScore();
+        }
       }
     };
 
     recognizer.canceled = (s, e) => {
+      if (!isRecording) return;
       isRecording = false;
+      stopMicMeter();
+      stopNativeBlindASR();
       btn.classList.remove('on');
       btn.textContent = '🎤 开始朗读';
-      setMsg(`❌ Azure 连接中断：${e.errorDetails || '请检查 Key 和 westus2 是否正确'}`);
+      setMsg(`❌ Azure 报错：${e.errorDetails || '请检查 Key 和 westus2 是否正确'}`);
       if (recognizer) { recognizer.close(); recognizer = null; }
     };
 
     recognizer.startContinuousRecognitionAsync();
   }
 
-  // 从音素列表中提取实际发出的声调（1~4，轻声0）
   function getSpokenToneFromPhonemes(w) {
     const phonemes = w?.Phonemes || [];
     for (const p of phonemes) {
@@ -497,15 +621,16 @@
     return null;
   }
 
-  function evaluateSingleStream() {
-    const fullHeardText = (heardTextSegments.join('') + interimText).replace(/[^\u4e00-\u9fa5]/g, '');
-    if (!fullHeardText && !pronWords.length) {
-      return setMsg('⚠️ 未检测到语音，请检查麦克风后重试');
+  function evaluateResults() {
+    // 优先采用浏览器 0 延迟真盲听文本（最能抓出把“我”读成“他”、把“买”读成“卖”），若无则用 Azure Lexical 文本
+    const rawBlind = (webSrTranscript || azureDisplaySegments.join('')).replace(/[^\u4e00-\u9fa5]/g, '');
+
+    if (!rawBlind && !pronWords.length) {
+      return setMsg('⚠️ 未检测到语音：请观察朗读时绿色音量条是否跳动，并读完后停顿 1 秒再点停止');
     }
 
-    // 1. 解析“中国人盲听文本”的真实字音与声调
-    const heardPyList = fullHeardText ? pinyin(fullHeardText, { type: 'array', toneType: 'num', v: true, toneSandhi: false }) : [];
-    const heardList = Array.from(fullHeardText).map((ch, idx) => {
+    const heardPyList = rawBlind ? pinyin(rawBlind, { type: 'array', toneType: 'num', v: true, toneSandhi: false }) : [];
+    const heardList = Array.from(rawBlind).map((ch, idx) => {
       const p = heardPyList[idx] || '';
       return {
         char: ch,
@@ -514,7 +639,6 @@
       };
     });
 
-    // 2. 过滤掉多读的 Insertion 词，使声学评测词与目标字严格对齐
     const alignedPron = pronWords.filter(w =>
       /[\u4e00-\u9fa5]/.test(w.Word) &&
       w.PronunciationAssessment?.ErrorType !== 'Insertion'
@@ -535,15 +659,20 @@
 
       // 在盲听序列窗口查找声韵母能听懂的字
       let matchedHeard = null;
-      for (let k = hIdx; k < Math.min(hIdx + 3, heardList.length); k++) {
-        if (isBaseAcceptable(t.base, heardList[k].base)) {
-          matchedHeard = heardList[k];
-          hIdx = k + 1;
-          break;
+      if (heardList.length > 0) {
+        for (let k = hIdx; k < Math.min(hIdx + 3, heardList.length); k++) {
+          if (isBaseAcceptable(t.base, heardList[k].base)) {
+            matchedHeard = heardList[k];
+            hIdx = k + 1;
+            break;
+          }
         }
+      } else if (pw && errType !== 'Omission' && wordAcc >= 60) {
+        // 如果盲听未返回但 Azure 声学过了，兜底生成
+        matchedHeard = { char: t.char, base: t.base, tone: acousticTone ?? t.tone };
       }
 
-      // 判定 1：如果盲听没听出这个音节（如把“我 wo”读成“他 ta”），或者声学评定漏读/音素严重错读 (<45分) -> 红底
+      // 1. 读错字/漏读（如把“我 wo”读成“他 ta”） -> 红底
       if (!matchedHeard || errType === 'Omission' || minPhonemeAcc < 45 || wordAcc < 45) {
         if (!matchedHeard && hIdx < heardList.length && heardList.length >= targets.length) {
           hIdx++;
@@ -552,7 +681,7 @@
         return;
       }
 
-      // 判定 2：声母韵母过关（中国人能听出这个音节），现在判断声调！
+      // 2. 声母韵母过关（中国人能听出是这个音节），判断声调！
       const heardSameChar = (matchedHeard.char === t.char);
       const userSpokenTone = (acousticTone !== null && acousticTone !== t.tone)
         ? acousticTone
@@ -560,14 +689,14 @@
 
       const isToneCorrect = (userSpokenTone === t.tone || userSpokenTone === t.origTone);
 
-      // 情况 2A：声调错导致盲听直接听成了别的同音异调字（如“买3”听成了“卖4”），影响理解 -> 黄底 + 错调→正调 (4→3)
+      // 情况 2A：声调错导致盲听听成了别的同音异调字（影响理解） -> 黄底 + 错调→正调 (4→3)
       if (!isToneCorrect && !heardSameChar) {
         paintChar(i, 'tone-hard', userSpokenTone, t.tone);
         passCount += 0.6;
         return;
       }
 
-      // 情况 2B：盲听已经听出了正确的汉字（不影响中国人理解），但声调有偏差（或声学分在 45~78 之间） -> 白底 + 错调→正调 (4→3)
+      // 情况 2B：盲听已经听出了正确的汉字（不影响中国人理解），但声调有瑕疵 -> 白底 + 错调→正调 (4→3)
       if (!isToneCorrect || errType === 'Mispronunciation' || wordAcc < 78) {
         const wrongLabel = (userSpokenTone !== t.tone) ? userSpokenTone : '偏';
         paintChar(i, 'tone-soft', wrongLabel, t.tone);
@@ -575,7 +704,7 @@
         return;
       }
 
-      // 判定 3：读音与声调全部过关 -> 绿底
+      // 3. 全对 -> 绿底
       paintChar(i, 'good');
       passCount += 1;
     });
@@ -585,7 +714,7 @@
 
     const dbg = document.getElementById('tpDbg');
     dbg.style.display = 'block';
-    dbg.innerHTML = `👂 中国人盲听识别结果：「<b>${fullHeardText || '无'}</b>」`;
+    dbg.innerHTML = `👂 中国人盲听识别结果：「<b>${rawBlind || '（仅声学对齐）'}</b>」`;
   }
 
   // 格式严格为：错误声调 → 正确声调（如 4→3）
