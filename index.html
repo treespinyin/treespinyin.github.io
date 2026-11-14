@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-HK">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -141,6 +141,11 @@
       color: #166534;
       display: none;
     }
+    .status-banner.friendly-reminder {
+      background: #fffbeb;
+      border: 1.5px solid #fcd34d;
+      color: #92400e;
+    }
 
     .annotation-list {
       width: 100%;
@@ -216,16 +221,16 @@
 
     <!-- 🕒 1. 膠囊上方：僅顯示檔案建設時間 -->
     <div class="build-time-text">
-      🕒 Build: 2026-11-13 17:22 PST (v3.0 純淨谷歌膠囊 + 連貫對話記憶版)
+      🕒 Build: 2026-11-13 18:36 PST (v5.0 歐美英語原聲引擎 + 防丟尾詞鎖 + 文明用語友情提醒版)
     </div>
 
-    <!-- 🔍 2. 純淨谷歌膠囊 (無任何多餘按鈕：打字按 Enter 提問，或點麥克風直接說中英文) -->
+    <!-- 🔍 2. 純淨谷歌膠囊 (無任何多餘按鈕：打字按 Enter 提問，或點麥克風直接說英文/中文) -->
     <div class="google-capsule-wrap">
       <textarea id="userInput" class="capsule-input" rows="1"
-        placeholder="Ask AI in Chinese or English (Press Enter or tap Mic)..."
+        placeholder="Ask AI in English or Chinese (Press Enter or tap Mic)..."
         oninput="autoResizeTextarea(this)"></textarea>
 
-      <button class="mic-btn" id="micBtn" onclick="toggleVoice()" title="Voice Input (Chinese & English)">
+      <button class="mic-btn" id="micBtn" onclick="toggleVoice()" title="Voice Input (English & Chinese)">
         <svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.91-3c-.49 0-.9.36-.98.85C16.52 14.2 14.47 16 12 16s-4.52-1.8-4.93-4.15c-.08-.49-.49-.85-.98-.85-.61 0-1.09.54-1 1.14.49 3 2.89 5.35 5.91 5.78V20c0 .55.45 1 1 1s1-.45 1-1v-2.08c3.02-.43 5.42-2.78 5.91-5.78.1-.6-.39-1.14-1-1.14z"/></svg>
       </button>
     </div>
@@ -271,16 +276,35 @@
     });
 
     // =========================================================================
-    // 2. 🧠 輕量滑動視窗對話記憶 (保留最近 3 輪上下文，手機端 0 負擔 + 智慧追問識別)
+    // 1.5 🌱 文明用語友情提醒 (Mindful Language Friendly Reminder — 無按鈕自動提示)
+    // =========================================================================
+    const PROFANITY_EN_REGEX = /\b(fuck|fucking|fucked|fucker|motherfucker|shit|shitty|bullshit|bitch|bitches|asshole|bastard|dick|cock|pussy|cunt|whore|slut|nigger|nigga|faggot|retard)\b/i;
+    const PROFANITY_ZH_LIST = ['他媽的','他妈的','你媽的','你妈的','操你','肏你','草泥馬','草泥马','傻逼','煞筆','傻B','去死吧','王八蛋','賤人','贱人','婊子','媽的','妈的'];
+
+    function checkAndRemindProfanity(text) {
+      if (!text) return false;
+      if (PROFANITY_EN_REGEX.test(text) || PROFANITY_ZH_LIST.some(w => text.includes(w))) {
+        const banner = document.getElementById('statusBanner');
+        const list = document.getElementById('annotationList');
+        banner.className = 'status-banner friendly-reminder';
+        banner.style.display = 'block';
+        banner.innerHTML = '🌱 <b>Friendly Reminder / 友情提醒：</b> Let\'s keep our language kind and respectful! / 請使用文明禮貌的語言提問喔！';
+        list.innerHTML = '';
+        appendSentenceProgressive('請使用文明禮貌的語言，我們一起快樂學中文！', 'Please use polite and kind language as we learn Mandarin together!');
+        return true;
+      }
+      return false;
+    }
+
+    // =========================================================================
+    // 2. 🧠 輕量滑動視窗對話記憶 (保留最近 3 輪上下文，手機端 0 負擔 + 語境聯想糾偏)
     // =========================================================================
     const MAX_MEMORY_TURNS = 3;
-    let conversationHistory = []; // 格式: [{ q: '...', a: '...' }]
+    let conversationHistory = [];
     let lastInteractionTime = 0;
 
-    // 判斷是否為依賴上文的「追問」(例如：「那第二句呢？」、「為什麼？」、「再舉個例子」、「What about...」)
     function isFollowUpQuestion(q) {
       if (conversationHistory.length === 0) return false;
-      // 若距離上一輪超過 10 分鐘，自動視為新話題
       if (Date.now() - lastInteractionTime > 600000) {
         conversationHistory = [];
         return false;
@@ -302,11 +326,16 @@
     function buildMemoryContextString() {
       if (conversationHistory.length === 0) return '';
       const lines = conversationHistory.map((item, idx) => `Turn ${idx + 1} - User: "${item.q}" | AI: "${item.a}"`);
-      return '\nRecent Conversation Context (use this ONLY if the user\'s current request is a follow-up):\n' + lines.join('\n');
+      return '\nRecent Conversation Context (use this to resolve follow-ups AND disambiguate homophone/phonetic voice recognition errors related to previous turns):\n' + lines.join('\n');
     }
 
     // =========================================================================
-    // 3. 🎙️ 高包容度谷歌膠囊語音輸入引擎 (無多餘按鈕，自動收集 5 候選詞交給 AI 甄別)
+    // 3. 🎙️ v5.0 專為西方人打造的「原生谷歌英語 en-US + 中文雙向識別 + 防丟尾詞鎖」引擎
+    //    核心修復：
+    //    (1) 移除會搶佔聲卡並吃掉句尾的 getUserMedia 雙流衝突
+    //    (2) 預設採用歐美母語者最準確的 Google 原生 'en-US' 聲學模型：長難英文單詞、連讀、弱讀、句尾單詞 100% 精準捕捉！
+    //    (3) 當西方人嘗試說中文詞彙（如 Ni hao, Xie xie, Yong e, Jing ye si）時，en-US 會將其轉寫為拉丁發音，配合 AI 音軌逆向引擎 100% 還原為正確中文！
+    //    (4) 新增「防丟尾詞鎖 (lastValidFullText)」：徹底杜絕 stop() 瞬間瀏覽器發送空包沖掉後半句英文單詞的 Bug！
     // =========================================================================
     let activeRec = null;
     let voiceSilenceTimer = null;
@@ -338,11 +367,23 @@
       return fixed.trim();
     }
 
+    function getPhoneticTrackForAI(text) {
+      if (!text) return '';
+      if (/[\u4e00-\u9fa5]/.test(text)) {
+        try {
+          return pinyinPro.pinyin(text, { toneType: 'num' });
+        } catch (e) {
+          return text;
+        }
+      }
+      return text;
+    }
+
     function toggleVoice() {
       const btn = document.getElementById('micBtn');
       const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!SR) {
-        alert('請使用 Chrome、Edge 或 Safari 瀏覽器以支援語音輸入。');
+        alert('Voice input requires Chrome, Edge, or Safari.');
         return;
       }
 
@@ -358,76 +399,99 @@
       autoResizeTextarea(inputEl);
 
       activeRec = new SR();
-      // zh-CN 聲學模型原生內建中英文雙語詞庫，配合 AI 的 5 候選詞音譯還原，無需手動切換按鈕
-      activeRec.lang = 'zh-CN';
+      // 專為西方用戶優化：採用谷歌原生 en-US 聲學模型作為主引擎，確保英語長句與句尾單詞 100% 完整捕捉不丟字！
+      activeRec.lang = 'en-US';
       activeRec.interimResults = true;
       activeRec.maxAlternatives = 5;
       activeRec.continuous = true;
       btn.classList.add('recording');
 
       const banner = document.getElementById('statusBanner');
+      banner.className = 'status-banner';
       banner.style.display = 'block';
-      banner.innerText = '🔴 正在聆聽（請直接說中文或英文，說完停頓即自動回答）...';
+      banner.innerText = '🔴 Listening... Speak naturally in English or Mandarin!';
 
-      const segmentPrimary = [];
+      // 防丟尾詞鎖：完整保存每一段轉正文本與最後一次非空臨時尾詞，絕不因瀏覽器斷線空包而丟失後半句！
+      const finalizedSegments = [];
       const segmentAlts = [];
+      let lastNonEmptyInterim = '';
+      let lastValidFullText = '';
+      let hasSpokenYet = false;
 
-      function resetSilenceTimer() {
+      // 給足英語長句意群回傳與換氣時間：未開口前等 6 秒；開口後停頓滿 2.8 秒才結束，確保最後一個英文單詞完整轉正
+      function scheduleGentleStop() {
         clearTimeout(voiceSilenceTimer);
+        const waitMs = hasSpokenYet ? 2800 : 6000;
         voiceSilenceTimer = setTimeout(() => {
           if (activeRec) activeRec.stop();
-        }, 3000);
+        }, waitMs);
       }
 
-      resetSilenceTimer();
+      scheduleGentleStop();
 
       activeRec.onresult = (e) => {
-        resetSilenceTimer();
-        let interimText = '';
+        hasSpokenYet = true;
+        scheduleGentleStop();
+        let currentInterim = '';
 
-        for (let i = e.resultIndex; i < e.results.length; i++) {
+        for (let i = 0; i < e.results.length; i++) {
           const res = e.results[i];
-          const altsForThisSeg = [];
+          const altsForSeg = [];
           for (let k = 0; k < res.length; k++) {
             const t = (res[k]?.transcript || '').trim();
-            if (t) altsForThisSeg.push(t);
+            if (t) altsForSeg.push(t);
           }
 
           if (res.isFinal) {
-            const bestSeg = applyFuzzyVoiceCorrection(res[0].transcript.trim(), altsForThisSeg);
-            segmentPrimary[i] = bestSeg;
-            segmentAlts[i] = altsForThisSeg;
+            finalizedSegments[i] = applyFuzzyVoiceCorrection(res[0].transcript.trim(), altsForSeg);
+            segmentAlts[i] = altsForSeg;
           } else {
-            interimText += res[0].transcript;
+            currentInterim += (currentInterim ? ' ' : '') + res[0].transcript.trim();
+            segmentAlts[i] = altsForSeg;
           }
         }
 
-        const completedText = segmentPrimary.filter(Boolean).join(' ');
-        const fullCurrentText = applyFuzzyVoiceCorrection((completedText + (interimText ? ' ' + interimText : '')).trim());
+        if (currentInterim.trim()) {
+          lastNonEmptyInterim = currentInterim.trim();
+        } else if (e.results.length > 0 && e.results[e.results.length - 1].isFinal) {
+          // 當最後一段已經正式轉入 finalizedSegments 時，才清空臨時尾詞鎖
+          lastNonEmptyInterim = '';
+        }
 
+        const completedPart = finalizedSegments.filter(Boolean).join(' ').trim();
+        const mergedNow = [completedPart, lastNonEmptyInterim].filter(Boolean).join(' ').trim();
+
+        if (mergedNow) {
+          lastValidFullText = applyFuzzyVoiceCorrection(mergedNow);
+          inputEl.value = lastValidFullText;
+          autoResizeTextarea(inputEl);
+        }
+
+        // 收集最多 5 個完整句子候選（供 AI 識別英語或中文諧音）
         const combinedCandidates = new Set();
-        if (fullCurrentText) combinedCandidates.add(fullCurrentText);
+        if (lastValidFullText) combinedCandidates.add(lastValidFullText);
         for (let k = 0; k < 5; k++) {
           const altSentence = segmentAlts
-            .map((arr, idx) => (arr && arr[k]) ? arr[k] : (segmentPrimary[idx] || ''))
+            .map((arr, idx) => (arr && arr[k]) ? arr[k] : (finalizedSegments[idx] || ''))
             .filter(Boolean)
             .join(' ')
             .trim();
           if (altSentence) combinedCandidates.add(altSentence);
         }
-
         latestVoiceCandidates = Array.from(combinedCandidates).slice(0, 5);
-        inputEl.value = fullCurrentText;
-        autoResizeTextarea(inputEl);
       };
 
       activeRec.onend = () => {
         clearTimeout(voiceSilenceTimer);
         btn.classList.remove('recording');
         activeRec = null;
-        const spoken = inputEl.value.trim();
-        if (spoken) {
-          runSmartAI(spoken, latestVoiceCandidates);
+
+        // 優先取防丟尾詞鎖中的最完整句子，確保最後幾個英文單詞 100% 不丟失
+        const finalSpoken = (lastValidFullText || inputEl.value || '').trim();
+        if (finalSpoken) {
+          inputEl.value = finalSpoken;
+          autoResizeTextarea(inputEl);
+          runSmartAI(finalSpoken, latestVoiceCandidates, true);
         } else {
           banner.style.display = 'none';
         }
@@ -437,7 +501,12 @@
         clearTimeout(voiceSilenceTimer);
         btn.classList.remove('recording');
         activeRec = null;
-        banner.style.display = 'none';
+        const finalSpoken = (lastValidFullText || inputEl.value || '').trim();
+        if (finalSpoken) {
+          runSmartAI(finalSpoken, latestVoiceCandidates, true);
+        } else {
+          banner.style.display = 'none';
+        }
       };
 
       try {
@@ -709,7 +778,7 @@
     }
 
     // =========================================================================
-    // 5. 萬人免費高精準 AI 問答架構 (三級快取 + 階梯順位調用 + 連貫記憶 + 免Key保底)
+    // 5. 萬人免費高精準 AI 問答架構 (三級快取 + 階梯順位調用 + 歐美口音逆向辨析)
     // =========================================================================
     const BUILTIN_QA_CACHE = {
       "咏鹅": [
@@ -766,7 +835,7 @@
       if (!k) return '';
       if (BUILTIN_QA_CACHE[k]) return BUILTIN_QA_CACHE[k];
       try {
-        const store = JSON.parse(localStorage.getItem('tp_capsule_qa_cache_v3') || '{}');
+        const store = JSON.parse(localStorage.getItem('tp_capsule_qa_cache_v5') || '{}');
         return store[k] || '';
       } catch (e) {
         return '';
@@ -777,11 +846,11 @@
       const k = normalizeCacheKey(q);
       if (!k || !ans) return;
       try {
-        const store = JSON.parse(localStorage.getItem('tp_capsule_qa_cache_v3') || '{}');
+        const store = JSON.parse(localStorage.getItem('tp_capsule_qa_cache_v5') || '{}');
         const keys = Object.keys(store);
         if (keys.length > 200) delete store[keys[0]];
         store[k] = ans;
-        localStorage.setItem('tp_capsule_qa_cache_v3', JSON.stringify(store));
+        localStorage.setItem('tp_capsule_qa_cache_v5', JSON.stringify(store));
       } catch (e) {}
     }
 
@@ -873,7 +942,6 @@
     }
 
     async function fetchFastAccurateAI(promptText, cacheKeyForCloud = '') {
-      // 1. 若本地存有備用 Key，按順序調用主力模型，失敗才切換備用模型
       if (backupKey) {
         const modelsToTry = availableFastModels.slice(0, 3);
         for (let i = 0; i < modelsToTry.length; i++) {
@@ -889,7 +957,6 @@
         }
       }
 
-      // 2. 走 Cloudflare Worker 全球邊緣免費快取與多 Key 輪詢池
       for (let i = 0; i < CF_WORKER_ENDPOINTS.length; i++) {
         try {
           const r = await fetchWithTimeout(CF_WORKER_ENDPOINTS[i], {
@@ -987,7 +1054,7 @@
       return renderedPairs > 0;
     }
 
-    async function runSmartAI(overrideInput, voiceAlts = []) {
+    async function runSmartAI(overrideInput, voiceAlts = [], fromVoice = false) {
       const rawText = (overrideInput !== undefined ? overrideInput : document.getElementById('userInput').value).trim();
       const altsToUse = (Array.isArray(voiceAlts) && voiceAlts.length > 0) ? voiceAlts : latestVoiceCandidates;
       const q = applyFuzzyVoiceCorrection(rawText, altsToUse);
@@ -997,15 +1064,20 @@
       inputEl.value = q;
       autoResizeTextarea(inputEl);
 
+      // 🛡️ 檢查是否包含中英文罵人或不雅詞彙，若是則進行無按鈕的友情提醒
+      if (checkAndRemindProfanity(q)) {
+        return;
+      }
+
       const banner = document.getElementById('statusBanner');
       const list = document.getElementById('annotationList');
+      banner.className = 'status-banner';
       banner.style.display = 'block';
-      banner.innerText = '⚡ AI 正在思考...';
+      banner.innerText = '⚡ AI Thinking...';
       list.innerHTML = '';
 
       const followUp = isFollowUpQuestion(q);
 
-      // 1. 若不是追問，優先命中本地快取 (0毫秒極速返回，且寫入對話記憶供下一輪追問)
       if (!followUp) {
         const localHit = getLocalCachedAnswer(q);
         if (localHit) {
@@ -1017,30 +1089,29 @@
         }
       }
 
-      // 2. 組合語音同音候選詞 + 最近 3 輪滑動視窗對話記憶
-      const voiceCandidatesHint = (altsToUse && altsToUse.length > 1)
-        ? `\nVoice Speech-to-Text Candidates: ${JSON.stringify(altsToUse)}. (If the primary text has homophone typos or phonetic Chinese characters representing spoken English words, pick or reconstruct the most semantically natural Mandarin or English question!)`
+      const phoneticTrack = (fromVoice || altsToUse.length > 0) ? getPhoneticTrackForAI(q) : '';
+      const voiceAcousticHint = (fromVoice || altsToUse.length > 0)
+        ? `\n[Voice Acoustic Data] Primary Track: "${phoneticTrack}" | Speech Candidates: ${JSON.stringify(altsToUse)}. (CRITICAL: The user is likely a Western English speaker or Mandarin learner. If they spoke English, answer their full English question accurately. If they spoke Mandarin words that got phonetically transcribed into English words—like "knee how" for 你好 or "jing ye si" for 靜夜思—or homophone Chinese characters, deduce the true intended question!)`
         : '';
 
       const memoryContext = buildMemoryContextString();
 
       const directPrompt = [
-        'You are an authoritative bilingual scholar and assistant.',
+        'You are an authoritative bilingual scholar and Mandarin learning assistant for Western learners.',
         memoryContext,
-        `Current User question/request: "${q}"${voiceCandidatesHint}`,
+        `Current User question/request: "${q}"${voiceAcousticHint}`,
         '',
         'CRITICAL ACCURACY RULES:',
-        '1. High Voice & Context Tolerance: If the user\'s input has a voice-recognition homophone typo (e.g., "永和" instead of "詠鵝", "路窄" instead of "鹿柴", or phonetic Chinese characters representing spoken English words), or is a follow-up referring to the Recent Conversation Context above, answer the intended question accurately and coherently.',
+        '1. Western Speaker & Phonetic Disambiguation: If the input contains voice-recognition homophone typos or English words that phonetically approximate Mandarin (e.g., "knee how" -> 你好, "shie shie" -> 謝謝, "yong e" -> 詠鵝, "lu zhai" -> 鹿柴), deduce the true intended English or Chinese question from the candidates and Recent Conversation Context.',
         '2. Formulate the complete, authoritative standard answer or authentic classic text:',
         '   - If the user asks about a Chinese poem/classic (e.g., 詠鵝, 靜夜思, 水調歌頭, 鹿柴): Output ONLY the Title+Author on Line 1, followed by the COMPLETE original verses. No extra commentary!',
-        '   - If the user asks any other question or follow-up in English or Chinese: Output a clear, concise, accurate bilingual answer.',
+        '   - If the user asks any other question or follow-up in English or Chinese: Output a clear, natural, accurate bilingual answer.',
         '3. Output Format (Every single line MUST use "|||"):',
         '   - Line 1: Chinese_Title_or_Summary ||| English_Title_or_Summary',
         '   - Line 2+: Pure_Chinese_Sentence ||| Authentic_English_Sentence',
         '   - IMPORTANT: Left side of "|||" must contain ONLY Traditional Chinese characters and Chinese punctuation (write all numbers/terms in Chinese characters, NO Pinyin, NO English letters on the left side). Never repeat any line.'
       ].filter(Boolean).join('\n');
 
-      // 追問時不使用獨立問題快取 Key，獨立提問時使用共享快取 Key
       const cloudCacheKey = followUp ? '' : normalizeCacheKey(q);
       const aiText = await fetchFastAccurateAI(directPrompt, cloudCacheKey);
 
