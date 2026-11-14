@@ -3,78 +3,66 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Trees Pinyin - Mandarin Tone & Intelligibility Coach</title>
+  <title>Trees Pinyin - Mandarin Intelligibility & Tone Coach</title>
   <script src="https://aka.ms/csspeech/jsbrowserpackageraw"></script>
   <script src="https://unpkg.com/pinyin-pro@3.26.0/dist/index.js"></script>
   <style>
-    .tp-tone-wrap {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      width: 100%;
-      max-width: 680px;
+    .tp-wrap {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 660px;
       margin: 24px auto;
-      background: #ffffff;
+      background: #fff;
       border: 1px solid #e2e8f0;
       border-radius: 18px;
       padding: 24px;
-      box-shadow: 0 6px 20px rgba(15, 23, 42, 0.05);
-      box-sizing: border-box;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.04);
       color: #1e293b;
+      box-sizing: border-box;
     }
-    .tp-tone-wrap * { box-sizing: border-box; }
+    .tp-wrap * { box-sizing: border-box; }
 
-    /* Quota & Support Banner */
-    .tp-quota-banner {
+    .tp-banner {
       background: #f8fafc;
       border: 1px solid #cbd5e1;
       border-radius: 12px;
-      padding: 14px 16px;
+      padding: 12px 14px;
       margin-bottom: 16px;
       font-size: 13.5px;
-      line-height: 1.55;
-      color: #334155;
+      line-height: 1.5;
     }
-    .tp-quota-top {
+    .tp-banner-top {
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
       gap: 8px;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
     .tp-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 4px 11px;
+      padding: 3px 10px;
       border-radius: 99px;
       font-weight: 700;
-      font-size: 12.5px;
+      font-size: 12px;
       background: #e0f2fe;
       color: #0369a1;
     }
     .tp-badge.pro { background: #dcfce7; color: #15803d; }
     .tp-badge.exhausted { background: #fee2e2; color: #b91c1c; }
 
-    .tp-actions-links { display: flex; gap: 14px; font-size: 13px; flex-wrap: wrap; }
-    .tp-link-btn {
+    .tp-link {
       background: none;
       border: none;
       color: #2563eb;
       font-weight: 600;
       cursor: pointer;
-      padding: 0;
       text-decoration: underline;
+      font-size: 13px;
+      padding: 0;
+      margin-left: 10px;
     }
-    .tp-link-btn.support { color: #d97706; }
-
-    .tp-byok-panel {
-      display: none;
-      margin-top: 12px;
-      padding-top: 12px;
-      border-top: 1px dashed #cbd5e1;
-    }
-    .tp-byok-panel.open { display: block; }
-    .tp-byok-row { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+    .tp-byok { display: none; margin-top: 10px; padding-top: 10px; border-top: 1px dashed #cbd5e1; }
+    .tp-byok.open { display: block; }
+    .tp-row { display: flex; gap: 8px; margin-top: 6px; }
 
     .tp-input {
       width: 100%;
@@ -84,20 +72,18 @@
       font-size: 16px;
       outline: none;
     }
-    .tp-input:focus { border-color: #3b82f6; }
 
-    /* Character Stage */
     .tp-stage {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
       gap: 10px;
-      padding: 28px 14px;
+      padding: 26px 12px;
       background: #f8fafc;
       border: 1px dashed #cbd5e1;
       border-radius: 14px;
-      margin: 16px 0 12px;
-      min-height: 140px;
+      margin: 14px 0;
+      min-height: 130px;
       align-items: center;
     }
     .tp-item {
@@ -106,61 +92,43 @@
       align-items: center;
       padding: 6px 12px;
       border-radius: 10px;
-      min-width: 56px;
+      min-width: 54px;
       background: #f1f5f9;
       border: 2px solid transparent;
-      transition: all 0.2s;
     }
-    .tp-err-tag {
-      height: 20px;
-      font-size: 14px;
+    .tp-tag {
+      height: 18px;
+      font-size: 13.5px;
       font-weight: 800;
       visibility: hidden;
       margin-bottom: 2px;
-      white-space: nowrap;
     }
-    .tp-hanzi { font-size: 36px; font-weight: 600; line-height: 1.15; }
-    .tp-pinyin-sub { font-size: 12px; color: #64748b; margin-top: 3px; font-weight: 500; }
-    .tp-punct { font-size: 28px; color: #94a3b8; align-self: flex-end; padding-bottom: 12px; }
+    .tp-hanzi { font-size: 34px; font-weight: 600; line-height: 1.1; }
+    .tp-py { font-size: 12px; color: #64748b; margin-top: 3px; }
+    .tp-punct { font-size: 26px; color: #94a3b8; align-self: flex-end; padding-bottom: 10px; }
 
-    /* Traffic Light Colors (Red / Yellow / Green) */
-    .tp-item.good {
-      background: #dcfce7;
-      color: #15803d;
-      border-color: #86efac;
-    }
-    .tp-item.good .tp-pinyin-sub { color: #15803d; }
+    /* Traffic Light Colors */
+    .tp-item.good { background: #dcfce7; color: #15803d; border-color: #86efac; }
+    .tp-item.good .tp-py { color: #15803d; }
 
-    /* Yellow: Tone error, but Chinese listener still understood the right word */
-    .tp-item.warn {
-      background: #fef08a;
-      color: #a16207;
-      border-color: #facc15;
-    }
-    .tp-item.warn .tp-err-tag { visibility: visible; color: #b45309; }
-    .tp-item.warn .tp-pinyin-sub { color: #a16207; }
+    .tp-item.warn { background: #fef08a; color: #a16207; border-color: #facc15; }
+    .tp-item.warn .tp-tag { visibility: visible; color: #b45309; }
+    .tp-item.warn .tp-py { color: #a16207; }
 
-    /* Red: Misleading tone error (changed word meaning) or wrong pronunciation */
-    .tp-item.bad {
-      background: #fecaca;
-      color: #b91c1c;
-      border-color: #f87171;
-    }
-    .tp-item.bad .tp-err-tag { visibility: visible; color: #b91c1c; }
-    .tp-item.bad .tp-pinyin-sub { color: #b91c1c; }
+    .tp-item.bad { background: #fecaca; color: #b91c1c; border-color: #f87171; }
+    .tp-item.bad .tp-tag { visibility: visible; color: #b91c1c; }
+    .tp-item.bad .tp-py { color: #b91c1c; }
 
-    /* Legend */
     .tp-legend {
       display: flex;
       justify-content: center;
       flex-wrap: wrap;
       gap: 14px;
-      font-size: 12.5px;
+      font-size: 12px;
       color: #475569;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
-    .tp-legend span { display: inline-flex; align-items: center; gap: 6px; }
-    .tp-dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+    .tp-dot { width: 11px; height: 11px; border-radius: 50%; display: inline-block; margin-right: 4px; vertical-align: middle; }
 
     .tp-btns { display: flex; justify-content: center; gap: 12px; }
     .tp-btn {
@@ -171,646 +139,406 @@
       font-size: 15px;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.15s;
     }
-    .tp-btn:hover { background: #f8fafc; }
     .tp-btn-rec { background: #10b981; color: #fff; border: none; }
-    .tp-btn-rec:hover { background: #059669; }
-    .tp-btn-rec.on { background: #ef4444; animation: tp-pulse 1.5s infinite; }
-    .tp-btn-rec:disabled { background: #94a3b8; cursor: not-allowed; animation: none; }
+    .tp-btn-rec.on { background: #ef4444; }
+    .tp-btn-rec:disabled { background: #94a3b8; cursor: not-allowed; }
 
-    @keyframes tp-pulse {
-      0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
-      70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
-    }
-
-    .tp-msg { text-align: center; margin-top: 14px; font-size: 14.5px; color: #334155; line-height: 1.5; }
-
-    /* Native Chinese Listener + English Translation Box */
-    .tp-blind-box {
-      margin-top: 16px;
-      padding: 14px 16px;
+    .tp-msg { text-align: center; margin-top: 12px; font-size: 14.5px; color: #334155; }
+    .tp-heard-box {
+      margin-top: 14px;
+      padding: 12px 16px;
       background: #f8fafc;
       border: 1px solid #e2e8f0;
       border-radius: 12px;
       font-size: 14px;
-      color: #1e293b;
       display: none;
-      line-height: 1.65;
-    }
-    .tp-blind-row {
-      display: flex;
-      align-items: baseline;
-      gap: 8px;
-      margin-bottom: 6px;
-    }
-    .tp-blind-row:last-child { margin-bottom: 0; }
-    .tp-blind-label {
-      font-weight: 700;
-      color: #475569;
-      min-width: 195px;
-      font-size: 13px;
-    }
-    .tp-blind-val {
-      font-weight: 600;
-      color: #0f172a;
-      font-size: 15px;
-    }
-    .tp-blind-en {
-      font-style: italic;
-      color: #2563eb;
-      font-weight: 600;
+      line-height: 1.6;
     }
   </style>
 </head>
 <body style="background:#f1f5f9; margin:0; padding:20px 12px;">
 
-<div class="tp-tone-wrap" id="tp-tone-module">
-
-  <!-- Quota & Free Education Support Banner -->
-  <div class="tp-quota-banner">
-    <div class="tp-quota-top">
-      <span class="tp-badge" id="tpQuotaBadge">🎁 Daily Free Quota: 2 / 2 left</span>
-      <div class="tp-actions-links">
-        <button class="tp-link-btn" onclick="toggleByokPanel()">⚙️ Add Your Azure Key (5 hrs/mo Free)</button>
-        <button class="tp-link-btn support" onclick="openSupportModal()">❤️ Support Free Education</button>
+<div class="tp-wrap">
+  <div class="tp-banner">
+    <div class="tp-banner-top">
+      <span class="tp-badge" id="quotaBadge">🎁 Daily Free Quota: 2 / 2 left</span>
+      <div>
+        <button class="tp-link" onclick="document.getElementById('byokBox').classList.toggle('open')">⚙️ Add Azure Key (5 hrs/mo Free)</button>
+        <button class="tp-link" style="color:#d97706" onclick="alert('Thank you for supporting Trees Pinyin free education!')">❤️ Support Us</button>
       </div>
     </div>
     <div>
-      Due to quota limits, each user is allowed <strong>2 free evaluations per day</strong>. You can <strong>add your own Azure Key (5 hours/month free quota)</strong> for unlimited practice. Welcome to <strong>support us in continuing to contribute to free education!</strong>
+      Due to quota limits, each user is allowed <strong>2 free evaluations per day</strong>. You can <strong>add your own Azure Key (5 hours/month free quota)</strong>. Welcome to <strong>support us in continuing to contribute to free education!</strong>
     </div>
-
-    <!-- Collapsible BYOK Panel -->
-    <div class="tp-byok-panel" id="tpByokPanel">
-      <div style="font-size:12.5px; color:#64748b;">
-        Enter your Microsoft Azure Speech Key (Free F0 tier gives 5 hours/month free). Stored locally in your browser only:
-      </div>
-      <div class="tp-byok-row">
-        <input id="tpUserKey" class="tp-input" type="password" placeholder="Paste your Azure KEY 1" oninput="saveByok()" style="flex:2; font-size:13px; padding:8px 10px;" />
-        <input id="tpUserRegion" class="tp-input" type="text" placeholder="Region (e.g. westus2)" oninput="saveByok()" style="flex:1; font-size:13px; padding:8px 10px;" />
-        <button class="tp-btn" onclick="clearByok()" style="padding:6px 14px; font-size:12.5px;">Clear</button>
+    <div class="tp-byok" id="byokBox">
+      <div class="tp-row">
+        <input id="azKey" class="tp-input" type="password" placeholder="Optional: Paste Azure KEY 1" oninput="saveCfg()" style="flex:2; font-size:13px; padding:7px 10px;" />
+        <input id="azReg" class="tp-input" type="text" placeholder="Region (westus2)" oninput="saveCfg()" style="flex:1; font-size:13px; padding:7px 10px;" />
+        <button class="tp-btn" onclick="clearCfg()" style="padding:6px 12px; font-size:12px;">Clear</button>
       </div>
     </div>
   </div>
 
-  <!-- Target Chinese Sentence Input -->
-  <div>
-    <input id="tpTxt" class="tp-input" value="你好，我买了一把雨伞。" oninput="renderSentence()" placeholder="Type or paste Chinese sentence here..." />
-  </div>
+  <input id="sentenceInput" class="tp-input" value="你好，我买了一把雨伞。" oninput="renderStage()" />
 
-  <!-- Character Evaluation Stage -->
-  <div class="tp-stage" id="tpStage"></div>
+  <div class="tp-stage" id="stage"></div>
 
-  <!-- Traffic Light Legend -->
   <div class="tp-legend">
-    <span><i class="tp-dot" style="background:#22c55e;"></i> <b>Green</b>: Accurate (Tone 1 & Neutral auto-pass)</span>
-    <span><i class="tp-dot" style="background:#eab308;"></i> <b>Yellow (4→3)</b>: Tone Error, Still Understood</span>
-    <span><i class="tp-dot" style="background:#ef4444;"></i> <b>Red (4→3)</b>: Misleading Tone / Wrong Sound</span>
+    <span><i class="tp-dot" style="background:#22c55e;"></i><b>Green</b>: Clear & Understood</span>
+    <span><i class="tp-dot" style="background:#eab308;"></i><b>Yellow (4→3)</b>: Tone Off, Still Understood</span>
+    <span><i class="tp-dot" style="background:#ef4444;"></i><b>Red (4→3)</b>: Misleading / Wrong Sound</span>
   </div>
 
-  <!-- Action Buttons -->
   <div class="tp-btns">
-    <button class="tp-btn" onclick="playDemo()">🔊 Listen Demo</button>
-    <button class="tp-btn tp-btn-rec" id="tpRecBtn" onclick="toggleEvaluation()">🎤 Start Speaking</button>
+    <button class="tp-btn" onclick="speakDemo()">🔊 Listen Demo</button>
+    <button class="tp-btn tp-btn-rec" id="recBtn" onclick="toggleRecord()">🎤 Start Speaking</button>
   </div>
 
-  <div class="tp-msg" id="tpMsg">Click "Start Speaking", read the sentence, and click Stop (or pause 1.5s) to score.</div>
+  <div class="tp-msg" id="msgBox">Click "Start Speaking", read the sentence, and click Stop to score.</div>
 
-  <!-- What a Chinese Listener Heard + English Translation -->
-  <div class="tp-blind-box" id="tpBlindBox">
-    <div class="tp-blind-row">
-      <span class="tp-blind-label">👂 Chinese Listener Heard:</span>
-      <span class="tp-blind-val" id="tpHeardZh">--</span>
-    </div>
-    <div class="tp-blind-row">
-      <span class="tp-blind-label">🌐 Meaning in English:</span>
-      <span class="tp-blind-val tp-blind-en" id="tpHeardEn">Translating...</span>
-    </div>
+  <div class="tp-heard-box" id="heardBox">
+    <div>👂 <b>What a Chinese Listener Heard:</b> <span id="heardZh" style="font-weight:700; color:#0f172a;"></span></div>
+    <div style="margin-top:4px;">🌐 <b>English Translation:</b> <span id="heardEn" style="color:#2563eb; font-weight:600; font-style:italic;"></span></div>
   </div>
 </div>
 
 <script>
   const { pinyin } = window.pinyinPro;
-
-  // Replace with your Cloudflare Worker URL when embedding into your main site
   const WORKER_TOKEN_URL = "/speech-token";
-  const DAILY_FREE_LIMIT = 2;
+  const DAILY_LIMIT = 2;
 
   let targets = [];
-  let isRecording = false;
-  let recognizer = null;
-  let webSr = null;
-  let blindTranscript = '';      // Unbiased Browser Native Blind Ear
-  let azureLexicalText = '';     // Fallback lexical text from Azure
-  let pronWords = [];
-  let pendingWorkerTokenUsed = false;
+  let recording = false;
+  let sr = null;
+  let azRecognizer = null;
+  let heardText = '';
+  let azToneMap = {}; // Optional acoustic tone map from Azure { index: spokenTone }
 
-  window.addEventListener('DOMContentLoaded', () => {
-    const savedKey = localStorage.getItem('tp_az_k') || localStorage.getItem('az_k') || '';
-    const savedReg = localStorage.getItem('tp_az_r') || localStorage.getItem('az_r') || 'westus2';
-    document.getElementById('tpUserKey').value = savedKey;
-    document.getElementById('tpUserRegion').value = savedReg;
-    updateQuotaUI();
-    renderSentence();
-  });
+  window.onload = () => {
+    document.getElementById('azKey').value = localStorage.getItem('tp_az_k') || localStorage.getItem('az_k') || '';
+    document.getElementById('azReg').value = localStorage.getItem('tp_az_r') || localStorage.getItem('az_r') || 'westus2';
+    updateQuota();
+    renderStage();
+  };
 
-  function toggleByokPanel() {
-    document.getElementById('tpByokPanel').classList.toggle('open');
+  function saveCfg() {
+    localStorage.setItem('tp_az_k', document.getElementById('azKey').value.trim());
+    localStorage.setItem('tp_az_r', document.getElementById('azReg').value.trim());
+    updateQuota();
   }
 
-  function openSupportModal() {
-    alert('❤️ Support Trees Pinyin Free Education:\n\nThank you for supporting our mission to make intuitive Mandarin phonics accessible to learners worldwide!');
-  }
-
-  function saveByok() {
-    const k = document.getElementById('tpUserKey').value.trim();
-    const r = document.getElementById('tpUserRegion').value.trim();
-    localStorage.setItem('tp_az_k', k);
-    localStorage.setItem('az_k', k);
-    localStorage.setItem('tp_az_r', r);
-    localStorage.setItem('az_r', r);
-    updateQuotaUI();
-  }
-
-  function clearByok() {
-    document.getElementById('tpUserKey').value = '';
+  function clearCfg() {
+    document.getElementById('azKey').value = '';
     localStorage.removeItem('tp_az_k');
     localStorage.removeItem('az_k');
-    updateQuotaUI();
+    updateQuota();
   }
 
-  function getTodayStorageKey() {
+  function todayKey() {
     const d = new Date();
-    return `tp_free_used_${d.getFullYear()}_${d.getMonth()+1}_${d.getDate()}`;
+    return `tp_q_${d.getFullYear()}_${d.getMonth()+1}_${d.getDate()}`;
   }
 
-  function getUsedFreeCount() {
-    return parseInt(localStorage.getItem(getTodayStorageKey()) || '0', 10);
-  }
+  function getUsed() { return parseInt(localStorage.getItem(todayKey()) || '0', 10); }
+  function addUsed() { localStorage.setItem(todayKey(), String(getUsed() + 1)); updateQuota(); }
+  function hasKey() { return Boolean(document.getElementById('azKey').value.trim()); }
 
-  function incrementUsedFreeCount() {
-    const next = getUsedFreeCount() + 1;
-    localStorage.setItem(getTodayStorageKey(), String(next));
-    updateQuotaUI();
-  }
-
-  function hasCustomKey() {
-    return Boolean(document.getElementById('tpUserKey').value.trim() && document.getElementById('tpUserRegion').value.trim());
-  }
-
-  function updateQuotaUI() {
-    const badge = document.getElementById('tpQuotaBadge');
-    const recBtn = document.getElementById('tpRecBtn');
-
-    if (hasCustomKey()) {
-      badge.className = 'tp-badge pro';
-      badge.textContent = '⚡ Custom Azure Key Active: Unlimited Free Practice';
-      recBtn.disabled = false;
+  function updateQuota() {
+    const b = document.getElementById('quotaBadge');
+    const btn = document.getElementById('recBtn');
+    if (hasKey()) {
+      b.className = 'tp-badge pro';
+      b.textContent = '⚡ Custom Azure Key: Unlimited Free Practice';
+      btn.disabled = false;
       return;
     }
-
-    const used = getUsedFreeCount();
-    const rem = Math.max(0, DAILY_FREE_LIMIT - used);
-    if (rem > 0) {
-      badge.className = 'tp-badge';
-      badge.textContent = `🎁 Daily Free Quota: ${rem} / ${DAILY_FREE_LIMIT} left`;
-      recBtn.disabled = false;
-    } else {
-      badge.className = 'tp-badge exhausted';
-      badge.textContent = `🔒 Daily Free Quota Used (0 / ${DAILY_FREE_LIMIT} left)`;
-    }
+    const rem = Math.max(0, DAILY_LIMIT - getUsed());
+    b.className = rem > 0 ? 'tp-badge' : 'tp-badge exhausted';
+    b.textContent = rem > 0 ? `🎁 Daily Free Quota: ${rem} / ${DAILY_LIMIT} left` : `🔒 Daily Free Quota Used (0 / ${DAILY_LIMIT} left)`;
+    btn.disabled = (rem <= 0);
   }
 
-  function renderSentence() {
-    const s = document.getElementById('tpTxt').value.trim();
-    const stage = document.getElementById('tpStage');
+  function renderStage() {
+    const s = document.getElementById('sentenceInput').value.trim();
+    const stage = document.getElementById('stage');
     stage.innerHTML = '';
     targets = [];
-    document.getElementById('tpBlindBox').style.display = 'none';
+    document.getElementById('heardBox').style.display = 'none';
     if (!s) return;
 
-    const pyList = pinyin(s, { type: 'array', toneType: 'num', v: true });
-    const origPyList = pinyin(s, { type: 'array', toneType: 'num', v: true, toneSandhi: false });
-    const displayPyList = pinyin(s, { type: 'array', v: true });
+    const pySandhi = pinyin(s, { type: 'array', toneType: 'num', v: true });
+    const pyOrig = pinyin(s, { type: 'array', toneType: 'num', v: true, toneSandhi: false });
+    const pyDisp = pinyin(s, { type: 'array', v: true });
 
     Array.from(s).forEach((ch, i) => {
       if (!/[\u4e00-\u9fa5]/.test(ch)) {
         stage.insertAdjacentHTML('beforeend', `<span class="tp-punct">${ch}</span>`);
         return;
       }
-      const py = pyList[i] || '';
-      const origPy = origPyList[i] || py;
-      const dispPy = displayPyList[i] || '';
-      const t = parseInt((py.match(/([0-5])$/) || [0,1])[1], 10) % 5;
-      const origT = parseInt((origPy.match(/([0-5])$/) || [0,1])[1], 10) % 5;
-      const base = py.replace(/[0-5]/g, '');
+      const p1 = pySandhi[i] || '';
+      const p2 = pyOrig[i] || p1;
+      const tone = parseInt((p1.match(/([0-5])$/) || [0,1])[1], 10) % 5;
+      const origTone = parseInt((p2.match(/([0-5])$/) || [0,1])[1], 10) % 5;
+      const base = p1.replace(/[0-5]/g, '');
       const idx = targets.length;
 
       // Tone 1 and Neutral Tone (0) skip tone checking
-      const skipToneCheck = (t === 1 || t === 0 || origT === 1 || origT === 0);
+      const skipTone = (tone === 1 || tone === 0 || origTone === 1 || origTone === 0);
 
-      targets.push({ idx, char: ch, base, tone: t, origTone: origT, skipToneCheck });
+      targets.push({ idx, char: ch, base, tone, origTone, skipTone });
       stage.insertAdjacentHTML('beforeend', `
-        <div class="tp-item" id="tp-c-${idx}">
-          <div class="tp-err-tag" id="tp-t-${idx}"></div>
+        <div class="tp-item" id="c-${idx}">
+          <div class="tp-tag" id="t-${idx}"></div>
           <div class="tp-hanzi">${ch}</div>
-          <div class="tp-pinyin-sub">${dispPy}</div>
+          <div class="tp-py">${pyDisp[i] || ''}</div>
         </div>`);
     });
   }
 
-  function playDemo() {
-    const u = new SpeechSynthesisUtterance(document.getElementById('tpTxt').value);
-    u.lang = 'zh-CN';
-    u.rate = 0.85;
-    speechSynthesis.cancel();
-    speechSynthesis.speak(u);
+  function speakDemo() {
+    const u = new SpeechSynthesisUtterance(document.getElementById('sentenceInput').value);
+    u.lang = 'zh-CN'; u.rate = 0.85;
+    speechSynthesis.cancel(); speechSynthesis.speak(u);
   }
 
-  function normBase(b) {
+  // Western learner friendly sound matching (tolerates z/zh, c/ch, s/sh, in/ing, en/eng, an/ang, u/v)
+  function fuzzySound(b) {
     if (!b) return '';
-    return b.toLowerCase()
-      .replace(/[1-5\s]/g, '')
+    return b.toLowerCase().replace(/[0-5\s]/g, '')
       .replace(/^zh/, 'z').replace(/^ch/, 'c').replace(/^sh/, 's')
-      .replace(/ing$/, 'in').replace(/eng$/, 'en').replace(/uang$/, 'uan')
+      .replace(/ing$/, 'in').replace(/eng$/, 'en').replace(/ang$/, 'an')
+      .replace(/uang$/, 'uan').replace(/iong$/, 'ion')
       .replace(/^w/, '').replace(/^y/, '');
   }
 
-  function isSoundAcceptable(exp, act) {
-    if (!exp || !act) return false;
-    return exp === act || normBase(exp) === normBase(act);
+  function isSameSyllable(b1, b2) {
+    if (!b1 || !b2) return false;
+    return b1 === b2 || fuzzySound(b1) === fuzzySound(b2);
   }
 
-  // Zero-cost English translation of what the Chinese listener heard
-  async function translateHeardToEnglish(zhText) {
-    const enSpan = document.getElementById('tpHeardEn');
-    if (!zhText) {
-      enSpan.textContent = '--';
+  async function toggleRecord() {
+    const btn = document.getElementById('recBtn');
+
+    // STOP & SCORE IMMEDIATELY
+    if (recording) {
+      recording = false;
+      btn.classList.remove('on');
+      btn.textContent = '🎤 Start Speaking';
+      if (sr) { try { sr.stop(); } catch (e) {} sr = null; }
+      if (azRecognizer) {
+        try { azRecognizer.stopContinuousRecognitionAsync(); azRecognizer.close(); } catch (e) {}
+        azRecognizer = null;
+      }
+      scoreByBlindHearing();
       return;
     }
-    enSpan.textContent = 'Translating...';
-    try {
-      const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=zh-CN&tl=en&dt=t&q=${encodeURIComponent(zhText)}`;
-      const res = await fetch(url);
-      const data = await res.json();
-      const translated = (data?.[0] || []).map(item => item?.[0] || '').join('');
-      enSpan.textContent = translated ? `"${translated}"` : '--';
-    } catch (e) {
-      enSpan.textContent = '(Translation unavailable offline)';
+
+    if (!hasKey() && getUsed() >= DAILY_LIMIT) {
+      document.getElementById('byokBox').classList.add('open');
+      return setMsg('⚠️ Daily free limit (2/2) reached. Please add your own Azure Key or support us!');
     }
+
+    renderStage();
+    heardText = '';
+    azToneMap = {};
+    recording = true;
+    btn.classList.add('on');
+    btn.textContent = '⏹ Stop & Score';
+    setMsg('🎙️ Listening... Speak naturally in Chinese.');
+
+    // 1. Primary Engine: Fast Native Chinese Blind Listener (Browser SpeechRecognition)
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SR) {
+      sr = new SR();
+      sr.lang = 'zh-CN';
+      sr.continuous = true;
+      sr.interimResults = true;
+      sr.onresult = (e) => {
+        let s = '';
+        for (let i = 0; i < e.results.length; i++) s += e.results[i][0].transcript;
+        heardText = s;
+        if (recording && s) setMsg(`👂 Hearing: <b>${s}</b>`);
+      };
+      try { sr.start(); } catch (e) {}
+    }
+
+    // 2. Optional Helper: Azure background tone detector (never blocks or zeroes out score if unavailable)
+    startOptionalAzureHelper();
   }
 
-  function startNativeBlindEar() {
-    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SR) return;
+  async function startOptionalAzureHelper() {
     try {
-      webSr = new SR();
-      webSr.lang = 'zh-CN';
-      webSr.continuous = true;
-      webSr.interimResults = true;
-      webSr.onresult = (e) => {
-        let s = '';
-        for (let i = 0; i < e.results.length; i++) {
-          s += e.results[i][0].transcript;
+      let speechConfig = null;
+      if (hasKey()) {
+        speechConfig = SpeechSDK.SpeechConfig.fromSubscription(
+          document.getElementById('azKey').value.trim(),
+          document.getElementById('azReg').value.trim() || 'westus2'
+        );
+      } else {
+        const res = await fetch(WORKER_TOKEN_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'speech-token' })
+        });
+        if (res.ok) {
+          const d = await res.json();
+          if (d.token && d.region) speechConfig = SpeechSDK.SpeechConfig.fromAuthorizationToken(d.token, d.region);
         }
-        blindTranscript = s;
-        if (isRecording && s) {
-          setMsg(`👂 Native Ear Hearing: <b>${s}</b>`);
+      }
+      if (!speechConfig || !recording) return;
+
+      speechConfig.speechRecognitionLanguage = "zh-CN";
+      speechConfig.outputFormat = SpeechSDK.OutputFormat.Detailed;
+      const pronCfg = SpeechSDK.PronunciationAssessmentConfig.fromJSON(JSON.stringify({
+        referenceText: document.getElementById('sentenceInput').value.trim(),
+        gradingSystem: "HundredMark",
+        granularity: "Phoneme",
+        phonemeAlphabet: "SAPI",
+        nBestPhonemeCount: 3
+      }));
+
+      azRecognizer = new SpeechSDK.SpeechRecognizer(speechConfig, SpeechSDK.AudioConfig.fromDefaultMicrophoneInput());
+      pronCfg.applyTo(azRecognizer);
+
+      azRecognizer.recognized = (s, e) => {
+        if (e.result.reason === SpeechSDK.ResultReason.RecognizedSpeech) {
+          if (!heardText && e.result.text) heardText = e.result.text;
+          try {
+            const json = JSON.parse(e.result.properties.getProperty(SpeechSDK.PropertyId.SpeechServiceResponse_JsonResult));
+            const words = (json?.NBest?.[0]?.Words || []).filter(w => /[\u4e00-\u9fa5]/.test(w.Word) && w.PronunciationAssessment?.ErrorType !== 'Insertion');
+            words.forEach((w, idx) => {
+              for (const p of (w.Phonemes || [])) {
+                const top = p.PronunciationAssessment?.NBestPhonemes?.[0]?.Phoneme || p.Phoneme || '';
+                const m = top.trim().match(/([1-5])\s*$/);
+                if (m) azToneMap[idx] = parseInt(m[1], 10) % 5;
+              }
+            });
+          } catch (err) {}
         }
       };
-      webSr.start();
+      azRecognizer.startContinuousRecognitionAsync();
     } catch (e) {}
   }
 
-  function stopNativeBlindEar() {
-    if (webSr) {
-      try { webSr.stop(); } catch (e) {}
-      webSr = null;
-    }
-  }
-
-  async function createAzureSpeechConfig() {
-    pendingWorkerTokenUsed = false;
-    if (hasCustomKey()) {
-      const k = document.getElementById('tpUserKey').value.trim();
-      const r = document.getElementById('tpUserRegion').value.trim();
-      return SpeechSDK.SpeechConfig.fromSubscription(k, r);
+  // CORE SCORING: Driven directly by What the Chinese Listener Heard (Lenient for Westerners!)
+  function scoreByBlindHearing() {
+    const cleanHeard = heardText.replace(/[^\u4e00-\u9fa5]/g, '');
+    if (!cleanHeard) {
+      return setMsg('⚠️ No speech detected. Please speak loud enough until you see "👂 Hearing: ..." on screen.');
     }
 
-    if (getUsedFreeCount() >= DAILY_FREE_LIMIT) {
-      document.getElementById('tpByokPanel').classList.add('open');
-      throw new Error('Daily free limit (2/2) reached. Please add your own free Azure Key or support our membership!');
-    }
+    if (!hasKey()) addUsed();
 
-    try {
-      const res = await fetch(WORKER_TOKEN_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'speech-token' })
-      });
-      const data = await res.json();
-      if (!res.ok || data.error === 'LIMIT_REACHED') {
-        localStorage.setItem(getTodayStorageKey(), String(DAILY_FREE_LIMIT));
-        updateQuotaUI();
-        document.getElementById('tpByokPanel').classList.add('open');
-        throw new Error('Daily free limit (2/2) reached. Please add your own Azure Key or support us!');
-      }
-      if (data.token && data.region) {
-        pendingWorkerTokenUsed = true;
-        return SpeechSDK.SpeechConfig.fromAuthorizationToken(data.token, data.region);
-      }
-      throw new Error('Invalid token response');
-    } catch (err) {
-      if (err.message.includes('Daily free limit')) throw err;
-      document.getElementById('tpByokPanel').classList.add('open');
-      throw new Error('Please click "⚙️ Add Your Azure Key" above and enter your KEY 1 and westus2.');
-    }
-  }
-
-  async function toggleEvaluation() {
-    const txt = document.getElementById('tpTxt').value.trim();
-    const btn = document.getElementById('tpRecBtn');
-
-    if (isRecording && recognizer) {
-      isRecording = false;
-      btn.classList.remove('on');
-      btn.textContent = '⏳ Scoring...';
-      stopNativeBlindEar();
-
-      await new Promise(r => setTimeout(r, 600));
-      await new Promise(res => recognizer.stopContinuousRecognitionAsync(res, res));
-      if (recognizer) { recognizer.close(); recognizer = null; }
-
-      btn.textContent = '🎤 Try Again';
-      evaluateCombined();
-      return;
-    }
-
-    let speechConfig;
-    try {
-      speechConfig = await createAzureSpeechConfig();
-    } catch (e) {
-      setMsg(`⚠️ ${e.message}`);
-      return;
-    }
-
-    renderSentence();
-    blindTranscript = '';
-    azureLexicalText = '';
-    pronWords = [];
-    isRecording = true;
-
-    btn.classList.add('on');
-    btn.textContent = '⏹ Stop & Score';
-    setMsg('🎙️ Listening... Please read the full sentence clearly.');
-
-    speechConfig.speechRecognitionLanguage = "zh-CN";
-    speechConfig.outputFormat = SpeechSDK.OutputFormat.Detailed;
-    speechConfig.setProperty(SpeechSDK.PropertyId.SpeechServiceConnection_InitialSilenceTimeoutMs, "8000");
-    speechConfig.setProperty(SpeechSDK.PropertyId.SpeechServiceConnection_EndSilenceTimeoutMs, "1800");
-    speechConfig.setProperty(SpeechSDK.PropertyId.Speech_SegmentationSilenceTimeoutMs, "1500");
-
-    const audioConfig = SpeechSDK.AudioConfig.fromDefaultMicrophoneInput();
-    const pronConfig = SpeechSDK.PronunciationAssessmentConfig.fromJSON(JSON.stringify({
-      referenceText: txt,
-      gradingSystem: "HundredMark",
-      granularity: "Phoneme",
-      dimension: "Comprehensive",
-      enableMiscue: true,
-      phonemeAlphabet: "SAPI",
-      nBestPhonemeCount: 5
-    }));
-
-    recognizer = new SpeechSDK.SpeechRecognizer(speechConfig, audioConfig);
-    pronConfig.applyTo(recognizer);
-
-    recognizer.sessionStarted = () => {
-      if (isRecording) startNativeBlindEar();
-    };
-
-    recognizer.recognizing = (s, e) => {
-      if (e.result.text && isRecording && !blindTranscript) {
-        setMsg(`👂 Hearing: <b>${e.result.text}</b>`);
-      }
-    };
-
-    recognizer.recognized = (s, e) => {
-      if (e.result.reason === SpeechSDK.ResultReason.RecognizedSpeech) {
-        try {
-          const json = JSON.parse(e.result.properties.getProperty(SpeechSDK.PropertyId.SpeechServiceResponse_JsonResult));
-          const lex = json?.NBest?.[0]?.Lexical || json?.DisplayText || e.result.text || '';
-          if (lex) azureLexicalText += lex;
-          const words = json?.NBest?.[0]?.Words || [];
-          pronWords.push(...words);
-        } catch (err) {}
-
-        const validCount = pronWords.filter(w => /[\u4e00-\u9fa5]/.test(w.Word) && w.PronunciationAssessment?.ErrorType !== 'Insertion').length;
-        if (isRecording && validCount >= targets.length) {
-          toggleEvaluation();
-        }
-      }
-    };
-
-    recognizer.canceled = (s, e) => {
-      if (!isRecording) return;
-      isRecording = false;
-      stopNativeBlindEar();
-      btn.classList.remove('on');
-      btn.textContent = '🎤 Start Speaking';
-      setMsg(`❌ Connection Error: ${e.errorDetails || 'Please check your Azure Key & Region (westus2)'}`);
-      if (recognizer) { recognizer.close(); recognizer = null; }
-    };
-
-    recognizer.startContinuousRecognitionAsync();
-  }
-
-  // Extract actual spoken tone from Azure NBestPhonemes
-  function inspectAzureWord(pw, targetObj) {
-    if (!pw) return { omitted: true };
-    const errType = pw.PronunciationAssessment?.ErrorType || 'None';
-    const wordAcc = pw.PronunciationAssessment?.AccuracyScore ?? 0;
-    if (errType === 'Omission' || wordAcc < 25) return { omitted: true };
-
-    const phonemes = pw.Phonemes || [];
-    let baseWrong = false;
-    let acousticSpokenTone = null;
-    let finalAcc = wordAcc;
-
-    for (const p of phonemes) {
-      const expRaw = (p.Phoneme || '').trim();
-      const pAcc = p.PronunciationAssessment?.AccuracyScore ?? wordAcc;
-      const nbest = p.PronunciationAssessment?.NBestPhonemes || [];
-      const topRaw = nbest[0]?.Phoneme ? nbest[0].Phoneme.trim() : expRaw;
-
-      const expToneMatch = expRaw.match(/([1-5])\s*$/);
-      if (expToneMatch) {
-        finalAcc = pAcc;
-        const topToneMatch = topRaw.match(/([1-5])\s*$/);
-        if (topToneMatch) {
-          acousticSpokenTone = parseInt(topToneMatch[1], 10) % 5;
-        }
-        // Check 2nd/3rd phoneme candidate if forced alignment masked a deliberate tone error (when score < 85)
-        if ((acousticSpokenTone === targetObj.tone || acousticSpokenTone === targetObj.origTone) && pAcc < 85 && nbest.length > 1) {
-          for (let k = 1; k < Math.min(4, nbest.length); k++) {
-            const candRaw = (nbest[k].Phoneme || '').trim();
-            const m = candRaw.match(/([1-5])\s*$/);
-            if (m && normBase(candRaw) === normBase(expRaw)) {
-              const candTone = parseInt(m[1], 10) % 5;
-              if (candTone !== targetObj.tone) {
-                acousticSpokenTone = candTone;
-                break;
-              }
-            }
-          }
-        }
-        if (pAcc < 52 && !isSoundAcceptable(expRaw, topRaw)) {
-          baseWrong = true;
-        }
-      } else {
-        if (pAcc < 48 && !isSoundAcceptable(expRaw, topRaw)) {
-          baseWrong = true;
-        }
-      }
-    }
-
-    return {
-      omitted: false,
-      wordAcc,
-      finalAcc,
-      baseWrong,
-      acousticSpokenTone
-    };
-  }
-
-  function evaluateCombined() {
-    const rawHeardSentence = (blindTranscript || azureLexicalText).trim();
-    const cleanBlind = rawHeardSentence.replace(/[^\u4e00-\u9fa5]/g, '');
-    const alignedPron = pronWords.filter(w =>
-      /[\u4e00-\u9fa5]/.test(w.Word) &&
-      w.PronunciationAssessment?.ErrorType !== 'Insertion'
-    );
-
-    if (!cleanBlind && !alignedPron.length) {
-      return setMsg('⚠️ No speech detected. Please speak clearly right after clicking "Start Speaking" (free quota was NOT deducted).');
-    }
-
-    if (pendingWorkerTokenUsed && !hasCustomKey()) {
-      incrementUsedFreeCount();
-      pendingWorkerTokenUsed = false;
-    }
-
-    const blindPyList = cleanBlind ? pinyin(cleanBlind, { type: 'array', toneType: 'num', v: true, toneSandhi: false }) : [];
-    const blindChars = Array.from(cleanBlind).map((ch, idx) => {
-      const p = blindPyList[idx] || '';
+    // Convert heard Chinese characters into Pinyin & Tones
+    const heardPy = pinyin(cleanHeard, { type: 'array', toneType: 'num', v: true, toneSandhi: false });
+    const heardOrigPy = pinyin(cleanHeard, { type: 'array', toneType: 'num', v: true });
+    const heardChars = Array.from(cleanHeard).map((ch, i) => {
+      const p = heardPy[i] || '';
+      const pSandhi = heardOrigPy[i] || p;
       return {
         char: ch,
         base: p.replace(/[0-5]/g, ''),
-        tone: parseInt((p.match(/([0-5])$/) || [0,1])[1], 10) % 5
+        tone: parseInt((p.match(/([0-5])$/) || [0,1])[1], 10) % 5,
+        sandhiTone: parseInt((pSandhi.match(/([0-5])$/) || [0,1])[1], 10) % 5
       };
     });
 
-    let passScore = 0;
-    let bIdx = 0;
-    let reconstructedChars = []; // Reconstructs what a Chinese person hears including tone-misled characters
+    let totalPoints = 0;
+    let cursor = 0;
 
     targets.forEach((t, i) => {
-      const pw = alignedPron[i];
-      const ac = inspectAzureWord(pw, t);
-
-      // Find matching syllable in Native Blind Ear window
-      let matchedBlind = null;
-      if (blindChars.length > 0) {
-        for (let k = bIdx; k < Math.min(bIdx + 3, blindChars.length); k++) {
-          if (isSoundAcceptable(t.base, blindChars[k].base)) {
-            matchedBlind = blindChars[k];
-            bIdx = k + 1;
-            break;
-          }
+      // Search within a 3-character window in the blind transcript
+      let match = null;
+      for (let k = cursor; k < Math.min(cursor + 3, heardChars.length); k++) {
+        // Exact character match OR acceptable Western syllable match
+        if (heardChars[k].char === t.char || isSameSyllable(t.base, heardChars[k].base)) {
+          match = heardChars[k];
+          cursor = k + 1;
+          break;
         }
       }
 
-      // 1. Mispronounced sound (e.g. "我 wo" read as "他 ta") or omitted -> RED (no tone arrow)
-      const blindCompletelyDifferentWord = (blindChars.length > 0 && !matchedBlind);
-      if (ac.omitted || ac.baseWrong || blindCompletelyDifferentWord) {
-        if (!matchedBlind && bIdx < blindChars.length) {
-          reconstructedChars.push(blindChars[bIdx].char);
-          if (blindChars.length >= targets.length) bIdx++;
+      // CASE 1: Not understood / Wrong syllable (e.g. read "我 wo" as "他 ta") -> RED
+      if (!match) {
+        if (cursor < heardChars.length && heardChars.length >= targets.length) cursor++;
+        setLight(i, 'bad', null, null);
+        return;
+      }
+
+      // CASE 2: Tone 1 and Neutral Tone (0) auto-pass once syllable is understood -> GREEN (100 pts)
+      if (t.skipTone) {
+        setLight(i, 'good', null, null);
+        totalPoints += 1;
+        return;
+      }
+
+      const heardExactChar = (match.char === t.char);
+      const azTone = azToneMap[i];
+
+      // Determine the tone the user actually produced
+      let userTone = match.tone;
+      if (heardExactChar && azTone !== undefined && azTone !== t.tone && azTone !== t.origTone) {
+        userTone = azTone;
+      }
+
+      const toneIsCorrect = (userTone === t.tone || userTone === t.origTone || match.sandhiTone === t.tone);
+
+      // CASE 3: Chinese listener heard the EXACT RIGHT CHARACTER! (Meaning 100% understood)
+      if (heardExactChar) {
+        if (!toneIsCorrect) {
+          // Tone was off, but Chinese listener still understood -> YELLOW + Wrong→Correct
+          setLight(i, 'warn', userTone, t.tone);
+          totalPoints += 0.85;
         } else {
-          reconstructedChars.push('?');
+          // Completely understood & tone is good -> GREEN!
+          setLight(i, 'good', null, null);
+          totalPoints += 1;
         }
-        paintLight(i, 'bad', null, null);
         return;
       }
 
-      // Record what character the blind ear heard for this position
-      reconstructedChars.push(matchedBlind ? matchedBlind.char : t.char);
-
-      // 2. Tone 1 and Neutral Tone (0) auto-pass -> GREEN
-      if (t.skipToneCheck) {
-        paintLight(i, 'good', null, null);
-        passScore += 1;
-        return;
+      // CASE 4: Syllable sound was right, but heard as a DIFFERENT character (e.g. 买 mǎi 3 -> 卖 mài 4)
+      if (!toneIsCorrect) {
+        // Misleading tone error that changed the word -> RED + Wrong→Correct (e.g. 4→3)
+        setLight(i, 'bad', userTone, t.tone);
+        totalPoints += 0.4;
+      } else {
+        // Homophone character with the same tone (100% sounds right to Chinese ears!) -> GREEN!
+        setLight(i, 'good', null, null);
+        totalPoints += 1;
       }
-
-      // 3. Tone Evaluation (WrongTone → CorrectTone)
-      const blindTone = matchedBlind ? matchedBlind.tone : null;
-      const blindHeardExactChar = matchedBlind ? (matchedBlind.char === t.char) : true;
-
-      let detectedWrongTone = null;
-      if (blindTone !== null && blindTone !== t.tone && blindTone !== t.origTone && !blindHeardExactChar) {
-        detectedWrongTone = blindTone;
-      } else if (ac.acousticSpokenTone !== null && ac.acousticSpokenTone !== t.tone && ac.acousticSpokenTone !== t.origTone) {
-        detectedWrongTone = ac.acousticSpokenTone;
-      }
-
-      // Case 3A: MISLEADING TONE ERROR (e.g. 买3 -> 卖4, blind ear heard a different character or score severely low)
-      // -> Display RED + WrongTone→CorrectTone (e.g. 4→3)
-      if (!blindHeardExactChar) {
-        const wrongT = detectedWrongTone !== null ? detectedWrongTone : (blindTone ?? '?');
-        paintLight(i, 'bad', wrongT, t.tone);
-        passScore += 0.2;
-        return;
-      }
-
-      // Case 3B: UNDERSTOOD DESPITE TONE ERROR (Blind ear still understood the right character, but tone was wrong/off)
-      // -> Display YELLOW + WrongTone→CorrectTone (e.g. 4→3)
-      if (detectedWrongTone !== null || ac.wordAcc < 80 || ac.finalAcc < 78) {
-        const wrongT = detectedWrongTone !== null ? detectedWrongTone : '?';
-        paintLight(i, 'warn', wrongT, t.tone);
-        passScore += 0.75;
-        return;
-      }
-
-      // 4. All clear & accurate -> GREEN
-      paintLight(i, 'good', null, null);
-      passScore += 1;
     });
 
-    const totalPct = Math.round((passScore / targets.length) * 100) || 0;
-    setMsg(`Evaluation Complete! Intelligibility Score: <b>${totalPct}%</b>`);
+    const finalScore = Math.round((totalPoints / targets.length) * 100);
+    setMsg(`Evaluation Complete! Intelligibility Score: <b>${finalScore}%</b>`);
 
-    // Show Chinese Listener Heard + English Translation
-    const finalHeardZh = rawHeardSentence || reconstructedChars.join('');
-    const blindBox = document.getElementById('tpBlindBox');
-    blindBox.style.display = 'block';
-    document.getElementById('tpHeardZh').textContent = `「${finalHeardZh}」`;
-    translateHeardToEnglish(finalHeardZh);
+    // Display Heard Chinese + English Translation
+    document.getElementById('heardBox').style.display = 'block';
+    document.getElementById('heardZh').textContent = `「${heardText}」`;
+    translateToEn(heardText);
   }
 
-  // Format: WrongTone → CorrectTone (e.g., 4→3)
-  function paintLight(i, status, wrongTone, correctTone) {
-    const box = document.getElementById(`tp-c-${i}`);
-    const tag = document.getElementById(`tp-t-${i}`);
+  function setLight(i, status, wrongTone, rightTone) {
+    const box = document.getElementById(`c-${i}`);
+    const tag = document.getElementById(`t-${i}`);
     box.className = `tp-item ${status}`;
-    if (wrongTone !== null && correctTone !== null) {
-      tag.textContent = `${wrongTone}→${correctTone}`;
-    } else {
-      tag.textContent = '';
+    tag.textContent = (wrongTone !== null && rightTone !== null) ? `${wrongTone}→${rightTone}` : '';
+  }
+
+  async function translateToEn(zh) {
+    const el = document.getElementById('heardEn');
+    el.textContent = 'Translating...';
+    try {
+      const r = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=zh-CN&tl=en&dt=t&q=${encodeURIComponent(zh)}`);
+      const d = await r.json();
+      el.textContent = `"${(d?.[0] || []).map(x => x?.[0] || '').join('')}"`;
+    } catch (e) {
+      el.textContent = '';
     }
   }
 
-  function setMsg(t) { document.getElementById('tpMsg').innerHTML = t; }
+  function setMsg(t) { document.getElementById('msgBox').innerHTML = t; }
 </script>
 </body>
 </html>
