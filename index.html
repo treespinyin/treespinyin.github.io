@@ -342,7 +342,7 @@
     <!-- 🕒 1. 膠囊上方：顯示檔案建設時間 + 語音聲道切換 + API Key 狀態 (方便測試) -->
     <div class="top-meta-bar">
       <div class="build-time-badge">
-        <span>🕒 檔案建設時間 (Build): 2026-11-13 16:50 PST (v2.0 高包容語音版)</span>
+        <span>🕒 檔案建設時間 (Build): 2026-11-13 17:02 PST (v2.1 零語法錯誤修復版)</span>
       </div>
 
       <div class="top-right-tools">
@@ -397,7 +397,7 @@
     <div class="modal-box">
       <h3 style="margin:0; font-size:1.02rem; color:var(--accent);">🔑 Google Gemini API Key</h3>
       <div style="font-size:0.84rem; line-height:1.55; background:#f8fafc; padding:12px; border-radius:10px; color:#334155;">
-        預設已啟用 <b>Cloudflare 全球共享快取 + 多 Key 輪詢通道</b>。<br>
+        預設已啟用 <b>Cloudflare 全球共享快取 + 多 Key 輪詢通道 + 免 Key 智慧保底</b>。<br>
         您也可以填入個人的免費 Gemini API Key 獲得專屬無限極速通道：<br>
         <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:var(--blue); font-weight:700;">點此前往 Google AI Studio 免費獲取 ↗</a>
       </div>
@@ -451,13 +451,6 @@
 
     // =========================================================================
     // 2. 🎙️ 高包容度谷歌膠囊語音輸入引擎
-    //    為什麼剛才不準？因為：
-    //    (1) 原版 2.5 秒一停頓就強制切斷，說話慢一點或思考一下後半句就被吞了；
-    //    (2) 原版在拼接多個分句時覆蓋了候選詞，且英語母語者在 Safari/Edge 下被強制鎖在 zh-CN 會音譯成亂碼漢字。
-    //    【全新升級】：
-    //    - 支援「中/EN 自動」、「中文優先」、「English 優先」三檔＋首音節智慧偵測
-    //    - 停頓容忍時間提升至 3.8 秒，且說話期間即時顯示聽寫進度與可點擊的同音候選詞膠囊
-    //    - 擴大本地口音/古詩/日常高頻同音詞糾偏庫 + 完整保留多段候選詞交給 AI 語境還原
     // =========================================================================
     let activeRec = null;
     let voiceSilenceTimer = null;
@@ -513,7 +506,7 @@
         return;
       }
       bar.style.display = 'flex';
-      bar.innerHTML = `<span>🎙️ 語音同音候選（AI 將自動甄別，也可點選）：</span>`;
+      bar.innerHTML = '<span>🎙️ 語音同音候選（AI 已自動甄別，您也可點擊切換）：</span>';
       unique.forEach(cand => {
         const chip = document.createElement('button');
         chip.className = 'voice-alt-chip';
@@ -535,7 +528,6 @@
         return;
       }
 
-      // 如果正在錄音，再次點擊則立刻結束並發送提問
       if (activeRec) {
         clearTimeout(voiceSilenceTimer);
         activeRec.stop();
@@ -545,13 +537,9 @@
       latestVoiceCandidates = [];
       activeRec = new SR();
 
-      // 根據用戶選擇或瀏覽器環境設定最佳識別語言
       if (voiceLangMode === 'en') {
         activeRec.lang = 'en-US';
-      } else if (voiceLangMode === 'zh') {
-        activeRec.lang = 'zh-CN';
       } else {
-        // auto 模式：zh-CN 聲學模型在 Chrome/Edge 原生兼顧國語與英語詞彙
         activeRec.lang = 'zh-CN';
       }
 
@@ -562,18 +550,16 @@
 
       const liveBar = document.getElementById('voiceLiveBar');
       liveBar.style.display = 'flex';
-      liveBar.innerHTML = `<span>🔴 正在聆聽中（請直接說中文或英文，說完停頓即自動回答，或再次點擊麥克風結束）...</span>`;
+      liveBar.innerHTML = '<span>🔴 正在聆聽中（請直接說中文或英文，說完停頓即自動回答，或再點麥克風結束）...</span>';
 
-      // 按段落保存，避免長句停頓時後一段覆蓋前一段的候選詞
       const segmentPrimary = [];
       const segmentAlts = [];
 
       function resetSilenceTimer() {
         clearTimeout(voiceSilenceTimer);
-        // 包容度大幅提升：給用戶 3.8 秒思考與換氣停頓時間，不會說一半被切斷
         voiceSilenceTimer = setTimeout(() => {
           if (activeRec) activeRec.stop();
-        }, 3800);
+        }, 3200);
       }
 
       resetSilenceTimer();
@@ -602,7 +588,6 @@
         const completedText = segmentPrimary.filter(Boolean).join(' ');
         const fullCurrentText = applyFuzzyVoiceCorrection((completedText + (interimText ? ' ' + interimText : '')).trim());
 
-        // 組合完整的全句候選清單（最多保留前 5 個高機率完整句子）
         const combinedCandidates = new Set();
         if (fullCurrentText) combinedCandidates.add(fullCurrentText);
         for (let k = 0; k < 5; k++) {
@@ -633,14 +618,17 @@
         }
       };
 
-      activeRec.onerror = () => {
+      activeRec.onerror = (err) => {
         clearTimeout(voiceSilenceTimer);
         btn.classList.remove('recording');
         activeRec = null;
-        liveBar.style.display = 'none';
+        liveBar.style.display = 'flex';
+        liveBar.innerHTML = '<span>⚠️ 語音未收到聲音或麥克風權限未開啟（請允許瀏覽器使用麥克風，或直接打字提問）。</span>';
       };
 
-      activeRec.start();
+      try {
+        activeRec.start();
+      } catch (err) {}
     }
 
     // =========================================================================
@@ -689,10 +677,10 @@
     function expandNumbersAndSymbolsToZh(text) {
       if (!text) return '';
       let s = text;
-      s = s.replace(/H2O/gi, '水').replace(/CO2/gi, '二氧化碳').replace(/O2/gi, '氧氣');
-      s = s.replace(/Wi-?Fi/gi, '無線網路').replace(/APP/gi, '應用程式').replace(/AI/gi, '人工智慧');
+      s = s.replace(/\bH2O\b/gi, '水').replace(/\bCO2\b/gi, '二氧化碳').replace(/\bO2\b/gi, '氧氣');
+      s = s.replace(/\bWi-?Fi\b/gi, '無線網路').replace(/\bAPP\b/gi, '應用程式').replace(/\bAI\b/gi, '人工智慧');
       s = s.replace(/°C|℃/g, '攝氏度').replace(/°F|℉/g, '華氏度');
-      s = s.replace(/(\d{1,2}):(\d{2})/g, (_, h, m) => intToChinese(h) + '點' + (m === '00' ? '整' : intToChinese(m) + '分'));
+      s = s.replace(/\b(\d{1,2}):(\d{2})\b/g, (_, h, m) => intToChinese(h) + '點' + (m === '00' ? '整' : intToChinese(m) + '分'));
       s = s.replace(/(\d+(?:\.\d+)?)\s*%/g, (_, num) => '百分之' + numberToChinese(num));
       s = s.replace(/\$\s*(\d+(?:\.\d+)?)/g, (_, num) => numberToChinese(num) + '美元');
       s = s.replace(/[¥￥]\s*(\d+(?:\.\d+)?)/g, (_, num) => numberToChinese(num) + '元');
@@ -793,7 +781,6 @@
       return pyArr;
     }
 
-    // 清晰國語女聲朗讀
     let selectedVoiceObj = null;
     function initFemaleVoice() {
       if (!('speechSynthesis' in window)) return;
@@ -837,6 +824,33 @@
       return new Promise(resolve => requestAnimationFrame(() => setTimeout(resolve, 10)));
     }
 
+    async function translateFastFallback(text, fromLang, toLang) {
+      const isZhToEn = fromLang.startsWith('zh');
+      const src = isZhToEn ? 'zh-CN' : 'en';
+      const tgt = isZhToEn ? 'en' : 'zh-CN';
+      const tasks = [
+        fetchWithTimeout(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=${src}&tl=${tgt}&dt=t&q=${encodeURIComponent(text)}`, {}, 4000)
+          .then(r => r.json())
+          .then(d => {
+            const j = d?.[0]?.map(x => x[0]).join('');
+            if (j && j.trim()) return j.trim();
+            throw new Error('empty');
+          }),
+        fetchWithTimeout(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${src}|${tgt}`, {}, 4500)
+          .then(r => r.json())
+          .then(d => {
+            const t = d?.responseData?.translatedText;
+            if (t && !t.includes('MYMEMORY WARNING')) return t.trim();
+            throw new Error('empty');
+          })
+      ];
+      try {
+        return await Promise.any(tasks);
+      } catch (e) {
+        return text;
+      }
+    }
+
     function appendSentenceProgressive(rawZhText, enTranslation = '') {
       const list = document.getElementById('annotationList');
       const block = document.createElement('div');
@@ -849,7 +863,8 @@
 
       const enDiv = document.createElement('div');
       enDiv.className = 'en-line';
-      enDiv.innerText = (enTranslation || '').trim();
+      const hasEn = Boolean(enTranslation && enTranslation.trim());
+      enDiv.innerText = hasEn ? enTranslation.trim() : '...';
       block.appendChild(enDiv);
 
       const charRow = document.createElement('div');
@@ -858,7 +873,7 @@
 
       for (let i = 0; i < tradZh.length; i++) {
         const char = tradZh[i];
-        const isChinese = /[一-龥]/.test(char);
+        const isChinese = /[\u4e00-\u9fa5]/.test(char);
         const col = document.createElement('div');
         col.className = 'tp-col';
 
@@ -866,11 +881,7 @@
           const pyNum = pinyinList[i] || '';
           const tp = compileToTreesPinyin(pyNum);
           const stdTone = numPinyinToToneMark(pyNum);
-          col.innerHTML = `
-            <span class="tp-py">${tp}</span>
-            <span class="tp-std">${stdTone}</span>
-            <span class="tp-zh">${char}</span>
-          `;
+          col.innerHTML = `<span class="tp-py">${tp}</span><span class="tp-std">${stdTone}</span><span class="tp-zh">${char}</span>`;
           col.onclick = () => speakText(char);
         } else {
           col.innerHTML = `<span class="tp-py">${char}</span><span class="tp-std">&nbsp;</span><span class="tp-zh">&nbsp;</span>`;
@@ -880,37 +891,54 @@
 
       block.appendChild(charRow);
       list.appendChild(block);
+
+      if (!hasEn) {
+        translateFastFallback(tradZh, 'zh', 'en').then(en => {
+          enDiv.innerText = en;
+          block.dataset.en = en;
+        });
+      }
     }
 
     // =========================================================================
-    // 4. 萬人免費高精準 AI 問答架構 (三級快取 + 階梯順位調用 + 永久別名防改名)
+    // 4. 萬人免費高精準 AI 問答架構 (三級快取 + 階梯順位調用 + 免Key雙語保底)
     // =========================================================================
     const BUILTIN_QA_CACHE = {
-      "咏鹅": "《詠鵝》駱賓王 ||| Ode to the Goose by Luo Binwang
-鵝，鵝，鵝， ||| Goose, goose, goose,
-曲項向天歌。 ||| You bend your neck and sing to the sky.
-白毛浮綠水， ||| Your white feathers float on the emerald water,
-紅掌撥清波。 ||| Your red webbed feet paddle the clear waves.",
-      "静夜思": "《靜夜思》李白 ||| Quiet Night Thought by Li Bai
-床前明月光， ||| Before my bed, the bright moonlight shines,
-疑是地上霜。 ||| I wonder if it is frost upon the ground.
-舉頭望明月， ||| I raise my head to gaze at the bright moon,
-低頭思故鄉。 ||| And lower my head, longing for my hometown.",
-      "春晓": "《春曉》孟浩然 ||| Spring Morning by Meng Haoran
-春眠不覺曉， ||| In spring sleep, I am unaware of the dawn,
-處處聞啼鳥。 ||| Everywhere I hear the singing of birds.
-夜來風雨聲， ||| Last night came the sound of wind and rain,
-花落知多少。 ||| Who knows how many blossoms have fallen.",
-      "登鹳雀楼": "《登鸛雀樓》王之渙 ||| On the Stork Tower by Wang Zhihuan
-白日依山盡， ||| The white sun sets behind the mountains,
-黃河入海流。 ||| And the Yellow River flows into the sea.
-欲窮千里目， ||| To see a thousand miles further,
-更上一層樓。 ||| Climb one more story higher.",
-      "鹿柴": "《鹿柴》王維 ||| Deer Enclosure by Wang Wei
-空山不見人， ||| In the empty mountain, no one is seen,
-但聞人語響。 ||| Yet echoes of voices are heard.
-返景入深林， ||| Returning sunlight enters the deep woods,
-復照青苔上。 ||| And shines again upon the green moss."
+      "咏鹅": [
+        "《詠鵝》駱賓王 ||| Ode to the Goose by Luo Binwang",
+        "鵝，鵝，鵝， ||| Goose, goose, goose,",
+        "曲項向天歌。 ||| You bend your neck and sing to the sky.",
+        "白毛浮綠水， ||| Your white feathers float on the emerald water,",
+        "紅掌撥清波。 ||| Your red webbed feet paddle the clear waves."
+      ].join("\n"),
+      "静夜思": [
+        "《靜夜思》李白 ||| Quiet Night Thought by Li Bai",
+        "床前明月光， ||| Before my bed, the bright moonlight shines,",
+        "疑是地上霜。 ||| I wonder if it is frost upon the ground.",
+        "舉頭望明月， ||| I raise my head to gaze at the bright moon,",
+        "低頭思故鄉。 ||| And lower my head, longing for my hometown."
+      ].join("\n"),
+      "春晓": [
+        "《春曉》孟浩然 ||| Spring Morning by Meng Haoran",
+        "春眠不覺曉， ||| In spring sleep, I am unaware of the dawn,",
+        "處處聞啼鳥。 ||| Everywhere I hear the singing of birds.",
+        "夜來風雨聲， ||| Last night came the sound of wind and rain,",
+        "花落知多少。 ||| Who knows how many blossoms have fallen."
+      ].join("\n"),
+      "登鹳雀楼": [
+        "《登鸛雀樓》王之渙 ||| On the Stork Tower by Wang Zhihuan",
+        "白日依山盡， ||| The white sun sets behind the mountains,",
+        "黃河入海流。 ||| And the Yellow River flows into the sea.",
+        "欲窮千里目， ||| To see a thousand miles further,",
+        "更上一層樓。 ||| Climb one more story higher."
+      ].join("\n"),
+      "鹿柴": [
+        "《鹿柴》王維 ||| Deer Enclosure by Wang Wei",
+        "空山不見人， ||| In the empty mountain, no one is seen,",
+        "但聞人語響。 ||| Yet echoes of voices are heard.",
+        "返景入深林， ||| Returning sunlight enters the deep woods,",
+        "復照青苔上。 ||| And shines again upon the green moss."
+      ].join("\n")
     };
 
     function normalizeCacheKey(rawQ) {
@@ -930,7 +958,7 @@
       if (!k) return '';
       if (BUILTIN_QA_CACHE[k]) return BUILTIN_QA_CACHE[k];
       try {
-        const store = JSON.parse(localStorage.getItem('tp_capsule_qa_cache_v2') || '{}');
+        const store = JSON.parse(localStorage.getItem('tp_capsule_qa_cache_v3') || '{}');
         return store[k] || '';
       } catch (e) {
         return '';
@@ -941,16 +969,15 @@
       const k = normalizeCacheKey(q);
       if (!k || !ans) return;
       try {
-        const store = JSON.parse(localStorage.getItem('tp_capsule_qa_cache_v2') || '{}');
+        const store = JSON.parse(localStorage.getItem('tp_capsule_qa_cache_v3') || '{}');
         const keys = Object.keys(store);
         if (keys.length > 200) delete store[keys[0]];
         store[k] = ans;
-        localStorage.setItem('tp_capsule_qa_cache_v2', JSON.stringify(store));
+        localStorage.setItem('tp_capsule_qa_cache_v3', JSON.stringify(store));
       } catch (e) {}
     }
 
-    let backupKey = (localStorage.getItem('tp_v22_backup_key') || '').trim();
-    // 置頂谷歌永久動態別名 gemini-flash-latest，徹底免疫版本改名！
+    let backupKey = (localStorage.getItem('tp_v22_backup_key') || localStorage.getItem('tp_test_gemini_key') || '').trim();
     let availableFastModels = [
       'gemini-flash-latest',
       'gemini-2.5-flash',
@@ -1049,7 +1076,6 @@
       return text;
     }
 
-    // 階梯式順位調用：絕不同時群發浪費額度，省下 75% 免費配額供萬人使用
     async function fetchFastAccurateAI(promptText, rawQuestionForCache = '') {
       const cleanCacheKey = normalizeCacheKey(rawQuestionForCache);
 
@@ -1102,7 +1128,7 @@
         .replace(/^[，。！？；：、,.!?;:\s]+/, '')
         .replace(/\s+/g, '')
         .trim();
-      return /[一-龥]/.test(s) ? s : '';
+      return /[\u4e00-\u9fa5]/.test(s) ? s : '';
     }
 
     function parseBilingualPairLine(rawLine) {
@@ -1112,25 +1138,24 @@
       if (parts.length < 2) return null;
 
       let zhPart = '', enPart = '';
-      if (/[一-龥]/.test(parts[0]) && !/[一-龥]/.test(parts[1])) {
+      if (/[\u4e00-\u9fa5]/.test(parts[0]) && !/[\u4e00-\u9fa5]/.test(parts[1])) {
         zhPart = cleanChineseSentence(parts[0]) || parts[0];
         enPart = parts[1];
-      } else if (/[一-龥]/.test(parts[1])) {
+      } else if (/[\u4e00-\u9fa5]/.test(parts[1])) {
         enPart = parts[0];
         zhPart = cleanChineseSentence(parts[1]) || parts[1];
       } else {
         zhPart = cleanChineseSentence(parts[0]) || parts[0];
         enPart = parts[1];
       }
-      if (!/[一-龥]/.test(zhPart)) return null;
+      if (!/[\u4e00-\u9fa5]/.test(zhPart)) return null;
       return { zh: zhPart, en: enPart };
     }
 
     async function renderBilingualAIOutput(aiText) {
       const banner = document.getElementById('statusBanner');
       banner.style.display = 'none';
-      const rawLines = aiText.split(/
-+/).map(l => l.trim()).filter(Boolean);
+      const rawLines = aiText.split(/\r?\n+/).map(l => l.trim()).filter(Boolean);
       if (rawLines.length === 0) return false;
 
       const seenExactZh = new Set();
@@ -1139,7 +1164,7 @@
       for (const rawLine of rawLines) {
         const pair = parseBilingualPairLine(rawLine);
         if (pair) {
-          const key = pair.zh.replace(/[^一-龥]/g, '');
+          const key = pair.zh.replace(/[^\u4e00-\u9fa5]/g, '');
           if (!key || seenExactZh.has(key)) continue;
           seenExactZh.add(key);
           renderedPairs++;
@@ -1149,14 +1174,14 @@
           const lineStr = rawLine.replace(/^[-*•\d.)、]+\s*/, '').replace(/\*+/g, '').trim();
           const parenMatch = lineStr.match(/^(.+?)\s*[(（]([A-Za-z][^）)]+)[)）]$/);
           let zhStr = '', enStr = '';
-          if (parenMatch && /[一-龥]/.test(parenMatch[1])) {
+          if (parenMatch && /[\u4e00-\u9fa5]/.test(parenMatch[1])) {
             zhStr = cleanChineseSentence(parenMatch[1]) || parenMatch[1].trim();
             enStr = parenMatch[2].trim();
           } else {
             zhStr = cleanChineseSentence(lineStr);
           }
           if (zhStr) {
-            const key = zhStr.replace(/[^一-龥]/g, '');
+            const key = zhStr.replace(/[^\u4e00-\u9fa5]/g, '');
             if (!key || seenExactZh.has(key)) continue;
             seenExactZh.add(key);
             renderedPairs++;
@@ -1193,22 +1218,23 @@
 
       // 2. 將語音識別的所有同音候選詞一併交給 AI，讓 AI 自動糾正口音、同音字或中英混輸誤判
       const voiceCandidatesHint = (altsToUse && altsToUse.length > 1)
-        ? `
-Voice Speech-to-Text Candidates: ${JSON.stringify(altsToUse)}. (IMPORTANT: If the primary text has homophone typos or garbled Chinese phonetic characters from spoken English, pick or reconstruct the most semantically natural Mandarin or English question!)`
+        ? `\nVoice Speech-to-Text Candidates: ${JSON.stringify(altsToUse)}. (IMPORTANT: If the primary text has homophone typos or garbled Chinese phonetic characters from spoken English, pick or reconstruct the most semantically natural Mandarin or English question!)`
         : '';
 
-      const directPrompt = `You are an authoritative bilingual scholar and assistant.
-User question/request: "${q}"${voiceCandidatesHint}
-
-CRITICAL ACCURACY RULES:
-1. High Voice Tolerance: If the user's input has a voice-recognition homophone typo (e.g., "永和" instead of "詠鵝", "路窄" instead of "鹿柴", or phonetic Chinese characters representing spoken English words), automatically answer the intended topic accurately.
-2. Formulate the complete, authoritative standard answer or authentic classic text:
-   - If the user asks about a Chinese poem/classic (e.g., 詠鵝, 靜夜思, 水調歌頭, 鹿柴): Output ONLY the Title+Author on Line 1, followed by the COMPLETE original verses. No extra commentary!
-   - If the user asks any other question in English or Chinese: Output a clear, complete, accurate bilingual answer.
-3. Output Format (Every single line MUST use "|||"):
-   - Line 1: Chinese_Title_or_Summary ||| English_Title_or_Summary
-   - Line 2+: Pure_Chinese_Sentence ||| Authentic_English_Sentence
-   - IMPORTANT: Left side of "|||" must contain ONLY Traditional Chinese characters and Chinese punctuation (write all numbers/terms in Chinese characters, NO Pinyin, NO English letters on the left side). Never repeat any line.`;
+      const directPrompt = [
+        'You are an authoritative bilingual scholar and assistant.',
+        `User question/request: "${q}"${voiceCandidatesHint}`,
+        '',
+        'CRITICAL ACCURACY RULES:',
+        '1. High Voice Tolerance: If the user\'s input has a voice-recognition homophone typo (e.g., "永和" instead of "詠鵝", "路窄" instead of "鹿柴", or phonetic Chinese characters representing spoken English words), automatically answer the intended topic accurately.',
+        '2. Formulate the complete, authoritative standard answer or authentic classic text:',
+        '   - If the user asks about a Chinese poem/classic (e.g., 詠鵝, 靜夜思, 水調歌頭, 鹿柴): Output ONLY the Title+Author on Line 1, followed by the COMPLETE original verses. No extra commentary!',
+        '   - If the user asks any other question in English or Chinese: Output a clear, complete, accurate bilingual answer.',
+        '3. Output Format (Every single line MUST use "|||"):',
+        '   - Line 1: Chinese_Title_or_Summary ||| English_Title_or_Summary',
+        '   - Line 2+: Pure_Chinese_Sentence ||| Authentic_English_Sentence',
+        '   - IMPORTANT: Left side of "|||" must contain ONLY Traditional Chinese characters and Chinese punctuation (write all numbers/terms in Chinese characters, NO Pinyin, NO English letters on the left side). Never repeat any line.'
+      ].join('\n');
 
       const aiText = await fetchFastAccurateAI(directPrompt, q);
       if (aiText) {
@@ -1219,8 +1245,16 @@ CRITICAL ACCURACY RULES:
         }
       }
 
-      banner.innerHTML = `💡 當前公共免費通道繁忙，請點擊右上角 <b>[🔑 API Key]</b> 填入您免費的個人 Google Gemini Key 即可無限極速問答。`;
-      openKeyModal();
+      // 3. 免 Key 100% 雙語注音保底：即便沒填 Key 且後端 Worker 忙碌，也立即將用戶輸入轉為中英雙語與 Trees Pinyin，絕不空白！
+      banner.style.display = 'none';
+      const hasZh = /[\u4e00-\u9fa5]/.test(q);
+      if (hasZh) {
+        const enTrans = await translateFastFallback(q, 'zh', 'en');
+        appendSentenceProgressive(q, enTrans);
+      } else {
+        const zhTrans = await translateFastFallback(q, 'en', 'zh');
+        appendSentenceProgressive(zhTrans, q);
+      }
     }
 
     // 預設載入一組示範，方便打開頁面立即看到效果
@@ -1235,6 +1269,7 @@ CRITICAL ACCURACY RULES:
     async function saveBackupKey() {
       backupKey = document.getElementById('apiKeyInput').value.trim();
       localStorage.setItem('tp_v22_backup_key', backupKey);
+      localStorage.setItem('tp_test_gemini_key', backupKey);
       refreshKeyBtnStyle();
       document.getElementById('keyModal').style.display = 'none';
       if (backupKey) {
@@ -1246,6 +1281,7 @@ CRITICAL ACCURACY RULES:
     function clearBackupKey() {
       backupKey = '';
       localStorage.removeItem('tp_v22_backup_key');
+      localStorage.removeItem('tp_test_gemini_key');
       document.getElementById('apiKeyInput').value = '';
       refreshKeyBtnStyle();
     }
