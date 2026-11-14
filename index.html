@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Trees Pinyin — 極簡谷歌膠囊 AI 問答測試版</title>
+  <title>Trees Pinyin</title>
   <meta name="theme-color" content="#1b5e20">
   <link rel="icon" type="image/png" href="/icon.png?v=3">
 
@@ -15,11 +15,7 @@
       --bg: #f8fafc;
       --card: #ffffff;
       --text: #111827;
-      --muted: #64748b;
       --accent: #1b5e20;
-      --accent-hover: #2e7d32;
-      --accent-soft: #e8f5e9;
-      --blue: #1a73e8;
       --border: #dfe1e5;
       --danger: #d93025;
     }
@@ -38,82 +34,40 @@
 
     .container {
       width: 100%;
-      max-width: 780px;
+      max-width: 760px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 14px;
+      gap: 12px;
     }
 
-    /* 1. 頂部版本時間與快速狀態列 (方便測試確認版本) */
-    .top-meta-bar {
-      width: 100%;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 8px;
-      padding: 0 6px;
-    }
-    .build-time-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: #e8f5e9;
-      color: #1b5e20;
-      border: 1px solid #a5d6a7;
-      padding: 5px 12px;
-      border-radius: 999px;
-      font-size: 0.8rem;
-      font-weight: 700;
-      letter-spacing: 0.2px;
-    }
-    .top-right-tools {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .mini-pill-btn {
-      background: #ffffff;
-      border: 1px solid #cbd5e1;
-      border-radius: 999px;
-      padding: 5px 12px;
+    /* 1. 膠囊上方：僅顯示檔案建設時間 (無任何多餘按鈕) */
+    .build-time-text {
       font-size: 0.78rem;
       font-weight: 700;
-      color: #334155;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      transition: all 0.15s;
-    }
-    .mini-pill-btn:hover { background: #f1f5f9; border-color: #94a3b8; }
-    .mini-pill-btn.active-mode {
-      background: var(--accent);
-      color: #fff;
-      border-color: var(--accent);
-    }
-    .mini-pill-btn.has-key {
-      background: #e8f5e9;
       color: #1b5e20;
-      border-color: #2e7d32;
+      background: #e8f5e9;
+      border: 1px solid #a5d6a7;
+      padding: 4px 12px;
+      border-radius: 999px;
+      letter-spacing: 0.2px;
     }
 
-    /* 2. 谷歌風格大膠囊搜索框 (Google Pill Search Bar) */
+    /* 2. 純淨谷歌膠囊搜索框 (僅輸入框 + 麥克風，Enter 或說完即答) */
     .google-capsule-wrap {
       width: 100%;
       background: #ffffff;
       border: 1.5px solid var(--border);
       border-radius: 32px;
-      padding: 8px 10px 8px 20px;
-      box-shadow: 0 2px 8px rgba(32, 33, 36, 0.08);
+      padding: 8px 10px 8px 22px;
+      box-shadow: 0 2px 10px rgba(32, 33, 36, 0.08);
       display: flex;
       align-items: center;
       gap: 8px;
       transition: box-shadow 0.2s, border-color 0.2s;
     }
     .google-capsule-wrap:focus-within {
-      border-color: #1b5e20;
+      border-color: var(--accent);
       box-shadow: 0 4px 16px rgba(27, 94, 32, 0.16);
     }
     .capsule-input {
@@ -131,13 +85,13 @@
     }
     .capsule-input::placeholder { color: #9aa0a6; }
 
-    .capsule-icon-btn {
+    .mic-btn {
       width: 42px;
       height: 42px;
       border-radius: 50%;
       border: none;
-      background: transparent;
-      color: #5f6368;
+      background: #f1f5f9;
+      color: #1a73e8;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -145,16 +99,10 @@
       flex-shrink: 0;
       transition: background 0.15s, transform 0.1s;
     }
-    .capsule-icon-btn:hover { background: #f1f3f4; color: #202124; }
-    .capsule-icon-btn:active { transform: scale(0.95); }
-    .capsule-icon-btn svg { width: 22px; height: 22px; fill: currentColor; }
-
-    /* 語音按鈕動態效果 */
-    .capsule-icon-btn.mic-btn {
-      background: #f1f5f9;
-      color: #1a73e8;
-    }
-    .capsule-icon-btn.mic-btn.recording {
+    .mic-btn:hover { background: #e2e8f0; }
+    .mic-btn:active { transform: scale(0.95); }
+    .mic-btn svg { width: 22px; height: 22px; fill: currentColor; }
+    .mic-btn.recording {
       background: var(--danger);
       color: #ffffff;
       animation: micPulse 1s infinite;
@@ -165,57 +113,7 @@
       100% { box-shadow: 0 0 0 0 rgba(217, 48, 37, 0); }
     }
 
-    /* 發送/AI 問答按鈕 */
-    .capsule-send-btn {
-      height: 42px;
-      padding: 0 18px;
-      border-radius: 999px;
-      border: none;
-      background: var(--accent);
-      color: #ffffff;
-      font-size: 0.92rem;
-      font-weight: 700;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      flex-shrink: 0;
-      transition: background 0.15s;
-    }
-    .capsule-send-btn:hover { background: var(--accent-hover); }
-
-    /* 語音即時聽寫與候選詞包容度條 (可點擊一鍵切換同音候選詞) */
-    .voice-live-bar {
-      width: 100%;
-      display: none;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 6px;
-      padding: 6px 14px;
-      background: #fffbeb;
-      border: 1px solid #fde68a;
-      border-radius: 14px;
-      font-size: 0.82rem;
-      color: #92400e;
-    }
-    .voice-alt-chip {
-      background: #ffffff;
-      border: 1px solid #fcd34d;
-      border-radius: 999px;
-      padding: 3px 10px;
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: #1f2937;
-      cursor: pointer;
-      transition: all 0.12s;
-    }
-    .voice-alt-chip:hover {
-      background: var(--accent);
-      color: #fff;
-      border-color: var(--accent);
-    }
-
-    /* 3. AI 回答與四位一體注音卡片 */
+    /* 3. AI 回答與四位一體注音顯示卡片 */
     .answer-card {
       width: 100%;
       background: var(--card);
@@ -310,81 +208,29 @@
       line-height: 1.22;
       min-height: 1.22em;
     }
-
-    /* API Key 彈窗 */
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0; left: 0; width: 100vw; height: 100vh;
-      background: rgba(0, 0, 0, 0.5);
-      z-index: 9999;
-      justify-content: center;
-      align-items: center;
-      padding: 16px;
-    }
-    .modal-box {
-      background: #fff;
-      width: 100%;
-      max-width: 410px;
-      border-radius: 16px;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-    }
   </style>
 </head>
 <body>
 
   <div class="container">
 
-    <!-- 🕒 1. 膠囊上方：顯示檔案建設時間 + 語音聲道切換 + API Key 狀態 (方便測試) -->
-    <div class="top-meta-bar">
-      <div class="build-time-badge">
-        <span>🕒 檔案建設時間 (Build): 2026-11-13 17:02 PST (v2.1 零語法錯誤修復版)</span>
-      </div>
-
-      <div class="top-right-tools">
-        <!-- 語音模式切換：支援「中英自動」、「中文優先」、「English 優先」 -->
-        <button class="mini-pill-btn active-mode" id="voiceLangModeBtn" onclick="cycleVoiceLangMode()" title="切換語音識別語言重心">
-          🎙️ 語音: 中/EN 自動
-        </button>
-        <button class="mini-pill-btn" id="speakAllBtn" onclick="speakAllDisplayed()">
-          🔊 朗讀
-        </button>
-        <button class="mini-pill-btn" id="keyBtn" onclick="openKeyModal()">
-          🔑 API Key
-        </button>
-      </div>
+    <!-- 🕒 1. 膠囊上方：僅顯示檔案建設時間 -->
+    <div class="build-time-text">
+      🕒 Build: 2026-11-13 17:22 PST (v3.0 純淨谷歌膠囊 + 連貫對話記憶版)
     </div>
 
-    <!-- 🔍 2. 谷歌膠囊輸入框 (僅保留核心 AI 問答與高包容語音輸入) -->
+    <!-- 🔍 2. 純淨谷歌膠囊 (無任何多餘按鈕：打字按 Enter 提問，或點麥克風直接說中英文) -->
     <div class="google-capsule-wrap">
       <textarea id="userInput" class="capsule-input" rows="1"
-        placeholder="像谷歌一樣說中文或英文提問（例：背誦靜夜思 / How to order milk tea in Chinese?）..."
+        placeholder="Ask AI in Chinese or English (Press Enter or tap Mic)..."
         oninput="autoResizeTextarea(this)"></textarea>
 
-      <!-- 清空按鈕 -->
-      <button class="capsule-icon-btn" id="clearBtn" onclick="clearCapsuleInput()" title="清空 (Clear)" style="display:none;">
-        <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
-      </button>
-
-      <!-- 谷歌風格麥克風按鈕 -->
-      <button class="capsule-icon-btn mic-btn" id="micBtn" onclick="toggleVoice()" title="點擊開始語音輸入（支援中英文、停頓不中斷）">
+      <button class="mic-btn" id="micBtn" onclick="toggleVoice()" title="Voice Input (Chinese & English)">
         <svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.91-3c-.49 0-.9.36-.98.85C16.52 14.2 14.47 16 12 16s-4.52-1.8-4.93-4.15c-.08-.49-.49-.85-.98-.85-.61 0-1.09.54-1 1.14.49 3 2.89 5.35 5.91 5.78V20c0 .55.45 1 1 1s1-.45 1-1v-2.08c3.02-.43 5.42-2.78 5.91-5.78.1-.6-.39-1.14-1-1.14z"/></svg>
-      </button>
-
-      <!-- 提問按鈕 -->
-      <button class="capsule-send-btn" onclick="runSmartAI()">
-        ✨ AI 問答
       </button>
     </div>
 
-    <!-- 💡 語音即時聽寫與多候選詞包容欄 (當識別出多個同音詞時，既交給 AI 自動選，也允許用戶一鍵點選) -->
-    <div id="voiceLiveBar" class="voice-live-bar"></div>
-
-    <!-- 📖 3. AI 回答與四位一體注音顯示區 -->
+    <!-- 📖 3. AI 回答與四位一體注音卡片 -->
     <div class="answer-card" id="answerCard">
       <div id="statusBanner" class="status-banner"></div>
       <div id="annotationList" class="annotation-list"></div>
@@ -392,26 +238,9 @@
 
   </div>
 
-  <!-- 🔑 API Key 設置彈窗 -->
-  <div class="modal" id="keyModal" onclick="if(event.target===this)this.style.display='none'">
-    <div class="modal-box">
-      <h3 style="margin:0; font-size:1.02rem; color:var(--accent);">🔑 Google Gemini API Key</h3>
-      <div style="font-size:0.84rem; line-height:1.55; background:#f8fafc; padding:12px; border-radius:10px; color:#334155;">
-        預設已啟用 <b>Cloudflare 全球共享快取 + 多 Key 輪詢通道 + 免 Key 智慧保底</b>。<br>
-        您也可以填入個人的免費 Gemini API Key 獲得專屬無限極速通道：<br>
-        <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:var(--blue); font-weight:700;">點此前往 Google AI Studio 免費獲取 ↗</a>
-      </div>
-      <input type="password" id="apiKeyInput" placeholder="AIzaSy... (選填)" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:8px; font-size:0.9rem;">
-      <div style="display:flex; gap:8px;">
-        <button class="capsule-send-btn" style="flex:1; justify-content:center;" onclick="saveBackupKey()">儲存並測試</button>
-        <button class="mini-pill-btn" style="padding:0 16px;" onclick="clearBackupKey()">清除</button>
-      </div>
-    </div>
-  </div>
-
   <script>
     // =========================================================================
-    // 1. 全域端點與萬人免費三級快取配置
+    // 1. 全域端點與基礎轉換配置
     // =========================================================================
     const IS_LOCAL_FILE = window.location.protocol === 'file:';
     const CF_WORKER_ENDPOINTS = IS_LOCAL_FILE
@@ -431,17 +260,9 @@
     function autoResizeTextarea(el) {
       el.style.height = 'auto';
       el.style.height = Math.min(el.scrollHeight, 110) + 'px';
-      document.getElementById('clearBtn').style.display = el.value.length > 0 ? 'flex' : 'none';
     }
 
-    function clearCapsuleInput() {
-      const input = document.getElementById('userInput');
-      input.value = '';
-      autoResizeTextarea(input);
-      document.getElementById('voiceLiveBar').style.display = 'none';
-      input.focus();
-    }
-
+    // 按下 Enter 鍵直接提問
     document.getElementById('userInput').addEventListener('keydown', function(e) {
       if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) {
         e.preventDefault();
@@ -450,28 +271,47 @@
     });
 
     // =========================================================================
-    // 2. 🎙️ 高包容度谷歌膠囊語音輸入引擎
+    // 2. 🧠 輕量滑動視窗對話記憶 (保留最近 3 輪上下文，手機端 0 負擔 + 智慧追問識別)
+    // =========================================================================
+    const MAX_MEMORY_TURNS = 3;
+    let conversationHistory = []; // 格式: [{ q: '...', a: '...' }]
+    let lastInteractionTime = 0;
+
+    // 判斷是否為依賴上文的「追問」(例如：「那第二句呢？」、「為什麼？」、「再舉個例子」、「What about...」)
+    function isFollowUpQuestion(q) {
+      if (conversationHistory.length === 0) return false;
+      // 若距離上一輪超過 10 分鐘，自動視為新話題
+      if (Date.now() - lastInteractionTime > 600000) {
+        conversationHistory = [];
+        return false;
+      }
+      const followUpPattern = /^(那|那麼|這|這個|它|他|她|為什麼|为什么|怎麼|怎么|還有|还有|再|第[一二三四五六七八九十\d]|什麼意思|什么意思|下一句|上一句|繼續|继续|解釋|解释|舉例|举例|what about|how about|why|and |also |explain|next|more|mean|it |this |that )/i;
+      return followUpPattern.test(q.trim()) || q.trim().length <= 5;
+    }
+
+    function pushConversationMemory(userQ, aiRawReply) {
+      if (!userQ || !aiRawReply) return;
+      const compactReply = aiRawReply.split(/\r?\n+/).slice(0, 4).join(' / ').slice(0, 260);
+      conversationHistory.push({ q: userQ, a: compactReply });
+      if (conversationHistory.length > MAX_MEMORY_TURNS) {
+        conversationHistory.shift();
+      }
+      lastInteractionTime = Date.now();
+    }
+
+    function buildMemoryContextString() {
+      if (conversationHistory.length === 0) return '';
+      const lines = conversationHistory.map((item, idx) => `Turn ${idx + 1} - User: "${item.q}" | AI: "${item.a}"`);
+      return '\nRecent Conversation Context (use this ONLY if the user\'s current request is a follow-up):\n' + lines.join('\n');
+    }
+
+    // =========================================================================
+    // 3. 🎙️ 高包容度谷歌膠囊語音輸入引擎 (無多餘按鈕，自動收集 5 候選詞交給 AI 甄別)
     // =========================================================================
     let activeRec = null;
     let voiceSilenceTimer = null;
-    let voiceLangMode = 'auto'; // 'auto' | 'zh' | 'en'
     let latestVoiceCandidates = [];
 
-    function cycleVoiceLangMode() {
-      const btn = document.getElementById('voiceLangModeBtn');
-      if (voiceLangMode === 'auto') {
-        voiceLangMode = 'zh';
-        btn.innerText = '🎙️ 語音: 中文優先';
-      } else if (voiceLangMode === 'zh') {
-        voiceLangMode = 'en';
-        btn.innerText = '🎙️ 語音: English 優先';
-      } else {
-        voiceLangMode = 'auto';
-        btn.innerText = '🎙️ 語音: 中/EN 自動';
-      }
-    }
-
-    // 高包容度同音字與口音快速糾偏字典
     const FUZZY_VOICE_CORRECTIONS = [
       [/永和|泳鵝|泳鹅|勇鵝|勇鹅|擁鵝|拥鹅|用鵝|用鹅|詠俄|咏俄|影鵝|影鹅/g, '詠鵝'],
       [/今夜思|敬業思|敬业思|進夜思|进夜思|淨夜思|净夜思|經夜思|经夜思/g, '靜夜思'],
@@ -498,28 +338,6 @@
       return fixed.trim();
     }
 
-    function renderVoiceCandidateChips(primaryText, candidates) {
-      const bar = document.getElementById('voiceLiveBar');
-      const unique = Array.from(new Set([primaryText, ...candidates].map(s => s.trim()).filter(Boolean))).slice(0, 5);
-      if (unique.length <= 1) {
-        bar.style.display = 'none';
-        return;
-      }
-      bar.style.display = 'flex';
-      bar.innerHTML = '<span>🎙️ 語音同音候選（AI 已自動甄別，您也可點擊切換）：</span>';
-      unique.forEach(cand => {
-        const chip = document.createElement('button');
-        chip.className = 'voice-alt-chip';
-        chip.innerText = cand;
-        chip.onclick = () => {
-          document.getElementById('userInput').value = cand;
-          autoResizeTextarea(document.getElementById('userInput'));
-          runSmartAI(cand, unique);
-        };
-        bar.appendChild(chip);
-      });
-    }
-
     function toggleVoice() {
       const btn = document.getElementById('micBtn');
       const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -535,22 +353,21 @@
       }
 
       latestVoiceCandidates = [];
+      const inputEl = document.getElementById('userInput');
+      inputEl.value = '';
+      autoResizeTextarea(inputEl);
+
       activeRec = new SR();
-
-      if (voiceLangMode === 'en') {
-        activeRec.lang = 'en-US';
-      } else {
-        activeRec.lang = 'zh-CN';
-      }
-
+      // zh-CN 聲學模型原生內建中英文雙語詞庫，配合 AI 的 5 候選詞音譯還原，無需手動切換按鈕
+      activeRec.lang = 'zh-CN';
       activeRec.interimResults = true;
       activeRec.maxAlternatives = 5;
       activeRec.continuous = true;
       btn.classList.add('recording');
 
-      const liveBar = document.getElementById('voiceLiveBar');
-      liveBar.style.display = 'flex';
-      liveBar.innerHTML = '<span>🔴 正在聆聽中（請直接說中文或英文，說完停頓即自動回答，或再點麥克風結束）...</span>';
+      const banner = document.getElementById('statusBanner');
+      banner.style.display = 'block';
+      banner.innerText = '🔴 正在聆聽（請直接說中文或英文，說完停頓即自動回答）...';
 
       const segmentPrimary = [];
       const segmentAlts = [];
@@ -559,7 +376,7 @@
         clearTimeout(voiceSilenceTimer);
         voiceSilenceTimer = setTimeout(() => {
           if (activeRec) activeRec.stop();
-        }, 3200);
+        }, 3000);
       }
 
       resetSilenceTimer();
@@ -600,7 +417,6 @@
         }
 
         latestVoiceCandidates = Array.from(combinedCandidates).slice(0, 5);
-        const inputEl = document.getElementById('userInput');
         inputEl.value = fullCurrentText;
         autoResizeTextarea(inputEl);
       };
@@ -609,21 +425,19 @@
         clearTimeout(voiceSilenceTimer);
         btn.classList.remove('recording');
         activeRec = null;
-        const spoken = document.getElementById('userInput').value.trim();
+        const spoken = inputEl.value.trim();
         if (spoken) {
-          renderVoiceCandidateChips(spoken, latestVoiceCandidates);
           runSmartAI(spoken, latestVoiceCandidates);
         } else {
-          liveBar.style.display = 'none';
+          banner.style.display = 'none';
         }
       };
 
-      activeRec.onerror = (err) => {
+      activeRec.onerror = () => {
         clearTimeout(voiceSilenceTimer);
         btn.classList.remove('recording');
         activeRec = null;
-        liveBar.style.display = 'flex';
-        liveBar.innerHTML = '<span>⚠️ 語音未收到聲音或麥克風權限未開啟（請允許瀏覽器使用麥克風，或直接打字提問）。</span>';
+        banner.style.display = 'none';
       };
 
       try {
@@ -632,7 +446,7 @@
     }
 
     // =========================================================================
-    // 3. 數字與符號轉中文口語 + Trees Pinyin 63 規則自然拼讀編譯器
+    // 4. 數字與符號轉中文口語 + Trees Pinyin 63 規則自然拼讀編譯器
     // =========================================================================
     const DIGITS_ZH = ['零','一','二','三','四','五','六','七','八','九'];
 
@@ -814,12 +628,6 @@
       window.speechSynthesis.speak(u);
     }
 
-    function speakAllDisplayed() {
-      const blocks = document.querySelectorAll('#annotationList .sentence-block');
-      const allZh = Array.from(blocks).map(b => b.dataset.zh).join('。');
-      if (allZh) speakText(allZh);
-    }
-
     function nextPaintTick() {
       return new Promise(resolve => requestAnimationFrame(() => setTimeout(resolve, 10)));
     }
@@ -901,7 +709,7 @@
     }
 
     // =========================================================================
-    // 4. 萬人免費高精準 AI 問答架構 (三級快取 + 階梯順位調用 + 免Key雙語保底)
+    // 5. 萬人免費高精準 AI 問答架構 (三級快取 + 階梯順位調用 + 連貫記憶 + 免Key保底)
     // =========================================================================
     const BUILTIN_QA_CACHE = {
       "咏鹅": [
@@ -985,18 +793,6 @@
       'gemini-2.0-flash'
     ];
 
-    function refreshKeyBtnStyle() {
-      const btn = document.getElementById('keyBtn');
-      if (backupKey) {
-        btn.classList.add('has-key');
-        btn.innerText = '🔑 已配置個人 Key';
-      } else {
-        btn.classList.remove('has-key');
-        btn.innerText = '🔑 API Key';
-      }
-    }
-    refreshKeyBtnStyle();
-
     async function discoverFastModels(key) {
       if (!key) return;
       try {
@@ -1076,10 +872,8 @@
       return text;
     }
 
-    async function fetchFastAccurateAI(promptText, rawQuestionForCache = '') {
-      const cleanCacheKey = normalizeCacheKey(rawQuestionForCache);
-
-      // 1. 若用戶填了自己的免費 Key，按順序調用主力模型，失敗才切換備用模型
+    async function fetchFastAccurateAI(promptText, cacheKeyForCloud = '') {
+      // 1. 若本地存有備用 Key，按順序調用主力模型，失敗才切換備用模型
       if (backupKey) {
         const modelsToTry = availableFastModels.slice(0, 3);
         for (let i = 0; i < modelsToTry.length; i++) {
@@ -1103,7 +897,7 @@
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               prompt: promptText,
-              cacheKey: cleanCacheKey
+              cacheKey: cacheKeyForCloud
             })
           }, 7000);
           if (!r.ok) continue;
@@ -1206,85 +1000,76 @@
       const banner = document.getElementById('statusBanner');
       const list = document.getElementById('annotationList');
       banner.style.display = 'block';
-      banner.innerText = '⚡ AI 正在極速思考並生成雙語注音...';
+      banner.innerText = '⚡ AI 正在思考...';
       list.innerHTML = '';
 
-      // 1. 優先命中本地快取 (0毫秒極速返回)
-      const localHit = getLocalCachedAnswer(q);
-      if (localHit) {
-        const ok = await renderBilingualAIOutput(localHit);
-        if (ok) return;
+      const followUp = isFollowUpQuestion(q);
+
+      // 1. 若不是追問，優先命中本地快取 (0毫秒極速返回，且寫入對話記憶供下一輪追問)
+      if (!followUp) {
+        const localHit = getLocalCachedAnswer(q);
+        if (localHit) {
+          const ok = await renderBilingualAIOutput(localHit);
+          if (ok) {
+            pushConversationMemory(q, localHit);
+            return;
+          }
+        }
       }
 
-      // 2. 將語音識別的所有同音候選詞一併交給 AI，讓 AI 自動糾正口音、同音字或中英混輸誤判
+      // 2. 組合語音同音候選詞 + 最近 3 輪滑動視窗對話記憶
       const voiceCandidatesHint = (altsToUse && altsToUse.length > 1)
-        ? `\nVoice Speech-to-Text Candidates: ${JSON.stringify(altsToUse)}. (IMPORTANT: If the primary text has homophone typos or garbled Chinese phonetic characters from spoken English, pick or reconstruct the most semantically natural Mandarin or English question!)`
+        ? `\nVoice Speech-to-Text Candidates: ${JSON.stringify(altsToUse)}. (If the primary text has homophone typos or phonetic Chinese characters representing spoken English words, pick or reconstruct the most semantically natural Mandarin or English question!)`
         : '';
+
+      const memoryContext = buildMemoryContextString();
 
       const directPrompt = [
         'You are an authoritative bilingual scholar and assistant.',
-        `User question/request: "${q}"${voiceCandidatesHint}`,
+        memoryContext,
+        `Current User question/request: "${q}"${voiceCandidatesHint}`,
         '',
         'CRITICAL ACCURACY RULES:',
-        '1. High Voice Tolerance: If the user\'s input has a voice-recognition homophone typo (e.g., "永和" instead of "詠鵝", "路窄" instead of "鹿柴", or phonetic Chinese characters representing spoken English words), automatically answer the intended topic accurately.',
+        '1. High Voice & Context Tolerance: If the user\'s input has a voice-recognition homophone typo (e.g., "永和" instead of "詠鵝", "路窄" instead of "鹿柴", or phonetic Chinese characters representing spoken English words), or is a follow-up referring to the Recent Conversation Context above, answer the intended question accurately and coherently.',
         '2. Formulate the complete, authoritative standard answer or authentic classic text:',
         '   - If the user asks about a Chinese poem/classic (e.g., 詠鵝, 靜夜思, 水調歌頭, 鹿柴): Output ONLY the Title+Author on Line 1, followed by the COMPLETE original verses. No extra commentary!',
-        '   - If the user asks any other question in English or Chinese: Output a clear, complete, accurate bilingual answer.',
+        '   - If the user asks any other question or follow-up in English or Chinese: Output a clear, concise, accurate bilingual answer.',
         '3. Output Format (Every single line MUST use "|||"):',
         '   - Line 1: Chinese_Title_or_Summary ||| English_Title_or_Summary',
         '   - Line 2+: Pure_Chinese_Sentence ||| Authentic_English_Sentence',
         '   - IMPORTANT: Left side of "|||" must contain ONLY Traditional Chinese characters and Chinese punctuation (write all numbers/terms in Chinese characters, NO Pinyin, NO English letters on the left side). Never repeat any line.'
-      ].join('\n');
+      ].filter(Boolean).join('\n');
 
-      const aiText = await fetchFastAccurateAI(directPrompt, q);
+      // 追問時不使用獨立問題快取 Key，獨立提問時使用共享快取 Key
+      const cloudCacheKey = followUp ? '' : normalizeCacheKey(q);
+      const aiText = await fetchFastAccurateAI(directPrompt, cloudCacheKey);
+
       if (aiText) {
         const ok = await renderBilingualAIOutput(aiText);
         if (ok) {
-          saveLocalCachedAnswer(q, aiText);
+          if (!followUp) saveLocalCachedAnswer(q, aiText);
+          pushConversationMemory(q, aiText);
           return;
         }
       }
 
-      // 3. 免 Key 100% 雙語注音保底：即便沒填 Key 且後端 Worker 忙碌，也立即將用戶輸入轉為中英雙語與 Trees Pinyin，絕不空白！
+      // 3. 免 Key 雙語保底：確保任何網路環境下都有回應
       banner.style.display = 'none';
       const hasZh = /[\u4e00-\u9fa5]/.test(q);
       if (hasZh) {
         const enTrans = await translateFastFallback(q, 'zh', 'en');
         appendSentenceProgressive(q, enTrans);
+        pushConversationMemory(q, `${q} ||| ${enTrans}`);
       } else {
         const zhTrans = await translateFastFallback(q, 'en', 'zh');
         appendSentenceProgressive(zhTrans, q);
+        pushConversationMemory(q, `${zhTrans} ||| ${q}`);
       }
     }
 
-    // 預設載入一組示範，方便打開頁面立即看到效果
     window.addEventListener('DOMContentLoaded', () => {
       appendSentenceProgressive('請問你想向人工智慧提問什麼問題？', 'What question would you like to ask AI today?');
     });
-
-    function openKeyModal() {
-      document.getElementById('apiKeyInput').value = backupKey;
-      document.getElementById('keyModal').style.display = 'flex';
-    }
-    async function saveBackupKey() {
-      backupKey = document.getElementById('apiKeyInput').value.trim();
-      localStorage.setItem('tp_v22_backup_key', backupKey);
-      localStorage.setItem('tp_test_gemini_key', backupKey);
-      refreshKeyBtnStyle();
-      document.getElementById('keyModal').style.display = 'none';
-      if (backupKey) {
-        await discoverFastModels(backupKey);
-        const pendingQ = document.getElementById('userInput').value.trim();
-        if (pendingQ) runSmartAI(pendingQ);
-      }
-    }
-    function clearBackupKey() {
-      backupKey = '';
-      localStorage.removeItem('tp_v22_backup_key');
-      localStorage.removeItem('tp_test_gemini_key');
-      document.getElementById('apiKeyInput').value = '';
-      refreshKeyBtnStyle();
-    }
   </script>
 </body>
 </html>
