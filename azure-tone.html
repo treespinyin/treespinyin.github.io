@@ -1,16 +1,16 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Trees Pinyin - 智能口语与声调评测模块</title>
+  <title>Trees Pinyin - Mandarin Tone & Intelligibility Coach</title>
   <script src="https://aka.ms/csspeech/jsbrowserpackageraw"></script>
   <script src="https://unpkg.com/pinyin-pro@3.26.0/dist/index.js"></script>
   <style>
     .tp-tone-wrap {
-      font-family: system-ui, -apple-system, sans-serif;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       width: 100%;
-      max-width: 660px;
+      max-width: 680px;
       margin: 24px auto;
       background: #ffffff;
       border: 1px solid #e2e8f0;
@@ -22,11 +22,12 @@
     }
     .tp-tone-wrap * { box-sizing: border-box; }
 
+    /* Quota & Support Banner */
     .tp-quota-banner {
       background: #f8fafc;
       border: 1px solid #cbd5e1;
       border-radius: 12px;
-      padding: 12px 14px;
+      padding: 14px 16px;
       margin-bottom: 16px;
       font-size: 13.5px;
       line-height: 1.55;
@@ -38,13 +39,13 @@
       align-items: center;
       flex-wrap: wrap;
       gap: 8px;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
     }
     .tp-badge {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      padding: 3px 10px;
+      padding: 4px 11px;
       border-radius: 99px;
       font-weight: 700;
       font-size: 12.5px;
@@ -54,7 +55,7 @@
     .tp-badge.pro { background: #dcfce7; color: #15803d; }
     .tp-badge.exhausted { background: #fee2e2; color: #b91c1c; }
 
-    .tp-actions-links { display: flex; gap: 12px; font-size: 13px; }
+    .tp-actions-links { display: flex; gap: 14px; font-size: 13px; flex-wrap: wrap; }
     .tp-link-btn {
       background: none;
       border: none;
@@ -64,27 +65,28 @@
       padding: 0;
       text-decoration: underline;
     }
-    .tp-link-btn.sub { color: #d97706; }
+    .tp-link-btn.support { color: #d97706; }
 
     .tp-byok-panel {
       display: none;
-      margin-top: 10px;
-      padding-top: 10px;
+      margin-top: 12px;
+      padding-top: 12px;
       border-top: 1px dashed #cbd5e1;
     }
     .tp-byok-panel.open { display: block; }
-    .tp-byok-row { display: flex; gap: 8px; margin-top: 6px; }
+    .tp-byok-row { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
 
     .tp-input {
       width: 100%;
-      padding: 10px 12px;
+      padding: 10px 14px;
       border: 1px solid #cbd5e1;
       border-radius: 10px;
-      font-size: 15px;
+      font-size: 16px;
       outline: none;
     }
     .tp-input:focus { border-color: #3b82f6; }
 
+    /* Character Stage */
     .tp-stage {
       display: flex;
       flex-wrap: wrap;
@@ -95,7 +97,7 @@
       border: 1px dashed #cbd5e1;
       border-radius: 14px;
       margin: 16px 0 12px;
-      min-height: 135px;
+      min-height: 140px;
       align-items: center;
     }
     .tp-item {
@@ -104,7 +106,7 @@
       align-items: center;
       padding: 6px 12px;
       border-radius: 10px;
-      min-width: 54px;
+      min-width: 56px;
       background: #f1f5f9;
       border: 2px solid transparent;
       transition: all 0.2s;
@@ -118,53 +120,36 @@
       white-space: nowrap;
     }
     .tp-hanzi { font-size: 36px; font-weight: 600; line-height: 1.15; }
-    .tp-punct { font-size: 28px; color: #94a3b8; align-self: flex-end; padding-bottom: 6px; }
+    .tp-pinyin-sub { font-size: 12px; color: #64748b; margin-top: 3px; font-weight: 500; }
+    .tp-punct { font-size: 28px; color: #94a3b8; align-self: flex-end; padding-bottom: 12px; }
 
-    /* 国际标准红、黄、绿交通灯配色 */
-    /* 绿灯：通过 */
+    /* International Traffic Light Colors (Red / Yellow / Green) */
     .tp-item.good {
       background: #dcfce7;
       color: #15803d;
       border-color: #86efac;
     }
-    /* 黄灯：声调偏差警告 + 顶部 4→3 */
+    .tp-item.good .tp-pinyin-sub { color: #15803d; }
+
+    /* Yellow: Tone off, but meaning is still understood */
     .tp-item.warn {
       background: #fef08a;
       color: #a16207;
       border-color: #facc15;
     }
-    .tp-item.warn .tp-err-tag {
-      visibility: visible;
-      color: #b45309;
-    }
-    /* 红灯：严重错调（如买读成卖，顶部显示 4→3）或读错字/漏读 */
+    .tp-item.warn .tp-err-tag { visibility: visible; color: #b45309; }
+    .tp-item.warn .tp-pinyin-sub { color: #a16207; }
+
+    /* Red: Wrong pronunciation or tone error that changes word meaning */
     .tp-item.bad {
       background: #fecaca;
       color: #b91c1c;
       border-color: #f87171;
     }
-    .tp-item.bad .tp-err-tag {
-      visibility: visible;
-      color: #b91c1c;
-    }
+    .tp-item.bad .tp-err-tag { visibility: visible; color: #b91c1c; }
+    .tp-item.bad .tp-pinyin-sub { color: #b91c1c; }
 
-    /* 麦克风实时音量指示条 */
-    .tp-mic-meter-wrap {
-      width: 220px;
-      height: 6px;
-      background: #e2e8f0;
-      border-radius: 99px;
-      margin: 0 auto 14px;
-      overflow: hidden;
-      display: none;
-    }
-    .tp-mic-meter-bar {
-      height: 100%;
-      width: 0%;
-      background: #10b981;
-      transition: width 0.08s ease;
-    }
-
+    /* Legend */
     .tp-legend {
       display: flex;
       justify-content: center;
@@ -175,7 +160,7 @@
       margin-bottom: 16px;
     }
     .tp-legend span { display: inline-flex; align-items: center; gap: 6px; }
-    .tp-dot { width: 13px; height: 13px; border-radius: 50%; display: inline-block; }
+    .tp-dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
 
     .tp-btns { display: flex; justify-content: center; gap: 12px; }
     .tp-btn {
@@ -186,87 +171,106 @@
       font-size: 15px;
       font-weight: 600;
       cursor: pointer;
+      transition: all 0.15s;
     }
+    .tp-btn:hover { background: #f8fafc; }
     .tp-btn-rec { background: #10b981; color: #fff; border: none; }
-    .tp-btn-rec.on { background: #ef4444; }
-    .tp-btn-rec:disabled { background: #94a3b8; cursor: not-allowed; }
+    .tp-btn-rec:hover { background: #059669; }
+    .tp-btn-rec.on { background: #ef4444; animation: tp-pulse 1.5s infinite; }
+    .tp-btn-rec:disabled { background: #94a3b8; cursor: not-allowed; animation: none; }
 
-    .tp-msg { text-align: center; margin-top: 14px; font-size: 14px; color: #475569; line-height: 1.6; }
-    .tp-debug { margin-top: 10px; padding: 8px 12px; background: #f1f5f9; border-radius: 8px; font-size: 13px; color: #475569; text-align: center; display: none; }
+    @keyframes tp-pulse {
+      0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+      70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+    }
+
+    .tp-msg { text-align: center; margin-top: 14px; font-size: 14.5px; color: #334155; line-height: 1.5; }
+
+    /* Native Chinese Blind Ear Box */
+    .tp-blind-box {
+      margin-top: 14px;
+      padding: 10px 14px;
+      background: #f1f5f9;
+      border-radius: 10px;
+      font-size: 13.5px;
+      color: #334155;
+      text-align: center;
+      display: none;
+      line-height: 1.6;
+    }
   </style>
 </head>
 <body style="background:#f1f5f9; margin:0; padding:20px 12px;">
 
 <div class="tp-tone-wrap" id="tp-tone-module">
 
-  <!-- 顶部配额说明与商业化横幅 -->
+  <!-- Quota & Free Education Support Banner -->
   <div class="tp-quota-banner">
     <div class="tp-quota-top">
-      <span class="tp-badge" id="tpQuotaBadge">🎁 今日免费额度：剩余 2 / 2 次</span>
+      <span class="tp-badge" id="tpQuotaBadge">🎁 Daily Free Quota: 2 / 2 left</span>
       <div class="tp-actions-links">
-        <button class="tp-link-btn" onclick="toggleByokPanel()">⚙️ 添加 Azure Key (免费大量使用)</button>
-        <button class="tp-link-btn sub" onclick="openSubscribeModal()">💎 订阅我们的会员</button>
+        <button class="tp-link-btn" onclick="toggleByokPanel()">⚙️ Add Your Azure Key (5 hrs/mo Free)</button>
+        <button class="tp-link-btn support" onclick="openSupportModal()">❤️ Support Free Education</button>
       </div>
     </div>
     <div>
-      由于额度限制，每人每天仅允许两次免费评测。您可以<strong>自己添加 Azure Key 免费大量使用</strong>，也可以<strong>订阅我们的会员</strong>。
+      Due to quota limits, each user is allowed <strong>2 free evaluations per day</strong>. You can <strong>add your own Azure Key (5 hours/month free quota)</strong> for unlimited practice. Welcome to <strong>support us in continuing to contribute to free education!</strong>
     </div>
 
+    <!-- Collapsible BYOK Panel -->
     <div class="tp-byok-panel" id="tpByokPanel">
-      <div style="font-size:12px; color:#64748b;">
-        填入您的微软 Azure Speech Key（如 Free F0 免费密钥），仅保存在您的浏览器本地，即可无限次免费评测：
+      <div style="font-size:12.5px; color:#64748b;">
+        Enter your Microsoft Azure Speech Key (Free F0 tier gives 5 hours/month free). Stored locally in your browser only:
       </div>
       <div class="tp-byok-row">
-        <input id="tpUserKey" class="tp-input" type="password" placeholder="粘贴您的 Azure KEY 1" oninput="saveByok()" style="flex:2; font-size:13px; padding:7px 10px;" />
-        <input id="tpUserRegion" class="tp-input" type="text" placeholder="Region (如 westus2)" oninput="saveByok()" style="flex:1; font-size:13px; padding:7px 10px;" />
-        <button class="tp-btn" onclick="clearByok()" style="padding:6px 12px; font-size:12px;">清除</button>
+        <input id="tpUserKey" class="tp-input" type="password" placeholder="Paste your Azure KEY 1" oninput="saveByok()" style="flex:2; font-size:13px; padding:8px 10px;" />
+        <input id="tpUserRegion" class="tp-input" type="text" placeholder="Region (e.g. westus2)" oninput="saveByok()" style="flex:1; font-size:13px; padding:8px 10px;" />
+        <button class="tp-btn" onclick="clearByok()" style="padding:6px 14px; font-size:12.5px;">Clear</button>
       </div>
     </div>
   </div>
 
-  <!-- 句子输入 -->
+  <!-- Target Chinese Sentence Input -->
   <div>
-    <input id="tpTxt" class="tp-input" value="你好，我买了一把雨伞。" oninput="renderSentence()" />
+    <input id="tpTxt" class="tp-input" value="你好，我买了一把雨伞。" oninput="renderSentence()" placeholder="Type or paste Chinese sentence here..." />
   </div>
 
-  <!-- 汉字舞台 -->
+  <!-- Character Evaluation Stage -->
   <div class="tp-stage" id="tpStage"></div>
 
-  <!-- 实时麦克风音量绿条 -->
-  <div class="tp-mic-meter-wrap" id="tpMeterWrap">
-    <div class="tp-mic-meter-bar" id="tpMeterBar"></div>
-  </div>
-
-  <!-- 国际标准红黄绿交通灯图例 -->
+  <!-- Traffic Light Legend -->
   <div class="tp-legend">
-    <span><i class="tp-dot" style="background:#22c55e;"></i> 绿灯：读音与声调过关（一声/轻声免检声调）</span>
-    <span><i class="tp-dot" style="background:#eab308;"></i> 黄灯 + <b>4→3</b>：声调微偏</span>
-    <span><i class="tp-dot" style="background:#ef4444;"></i> 红灯 + <b>4→3</b>：严重错调（如买→卖）或读错字</span>
+    <span><i class="tp-dot" style="background:#22c55e;"></i> <b>Green</b>: Clear & Accurate (Tone 1 & Neutral Tone auto-pass)</span>
+    <span><i class="tp-dot" style="background:#eab308;"></i> <b>Yellow (4→3)</b>: Tone slightly off (Meaning still understood)</span>
+    <span><i class="tp-dot" style="background:#ef4444;"></i> <b>Red (4→3)</b>: Wrong sound or tone changes meaning</span>
   </div>
 
-  <!-- 按钮 -->
+  <!-- Action Buttons -->
   <div class="tp-btns">
-    <button class="tp-btn" onclick="playDemo()">🔊 示范朗读</button>
-    <button class="tp-btn tp-btn-rec" id="tpRecBtn" onclick="toggleEvaluation()">🎤 开始朗读</button>
+    <button class="tp-btn" onclick="playDemo()">🔊 Listen Demo</button>
+    <button class="tp-btn tp-btn-rec" id="tpRecBtn" onclick="toggleEvaluation()">🎤 Start Speaking</button>
   </div>
 
-  <div class="tp-msg" id="tpMsg">点击「开始朗读」，读完一整句停顿 1 秒自动出分（或手动点停止）</div>
-  <div class="tp-debug" id="tpDbg"></div>
+  <div class="tp-msg" id="tpMsg">Click "Start Speaking", read the sentence, and click Stop (or pause 1.5s) to score.</div>
+  <div class="tp-blind-box" id="tpBlindBox"></div>
 </div>
 
 <script>
   const { pinyin } = window.pinyinPro;
 
+  // Replace with your full Cloudflare Worker URL when embedding into your main site
   const WORKER_TOKEN_URL = "/speech-token";
   const DAILY_FREE_LIMIT = 2;
 
   let targets = [];
   let isRecording = false;
   let recognizer = null;
+  let webSr = null;
+  let blindTranscript = '';      // Real-time Native Blind Ear transcript (0 extra Azure cost)
+  let azureLexicalText = '';     // Fallback blind lexical text from Azure
   let pronWords = [];
-  let gotResultPromiseResolve = null;
-
-  let audioCtx = null, micStream = null, meterTimer = null;
+  let pendingWorkerTokenUsed = false;
 
   window.addEventListener('DOMContentLoaded', () => {
     const savedKey = localStorage.getItem('tp_az_k') || localStorage.getItem('az_k') || '';
@@ -281,8 +285,8 @@
     document.getElementById('tpByokPanel').classList.toggle('open');
   }
 
-  function openSubscribeModal() {
-    alert('💎 Trees Pinyin 会员订阅：\n\n升级会员后无需配置任何 Key，即可每日无限次使用中文发音与声调评测！');
+  function openSupportModal() {
+    alert('❤️ Support Trees Pinyin Free Education:\n\nThank you for supporting our mission to make intuitive Mandarin phonics accessible to learners worldwide!\n(Link this button to your Subscribe / Buy Me a Coffee / Stripe page)');
   }
 
   function saveByok() {
@@ -327,7 +331,7 @@
 
     if (hasCustomKey()) {
       badge.className = 'tp-badge pro';
-      badge.textContent = '⚡ 已启用自有 Azure Key：无限免费评测';
+      badge.textContent = '⚡ Custom Azure Key Active: Unlimited Free Practice';
       recBtn.disabled = false;
       return;
     }
@@ -336,11 +340,11 @@
     const rem = Math.max(0, DAILY_FREE_LIMIT - used);
     if (rem > 0) {
       badge.className = 'tp-badge';
-      badge.textContent = `🎁 今日免费额度：剩余 ${rem} / ${DAILY_FREE_LIMIT} 次`;
+      badge.textContent = `🎁 Daily Free Quota: ${rem} / ${DAILY_FREE_LIMIT} left`;
       recBtn.disabled = false;
     } else {
       badge.className = 'tp-badge exhausted';
-      badge.textContent = `🔒 今日免费额度已用完 (0 / ${DAILY_FREE_LIMIT} 次)`;
+      badge.textContent = `🔒 Daily Free Quota Used (0 / ${DAILY_FREE_LIMIT} left)`;
     }
   }
 
@@ -349,12 +353,13 @@
     const stage = document.getElementById('tpStage');
     stage.innerHTML = '';
     targets = [];
-    document.getElementById('tpDbg').style.display = 'none';
+    document.getElementById('tpBlindBox').style.display = 'none';
     if (!s) return;
 
-    // 获取带上下文变调的拼音与本调拼音
+    // Context sandhi pinyin (e.g. 你好 -> ni2 hao3) and dictionary original tone
     const pyList = pinyin(s, { type: 'array', toneType: 'num', v: true });
     const origPyList = pinyin(s, { type: 'array', toneType: 'num', v: true, toneSandhi: false });
+    const displayPyList = pinyin(s, { type: 'array', v: true });
 
     Array.from(s).forEach((ch, i) => {
       if (!/[\u4e00-\u9fa5]/.test(ch)) {
@@ -363,12 +368,13 @@
       }
       const py = pyList[i] || '';
       const origPy = origPyList[i] || py;
+      const dispPy = displayPyList[i] || '';
       const t = parseInt((py.match(/([0-5])$/) || [0,1])[1], 10) % 5;
       const origT = parseInt((origPy.match(/([0-5])$/) || [0,1])[1], 10) % 5;
       const base = py.replace(/[0-5]/g, '');
       const idx = targets.length;
 
-      // 规则：一声 (1) 和 轻声 (0) 免检声调！
+      // Rule: Tone 1 and Neutral Tone (0) skip tone checking and arrow prompts
       const skipToneCheck = (t === 1 || t === 0 || origT === 1 || origT === 0);
 
       targets.push({ idx, char: ch, base, tone: t, origTone: origT, skipToneCheck });
@@ -376,6 +382,7 @@
         <div class="tp-item" id="tp-c-${idx}">
           <div class="tp-err-tag" id="tp-t-${idx}"></div>
           <div class="tp-hanzi">${ch}</div>
+          <div class="tp-pinyin-sub">${dispPy}</div>
         </div>`);
     });
   }
@@ -388,45 +395,53 @@
     speechSynthesis.speak(u);
   }
 
-  // 老外声韵母宽容对比（比较 Azure 听到的实际音素与目标音素）
-  function normPhoneme(p) {
-    if (!p) return '';
-    return p.toLowerCase()
+  // Foreigner-friendly phoneme/pinyin normalization (tolerates z/zh, c/ch, s/sh, in/ing, en/eng)
+  function normBase(b) {
+    if (!b) return '';
+    return b.toLowerCase()
       .replace(/[1-5\s]/g, '')
       .replace(/^zh/, 'z').replace(/^ch/, 'c').replace(/^sh/, 's')
-      .replace(/ing$/, 'in').replace(/eng$/, 'en').replace(/uang$/, 'uan');
+      .replace(/ing$/, 'in').replace(/eng$/, 'en').replace(/uang$/, 'uan')
+      .replace(/^w/, '').replace(/^y/, '');
   }
 
-  async function startMicMeter() {
+  function isSoundAcceptable(exp, act) {
+    if (!exp || !act) return false;
+    return exp === act || normBase(exp) === normBase(act);
+  }
+
+  // Start zero-cost Browser Native Blind ASR (simulates a Chinese listener without reference text)
+  function startNativeBlindEar() {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) return;
     try {
-      micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      const source = audioCtx.createMediaStreamSource(micStream);
-      const analyser = audioCtx.createAnalyser();
-      analyser.fftSize = 256;
-      source.connect(analyser);
-      const data = new Uint8Array(analyser.frequencyBinCount);
-      document.getElementById('tpMeterWrap').style.display = 'block';
-      const bar = document.getElementById('tpMeterBar');
-      meterTimer = setInterval(() => {
-        analyser.getByteFrequencyData(data);
-        let sum = 0;
-        for (let i = 0; i < data.length; i++) sum += data[i];
-        const pct = Math.min(100, Math.round((sum / data.length) * 2.2));
-        bar.style.width = pct + '%';
-      }, 60);
+      webSr = new SR();
+      webSr.lang = 'zh-CN';
+      webSr.continuous = true;
+      webSr.interimResults = true;
+      webSr.onresult = (e) => {
+        let s = '';
+        for (let i = 0; i < e.results.length; i++) {
+          s += e.results[i][0].transcript;
+        }
+        blindTranscript = s;
+        if (isRecording && s) {
+          setMsg(`👂 Native Ear Hearing: <b>${s}</b>`);
+        }
+      };
+      webSr.start();
     } catch (e) {}
   }
 
-  function stopMicMeter() {
-    if (meterTimer) { clearInterval(meterTimer); meterTimer = null; }
-    if (micStream) { micStream.getTracks().forEach(t => t.stop()); micStream = null; }
-    if (audioCtx) { audioCtx.close().catch(()=>{}); audioCtx = null; }
-    document.getElementById('tpMeterWrap').style.display = 'none';
-    document.getElementById('tpMeterBar').style.width = '0%';
+  function stopNativeBlindEar() {
+    if (webSr) {
+      try { webSr.stop(); } catch (e) {}
+      webSr = null;
+    }
   }
 
   async function createAzureSpeechConfig() {
+    pendingWorkerTokenUsed = false;
     if (hasCustomKey()) {
       const k = document.getElementById('tpUserKey').value.trim();
       const r = document.getElementById('tpUserRegion').value.trim();
@@ -435,7 +450,7 @@
 
     if (getUsedFreeCount() >= DAILY_FREE_LIMIT) {
       document.getElementById('tpByokPanel').classList.add('open');
-      throw new Error('由于额度限制，每人每天仅允许两次免费评测。您可以自己添加Azure Key免费大量使用，也可以订阅我们的会员！');
+      throw new Error('Daily free limit (2/2) reached. Please add your own free Azure Key or support our membership!');
     }
 
     try {
@@ -449,52 +464,38 @@
         localStorage.setItem(getTodayStorageKey(), String(DAILY_FREE_LIMIT));
         updateQuotaUI();
         document.getElementById('tpByokPanel').classList.add('open');
-        throw new Error(data.message || '由于额度限制，每人每天仅允许两次免费评测。');
+        throw new Error('Daily free limit (2/2) reached. Please add your own Azure Key or support us!');
       }
       if (data.token && data.region) {
-        incrementUsedFreeCount();
+        pendingWorkerTokenUsed = true;
         return SpeechSDK.SpeechConfig.fromAuthorizationToken(data.token, data.region);
       }
-      throw new Error('Token 获取异常');
+      throw new Error('Invalid token response');
     } catch (err) {
-      if (err.message.includes('每天仅允许两次')) throw err;
+      if (err.message.includes('Daily free limit')) throw err;
       document.getElementById('tpByokPanel').classList.add('open');
-      throw new Error('请先在上方展开栏填入您的 Azure KEY 1 和 westus2。');
+      throw new Error('Please click "⚙️ Add Your Azure Key" above and enter your KEY 1 and westus2.');
     }
-  }
-
-  async function finishAndScore() {
-    if (!isRecording) return;
-    isRecording = false;
-    const btn = document.getElementById('tpRecBtn');
-    btn.classList.remove('on');
-    btn.textContent = '⏳ 正在出分...';
-
-    stopMicMeter();
-
-    if (pronWords.length === 0 && recognizer) {
-      await Promise.race([
-        new Promise(res => { gotResultPromiseResolve = res; }),
-        new Promise(res => setTimeout(res, 1300))
-      ]);
-    }
-
-    if (recognizer) {
-      await new Promise(res => recognizer.stopContinuousRecognitionAsync(res, res));
-      recognizer.close();
-      recognizer = null;
-    }
-
-    btn.textContent = '🎤 重新朗读';
-    evaluatePureAcoustic();
   }
 
   async function toggleEvaluation() {
     const txt = document.getElementById('tpTxt').value.trim();
     const btn = document.getElementById('tpRecBtn');
 
-    if (isRecording) {
-      await finishAndScore();
+    // Manual Stop clicked while recording
+    if (isRecording && recognizer) {
+      isRecording = false;
+      btn.classList.remove('on');
+      btn.textContent = '⏳ Scoring...';
+      stopNativeBlindEar();
+
+      // Wait briefly so Azure finalizes the current spoken phrase before closing
+      await new Promise(r => setTimeout(r, 600));
+      await new Promise(res => recognizer.stopContinuousRecognitionAsync(res, res));
+      if (recognizer) { recognizer.close(); recognizer = null; }
+
+      btn.textContent = '🎤 Try Again';
+      evaluateCombined();
       return;
     }
 
@@ -507,25 +508,23 @@
     }
 
     renderSentence();
+    blindTranscript = '';
+    azureLexicalText = '';
     pronWords = [];
-    gotResultPromiseResolve = null;
     isRecording = true;
 
     btn.classList.add('on');
-    btn.textContent = '⏹ 读完点击打分';
-    setMsg('⏳ 正在启动麦克风...');
+    btn.textContent = '⏹ Stop & Score';
+    setMsg('🎙️ Listening... Please read the full sentence clearly.');
 
-    await startMicMeter();
-
+    // Allow generous pauses between words (2.2s) so learners aren't cut off mid-sentence
     speechConfig.speechRecognitionLanguage = "zh-CN";
     speechConfig.outputFormat = SpeechSDK.OutputFormat.Detailed;
-    speechConfig.setProperty(SpeechSDK.PropertyId.SpeechServiceConnection_EndSilenceTimeoutMs, "1500");
-    speechConfig.setProperty(SpeechSDK.PropertyId.Speech_SegmentationSilenceTimeoutMs, "1200");
+    speechConfig.setProperty(SpeechSDK.PropertyId.SpeechServiceConnection_InitialSilenceTimeoutMs, "8000");
+    speechConfig.setProperty(SpeechSDK.PropertyId.SpeechServiceConnection_EndSilenceTimeoutMs, "1800");
+    speechConfig.setProperty(SpeechSDK.PropertyId.Speech_SegmentationSilenceTimeoutMs, "1500");
 
     const audioConfig = SpeechSDK.AudioConfig.fromDefaultMicrophoneInput();
-
-    // 关键升级：直接传入自定义 JSON 配置，强制开启 NBestPhonemeCount = 5
-    // 这样 Azure 会返回你嘴里真实发出的 Top 5 实际音素与声调（如把 mai 3 读成 mai 4，第一候选就是 ai 4！）
     const pronConfig = SpeechSDK.PronunciationAssessmentConfig.fromJSON(JSON.stringify({
       referenceText: txt,
       gradingSystem: "HundredMark",
@@ -539,26 +538,31 @@
     recognizer = new SpeechSDK.SpeechRecognizer(speechConfig, audioConfig);
     pronConfig.applyTo(recognizer);
 
+    // Start Native Blind Ear only after Azure session starts to avoid Mac mic lock conflicts
     recognizer.sessionStarted = () => {
-      if (isRecording) setMsg('🎙️ 麦克风已就绪！请开始朗读（读完停顿 1 秒自动出分）...');
+      if (isRecording) startNativeBlindEar();
+    };
+
+    recognizer.recognizing = (s, e) => {
+      if (e.result.text && isRecording && !blindTranscript) {
+        setMsg(`👂 Hearing: <b>${e.result.text}</b>`);
+      }
     };
 
     recognizer.recognized = (s, e) => {
       if (e.result.reason === SpeechSDK.ResultReason.RecognizedSpeech) {
         try {
           const json = JSON.parse(e.result.properties.getProperty(SpeechSDK.PropertyId.SpeechServiceResponse_JsonResult));
+          const lex = json?.NBest?.[0]?.Lexical || json?.DisplayText || e.result.text || '';
+          if (lex) azureLexicalText += lex;
           const words = json?.NBest?.[0]?.Words || [];
           pronWords.push(...words);
         } catch (err) {}
 
-        if (gotResultPromiseResolve) {
-          gotResultPromiseResolve();
-          gotResultPromiseResolve = null;
-        }
-
+        // Auto-finish once all characters in the sentence are captured
         const validCount = pronWords.filter(w => /[\u4e00-\u9fa5]/.test(w.Word) && w.PronunciationAssessment?.ErrorType !== 'Insertion').length;
-        if (isRecording && validCount >= Math.max(1, targets.length - 1)) {
-          finishAndScore();
+        if (isRecording && validCount >= targets.length) {
+          toggleEvaluation();
         }
       }
     };
@@ -566,156 +570,182 @@
     recognizer.canceled = (s, e) => {
       if (!isRecording) return;
       isRecording = false;
-      stopMicMeter();
+      stopNativeBlindEar();
       btn.classList.remove('on');
-      btn.textContent = '🎤 开始朗读';
-      setMsg(`❌ Azure 报错：${e.errorDetails || '请检查 Key 和 westus2 是否正确'}`);
+      btn.textContent = '🎤 Start Speaking';
+      setMsg(`❌ Connection Error: ${e.errorDetails || 'Please check your Azure Key & Region (westus2)'}`);
       if (recognizer) { recognizer.close(); recognizer = null; }
     };
 
     recognizer.startContinuousRecognitionAsync();
   }
 
-  // 核心算法：从 Azure 底层 NBestPhonemes 中提取用户真实发出的声母、韵母和真实声调！
-  function analyzeWordAcoustics(pw, targetObj) {
-    if (!pw) return { isOmitted: true };
-
+  // Extract actual spoken tone and phoneme accuracy from Azure NBestPhonemes
+  function inspectAzureWord(pw, targetObj) {
+    if (!pw) return { omitted: true };
     const errType = pw.PronunciationAssessment?.ErrorType || 'None';
     const wordAcc = pw.PronunciationAssessment?.AccuracyScore ?? 0;
-    if (errType === 'Omission' || wordAcc < 25) {
-      return { isOmitted: true };
-    }
+    if (errType === 'Omission' || wordAcc < 25) return { omitted: true };
 
     const phonemes = pw.Phonemes || [];
-    let phonemeBaseMismatch = false;
-    let detectedSpokenTone = null;
-    let vowelAccuracy = wordAcc;
+    let baseWrong = false;
+    let acousticSpokenTone = null;
+    let finalAcc = wordAcc;
 
     for (const p of phonemes) {
-      const expectedRaw = (p.Phoneme || '').trim(); // 例如 "w" 或 "o 3" 或 "ai 3"
+      const expRaw = (p.Phoneme || '').trim();
       const pAcc = p.PronunciationAssessment?.AccuracyScore ?? wordAcc;
       const nbest = p.PronunciationAssessment?.NBestPhonemes || [];
-      const topActualRaw = nbest[0]?.Phoneme ? nbest[0].Phoneme.trim() : expectedRaw;
+      const topRaw = nbest[0]?.Phoneme ? nbest[0].Phoneme.trim() : expRaw;
 
-      // 判断这个音素是不是带声调数字的韵母（如 "ai 3"）
-      const expToneMatch = expectedRaw.match(/([1-5])\s*$/);
-
+      const expToneMatch = expRaw.match(/([1-5])\s*$/);
       if (expToneMatch) {
-        vowelAccuracy = pAcc;
-        // 提取用户真实发出的第一候选音素的声调（例如用户读了 "ai 4"，这里直接抓出 4！）
-        const actToneMatch = topActualRaw.match(/([1-5])\s*$/);
-        if (actToneMatch) {
-          detectedSpokenTone = parseInt(actToneMatch[1], 10) % 5;
+        finalAcc = pAcc;
+        // Scan NBestPhonemes for actual tone spoken by the learner
+        const topToneMatch = topRaw.match(/([1-5])\s*$/);
+        if (topToneMatch) {
+          acousticSpokenTone = parseInt(topToneMatch[1], 10) % 5;
         }
-        // 如果第一候选跟标准声调一样，但韵母得分较低 (< 82)，看第二候选是不是另一个声调（抓出隐藏的故意错调）
-        if ((detectedSpokenTone === targetObj.tone || detectedSpokenTone === targetObj.origTone) && pAcc < 82 && nbest.length > 1) {
-          const secondRaw = nbest[1].Phoneme.trim();
-          const secMatch = secondRaw.match(/([1-5])\s*$/);
-          if (secMatch && normPhoneme(secondRaw) === normPhoneme(expectedRaw)) {
-            const secTone = parseInt(secMatch[1], 10) % 5;
-            if (secTone !== targetObj.tone) {
-              detectedSpokenTone = secTone;
+        // If top candidate matches expected tone because of forced alignment bias, check 2nd candidate when score < 84
+        if ((acousticSpokenTone === targetObj.tone || acousticSpokenTone === targetObj.origTone) && pAcc < 84 && nbest.length > 1) {
+          for (let k = 1; k < Math.min(3, nbest.length); k++) {
+            const candRaw = (nbest[k].Phoneme || '').trim();
+            const m = candRaw.match(/([1-5])\s*$/);
+            if (m && normBase(candRaw) === normBase(expRaw)) {
+              const candTone = parseInt(m[1], 10) % 5;
+              if (candTone !== targetObj.tone) {
+                acousticSpokenTone = candTone;
+                break;
+              }
             }
           }
         }
-
-        // 检查韵母本身有没有读成完全别的韵母（比如把“我 o”读成“他 a”）
-        if (pAcc < 55 && normPhoneme(topActualRaw) !== normPhoneme(expectedRaw)) {
-          phonemeBaseMismatch = true;
+        if (pAcc < 52 && !isSoundAcceptable(expRaw, topRaw)) {
+          baseWrong = true;
         }
       } else {
-        // 声母检查（比如把“我 w”读成“他 t”）
-        if (pAcc < 50 && normPhoneme(topActualRaw) !== normPhoneme(expectedRaw)) {
-          phonemeBaseMismatch = true;
+        if (pAcc < 48 && !isSoundAcceptable(expRaw, topRaw)) {
+          baseWrong = true;
         }
       }
     }
 
     return {
-      isOmitted: false,
+      omitted: false,
       wordAcc,
-      vowelAccuracy,
-      phonemeBaseMismatch,
-      detectedSpokenTone
+      finalAcc,
+      baseWrong,
+      acousticSpokenTone
     };
   }
 
-  function evaluatePureAcoustic() {
+  function evaluateCombined() {
+    const cleanBlind = (blindTranscript || azureLexicalText).replace(/[^\u4e00-\u9fa5]/g, '');
     const alignedPron = pronWords.filter(w =>
       /[\u4e00-\u9fa5]/.test(w.Word) &&
       w.PronunciationAssessment?.ErrorType !== 'Insertion'
     );
 
-    if (!alignedPron.length) {
-      return setMsg('⚠️ 未检测到语音：请观察朗读时绿色音量条是否跳动，读完停顿 1 秒后再试');
+    if (!cleanBlind && !alignedPron.length) {
+      return setMsg('⚠️ No speech detected. Please speak clearly right after clicking "Start Speaking" (free quota was NOT deducted).');
     }
 
-    let passCount = 0;
-    let debugDetails = [];
+    // Deduct free quota only when valid speech was actually evaluated
+    if (pendingWorkerTokenUsed && !hasCustomKey()) {
+      incrementUsedFreeCount();
+      pendingWorkerTokenUsed = false;
+    }
+
+    // Parse Native Blind Ear characters & tones (without sandhi so we see exact character tone heard)
+    const blindPyList = cleanBlind ? pinyin(cleanBlind, { type: 'array', toneType: 'num', v: true, toneSandhi: false }) : [];
+    const blindChars = Array.from(cleanBlind).map((ch, idx) => {
+      const p = blindPyList[idx] || '';
+      return {
+        char: ch,
+        base: p.replace(/[0-5]/g, ''),
+        tone: parseInt((p.match(/([0-5])$/) || [0,1])[1], 10) % 5
+      };
+    });
+
+    let passScore = 0;
+    let bIdx = 0;
 
     targets.forEach((t, i) => {
       const pw = alignedPron[i];
-      const res = analyzeWordAcoustics(pw, t);
+      const ac = inspectAzureWord(pw, t);
 
-      // 1. 漏读，或者声母/韵母完全读成了别的字（如把“我 wo”读成“他 ta”） -> 红灯（无声调箭头）
-      if (res.isOmitted || res.phonemeBaseMismatch) {
-        paintTrafficLight(i, 'bad', null, null);
-        debugDetails.push(`${t.char}:读错字/漏读`);
-        return;
-      }
-
-      // 2. 规则：一声 (1) 和 轻声 (0) 免检声调！只要声韵母没读成别的字，一律直接给绿灯！
-      if (t.skipToneCheck) {
-        paintTrafficLight(i, 'good', null, null);
-        passCount += 1;
-        debugDetails.push(`${t.char}:免检通过`);
-        return;
-      }
-
-      // 3. 二声、三声、四声：严格检查真实声调！
-      const spokenTone = res.detectedSpokenTone !== null ? res.detectedSpokenTone : t.tone;
-      const isToneMatch = (spokenTone === t.tone || spokenTone === t.origTone);
-
-      // 情况 3A：明确读成了另一个声调（例如把“买3”读成了“卖4”）
-      if (!isToneMatch) {
-        // 如果韵母/整字得分低 (< 72) 或者完全读成了对立声调 -> 红灯 + 顶部显示 4→3！
-        if (res.wordAcc < 72 || res.vowelAccuracy < 72 || (spokenTone === 4 && t.tone === 3) || (spokenTone === 3 && t.tone === 4)) {
-          paintTrafficLight(i, 'bad', spokenTone, t.tone);
-          passCount += 0.2;
-          debugDetails.push(`${t.char}:错调(${spokenTone}→${t.tone})`);
-        } else {
-          // 轻微声调混淆 -> 黄灯 + 顶部显示 错→正
-          paintTrafficLight(i, 'warn', spokenTone, t.tone);
-          passCount += 0.6;
-          debugDetails.push(`${t.char}:微偏(${spokenTone}→${t.tone})`);
+      // Match against Native Blind Ear window
+      let matchedBlind = null;
+      if (blindChars.length > 0) {
+        for (let k = bIdx; k < Math.min(bIdx + 3, blindChars.length); k++) {
+          if (isSoundAcceptable(t.base, blindChars[k].base)) {
+            matchedBlind = blindChars[k];
+            bIdx = k + 1;
+            break;
+          }
         }
+      }
+
+      // 1. Check if the base syllable (initial/final) was mispronounced (e.g. "我 wo" read as "他 ta") or omitted -> RED
+      const blindCompletelyDifferentWord = (blindChars.length > 0 && !matchedBlind);
+      if (ac.omitted || ac.baseWrong || blindCompletelyDifferentWord) {
+        if (!matchedBlind && bIdx < blindChars.length && blindChars.length >= targets.length) {
+          bIdx++;
+        }
+        paintLight(i, 'bad', null, null);
         return;
       }
 
-      // 情况 3B：虽然第一候选声调数字相同，但声学得分偏低 (50 ~ 78 分)，说明声调拐弯不到位 -> 黄灯提醒
-      if (res.wordAcc < 78 || res.vowelAccuracy < 75) {
-        paintTrafficLight(i, 'warn', '偏', t.tone);
-        passCount += 0.7;
-        debugDetails.push(`${t.char}:声调不到位(${Math.round(res.wordAcc)}分)`);
+      // 2. Rule: Tone 1 and Neutral Tone (0) skip tone check -> Instant GREEN
+      if (t.skipToneCheck) {
+        paintLight(i, 'good', null, null);
+        passScore += 1;
         return;
       }
 
-      // 4. 读音与声调全部过关 -> 绿灯！
-      paintTrafficLight(i, 'good', null, null);
-      passCount += 1;
-      debugDetails.push(`${t.char}:通过`);
+      // 3. Evaluate Tone (combining Native Blind Ear + Azure Acoustic NBestPhonemes)
+      const blindTone = matchedBlind ? matchedBlind.tone : null;
+      const blindHeardExactChar = matchedBlind ? (matchedBlind.char === t.char) : true;
+
+      // Determine the actual wrong tone spoken (if any)
+      let detectedWrongTone = null;
+      if (blindTone !== null && blindTone !== t.tone && blindTone !== t.origTone && !blindHeardExactChar) {
+        detectedWrongTone = blindTone;
+      } else if (ac.acousticSpokenTone !== null && ac.acousticSpokenTone !== t.tone && ac.acousticSpokenTone !== t.origTone) {
+        detectedWrongTone = ac.acousticSpokenTone;
+      }
+
+      // Case 3A: Tone error changed the character meaning in Native Blind Ear (e.g. 买 mǎi 3 -> 卖 mài 4) -> RED + 4→3
+      if (detectedWrongTone !== null && (!blindHeardExactChar || ac.wordAcc < 70 || ac.finalAcc < 70)) {
+        paintLight(i, 'bad', detectedWrongTone, t.tone);
+        passScore += 0.2;
+        return;
+      }
+
+      // Case 3B: Tone is off, BUT meaning is still understood (Yellow + Wrong→Correct arrow)
+      if (detectedWrongTone !== null || ac.wordAcc < 80 || ac.finalAcc < 78) {
+        const wrongLabel = detectedWrongTone !== null ? detectedWrongTone : 'Off';
+        paintLight(i, 'warn', wrongLabel, t.tone);
+        passScore += 0.75;
+        return;
+      }
+
+      // 4. Both sound and tone are natural and understood -> GREEN
+      paintLight(i, 'good', null, null);
+      passScore += 1;
     });
 
-    const finalScore = Math.round((passCount / targets.length) * 100) || 0;
-    setMsg(`评测完成！综合得分：<b>${finalScore} 分</b>`);
+    const totalPct = Math.round((passScore / targets.length) * 100) || 0;
+    setMsg(`Evaluation Complete! Intelligibility Score: <b>${totalPct}%</b>`);
 
-    const dbg = document.getElementById('tpDbg');
-    dbg.style.display = 'block';
-    dbg.innerHTML = `🔍 诊断详情：${debugDetails.join(' ｜ ')}`;
+    const blindBox = document.getElementById('tpBlindBox');
+    blindBox.style.display = 'block';
+    const heardDisplay = cleanBlind || azureLexicalText || '(Evaluated via acoustic alignment)';
+    blindBox.innerHTML = `👂 <b>What a Native Chinese Listener Heard (中国人盲听结果):</b> 「<b>${heardDisplay}</b>」`;
   }
 
-  // 渲染红黄绿交通灯：无论黄灯还是红灯，只要有 wrongTone 和 correctTone，一律在头顶显示「错→正」（如 4→3）！
-  function paintTrafficLight(i, status, wrongTone, correctTone) {
+  // Format: WrongTone → CorrectTone (e.g., 4→3) on both Yellow and Red tone errors
+  function paintLight(i, status, wrongTone, correctTone) {
     const box = document.getElementById(`tp-c-${i}`);
     const tag = document.getElementById(`tp-t-${i}`);
     box.className = `tp-item ${status}`;
