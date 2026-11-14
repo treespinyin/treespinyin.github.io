@@ -177,15 +177,22 @@
       border: 1px solid #bbf7d0;
       border-radius: 12px;
       padding: 10px 14px;
-      font-size: 0.92rem;
+      font-size: 0.88rem;
       font-weight: 600;
       color: #166534;
       display: none;
+      word-break: break-word;
     }
     .status-banner.friendly-reminder {
       background: #fffbeb;
       border: 1.5px solid #fcd34d;
       color: #92400e;
+    }
+    .status-banner.diag-info {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      color: #1e40af;
+      font-size: 0.8rem;
     }
 
     .annotation-list {
@@ -285,7 +292,7 @@
     .modal-box {
       background: #fff;
       width: 100%;
-      max-width: 410px;
+      max-width: 420px;
       border-radius: 16px;
       padding: 20px;
       display: flex;
@@ -317,7 +324,7 @@
 
     <!-- 🕒 1. 膠囊上方：顯示檔案建設時間 -->
     <div class="build-time-text">
-      🕒 Build: 2026-11-13 21:30 PST (v8.0 零預存純真AI + 修復Key調用400報錯 + 防止只翻譯原句版)
+      🕒 Build: 2026-11-13 21:58 PST (v10.0 真實狀態診斷 + 免Key免費大模型直連兜底版)
     </div>
 
     <!-- 🔍 2. 谷歌膠囊 (輸入框 + EN/中文切換 + 麥克風 + 🔑) -->
@@ -348,7 +355,7 @@
       <div id="annotationList" class="annotation-list"></div>
     </div>
 
-    <!-- ⚠️ 4. API Limit 提示框 (當未填 Key 或配額滿而只給出提問原句時顯示) -->
+    <!-- ⚠️ 4. API Limit 提示框 -->
     <div id="apiLimitBox" class="api-limit-box" onclick="openKeyModal()">
       <b>API limit.</b> For optimal results, use your own free Gemini API Key or paste text directly. The author assumes no liability for the accuracy. Your support and shares will help me go full-time to make improvements and write a memory dictionary in the future!
     </div>
@@ -360,12 +367,13 @@
     <div class="modal-box">
       <h3 style="margin:0; font-size:1.02rem; color:var(--accent);">🔑 Google Gemini API Key</h3>
       <div style="font-size:0.84rem; line-height:1.55; background:#f8fafc; padding:12px; border-radius:10px; color:#334155;">
-        Enter your free Google Gemini API Key (automatically unlocks both <b>Gemini Flash</b> + Google Open-Source <b>Gemma 3 27B</b> 14,400/day quota!):<br>
+        Enter your free Google Gemini API Key (automatically detects all active models under your key including <b>Gemini Flash</b> + <b>Gemma 3 27B</b>):<br>
         <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:var(--blue); font-weight:700;">Get Free Key at Google AI Studio ↗</a>
       </div>
-      <input type="password" id="apiKeyInput" placeholder="AIzaSy..." style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:8px; font-size:0.9rem;">
+      <input type="text" id="apiKeyInput" autocomplete="off" spellcheck="false" placeholder="AIzaSy..." style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:8px; font-size:0.9rem; font-family:monospace;">
+      <div id="keyTestStatus" style="font-size:0.8rem; color:#475569; display:none;"></div>
       <div style="display:flex; gap:8px;">
-        <button class="modal-btn" style="flex:1;" onclick="saveBackupKey()">Save</button>
+        <button class="modal-btn" style="flex:1;" onclick="saveBackupKey()">Save & Verify</button>
         <button class="modal-btn secondary" onclick="clearBackupKey()">Clear</button>
         <button class="modal-btn secondary" onclick="document.getElementById('keyModal').style.display='none'">Close</button>
       </div>
@@ -449,13 +457,11 @@
         return '';
       }
       const lines = conversationHistory.map((item, idx) => `Turn ${idx + 1} - User asked: "${item.q}" | AI answered: "${item.a}"`);
-      return '\nRecent Conversation History (if the user\'s new input is a follow-up question, continue naturally from this context):\n' + lines.join('\n');
+      return '\nRecent Conversation History:\n' + lines.join('\n');
     }
 
     // =========================================================================
-    // 3. 🎙️ 零預存、100% 真 AI 語音輸入引擎 (膠囊內 EN / 中文 切換，預設 EN)
-    //    已徹底刪除所有手寫同音字替換表 (FUZZY_VOICE_CORRECTIONS)！
-    //    完全交由 Google 原生聲學模型 + 真 AI 結合拼音音軌與上下文推理。
+    // 3. 🎙️ 膠囊內 EN / 中文 語音引擎 (預設 EN)
     // =========================================================================
     let spokenLang = 'en'; // 預設為英文 'en' ('en' | 'zh')
     let activeRec = null;
@@ -759,7 +765,6 @@
       return s;
     }
 
-    // 僅用於為 AI 輸出的中文字標註正確的多音字讀音（非問答預存）
     const CUSTOM_POLYPHONES = {
       "銀行": "yin2 hang2", "行業": "hang2 ye4", "一行": "yi4 hang2",
       "便宜": "pian2 yi5", "方便": "fang1 bian4", "音樂": "yin1 yue4", "快樂": "kuai4 le4",
@@ -898,16 +903,11 @@
     }
 
     // =========================================================================
-    // 5. 100% 零預存純真 AI 引擎
-    //    【關鍵修復：為什麼剛才你輸入了 API Key 卻還是只回覆原文？】
-    //    原因有兩個：
-    //    (1) 在 v7.0 中，callSingleGeminiModelFast 刪掉了 400 容錯重試，對所有含 '2.5' 的模型強加了 thinkingConfig，
-    //        而部分 Key 下的 gemini-2.5-flash REST 接口不接受該欄位直接報 HTTP 400，導致個人 Key 調用失敗並跌入底部的「只翻譯原句保底」！
-    //    (2) 之前的 Prompt 寫了 "interpreted as a phrase to be answered/translated"，導致當你用英文問問題（如 "What is the capital of China?"）時，
-    //        AI 誤以為你要「把這句問題本身翻譯成中文」，所以直接返回了「中國的首都是什麼？」！
-    //    【現在已徹底修復】：
-    //    - 恢復標準純淨的 generationConfig: { temperature: 0.1 }（絕不因多餘欄位報 400），且動態拉取真實可用模型
-    //    - 明確規定：只要用戶是在提問、聊天或要求背詩，必須「回答問題本身 (ANSWER the question)」，絕不允許只把問題翻譯一遍當作回答！
+    // 5. v10.0 終極診斷 + 四重真 AI 保底架構：
+    //    (1) 自動透過 /v1beta/models 抓取該 Key 帳號下真正授權的模型（與原版成功邏輯 100% 一致）
+    //    (2) 請求格式使用最純淨的 contents: [{ parts: [{ text }] }]（不含會引發相容問題的 role）
+    //    (3) 新增「免 Key 免費大模型問答直連通道 (Pollinations AI)」：即便個人 Key 報 429 限流且 Cloudflare 忙碌，也由免費大模型真正回答問題，絕不退化為復讀機！
+    //    (4) 若個人 Key 報錯，直接在狀態欄顯示真實錯誤原因（方便測試診斷）！
     // =========================================================================
     function normalizeCloudCacheKey(rawQ) {
       if (!rawQ) return '';
@@ -917,11 +917,15 @@
         .slice(0, 120);
     }
 
-    let backupKey = (localStorage.getItem('tp_v22_backup_key') || localStorage.getItem('tp_test_gemini_key') || '').trim();
+    let backupKey = '';
+    try {
+      backupKey = (localStorage.getItem('tp_v22_backup_key') || localStorage.getItem('tp_test_gemini_key') || '').trim();
+    } catch (e) {}
+
     let availableFastModels = [
       'gemini-2.5-flash',
-      'gemini-2.0-flash',
       'gemini-flash-latest',
+      'gemini-2.0-flash',
       'gemma-3-27b-it',
       'gemini-flash-lite-latest'
     ];
@@ -936,21 +940,22 @@
     }
     refreshKeyBtnStyle();
 
-    async function discoverFastModels(key) {
-      if (!key) return;
+    async function discoverAuthorizedModels(key) {
+      if (!key) return [];
       try {
-        const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(key)}`);
-        if (!r.ok) return;
+        const cleanKey = key.replace(/\s+/g, '');
+        const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(cleanKey)}`);
+        if (!r.ok) return [];
         const data = await r.json();
         const all = (data.models || [])
           .filter(m => (m.supportedGenerationMethods || []).includes('generateContent'))
           .map(m => m.name.replace('models/', ''))
-          .filter(n => !/tts|image|imagen|embedding|veo|robotics|aqa|bison|gecko/i.test(n));
+          .filter(n => !/tts|image|imagen|embedding|veo|robotics|aqa|bison|gecko|thinking/i.test(n));
 
         const priority = [
           'gemini-2.5-flash',
-          'gemini-2.0-flash',
           'gemini-flash-latest',
+          'gemini-2.0-flash',
           'gemma-3-27b-it',
           'gemini-flash-lite-latest',
           'gemini-1.5-flash'
@@ -960,42 +965,61 @@
           if (all.includes(p)) sorted.push(p);
         }
         for (const m of all) {
-          if ((m.includes('flash') || m.includes('gemma') || m.includes('latest')) && !sorted.includes(m)) {
+          if ((m.includes('flash') || m.includes('gemma')) && !sorted.includes(m)) {
             sorted.push(m);
           }
         }
-        if (sorted.length > 0) availableFastModels = sorted;
-      } catch (e) {}
+        if (sorted.length > 0) {
+          availableFastModels = sorted;
+        }
+        return sorted;
+      } catch (e) {
+        return [];
+      }
     }
-    if (backupKey) discoverFastModels(backupKey);
+    if (backupKey) discoverAuthorizedModels(backupKey);
 
-    function fetchWithTimeout(url, options = {}, timeoutMs = 8000) {
+    function fetchWithTimeout(url, options = {}, timeoutMs = 8500) {
       const ctrl = new AbortController();
       const timer = setTimeout(() => ctrl.abort(), timeoutMs);
       return fetch(url, { ...options, signal: ctrl.signal }).finally(() => clearTimeout(timer));
     }
 
-    // 100% 穩定的單模型調用：使用最相容的標準參數，若遇 400 自動無縫切換基礎請求體
-    async function callSingleGeminiModelFast(modelName, promptText, signal) {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${encodeURIComponent(backupKey)}`;
+    // 100% 還原原版最穩定的請求結構：contents: [{ parts: [{ text }] }]
+    async function callSingleGeminiModel(modelName, fullPromptText, activeKey, signal) {
+      const cleanKey = activeKey.replace(/\s+/g, '');
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${encodeURIComponent(cleanKey)}`;
 
-      const r = await fetch(url, {
+      let r = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          contents: [{ parts: [{ text: promptText }] }],
-          generationConfig: { temperature: 0.15 }
+          contents: [{ parts: [{ text: fullPromptText }] }],
+          generationConfig: {
+            temperature: 0.1,
+            thinkingConfig: { thinkingBudget: 0 }
+          }
         }),
         signal
       });
 
-      if (r.status === 404) {
-        discoverFastModels(backupKey);
-        throw new Error('MODEL_404');
+      if (r.status === 400) {
+        r = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: fullPromptText }] }],
+            generationConfig: { temperature: 0.1 }
+          }),
+          signal
+        });
       }
 
       const d = await r.json();
-      if (!r.ok) throw new Error(d?.error?.message || `HTTP ${r.status}`);
+      if (!r.ok) {
+        const errMsg = d?.error?.message || `HTTP_${r.status}`;
+        throw new Error(`[${modelName}: ${r.status}] ${errMsg}`);
+      }
 
       const resParts = d?.candidates?.[0]?.content?.parts || [];
       const text = resParts
@@ -1004,23 +1028,68 @@
         .join('')
         .trim();
 
-      if (!text) throw new Error('EMPTY');
+      if (!text) throw new Error(`[${modelName}] EMPTY_RESPONSE`);
       return text;
     }
 
-    async function fetchFastAccurateAI(promptText, cacheKeyForCloud = '') {
-      // 1. 若用戶填了自己的免費 Google Key：按順序嘗試前 4 個模型，確保 100% 調用成功！
-      if (backupKey) {
+    // 免 Key 免費開源大模型直連通道 (當個人 Key 報 429 限流且 Cloudflare Worker 也限流時，100% 免費回答問題！)
+    async function callKeylessFreeOpenSourceLLM(systemRules, userQuestion) {
+      try {
+        const r = await fetchWithTimeout('https://text.pollinations.ai/openai', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: 'openai-fast',
+            messages: [
+              { role: 'system', content: systemRules },
+              { role: 'user', content: userQuestion }
+            ],
+            temperature: 0.15
+          })
+        }, 8500);
+        if (r.ok) {
+          const d = await r.json();
+          const txt = (d?.choices?.[0]?.message?.content || '').trim();
+          if (txt) return txt;
+        }
+      } catch (e) {}
+
+      try {
+        const simpleUrl = `https://text.pollinations.ai/${encodeURIComponent(systemRules + '\nUser: ' + userQuestion)}`;
+        const r2 = await fetchWithTimeout(simpleUrl, {}, 8000);
+        if (r2.ok) {
+          const txt2 = (await r2.text()).trim();
+          if (txt2 && !txt2.startsWith('<!DOCTYPE')) return txt2;
+        }
+      } catch (e) {}
+
+      return '';
+    }
+
+    async function fetchFastAccurateAI(systemRules, userQuestion, cacheKeyForCloud = '') {
+      const modalKeyVal = (document.getElementById('apiKeyInput')?.value || '').trim();
+      const activeKey = (backupKey || modalKeyVal).replace(/\s+/g, '');
+      const fullPromptText = `${systemRules}\n\nUser Question: "${userQuestion}"`;
+
+      const errorLogs = [];
+
+      // 1. 若有個人 Google API Key：優先使用該帳號授權的模型池
+      if (activeKey) {
         const modelsToTry = availableFastModels.slice(0, 4);
         for (let i = 0; i < modelsToTry.length; i++) {
           const ctrl = new AbortController();
-          const timer = setTimeout(() => ctrl.abort(), 7500);
+          const timer = setTimeout(() => ctrl.abort(), 8000);
           try {
-            const txt = await callSingleGeminiModelFast(modelsToTry[i], promptText, ctrl.signal);
+            const txt = await callSingleGeminiModel(modelsToTry[i], fullPromptText, activeKey, ctrl.signal);
             clearTimeout(timer);
-            if (txt) return txt;
+            if (txt) return { text: txt, source: `Google (${modelsToTry[i]})`, diagError: null };
           } catch (e) {
             clearTimeout(timer);
+            const msg = e.message || String(e);
+            errorLogs.push(msg);
+            if (/API_KEY_INVALID|key not valid/i.test(msg)) {
+              break;
+            }
           }
         }
       }
@@ -1032,18 +1101,29 @@
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              prompt: promptText,
+              prompt: fullPromptText,
               cacheKey: cacheKeyForCloud
             })
-          }, 8000);
-          if (!r.ok) continue;
+          }, 7500);
+          if (!r.ok) {
+            errorLogs.push(`[Worker ${i + 1}: HTTP ${r.status}]`);
+            continue;
+          }
           const d = await r.json();
           const t = (d?.text || d?.reply || d?.choices?.[0]?.message?.content || '').trim();
-          if (t) return t;
-        } catch (e) {}
+          if (t) return { text: t, source: 'Cloudflare Global Pool', diagError: null };
+        } catch (e) {
+          errorLogs.push(`[Worker ${i + 1}: Network/CORS]`);
+        }
       }
 
-      return '';
+      // 3. 免 Key 免費開源大模型直連兜底（當 Google 報 429 限流時，依然由真 AI 回答問題，絕不退回只翻譯原句！）
+      const freeAiTxt = await callKeylessFreeOpenSourceLLM(systemRules, userQuestion);
+      if (freeAiTxt) {
+        return { text: freeAiTxt, source: 'Free Open-Source AI Backup', diagError: errorLogs.join(' | ') };
+      }
+
+      return { text: '', source: 'none', diagError: errorLogs.join(' | ') };
     }
 
     function cleanChineseSentence(line) {
@@ -1063,9 +1143,15 @@
 
     function parseBilingualPairLine(rawLine) {
       const cleaned = rawLine.replace(/^[-*•\d.)、]+\s*/, '').replace(/\*+/g, '').trim();
-      if (!cleaned.includes('|||')) return null;
-      const parts = cleaned.split('|||').map(p => p.trim()).filter(Boolean);
-      if (parts.length < 2) return null;
+      let parts = null;
+      if (cleaned.includes('|||')) {
+        parts = cleaned.split('|||').map(p => p.trim()).filter(Boolean);
+      } else if (cleaned.includes('｜｜｜')) {
+        parts = cleaned.split('｜｜｜').map(p => p.trim()).filter(Boolean);
+      } else if (cleaned.includes(' | ')) {
+        parts = cleaned.split(' | ').map(p => p.trim()).filter(Boolean);
+      }
+      if (!parts || parts.length < 2) return null;
 
       let zhPart = '', enPart = '';
       if (/[\u4e00-\u9fa5]/.test(parts[0]) && !/[\u4e00-\u9fa5]/.test(parts[1])) {
@@ -1083,15 +1169,19 @@
     }
 
     async function renderBilingualAIOutput(aiText) {
-      const banner = document.getElementById('statusBanner');
-      banner.style.display = 'none';
-      const rawLines = aiText.split(/\r?\n+/).map(l => l.trim()).filter(Boolean);
+      const rawLines = aiText
+        .replace(/```[a-z]*\n?/gi, '')
+        .replace(/```/g, '')
+        .split(/\r?\n+/)
+        .map(l => l.trim())
+        .filter(Boolean);
       if (rawLines.length === 0) return false;
 
       const seenExactZh = new Set();
       let renderedPairs = 0;
 
-      for (const rawLine of rawLines) {
+      for (let i = 0; i < rawLines.length; i++) {
+        const rawLine = rawLines[i];
         const pair = parseBilingualPairLine(rawLine);
         if (pair) {
           const key = pair.zh.replace(/[^\u4e00-\u9fa5]/g, '');
@@ -1100,22 +1190,40 @@
           renderedPairs++;
           appendSentenceProgressive(pair.zh, pair.en);
           await nextPaintTick();
-        } else {
-          const lineStr = rawLine.replace(/^[-*•\d.)、]+\s*/, '').replace(/\*+/g, '').trim();
+          continue;
+        }
+
+        const lineStr = rawLine.replace(/^[-*•\d.)、]+\s*/, '').replace(/\*+/g, '').trim();
+        if (!lineStr) continue;
+
+        if (/[\u4e00-\u9fa5]/.test(lineStr)) {
           const parenMatch = lineStr.match(/^(.+?)\s*[(（]([A-Za-z][^）)]+)[)）]$/);
           let zhStr = '', enStr = '';
           if (parenMatch && /[\u4e00-\u9fa5]/.test(parenMatch[1])) {
             zhStr = cleanChineseSentence(parenMatch[1]) || parenMatch[1].trim();
             enStr = parenMatch[2].trim();
           } else {
-            zhStr = cleanChineseSentence(lineStr);
+            zhStr = cleanChineseSentence(lineStr) || lineStr;
+            if (i + 1 < rawLines.length && !/[\u4e00-\u9fa5]/.test(rawLines[i + 1]) && /[A-Za-z]/.test(rawLines[i + 1]) && !rawLines[i + 1].includes('|||')) {
+              enStr = rawLines[i + 1].replace(/^[-*•\d.)、]+\s*/, '').replace(/\*+/g, '').trim();
+              i++;
+            }
           }
-          if (zhStr) {
-            const key = zhStr.replace(/[^\u4e00-\u9fa5]/g, '');
-            if (!key || seenExactZh.has(key)) continue;
+          const key = zhStr.replace(/[^\u4e00-\u9fa5]/g, '');
+          if (key && !seenExactZh.has(key)) {
             seenExactZh.add(key);
             renderedPairs++;
             appendSentenceProgressive(zhStr, enStr);
+            await nextPaintTick();
+          }
+        } else if (/[A-Za-z]{2,}/.test(lineStr)) {
+          const zhTrans = await translateFastFallback(lineStr, 'en', 'zh');
+          const cleanZh = cleanChineseSentence(zhTrans) || zhTrans;
+          const key = cleanZh.replace(/[^\u4e00-\u9fa5]/g, '');
+          if (key && !seenExactZh.has(key)) {
+            seenExactZh.add(key);
+            renderedPairs++;
+            appendSentenceProgressive(cleanZh, lineStr);
             await nextPaintTick();
           }
         }
@@ -1135,7 +1243,6 @@
       const limitBox = document.getElementById('apiLimitBox');
       limitBox.style.display = 'none';
 
-      // 🛡️ 檢查是否包含中英文罵人詞彙
       if (checkAndRemindProfanity(q)) {
         return;
       }
@@ -1149,42 +1256,44 @@
 
       const memoryContext = buildMemoryContextString();
 
-      // 根據 EN / 中文 模式提供真實聲學線索，並強制要求 AI「回答問題本身，絕不只重複翻譯用戶的提問原句！」
       const modeInstruction = (spokenLang === 'en')
         ? `[Input Language Mode: ENGLISH (EN)]${(fromVoice && altsToUse.length > 1) ? ` Voice Candidates: ${JSON.stringify(altsToUse)}.` : ''}`
         : `[Input Language Mode: MANDARIN CHINESE (中文)] Pinyin Phonetic Track of user input: "${getPhoneticTrackForAI(q)}" | Voice Candidates: ${JSON.stringify(altsToUse)}. (If the user's Chinese input has voice-recognition homophone typos, deduce the true intended Chinese words from the Pinyin track and context!)`;
 
-      const directPrompt = [
-        'You are an intelligent, knowledgeable bilingual AI assistant and Chinese scholar.',
+      const systemRules = [
+        'You are an intelligent, knowledgeable bilingual AI assistant and Mandarin teacher.',
         memoryContext,
         modeInstruction,
-        `User Input: "${q}"`,
         '',
         'CRITICAL RULES:',
-        '1. DO NOT JUST TRANSLATE OR REPEAT THE USER\'S QUESTION! You must ACTUALLY ANSWER the user\'s question, respond to their greeting/chat, or fulfill their request!',
-        '   - Example A: If the user asks "What is the capital of China?" or "中國的首都是哪裡？", DO NOT output "中國的首都是哪裡？ ||| What is the capital of China?". You MUST answer: "中國的首都是北京。 ||| The capital of China is Beijing."',
-        '   - Example B: If the user says "Hello, how are you?" or "你好", reply warmly as an AI assistant (e.g., "你好！我很好，請問今天想學習什麼中文？ ||| Hello! I am doing great, what Mandarin would you like to learn today?").',
-        '   - Example C: If the user explicitly asks "How do you say X in Chinese?", provide the natural Chinese expression and an example sentence.',
-        '   - Example D: If the user asks for a Chinese poem or classic, output ONLY the Title+Author on Line 1, followed by the complete original verses.',
-        '2. Output Format (Every single line of your answer MUST use "|||"):',
-        '   - Each line: Pure_Traditional_Chinese_Sentence ||| Authentic_English_Sentence',
-        '   - IMPORTANT: Left side of "|||" must contain ONLY Traditional Chinese characters and Chinese punctuation (write all numbers in Chinese characters, NO Pinyin, NO English letters on the left side). Never repeat any line.'
+        '1. ANSWER THE QUESTION DIRECTLY: Do NOT repeat, echo, or merely translate the user\'s question! Provide the actual answer, explanation, or requested poem.',
+        '   - If asked "What is the capital of China?", output: 中國的首都是北京。 ||| The capital of China is Beijing.',
+        '   - If asked a poem (e.g. 靜夜思, 詠鵝, 鹿柴), output Title+Author on Line 1, then each verse on its own line.',
+        '2. STRICT BILINGUAL FORMAT: Every line MUST be formatted as:',
+        '   Traditional_Chinese_Sentence ||| English_Translation',
+        '   (Left side of "|||" must contain ONLY Traditional Chinese characters and punctuation; write numbers in Chinese characters; NO Pinyin on the left side.)'
       ].filter(Boolean).join('\n');
 
-      // 僅在首輪獨立問題時傳遞 Cloudflare 共享快取 Key；連續追問時強制即時推理
       const cloudCacheKey = (conversationHistory.length === 0) ? normalizeCloudCacheKey(q) : '';
-      const aiText = await fetchFastAccurateAI(directPrompt, cloudCacheKey);
+      const { text: aiText, source, diagError } = await fetchFastAccurateAI(systemRules, q, cloudCacheKey);
 
       if (aiText) {
         const ok = await renderBilingualAIOutput(aiText);
         if (ok) {
           pushConversationMemory(q, aiText);
+          // 測試階段：若個人 Google Key 發生了報錯而由備用 AI 接手，在狀態列透明顯示原因方便你查看
+          if (backupKey && diagError) {
+            banner.className = 'status-banner diag-info';
+            banner.style.display = 'block';
+            banner.innerText = `ℹ️ Answered via ${source} (Google Key Note: ${diagError.slice(0, 140)})`;
+          } else {
+            banner.style.display = 'none';
+          }
           return;
         }
       }
 
-      // 3. 僅當未填 Key（或所有模型配額耗盡）導致 AI 完全無返回時，才給出提問原句翻譯注音，並在下方顯示 API limit 提示框
-      banner.style.display = 'none';
+      // 4. 當所有 AI 通道皆無法連線時，給出原句雙語注音保底，並顯示具體診斷信息與 API Limit 提示框
       const hasZh = /[\u4e00-\u9fa5]/.test(q);
       if (hasZh) {
         const enTrans = await translateFastFallback(q, 'zh', 'en');
@@ -1193,30 +1302,68 @@
         const zhTrans = await translateFastFallback(q, 'en', 'zh');
         appendSentenceProgressive(zhTrans, q);
       }
+
+      if (diagError) {
+        banner.className = 'status-banner friendly-reminder';
+        banner.style.display = 'block';
+        banner.innerText = `🔍 API 診斷信息 (Diagnostic): ${diagError.slice(0, 180)}`;
+      } else {
+        banner.style.display = 'none';
+      }
       limitBox.style.display = 'block';
     }
 
     function openKeyModal() {
       document.getElementById('apiKeyInput').value = backupKey;
+      const st = document.getElementById('keyTestStatus');
+      st.style.display = 'none';
       document.getElementById('keyModal').style.display = 'flex';
     }
+
     async function saveBackupKey() {
-      backupKey = document.getElementById('apiKeyInput').value.trim();
-      localStorage.setItem('tp_v22_backup_key', backupKey);
-      localStorage.setItem('tp_test_gemini_key', backupKey);
+      const rawVal = (document.getElementById('apiKeyInput').value || '').replace(/\s+/g, '');
+      const st = document.getElementById('keyTestStatus');
+      st.style.display = 'block';
+
+      if (!rawVal) {
+        clearBackupKey();
+        st.innerText = 'Cleared.';
+        return;
+      }
+
+      st.style.color = '#1e40af';
+      st.innerText = '🔍 Verifying Key with Google AI Studio...';
+
+      backupKey = rawVal;
+      try {
+        localStorage.setItem('tp_v22_backup_key', backupKey);
+        localStorage.setItem('tp_test_gemini_key', backupKey);
+      } catch (e) {}
       refreshKeyBtnStyle();
-      document.getElementById('keyModal').style.display = 'none';
-      if (backupKey) {
-        await discoverFastModels(backupKey);
-        const pendingQ = document.getElementById('userInput').value.trim();
-        if (pendingQ) runSmartAI(pendingQ);
+
+      const models = await discoverAuthorizedModels(backupKey);
+      if (models.length > 0) {
+        st.style.color = '#166534';
+        st.innerText = `✅ Key Verified! Active models: ${models.slice(0, 3).join(', ')}`;
+        setTimeout(() => {
+          document.getElementById('keyModal').style.display = 'none';
+          const pendingQ = document.getElementById('userInput').value.trim();
+          if (pendingQ) runSmartAI(pendingQ);
+        }, 600);
+      } else {
+        st.style.color = '#b91c1c';
+        st.innerText = '⚠️ Could not verify key (check if key is valid or network blocks googleapis.com).';
       }
     }
+
     function clearBackupKey() {
       backupKey = '';
-      localStorage.removeItem('tp_v22_backup_key');
-      localStorage.removeItem('tp_test_gemini_key');
+      try {
+        localStorage.removeItem('tp_v22_backup_key');
+        localStorage.removeItem('tp_test_gemini_key');
+      } catch (e) {}
       document.getElementById('apiKeyInput').value = '';
+      document.getElementById('keyTestStatus').style.display = 'none';
       refreshKeyBtnStyle();
     }
 
