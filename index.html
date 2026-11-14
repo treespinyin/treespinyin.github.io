@@ -324,7 +324,7 @@
 
     <!-- 🕒 1. 膠囊上方：顯示檔案建設時間 -->
     <div class="build-time-text">
-      🕒 Build: 2026-11-14 09:45 PST (v13.0 極速1秒收音回應 + 中文雙軌拼音聲學糾偏 + 單人高頻引導Key版)
+      🕒 Build: 2026-11-14 10:12 PST (v14.0 禁絕AI自言自語 + 雙向模糊糾偏並更新輸入框 + 詩詞全文零疏漏干練版)
     </div>
 
     <!-- 🔍 2. 谷歌膠囊 (輸入框 + EN/中文切換 + 麥克風 + 🔑) -->
@@ -501,19 +501,22 @@
       }
     }
 
-    // 同時生成「帶聲調拼音」與「無聲調純音節軌跡 (Toneless Pinyin)」，讓 AI 100% 勘破普通話同音字、平翹舌 (z/zh, c/ch, s/sh) 與前後鼻音 (in/ing, en/eng) 誤差！
+    // 產生三軌聲學指紋：「帶調拼音」+「無調拼音」+「平翹舌/前後鼻音歸一化模糊音軌 (Fuzzy Skeleton)」，讓 AI 100% 瞬間看穿同音錯字與口音偏差！
     function getPhoneticTrackForAI(text) {
       if (!text) return '';
       if (/[\u4e00-\u9fa5]/.test(text)) {
         try {
           const withTone = pinyinPro.pinyin(text, { toneType: 'num' });
           const noTone = pinyinPro.pinyin(text, { toneType: 'none' });
-          return `${withTone} (toneless: ${noTone})`;
+          const fuzzy = noTone
+            .replace(/\bzh/g, 'z').replace(/\bch/g, 'c').replace(/\bsh/g, 's')
+            .replace(/ing\b/g, 'in').replace(/eng\b/g, 'en').replace(/ang\b/g, 'an');
+          return `Pinyin: "${withTone}" | Toneless: "${noTone}" | Fuzzy: "${fuzzy}"`;
         } catch (e) {
           return text;
         }
       }
-      return text;
+      return `Spoken Phonetics: "${text}"`;
     }
 
     function toggleVoice() {
@@ -560,7 +563,7 @@
       // 極速收音計時：中文說完停頓 1.15 秒即刻發送（比之前快 1.1 秒！），英文停頓 1.55 秒即刻發送
       function scheduleGentleStop() {
         clearTimeout(voiceSilenceTimer);
-        const silenceAllowance = (spokenLang === 'en') ? 1550 : 1150;
+        const silenceAllowance = (spokenLang === 'en') ? 1650 : 1350;
         const waitMs = hasSpokenYet ? silenceAllowance : 5000;
         voiceSilenceTimer = setTimeout(() => {
           if (activeRec) activeRec.stop();
@@ -610,7 +613,7 @@
 
         const combinedCandidates = new Set();
         if (lastValidFullText) combinedCandidates.add(lastValidFullText);
-        for (let k = 0; k < 5; k++) {
+        for (let k = 0; k < 8; k++) {
           const altSentence = segmentAlts
             .map((arr, idx) => (arr && arr[k]) ? arr[k] : (finalizedSegments[idx] || ''))
             .filter(Boolean)
@@ -618,7 +621,7 @@
             .trim();
           if (altSentence) combinedCandidates.add(altSentence);
         }
-        latestVoiceCandidates = Array.from(combinedCandidates).slice(0, 5);
+        latestVoiceCandidates = Array.from(combinedCandidates).slice(0, 8);
       };
 
       activeRec.onend = () => {
@@ -1033,8 +1036,8 @@
 
       const isGemma = /gemma/i.test(modelName);
       const genConfig = isGemma
-        ? { temperature: 0.1, maxOutputTokens: 600 }
-        : { temperature: 0.1, maxOutputTokens: 600, thinkingConfig: { thinkingBudget: 0 } };
+        ? { temperature: 0.1, maxOutputTokens: 1200 }
+        : { temperature: 0.1, maxOutputTokens: 1200, thinkingConfig: { thinkingBudget: 0 } };
 
       let r = await fetch(url, {
         method: 'POST',
@@ -1052,7 +1055,7 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             contents: [{ parts: [{ text: fullPromptText }] }],
-            generationConfig: { temperature: 0.1, maxOutputTokens: 600 }
+            generationConfig: { temperature: 0.1, maxOutputTokens: 1200 }
           }),
           signal
         });
@@ -1192,8 +1195,19 @@
       return /[\u4e00-\u9fa5]/.test(s) ? s : '';
     }
 
+    // 嚴格攔截 AI 的自言自語、思考過程、糾錯解釋（如 "Based on context and phonetics..."），絕不允許這類廢話混入回答或古詩中！
+    function isAIMetaChatterLine(line) {
+      if (!line) return true;
+      const metaPattern = /^(based on context|based on phonetics|based on the|the user input|speech recognition error|phonetic track|intended question|corrected input|user meant|here is the|sure,\s*here|note:|explanation:|analysis:|reasoning:|根據語音|根據上下文|語音識別錯誤|用戶本意|糾正後)/i;
+      if (metaPattern.test(line.trim())) return true;
+      if (/speech recognition error|phonetic disambiguation|homophone typo|acoustic track/i.test(line)) return true;
+      return false;
+    }
+
     function parseBilingualPairLine(rawLine) {
       const cleaned = rawLine.replace(/^[-*•\d.)、]+\s*/, '').replace(/\*+/g, '').trim();
+      if (isAIMetaChatterLine(cleaned)) return null;
+
       let parts = null;
       if (cleaned.includes('|||')) {
         parts = cleaned.split('|||').map(p => p.trim()).filter(Boolean);
@@ -1215,7 +1229,7 @@
         zhPart = cleanChineseSentence(parts[0]) || parts[0];
         enPart = parts[1];
       }
-      if (!/[\u4e00-\u9fa5]/.test(zhPart)) return null;
+      if (!/[\u4e00-\u9fa5]/.test(zhPart) || isAIMetaChatterLine(enPart) || isAIMetaChatterLine(zhPart)) return null;
       return { zh: zhPart, en: enPart };
     }
 
@@ -1226,13 +1240,29 @@
         .split(/\r?\n+/)
         .map(l => l.trim())
         .filter(Boolean);
-      if (rawLines.length === 0) return false;
+      if (rawLines.length === 0) return { ok: false, correctedQuery: '' };
 
       const seenExactZh = new Set();
       let renderedPairs = 0;
+      let correctedQuery = '';
 
       for (let i = 0; i < rawLines.length; i++) {
         const rawLine = rawLines[i];
+
+        // 若 AI 第一行回傳了 [FIXED_INPUT]: 糾偏後的用戶真實問題，自動更新膠囊輸入框顯示並記住真實意圖，但不渲染到下方回答區！
+        const fixedMatch = rawLine.match(/^\[?FIXED_INPUT\]?\s*[:：]\s*(.+)$/i);
+        if (fixedMatch) {
+          correctedQuery = fixedMatch[1].replace(/^["'「『]|["'」』]$/g, '').trim();
+          if (correctedQuery) {
+            const inputEl = document.getElementById('userInput');
+            inputEl.value = correctedQuery;
+            autoResizeTextarea(inputEl);
+          }
+          continue;
+        }
+
+        if (isAIMetaChatterLine(rawLine)) continue;
+
         const pair = parseBilingualPairLine(rawLine);
         if (pair) {
           const key = pair.zh.replace(/[^\u4e00-\u9fa5]/g, '');
@@ -1240,12 +1270,11 @@
           seenExactZh.add(key);
           renderedPairs++;
           appendSentenceProgressive(pair.zh, pair.en);
-          await nextPaintTick();
           continue;
         }
 
         const lineStr = rawLine.replace(/^[-*•\d.)、]+\s*/, '').replace(/\*+/g, '').trim();
-        if (!lineStr) continue;
+        if (!lineStr || isAIMetaChatterLine(lineStr)) continue;
 
         if (/[\u4e00-\u9fa5]/.test(lineStr)) {
           const parenMatch = lineStr.match(/^(.+?)\s*[(（]([A-Za-z][^）)]+)[)）]$/);
@@ -1255,7 +1284,7 @@
             enStr = parenMatch[2].trim();
           } else {
             zhStr = cleanChineseSentence(lineStr) || lineStr;
-            if (i + 1 < rawLines.length && !/[\u4e00-\u9fa5]/.test(rawLines[i + 1]) && /[A-Za-z]/.test(rawLines[i + 1]) && !rawLines[i + 1].includes('|||')) {
+            if (i + 1 < rawLines.length && !/[\u4e00-\u9fa5]/.test(rawLines[i + 1]) && /[A-Za-z]/.test(rawLines[i + 1]) && !rawLines[i + 1].includes('|||') && !isAIMetaChatterLine(rawLines[i + 1])) {
               enStr = rawLines[i + 1].replace(/^[-*•\d.)、]+\s*/, '').replace(/\*+/g, '').trim();
               i++;
             }
@@ -1265,21 +1294,10 @@
             seenExactZh.add(key);
             renderedPairs++;
             appendSentenceProgressive(zhStr, enStr);
-            await nextPaintTick();
-          }
-        } else if (/[A-Za-z]{2,}/.test(lineStr)) {
-          const zhTrans = await translateFastFallback(lineStr, 'en', 'zh');
-          const cleanZh = cleanChineseSentence(zhTrans) || zhTrans;
-          const key = cleanZh.replace(/[^\u4e00-\u9fa5]/g, '');
-          if (key && !seenExactZh.has(key)) {
-            seenExactZh.add(key);
-            renderedPairs++;
-            appendSentenceProgressive(cleanZh, lineStr);
-            await nextPaintTick();
           }
         }
       }
-      return renderedPairs > 0;
+      return { ok: renderedPairs > 0, correctedQuery };
     }
 
     async function runSmartAI(overrideInput, voiceAlts = [], fromVoice = false) {
@@ -1307,31 +1325,41 @@
 
       const memoryContext = buildMemoryContextString();
 
-      const modeInstruction = (spokenLang === 'en')
-        ? `[Input Language Mode: ENGLISH (EN)]${(fromVoice && altsToUse.length > 0) ? ` Voice Candidates: ${JSON.stringify(altsToUse)}. (NOTE: If the user accidentally left the toggle on EN while speaking Mandarin Chinese—producing English words that sound like Chinese Pinyin such as "knee how"->"你好", "jing yes"->"靜夜思", "yong a"->"詠鵝"—automatically deduce and answer their intended Chinese request!)` : ''}`
-        : `[Input Language Mode: MANDARIN CHINESE (中文)] Acoustic Pinyin Track of user input: "${getPhoneticTrackForAI(q)}" | Top 8 Speech Candidates: ${JSON.stringify(altsToUse)}. (CRITICAL FOR CHINESE VOICE: Browser speech-to-text often outputs homophone typos—e.g. "永和/泳鵝" for "詠鵝", "今夜思/敬業思" for "靜夜思", "禮拜" for "李白", "路窄" for "鹿柴", or z/zh, c/ch, s/sh, in/ing mix-ups. Always use the Acoustic Pinyin Track and candidates to reconstruct the true intended Chinese question or poem!)`;
+      const acousticInfo = `[Speech Recognition Data] Selected Mode: ${spokenLang === 'en' ? 'EN' : '中文'} | Raw Transcript: "${q}" | ${getPhoneticTrackForAI(q)} | Alternative Speech Candidates: ${JSON.stringify(altsToUse)}`;
 
       const systemRules = [
-        'You are an authoritative, fast bilingual AI assistant and Mandarin scholar.',
+        'You are a crisp, authoritative bilingual Mandarin scholar and AI assistant.',
         memoryContext,
-        modeInstruction,
+        acousticInfo,
         '',
-        'CRITICAL RULES:',
-        '1. ANSWER DIRECTLY & CONCISELY (Max 4 lines for general questions): Do NOT repeat, echo, or merely translate the user\'s question! Provide the actual answer, explanation, or requested poem.',
-        '   - If asked "What is the capital of China?", output: 中國的首都是北京。 ||| The capital of China is Beijing.',
-        '   - If asked a poem (e.g. 靜夜思, 詠鵝, 鹿柴, 春曉), output Title+Author on Line 1, then each verse on its own line.',
-        '2. STRICT BILINGUAL FORMAT: Every line MUST be formatted as:',
-        '   Traditional_Chinese_Sentence ||| English_Translation',
-        '   (Left side of "|||" must contain ONLY Traditional Chinese characters and punctuation; write numbers in Chinese characters; NO Pinyin on the left side.)'
+        'STRICT EXECUTION RULES (FOLLOW EXACTLY):',
+        '1. SILENT PHONETIC & CONTEXT CORRECTION (NO META-CHATTER!):',
+        '   - Speech recognition often produces homophone errors (e.g., "永和/泳鵝"->"詠鵝", "今夜思"->"靜夜思", "禮拜"->"李白", "路窄"->"鹿柴", "春笑"->"春曉", "敏農"->"憫農", or English phonetic words like "jing yes"->"靜夜思").',
+        '   - Combine the Recent Conversation History + Acoustic Pinyin Track + Candidates to silently deduce what the user REALLY meant.',
+        '   - NEVER output explanations like "Based on context and phonetics..." or "The user input is a speech recognition error"! ZERO meta-commentary!',
+        '   - If the raw transcript had a speech recognition typo, output ONLY this tag on the very first line: [FIXED_INPUT]: Corrected_Question_Text',
+        '2. POEMS, SONGS & CLASSICS (COMPLETE & PURE):',
+        '   - When the user asks for ANY poem, classic, or lyric (or follows up asking for another poem by the same poet), output ONLY:',
+        '     Line 1: 《詩詞名稱》朝代・作者 ||| English Title by Author',
+        '     Line 2+: Every single verse of the FULL original text in exact order (一字不漏、完整全篇), one verse per line.',
+        '   - DO NOT include background intro, appreciation, analysis, or extra chatter!',
+        '3. GENERAL QUESTIONS & FOLLOW-UPS (CRISP & CONCISE):',
+        '   - Use Recent Conversation History to resolve pronouns ("他", "這首", "第二句", "還有嗎", "why", "another one", "what does it mean").',
+        '   - Answer directly and concisely in 1 to 3 crisp sentences. No filler or pleasantries.',
+        '4. STRICT BILINGUAL LINE FORMAT:',
+        '   - Every content line MUST use "|||":',
+        '     Pure_Traditional_Chinese ||| Authentic_English',
+        '   - Left side of "|||" must contain ONLY Traditional Chinese characters and Chinese punctuation (write numbers in Chinese characters; NO Pinyin or English letters on the left side).'
       ].filter(Boolean).join('\n');
 
-      const cloudCacheKey = (conversationHistory.length === 0) ? normalizeCloudCacheKey(q) : '';
+      // 只要處於連續對話中 (conversationHistory.length > 0) 或帶有語音候選詞，強制結合上下文即時推理，不走靜態快取避免答非所問
+      const cloudCacheKey = (conversationHistory.length === 0 && !fromVoice) ? normalizeCloudCacheKey(q) : '';
       const { text: aiText, source, diagError, usedPublicPool } = await fetchFastAccurateAI(systemRules, q, cloudCacheKey);
 
       if (aiText) {
-        const ok = await renderBilingualAIOutput(aiText);
+        const { ok, correctedQuery } = await renderBilingualAIOutput(aiText);
         if (ok) {
-          pushConversationMemory(q, aiText);
+          pushConversationMemory(correctedQuery || q, aiText);
           if (backupKey && diagError) {
             banner.className = 'status-banner diag-info';
             banner.style.display = 'block';
