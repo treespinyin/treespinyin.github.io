@@ -1,41 +1,32 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-HK">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Trees Pinyin</title>
+  <title>Trees Pinyin — 極簡谷歌膠囊 AI 問答測試版</title>
   <meta name="theme-color" content="#1b5e20">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Trees Pinyin">
-
   <link rel="icon" type="image/png" href="/icon.png?v=3">
-  <link rel="shortcut icon" type="image/png" href="/icon.png?v=3">
-  <link id="appleTouchIcon" rel="apple-touch-icon" href="/icon.png?v=3">
-  <link rel="apple-touch-icon-precomposed" href="/icon.png?v=3">
 
   <script src="https://cdn.jsdelivr.net/npm/pinyin-pro@3.19.6/dist/index.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/opencc-js@1.0.5/dist/umd/full.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
   <style>
     :root {
-      --bg: #f5f7f9;
+      --bg: #f8fafc;
       --card: #ffffff;
-      --text: #111111;
-      --muted: #555555;
+      --text: #111827;
+      --muted: #64748b;
       --accent: #1b5e20;
       --accent-hover: #2e7d32;
       --accent-soft: #e8f5e9;
-      --blue: #1565c0;
-      --border: #dcdcdc;
-      --danger: #d32f2f;
+      --blue: #1a73e8;
+      --border: #dfe1e5;
+      --danger: #d93025;
     }
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     body {
       margin: 0;
-      padding: 0 0 36px;
+      padding: 28px 16px 48px;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       background: var(--bg);
       color: var(--text);
@@ -44,346 +35,221 @@
       align-items: center;
       min-height: 100vh;
     }
-    .hidden { display: none !important; }
 
-    /* ================= Navbar ================= */
-    .navbar {
+    .container {
       width: 100%;
-      background: #ffffff;
-      border-bottom: 1px solid #e5e7eb;
-      padding: 8px 20px;
+      max-width: 780px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+    }
+
+    /* 1. 頂部版本時間與快速狀態列 (方便測試確認版本) */
+    .top-meta-bar {
+      width: 100%;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.03);
-      gap: 10px;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 0 6px;
     }
-    .nav-left {
-      display: flex;
+    .build-time-badge {
+      display: inline-flex;
       align-items: center;
-      gap: 10px;
-      text-decoration: none;
-      color: inherit;
+      gap: 6px;
+      background: #e8f5e9;
+      color: #1b5e20;
+      border: 1px solid #a5d6a7;
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.2px;
     }
-    .brand-logo {
-      width: 34px;
-      height: 34px;
-      border-radius: 8px;
-      object-fit: cover;
-      flex-shrink: 0;
-    }
-    .brand-title {
-      font-size: 1.15rem;
-      font-weight: 800;
-      color: var(--accent);
-      line-height: 1.2;
-    }
-
-    .nav-center, .nav-right {
+    .top-right-tools {
       display: flex;
       align-items: center;
       gap: 8px;
     }
-    .dropdown {
-      position: relative;
-      display: inline-block;
-    }
-    .nav-btn {
-      background: #fff;
-      border: 1px solid #d0d7de;
-      border-radius: 10px;
-      padding: 6px 12px;
-      font-size: 0.84rem;
+    .mini-pill-btn {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 999px;
+      padding: 5px 12px;
+      font-size: 0.78rem;
       font-weight: 700;
-      color: #222;
+      color: #334155;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
       transition: all 0.15s;
-      text-decoration: none;
-      white-space: nowrap;
     }
-    .nav-btn:hover {
-      background: #f3f4f6;
-      border-color: #adb5bd;
-    }
-    .nav-btn.has-key {
-      border-color: #2e7d32;
-      color: #1b5e20;
-      background: #e8f5e9;
-    }
-    .nav-btn.login-btn {
+    .mini-pill-btn:hover { background: #f1f5f9; border-color: #94a3b8; }
+    .mini-pill-btn.active-mode {
       background: var(--accent);
       color: #fff;
       border-color: var(--accent);
     }
-    .nav-btn.login-btn:hover {
-      background: var(--accent-hover);
-    }
-    .btn-mini-icon {
-      width: 16px;
-      height: 16px;
-      border-radius: 4px;
-      object-fit: cover;
+    .mini-pill-btn.has-key {
+      background: #e8f5e9;
+      color: #1b5e20;
+      border-color: #2e7d32;
     }
 
-    .dropdown-menu {
-      display: none;
-      position: absolute;
-      top: calc(100% + 6px);
-      left: 0;
-      background: #fff;
-      min-width: 200px;
-      border-radius: 12px;
-      border: 1px solid #e5e7eb;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.12);
-      padding: 6px;
-      z-index: 2000;
-    }
-    .dropdown-menu.right-align {
-      left: auto;
-      right: 0;
-    }
-    .dropdown.open .dropdown-menu {
-      display: block;
-    }
-    .dropdown-item {
+    /* 2. 谷歌風格大膠囊搜索框 (Google Pill Search Bar) */
+    .google-capsule-wrap {
+      width: 100%;
+      background: #ffffff;
+      border: 1.5px solid var(--border);
+      border-radius: 32px;
+      padding: 8px 10px 8px 20px;
+      box-shadow: 0 2px 8px rgba(32, 33, 36, 0.08);
       display: flex;
       align-items: center;
       gap: 8px;
-      padding: 8px 12px;
-      color: #222;
-      text-decoration: none;
-      font-size: 0.85rem;
-      font-weight: 600;
-      border-radius: 8px;
-      transition: background 0.15s;
-      cursor: pointer;
+      transition: box-shadow 0.2s, border-color 0.2s;
     }
-    .dropdown-item:hover {
-      background: var(--accent-soft);
-      color: var(--accent);
+    .google-capsule-wrap:focus-within {
+      border-color: #1b5e20;
+      box-shadow: 0 4px 16px rgba(27, 94, 32, 0.16);
     }
-    .dropdown-divider {
-      height: 1px;
-      background: #e5e7eb;
-      margin: 4px 0;
-    }
-
-    /* ================= Main Container ================= */
-    .main-wrap {
-      width: 100%;
-      max-width: 920px;
-      padding: 12px 16px 0;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .tab-panel {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      width: 100%;
-    }
-
-    .panel {
-      width: 100%;
-      background: var(--card);
-      padding: 12px 14px;
-      border-radius: 16px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.03);
-      border: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .search-box {
-      display: flex;
-      align-items: center;
-      border: 1.5px solid #cbd5e1;
-      border-radius: 14px;
-      padding: 6px 8px 6px 12px;
-      background: #fff;
-      gap: 8px;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-    .search-box:focus-within {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(27, 94, 32, 0.1);
-    }
-    textarea {
+    .capsule-input {
       flex: 1;
       border: none;
-      font-size: 0.96rem;
-      line-height: 1.4;
-      resize: vertical;
       outline: none;
-      font-family: inherit;
-      padding: 2px 0;
+      font-size: 1.05rem;
+      line-height: 1.45;
+      color: var(--text);
       background: transparent;
-      min-height: 42px;
+      font-family: inherit;
+      resize: none;
+      max-height: 110px;
+      padding: 4px 0;
     }
-    .icon-action {
-      width: 40px;
-      height: 40px;
+    .capsule-input::placeholder { color: #9aa0a6; }
+
+    .capsule-icon-btn {
+      width: 42px;
+      height: 42px;
       border-radius: 50%;
       border: none;
-      background: #f1f3f4;
-      color: #333;
+      background: transparent;
+      color: #5f6368;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
       flex-shrink: 0;
-      transition: background 0.15s;
+      transition: background 0.15s, transform 0.1s;
     }
-    .icon-action:hover { background: #e2e8f0; }
-    .icon-action:active { background: #cbd5e1; }
-    .icon-action svg { width: 21px; height: 21px; fill: currentColor; }
-    .icon-action.recording {
-      background: var(--danger);
-      color: #fff;
-      animation: pulse 1s infinite;
-    }
-    @keyframes pulse { 50% { opacity: 0.45; } }
+    .capsule-icon-btn:hover { background: #f1f3f4; color: #202124; }
+    .capsule-icon-btn:active { transform: scale(0.95); }
+    .capsule-icon-btn svg { width: 22px; height: 22px; fill: currentColor; }
 
-    .action-row {
-      display: flex;
-      gap: 8px;
-      align-items: center;
+    /* 語音按鈕動態效果 */
+    .capsule-icon-btn.mic-btn {
+      background: #f1f5f9;
+      color: #1a73e8;
     }
-    .btn {
-      flex: 1;
-      padding: 10px 14px;
+    .capsule-icon-btn.mic-btn.recording {
+      background: var(--danger);
+      color: #ffffff;
+      animation: micPulse 1s infinite;
+    }
+    @keyframes micPulse {
+      0% { box-shadow: 0 0 0 0 rgba(217, 48, 37, 0.45); }
+      70% { box-shadow: 0 0 0 10px rgba(217, 48, 37, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(217, 48, 37, 0); }
+    }
+
+    /* 發送/AI 問答按鈕 */
+    .capsule-send-btn {
+      height: 42px;
+      padding: 0 18px;
+      border-radius: 999px;
       border: none;
-      border-radius: 10px;
+      background: var(--accent);
+      color: #ffffff;
       font-size: 0.92rem;
       font-weight: 700;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      justify-content: center;
       gap: 6px;
-      white-space: nowrap;
-      transition: filter 0.15s, transform 0.1s;
+      flex-shrink: 0;
+      transition: background 0.15s;
     }
-    .btn:hover { filter: brightness(1.06); }
-    .btn:active { transform: translateY(1px); }
-    .btn-blue { background: var(--blue); color: #fff; }
-    .btn-green { background: var(--accent); color: #fff; }
-    .btn-soft { background: var(--accent-soft); color: var(--accent); border: 1px solid #c8e6c9; }
-    .btn-dark { background: #222; color: #fff; font-size: 0.84rem; padding: 8px 14px; border-radius: 10px; flex: unset; }
+    .capsule-send-btn:hover { background: var(--accent-hover); }
 
-    /* Disclaimer Banner (Original Text Preserved) */
-    .disclaimer-banner {
-      background: #fffdf5;
-      border: 1px solid #fde68a;
-      border-left: 4px solid #f59e0b;
-      border-radius: 10px;
-      padding: 9px 14px;
-      font-size: 0.82rem;
-      color: #4b5563;
-      line-height: 1.45;
-    }
-
-    /* Minimal Bottom Bar: Only Layout, Print, Record Video */
-    .bottom-bar {
+    /* 語音即時聽寫與候選詞包容度條 (可點擊一鍵切換同音候選詞) */
+    .voice-live-bar {
       width: 100%;
-      background: #ffffff;
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 10px 16px;
-      display: flex;
-      align-items: center;
-      justify-content: flex-start;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-    .layout-popover {
-      min-width: 280px;
-      padding: 14px;
       display: none;
-      flex-direction: column;
-      gap: 10px;
-      position: absolute;
-      bottom: calc(100% + 8px);
-      left: 0;
-      background: #fff;
-      border: 1px solid #cbd5e1;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      background: #fffbeb;
+      border: 1px solid #fde68a;
       border-radius: 14px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-      z-index: 2500;
-      font-size: 0.85rem;
-      font-weight: 600;
+      font-size: 0.82rem;
+      color: #92400e;
     }
-    .dropdown.open .layout-popover { display: flex; }
-    .chk-row { display: flex; flex-direction: column; gap: 6px; }
-    .chk-row label { display: flex; align-items: center; gap: 6px; cursor: pointer; user-select: none; }
-    .chk-row input[type="checkbox"] { width: 15px; height: 15px; accent-color: var(--accent); cursor: pointer; }
-    .layout-select { padding: 6px 9px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 0.83rem; background: #fff; width: 100%; }
-
-    /* ================= Clean 4-in-1 Sheet Card ================= */
-    .sheet-card {
-      width: 100%;
+    .voice-alt-chip {
       background: #ffffff;
-      padding: 14px 18px;
-      border-radius: 16px;
+      border: 1px solid #fcd34d;
+      border-radius: 999px;
+      padding: 3px 10px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #1f2937;
+      cursor: pointer;
+      transition: all 0.12s;
+    }
+    .voice-alt-chip:hover {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    /* 3. AI 回答與四位一體注音卡片 */
+    .answer-card {
+      width: 100%;
+      background: var(--card);
+      border-radius: 20px;
       border: 1px solid var(--border);
-      box-shadow: 0 3px 12px rgba(0,0,0,0.03);
-      min-height: 76px;
+      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.03);
+      padding: 18px 20px;
+      min-height: 110px;
       display: flex;
       flex-direction: column;
       align-items: center;
       text-align: center;
-      gap: 10px;
+      gap: 14px;
       --user-font-size: 20px;
     }
-    .sheet-card.align-left {
-      align-items: flex-start;
-      text-align: left;
-    }
-    .sheet-card.align-left .char-row {
-      justify-content: flex-start;
-    }
-    .sheet-card.align-left .sentence-block {
-      align-items: flex-start;
-    }
-    .print-header-title {
-      font-size: 1.4rem;
-      font-weight: 800;
-      color: #111;
-      margin-bottom: 2px;
-      display: none;
-    }
-    .preview-img {
-      max-width: 80%;
-      max-height: 150px;
-      border-radius: 10px;
-      object-fit: contain;
-      display: none;
-    }
-    .ai-reply-box {
+
+    .status-banner {
       width: 100%;
-      background: #f9fbe7;
-      border: 1px solid #dce775;
-      border-radius: 10px;
-      padding: 8px 14px;
-      font-size: 0.94rem;
-      color: #111;
-      line-height: 1.45;
-      text-align: center;
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: #166534;
       display: none;
     }
+
     .annotation-list {
       width: 100%;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 16px;
+      gap: 18px;
     }
     .sentence-block {
       width: 100%;
@@ -391,17 +257,16 @@
       flex-direction: column;
       align-items: center;
       gap: 6px;
-      padding-bottom: 12px;
+      padding-bottom: 14px;
       border-bottom: 1px dashed #e5e7eb;
     }
     .sentence-block:last-child { border-bottom: none; padding-bottom: 0; }
+
     .en-line {
       font-size: calc(var(--user-font-size) * 0.92);
       font-weight: 600;
-      color: #111;
-      line-height: 1.4;
-      word-break: normal;
-      overflow-wrap: break-word;
+      color: #1f2937;
+      line-height: 1.42;
       max-width: 96%;
     }
     .char-row {
@@ -423,7 +288,6 @@
       transition: background 0.12s;
     }
     .tp-col:hover { background: #f1f8e9; }
-    .tp-col:active { background: #c8e6c9; }
     .tp-py {
       font-size: calc(var(--user-font-size) * 0.96);
       font-weight: 700;
@@ -442,1441 +306,197 @@
     .tp-zh {
       font-size: calc(var(--user-font-size) * 1.25);
       font-weight: 600;
-      color: #000;
+      color: #000000;
       line-height: 1.22;
       min-height: 1.22em;
     }
 
-    /* Dynamic Row Visibility */
-    .sheet-card.hide-en .en-line, .studio-top-pane.hide-en .en-line { display: none !important; }
-    .sheet-card.hide-tp .tp-py, .studio-top-pane.hide-tp .tp-py { display: none !important; }
-    .sheet-card.hide-std .tp-std, .studio-top-pane.hide-std .tp-std { display: none !important; }
-    .sheet-card.hide-zh .tp-zh, .studio-top-pane.hide-zh .tp-zh { display: none !important; }
-
-    /* ================= 🟢 Floating icon.png + Mini Popover ================= */
-    .selection-icon-only {
-      position: absolute;
-      display: none;
-      z-index: 200010;
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background: #1b5e20;
-      border: 2px solid #ffffff;
-      box-shadow: 0 4px 14px rgba(27,94,32,0.48);
-      cursor: pointer;
-      padding: 3px;
-      transition: transform 0.15s;
-    }
-    .selection-icon-only:hover { transform: scale(1.12); }
-    .selection-icon-only img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
-
-    .selection-mini-popover {
-      position: absolute;
-      display: none;
-      z-index: 200011;
-      width: 92vw;
-      max-width: 440px;
-      background: #ffffff;
-      border: 2px solid var(--accent);
-      border-radius: 16px;
-      box-shadow: 0 12px 35px rgba(0,0,0,0.25);
-      padding: 12px;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    /* ================= 🎬 Video Studio Overlay ================= */
-    .studio-overlay {
+    /* API Key 彈窗 */
+    .modal {
       display: none;
       position: fixed;
       top: 0; left: 0; width: 100vw; height: 100vh;
-      background: #0f172a;
-      z-index: 100000;
-      flex-direction: column;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 9999;
+      justify-content: center;
       align-items: center;
-      justify-content: space-between;
-      padding: 10px;
-      color: #fff;
-    }
-    .studio-overlay.active { display: flex; }
-    .studio-top-bar {
-      width: 100%; max-width: 900px;
-      display: flex; justify-content: space-between; align-items: center;
-      flex-wrap: wrap; gap: 8px;
-      background: rgba(255,255,255,0.08);
-      padding: 8px 12px; border-radius: 12px;
-    }
-    .studio-select {
-      background: #1e293b; color: #fff; border: 1px solid #475569;
-      border-radius: 8px; padding: 6px 10px; font-size: 0.82rem; font-weight: 700; outline: none;
-    }
-    .studio-mode-pill {
-      padding: 6px 12px; border-radius: 18px; border: 1px solid rgba(255,255,255,0.25);
-      background: transparent; color: #fff; font-size: 0.8rem; font-weight: 700; cursor: pointer;
-    }
-    .studio-mode-pill.active { background: var(--accent); border-color: #a5d6a7; }
-
-    .studio-stage {
-      position: relative; background: #ffffff; color: #111; border-radius: 16px;
-      overflow: hidden; display: flex; flex-direction: column;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.5); border: 2px solid #334155;
-      --user-font-size: 19px;
-    }
-    .studio-stage.ratio-9-16 { width: min(92vw, 380px); height: min(76vh, 675px); }
-    .studio-stage.ratio-16-9 { width: min(94vw, 820px); height: min(72vh, 461px); }
-
-    .studio-top-pane {
-      flex: 1; overflow-y: auto; padding: 14px 12px; background: #ffffff;
-      display: flex; flex-direction: column; align-items: center; text-align: center; gap: 14px;
-      scroll-behavior: smooth; border-bottom: 2px solid #1b5e20;
-    }
-    .studio-bottom-pane {
-      flex: 1; position: relative; background: #000; overflow: hidden;
-      display: flex; align-items: center; justify-content: center;
-    }
-    .studio-bottom-pane video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
-
-    .studio-stage.view-full-text .studio-bottom-pane { display: none !important; }
-    .studio-stage.view-full-text .studio-top-pane { flex: 1; height: 100%; border-bottom: none; }
-    .studio-stage.view-full-cam .studio-top-pane { display: none !important; }
-    .studio-stage.view-full-cam .studio-bottom-pane { flex: 1; height: 100%; }
-
-    .studio-bottom-controls {
-      width: 100%; max-width: 900px; display: flex; justify-content: center;
-      align-items: center; gap: 10px; flex-wrap: wrap; padding: 6px;
-    }
-
-    /* ================= Mnemonic Cards ================= */
-    .reward-banner {
-      background: #ffffff; border: 1px solid var(--border); border-radius: 16px;
-      padding: 14px 16px; display: flex; flex-direction: column; gap: 10px;
-    }
-    .reward-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; }
-    .mnemonic-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; width: 100%; }
-    .mnemonic-card {
-      background: #ffffff; border: 1px solid #dce3ea; border-radius: 14px; padding: 14px;
-      display: flex; flex-direction: column; gap: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.03);
-    }
-    .mc-top { display: flex; flex-direction: column; gap: 4px; border-bottom: 1px dashed #e5e7eb; padding-bottom: 8px; }
-    .mc-meaning { font-size: 1rem; font-weight: 800; color: var(--accent); }
-    .mc-trees { font-size: 1.05rem; color: #111; }
-    .mc-hanzi { font-size: 0.92rem; font-weight: 600; color: #444; }
-    .mc-sound, .mc-tip { font-size: 0.85rem; line-height: 1.48; color: #222; }
-    .locked-pack-box { background: #fff8e1; border: 1.5px dashed #ffb300; border-radius: 14px; padding: 24px 18px; text-align: center; }
-
-    .share-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; width: 100%; }
-    .share-app-btn {
-      padding: 10px 12px; border-radius: 10px; border: 1px solid #d0d7de; background: #f8fafc;
-      font-size: 0.86rem; font-weight: 700; color: #111; cursor: pointer;
-      display: flex; align-items: center; justify-content: center; gap: 6px; text-decoration: none;
-    }
-
-    /* Modals */
-    .modal {
-      display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-      background: rgba(0,0,0,0.55); z-index: 200005; justify-content: center; align-items: center; padding: 16px;
+      padding: 16px;
     }
     .modal-box {
-      background: #fff; width: 100%; max-width: 420px; border-radius: 16px;
-      padding: 20px; display: flex; flex-direction: column; gap: 12px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-      color: #111;
-    }
-    .option-card-btn {
-      width: 100%; padding: 13px 14px; border: 1.5px solid #d0d7de; border-radius: 12px;
-      background: #f8fafc; color: #111; font-size: 0.95rem; font-weight: 700;
-      cursor: pointer; display: flex; align-items: center; justify-content: space-between; text-align: left;
-    }
-    .option-card-btn:hover { background: #e8f5e9; border-color: var(--accent); }
-    .notice-box { font-size: 0.86rem; line-height: 1.55; background: #fff8e1; border: 1px solid #ffe082; color: #333; padding: 12px; border-radius: 10px; }
-
-    @media (max-width: 768px) {
-      .navbar { padding: 8px 12px; flex-wrap: wrap; }
-      .action-row { flex-wrap: wrap; }
-    }
-    @media print {
-      .navbar, .panel, .disclaimer-banner, .bottom-bar, .preview-img,
-      .selection-icon-only, .selection-mini-popover, .studio-overlay { display: none !important; }
-      body { background: #fff; padding: 0; }
-      .main-wrap { max-width: 100%; padding: 0; }
-      .sheet-card { border: none; box-shadow: none; padding: 8mm; }
-      .print-header-title.has-title { display: block !important; }
+      background: #fff;
+      width: 100%;
+      max-width: 410px;
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
     }
   </style>
 </head>
 <body>
 
-  <!-- 🟢 1. 劃詞僅顯示 icon.png 小圖標 -->
-  <button id="selectionIconOnly" class="selection-icon-only" onmousedown="event.preventDefault(); event.stopPropagation();" onclick="openSelectionMiniPopover(event)">
-    <img src="/icon.png?v=3" alt="Trees Pinyin" onerror="this.src='icon.png'">
-  </button>
+  <div class="container">
 
-  <!-- 🪟 2. 點擊 icon.png 後跳出的獨立小顯示框 -->
-  <div id="selectionMiniPopover" class="selection-mini-popover" onmousedown="event.stopPropagation()">
-    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:6px;">
-      <div style="display:flex; align-items:center; gap:6px; font-weight:800; color:var(--accent); font-size:0.86rem;">
-        <img src="/icon.png?v=3" style="width:18px; height:18px; border-radius:4px;" onerror="this.src='icon.png'">
-        <span>Trees Pinyin</span>
-      </div>
-      <button onclick="closeSelectionMiniPopover()" style="border:none; background:none; font-size:1rem; cursor:pointer; color:#666;">✕</button>
-    </div>
-    <div id="popoverAnnotationBody" style="max-height:220px; overflow-y:auto; display:flex; flex-direction:column; align-items:center; gap:8px; padding:4px 0;"></div>
-    <div style="display:flex; gap:8px; border-top:1px solid #eee; padding-top:8px;">
-      <button class="btn btn-soft" style="padding:6px 10px; font-size:0.8rem;" onclick="speakPopoverContent()">🔊 Speak</button>
-      <button class="btn btn-soft" style="padding:6px 10px; font-size:0.8rem;" onclick="printPopoverContent()">🖨️ Print</button>
-    </div>
-  </div>
-
-  <!-- 🎬 3. 錄影工坊 (預設 9:16 + 1080p HD + MP4 輸出 + 錄製中右鍵改字同步顯示) -->
-  <div id="studioOverlay" class="studio-overlay">
-    <div class="studio-top-bar">
-      <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
-        <select id="studioRatioSelect" class="studio-select" onchange="setStudioRatio(this.value)">
-          <option value="9-16" selected>📱 9:16</option>
-          <option value="16-9">🎬 16:9</option>
-        </select>
-
-        <select id="studioQualitySelect" class="studio-select" title="Resolution">
-          <option value="1080" selected>🌟 1080p HD</option>
-          <option value="720">⚖️ 720p HD</option>
-          <option value="480">⚡ 480p Compact</option>
-        </select>
+    <!-- 🕒 1. 膠囊上方：顯示檔案建設時間 + 語音聲道切換 + API Key 狀態 (方便測試) -->
+    <div class="top-meta-bar">
+      <div class="build-time-badge">
+        <span>🕒 檔案建設時間 (Build): 2026-11-13 16:50 PST (v2.0 高包容語音版)</span>
       </div>
 
-      <div style="display:flex; align-items:center; gap:6px;">
-        <button class="studio-mode-pill active" id="viewBtnSplit" onclick="setStudioViewMode('split')">🌗 Split</button>
-        <button class="studio-mode-pill" id="viewBtnText" onclick="setStudioViewMode('full-text')">📄 Text</button>
-        <button class="studio-mode-pill" id="viewBtnCam" onclick="setStudioViewMode('full-cam')">🧑 Cam</button>
-      </div>
-
-      <button class="studio-mode-pill" style="background:#d32f2f; border-color:#ef5350;" onclick="closeCreatorStudio()">✕</button>
-    </div>
-
-    <div id="studioStage" class="studio-stage ratio-9-16">
-      <div id="studioTopPane" class="studio-top-pane"></div>
-      <div id="studioBottomPane" class="studio-bottom-pane">
-        <video id="studioCamVideo" autoplay playsinline muted></video>
-      </div>
-    </div>
-
-    <div class="studio-bottom-controls">
-      <span id="studioTimerBadge" style="font-family:monospace; font-size:0.95rem; font-weight:800; background:#1e293b; padding:6px 10px; border-radius:8px;">⏺️ 00:00</span>
-      <button class="btn btn-green" id="studioRecBtn" style="flex:unset; padding:8px 18px;" onclick="toggleStudioRecording()">🔴 Record</button>
-      <button class="btn btn-soft" style="flex:unset; padding:8px 14px;" onclick="speakAllStudioText()">🔊 Speak</button>
-      <a id="studioDownloadLink" class="btn btn-blue hidden" style="flex:unset; padding:8px 16px; text-decoration:none;" download="trees-pinyin-video.mp4">💾 Save MP4</a>
-    </div>
-  </div>
-
-  <!-- 🛡️ 文明用語勸告彈窗 -->
-  <div class="modal" id="profanityModal" onclick="if(event.target===this)this.style.display='none'">
-    <div class="modal-box" style="border-top: 6px solid #f59e0b; text-align: center; align-items: center;">
-      <div style="font-size: 2.2rem;">🌱</div>
-      <h3 style="margin: 0; color: #b45309; font-size: 1.1rem;">Mindful Language Reminder</h3>
-      <p style="margin: 0; font-size: 0.9rem; color: #374151; line-height: 1.5;">
-        Please use polite and respectful language.
-      </p>
-      <button class="btn btn-green" style="width: 100%;" onclick="document.getElementById('profanityModal').style.display='none'">OK</button>
-    </div>
-  </div>
-
-  <!-- ================= 頂部導覽列 ================= -->
-  <header class="navbar">
-    <a href="index.html" class="nav-left" onclick="switchMainTab('workspace'); return false;">
-      <img src="/icon.png?v=3" alt="Trees Pinyin" class="brand-logo" onerror="this.src='icon.png'">
-      <span class="brand-title" id="uiTitle">Trees Pinyin</span>
-    </a>
-
-    <div class="nav-center">
-      <div class="dropdown" id="resDropdown">
-        <button class="nav-btn" onclick="toggleDropdown('resDropdown', event)">
-          <span id="uiMoreRes">📚 More Resources</span> ▾
+      <div class="top-right-tools">
+        <!-- 語音模式切換：支援「中英自動」、「中文優先」、「English 優先」 -->
+        <button class="mini-pill-btn active-mode" id="voiceLangModeBtn" onclick="cycleVoiceLangMode()" title="切換語音識別語言重心">
+          🎙️ 語音: 中/EN 自動
         </button>
-        <div class="dropdown-menu">
-          <div class="dropdown-item" onclick="switchMainTab('workspace')" id="uiMenuWorkspace">✨ AI Translator</div>
-          <div class="dropdown-item" onclick="switchMainTab('mnemonics')" id="uiMenuCards">🧠 Mnemonics</div>
-          <div class="dropdown-item" onclick="switchMainTab('studylog')" id="uiMenuLog">📊 Study Log</div>
-          <div class="dropdown-divider"></div>
-          <a href="about.html" class="dropdown-item" id="uiMenuAbout">📖 About & Rules</a>
-          <a href="arcade.html" class="dropdown-item" id="uiMenuGames">🎮 Mini Games</a>
-          <a href="about.html#contact" class="dropdown-item" id="uiMenuContact">✉️ Contact</a>
-        </div>
-      </div>
-
-      <button class="nav-btn" onclick="toggleLang()" id="uiLangBtn">中文</button>
-    </div>
-
-    <div class="nav-right">
-      <button class="nav-btn" onclick="openKeyModal()" id="uiKeyBtn">🔑 API Key</button>
-
-      <button class="nav-btn" onclick="openInstallModal()" id="uiInstallBtn">
-        <img src="/icon.png?v=3" alt="" class="btn-mini-icon" onerror="this.src='icon.png'">
-        <span id="uiInstallBtnText">Install</span>
-      </button>
-
-      <div class="dropdown" id="loginDropdown">
-        <button class="nav-btn login-btn" onclick="toggleDropdown('loginDropdown', event)">
-          <span id="uiLoginBtnText">👨‍🏫 Login</span> ▾
+        <button class="mini-pill-btn" id="speakAllBtn" onclick="speakAllDisplayed()">
+          🔊 朗讀
         </button>
-        <div class="dropdown-menu right-align">
-          <a href="student.html" class="dropdown-item" id="uiLoginStudent">🌱 Student</a>
-          <a href="dashboard.html" class="dropdown-item" id="uiLoginTeacher">👩‍🏫 Teacher</a>
-        </div>
+        <button class="mini-pill-btn" id="keyBtn" onclick="openKeyModal()">
+          🔑 API Key
+        </button>
       </div>
     </div>
-  </header>
 
-  <!-- ================= 核心主工作區 ================= -->
-  <main class="main-wrap">
+    <!-- 🔍 2. 谷歌膠囊輸入框 (僅保留核心 AI 問答與高包容語音輸入) -->
+    <div class="google-capsule-wrap">
+      <textarea id="userInput" class="capsule-input" rows="1"
+        placeholder="像谷歌一樣說中文或英文提問（例：背誦靜夜思 / How to order milk tea in Chinese?）..."
+        oninput="autoResizeTextarea(this)"></textarea>
 
-    <!-- ==================== PANEL 1: AI 問答與文件翻譯工作區 ==================== -->
-    <div id="panel-workspace" class="tab-panel">
-
-      <!-- 1. 膠囊輸入面板 (純淨無多餘按鈕列) -->
-      <section class="panel">
-        <div class="search-box" id="dropZone">
-          <textarea id="userInput" rows="2"
-            placeholder="Ask AI any question, or enter/paste/drag text, PDF, Word, Google Docs link, or photo to translate..."></textarea>
-
-          <!-- 免切換中英自動識別語音按鈕 -->
-          <button class="icon-action" id="micBtn" onclick="toggleVoice()" title="Voice Input (Auto-detects Chinese & English)">
-            <svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.91-3c-.49 0-.9.36-.98.85C16.52 14.2 14.47 16 12 16s-4.52-1.8-4.93-4.15c-.08-.49-.49-.85-.98-.85-.61 0-1.09.54-1 1.14.49 3 2.89 5.35 5.91 5.78V20c0 .55.45 1 1 1s1-.45 1-1v-2.08c3.02-.43 5.42-2.78 5.91-5.78.1-.6-.39-1.14-1-1.14z"/></svg>
-          </button>
-
-          <!-- 文件夾按鈕 -->
-          <button class="icon-action" id="fileMenuBtn" onclick="openFileMenuModal()" title="Open File, Google Docs Link or Photo">
-            <svg viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2zm4 10h2v2h-2v2h-2v-2h-2v-2h2v-2h2v2z"/></svg>
-          </button>
-
-          <input type="file" id="docFileInput" accept=".txt,.md,.csv,.json,.html,.rtf,.pdf,.docx,.doc,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword,text/plain" style="display:none" onchange="handleDocFileUpload(this)">
-          <input type="file" id="galleryInput" accept="image/*" style="display:none" onchange="handlePhotoUpload(this)">
-          <input type="file" id="cameraInput" accept="image/*" style="display:none" onchange="handlePhotoUpload(this)">
-        </div>
-
-        <div class="action-row">
-          <button class="btn btn-blue" onclick="runSmartAI()" id="uiAIBtn">✨ AI Reply & Pinyin</button>
-          <button class="btn btn-green" onclick="runDirectTranslate()" id="uiTransBtn">📝 Translate & Pinyin</button>
-          <button class="btn btn-soft" style="flex:0.45;" id="speakBtn" onclick="toggleSpeak()">🔊 Speak</button>
-        </div>
-      </section>
-
-      <!-- 2. 輸出畫布區 -->
-      <section class="sheet-card" id="sheetCard">
-        <div class="print-header-title" id="printHeaderTitle"></div>
-        <img id="previewImg" class="preview-img" alt="Preview">
-        <div class="ai-reply-box" id="aiReplyBox"></div>
-        <div class="annotation-list" id="annotationList"></div>
-      </section>
-
-      <!-- 3. 免責聲明 (100% 原版內容) -->
-      <section class="disclaimer-banner" id="uiDisclaimer">
-        <b>Tip:</b> For optimal results, use your own free Gemini API Key or paste text directly. Or switch to the keyless PWA web app at <a href="https://www.treespinyin.com/app" target="_blank" style="color: var(--accent); font-weight: 700; text-decoration: underline;">www.treespinyin.com/app</a> (may be slower due to API limits). The author assumes no liability for the accuracy. Your support and shares will help me go full-time to make improvements and write a memory dictionary in the future!
-      </section>
-
-      <!-- 4. 極簡底部控制區：僅保留 Layout, Print, Record Video -->
-      <section class="bottom-bar">
-        <div class="dropdown" id="layoutDropdown">
-          <button class="btn btn-dark" onclick="toggleDropdown('layoutDropdown', event)" id="uiLayoutBtn">📐 Layout ▾</button>
-          <div class="layout-popover" onclick="event.stopPropagation()">
-            <div class="chk-row">
-              <label><input type="checkbox" id="chkEn" checked onchange="updateRowVisibility()"> <span id="uiChkEn">English</span></label>
-              <label><input type="checkbox" id="chkTp" checked onchange="updateRowVisibility()"> <span id="uiChkTp">Trees Pinyin</span></label>
-              <label><input type="checkbox" id="chkStd" checked onchange="updateRowVisibility()"> <span id="uiChkStd">Standard Pinyin (ā á ǎ à)</span></label>
-              <label><input type="checkbox" id="chkTrad" checked onchange="switchScriptMode('trad')"> <span id="uiChkTrad">Traditional Chinese</span></label>
-              <label><input type="checkbox" id="chkSimp" onchange="switchScriptMode('simp')"> <span id="uiChkSimp">Simplified Chinese</span></label>
-            </div>
-            <div class="dropdown-divider"></div>
-            <div>
-              <select class="layout-select" id="layoutSelect" onchange="updateLayoutMode()">
-                <option value="center" id="uiLayoutAuto">✨ Auto-Fit (Centered)</option>
-                <option value="left" id="uiLayoutLeft">📄 Left-Aligned Book Mode</option>
-              </select>
-            </div>
-            <div style="display:flex; align-items:center; gap:8px;">
-              <span id="uiFontLabel">Font:</span>
-              <input type="range" id="fontSlider" min="14" max="36" value="20" oninput="updateFontSize(this.value)" style="flex:1; accent-color:var(--accent);">
-              <span id="fontValDisplay">20px</span>
-            </div>
-            <input type="text" id="printTitleInput" placeholder="Print Title" oninput="updatePrintTitle(this.value)" style="padding:6px 8px; border:1px solid #cbd5e1; border-radius:8px; font-size:0.82rem;">
-          </div>
-        </div>
-
-        <button class="btn btn-dark" onclick="window.print()" id="uiPrintBtn">🖨️ Print</button>
-        <button class="btn btn-dark" style="background:var(--accent);" onclick="openCreatorStudio('9-16')" id="uiRecordBtn">🎬 Record Video</button>
-      </section>
-
-    </div>
-
-    <!-- ==================== PANEL 2: 原書 45 詞記憶閃卡 ==================== -->
-    <div id="panel-mnemonics" class="tab-panel hidden">
-      <section class="reward-banner">
-        <div class="reward-row">
-          <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-            <select id="packSelect" class="layout-select" style="width:auto; font-weight:700;" onchange="renderMnemonicsPack()">
-              <option value="1">Pack 1 (15 Free)</option>
-              <option value="2">Pack 2 (⭐ Rate Unlock)</option>
-              <option value="3">Pack 3 (📤 Share Unlock)</option>
-              <option value="all">🔍 All Unlocked</option>
-            </select>
-            <input type="text" id="mnemonicSearchInput" placeholder="🔍 Search..." oninput="renderMnemonicsPack()" style="padding:6px 10px; border:1px solid #cbd5e1; border-radius:8px; font-size:0.84rem; width:170px;">
-          </div>
-
-          <div style="display:flex; gap:8px; flex-wrap:wrap;">
-            <button class="btn btn-soft" style="padding:7px 12px; font-size:0.82rem;" onclick="handleRateUnlock()">⭐ Rate 5-Stars</button>
-            <button class="btn btn-green" style="padding:7px 12px; font-size:0.82rem;" onclick="openShareAppModal()">📤 Share</button>
-          </div>
-        </div>
-
-        <div class="reward-row" style="border-top:1px dashed #e5e7eb; padding-top:8px; font-size:0.84rem;">
-          <div>🎁 Code: <b id="myInviteCodeText" style="color:var(--blue); font-family:monospace;">PIN9X2B</b></div>
-          <div style="display:flex; gap:6px; align-items:center;">
-            <input type="text" id="friendCodeInput" placeholder="Friend / VIP Code" style="padding:5px 9px; border:1px solid #cbd5e1; border-radius:8px; font-size:0.82rem; width:150px;">
-            <button class="btn btn-dark" style="padding:5px 10px;" onclick="handleActivateFriendCode()">Activate</button>
-          </div>
-        </div>
-        <div id="rewardStatusMsg" style="font-size:0.82rem; font-weight:700; color:var(--accent);"></div>
-      </section>
-
-      <div id="mnemonicLockedBox" class="locked-pack-box hidden"></div>
-      <div id="mnemonicCardsContainer" class="mnemonic-grid"></div>
-    </div>
-
-    <!-- ==================== PANEL 3: 個人學習記錄 ==================== -->
-    <div id="panel-studylog" class="tab-panel hidden">
-      <section class="panel" style="flex-direction:row; justify-content:space-between; align-items:center; flex-wrap:wrap;">
-        <div>
-          <b style="color:var(--accent);" id="uiStudyLogTitle">📊 Study Log</b>
-          <span style="font-size:0.83rem; color:#555; margin-left:8px;" id="vipStatusBadge">Free Tier</span>
-        </div>
-        <div style="display:flex; gap:6px;">
-          <input type="text" id="vipCodeInput" placeholder="VIP Code" style="padding:6px 10px; border:1px solid #cbd5e1; border-radius:8px; font-size:0.82rem; width:130px;">
-          <button class="btn btn-green" style="padding:6px 12px; font-size:0.82rem;" onclick="activateVipProCode()">Unlock</button>
-          <button class="btn btn-soft" style="padding:6px 10px; font-size:0.82rem;" onclick="clearPersonalStudyLog()">Clear</button>
-        </div>
-      </section>
-      <section class="panel">
-        <div id="personalTrickyList" style="display:flex; flex-direction:column; gap:12px;"></div>
-      </section>
-    </div>
-
-  </main>
-
-  <!-- ✍️ 右鍵三合一修改器彈窗 (z-index: 200005，在錄影中也立即顯示並同步畫入影片) -->
-  <div class="modal" id="editCharModal" onclick="if(event.target===this)this.style.display='none'">
-    <div class="modal-box" id="editCharModalBox">
-      <h3 style="margin:0; color:var(--accent); font-size:1rem;">✍️ Edit Character & Pinyin</h3>
-      <div>
-        <label style="font-size:0.78rem; font-weight:700;">Character (漢字):</label>
-        <input type="text" id="editZhInput" oninput="onEditZhOrNumChange('zh')" style="width:100%; padding:8px; border:1px solid #cbd5e1; border-radius:8px; font-size:1.05rem; font-weight:700; margin-top:3px;">
-      </div>
-      <div>
-        <label style="font-size:0.78rem; font-weight:700;">Standard Pinyin (e.g. <code>hang2</code>):</label>
-        <input type="text" id="editStdInput" oninput="onEditZhOrNumChange('std')" style="width:100%; padding:8px; border:1px solid #cbd5e1; border-radius:8px; font-size:0.9rem; margin-top:3px;">
-      </div>
-      <div>
-        <label style="font-size:0.78rem; font-weight:700;">Trees Pinyin:</label>
-        <input type="text" id="editTpInput" style="width:100%; padding:8px; border:1px solid #2e7d32; border-radius:8px; font-size:0.95rem; font-weight:700; color:#1b5e20; margin-top:3px;">
-      </div>
-      <div class="action-row">
-        <button class="btn btn-green" onclick="saveThreeInOneEdit()">Save</button>
-        <button class="btn btn-soft" onclick="document.getElementById('editCharModal').style.display='none'">Cancel</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ================= 彈窗 1：文件夾選單 ================= -->
-  <div class="modal" id="fileMenuModal" onclick="if(event.target===this)this.style.display='none'">
-    <div class="modal-box">
-      <h3 style="margin:0; font-size:1.05rem;" id="uiFileMenuTitle">📁 File & Cloud Options</h3>
-
-      <div style="background:#f0fdf4; border:1.5px solid #a5d6a7; border-radius:12px; padding:12px; display:flex; flex-direction:column; gap:8px;">
-        <div style="font-size:0.88rem; font-weight:800; color:var(--accent);" id="uiCloudLinkLabel">🔗 Open Google Docs / Drive Link</div>
-        <div style="display:flex; gap:6px;">
-          <input type="text" id="cloudUrlModalInput" placeholder="Paste Google Docs link..." onkeydown="if(event.key==='Enter')openCloudUrlFromModal()" style="flex:1; padding:8px 10px; border:1px solid #cbd5e1; border-radius:8px; font-size:0.84rem; outline:none;">
-          <button class="btn btn-green" style="flex:unset; padding:8px 14px; font-size:0.84rem;" onclick="openCloudUrlFromModal()">Open</button>
-        </div>
-      </div>
-
-      <button class="option-card-btn" onclick="triggerDocUpload()">
-        <div>
-          <div id="uiOptCloudTitle">📄 Upload File (PDF / Word / Docs / TXT)</div>
-          <div style="font-size:0.78rem; color:#555; font-weight:400; margin-top:3px;" id="uiOptCloudSub">100% Client-side instant extraction & Pinyin</div>
-        </div>
-        <span>➔</span>
+      <!-- 清空按鈕 -->
+      <button class="capsule-icon-btn" id="clearBtn" onclick="clearCapsuleInput()" title="清空 (Clear)" style="display:none;">
+        <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
       </button>
 
-      <button class="option-card-btn" onclick="openCameraNoticeModal()">
-        <div>
-          <div id="uiOptCamTitle">📷 Camera & Photo Library</div>
-          <div style="font-size:0.78rem; color:#555; font-weight:400; margin-top:3px;" id="uiOptCamSub">Recognize text or objects from photos</div>
-        </div>
-        <span>➔</span>
+      <!-- 谷歌風格麥克風按鈕 -->
+      <button class="capsule-icon-btn mic-btn" id="micBtn" onclick="toggleVoice()" title="點擊開始語音輸入（支援中英文、停頓不中斷）">
+        <svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.91-3c-.49 0-.9.36-.98.85C16.52 14.2 14.47 16 12 16s-4.52-1.8-4.93-4.15c-.08-.49-.49-.85-.98-.85-.61 0-1.09.54-1 1.14.49 3 2.89 5.35 5.91 5.78V20c0 .55.45 1 1 1s1-.45 1-1v-2.08c3.02-.43 5.42-2.78 5.91-5.78.1-.6-.39-1.14-1-1.14z"/></svg>
       </button>
 
-      <button class="nav-btn" style="width:100%; padding:9px; justify-content:center;" onclick="document.getElementById('fileMenuModal').style.display='none'" id="uiFileMenuCancel">Cancel</button>
-    </div>
-  </div>
-
-  <!-- ================= 彈窗 2：拍照提速提示 ================= -->
-  <div class="modal" id="cameraNoticeModal" onclick="if(event.target===this)this.style.display='none'">
-    <div class="modal-box">
-      <h3 style="margin:0; font-size:1.05rem; color:#1b5e20;">⚡ Speed Tip for Photo Recognition</h3>
-      <div class="notice-box">
-        <b>📱 Fastest Way on iPhone / iPad (0.1s):</b><br>
-        Take a photo with your <b>Apple Camera</b> first, tap to <b>Copy Text (Live Text)</b>, and paste it here for instant 0-delay annotation!<br><br>
-        <b>📷 Direct Photo Upload:</b><br>
-        Best for <b>short text, menus, signs, or single objects</b>.
-      </div>
-      <div class="action-row">
-        <button class="btn btn-green" onclick="triggerGalleryPick()">🖼️ Photo Library</button>
-        <button class="btn btn-blue" onclick="triggerDirectCamera()">📸 Take Photo</button>
-      </div>
-      <button class="nav-btn" style="width:100%; padding:9px; justify-content:center;" onclick="document.getElementById('cameraNoticeModal').style.display='none'">Back</button>
-    </div>
-  </div>
-
-  <!-- ================= 彈窗 3：多平台社交 App 分享面板 ================= -->
-  <div class="modal" id="shareAppModal" onclick="if(event.target===this)this.style.display='none'">
-    <div class="modal-box">
-      <h3 style="margin:0; font-size:1.05rem; color:var(--accent);">📤 Share Trees Pinyin & Unlock Pack 3</h3>
-      <div style="font-size:0.85rem; color:#444; background:#f8fafc; padding:10px 12px; border-radius:10px; border:1px solid #e2e8f0;">
-        Your code <b id="modalShareCode" style="color:var(--blue);">PIN9X2B</b> has been copied!
-      </div>
-      <button class="btn btn-green" onclick="triggerNativeSystemShare()" style="width:100%;">
-        📱 Share via System Menu (iMessage / WeChat / AirDrop)
+      <!-- 提問按鈕 -->
+      <button class="capsule-send-btn" onclick="runSmartAI()">
+        ✨ AI 問答
       </button>
-      <div class="share-grid">
-        <a id="shareWhatsApp" target="_blank" class="share-app-btn">💬 WhatsApp</a>
-        <a id="shareTwitter" target="_blank" class="share-app-btn">🐦 X (Twitter)</a>
-        <a id="shareFacebook" target="_blank" class="share-app-btn">📘 Facebook</a>
-        <a id="shareTelegram" target="_blank" class="share-app-btn">✈️ Telegram</a>
-        <a id="shareEmail" class="share-app-btn">✉️ Email</a>
-        <button onclick="copyShareTextOnly()" class="share-app-btn">📋 Copy for WeChat</button>
-      </div>
-      <button class="nav-btn" style="width:100%; padding:8px; justify-content:center;" onclick="document.getElementById('shareAppModal').style.display='none'">Done</button>
     </div>
+
+    <!-- 💡 語音即時聽寫與多候選詞包容欄 (當識別出多個同音詞時，既交給 AI 自動選，也允許用戶一鍵點選) -->
+    <div id="voiceLiveBar" class="voice-live-bar"></div>
+
+    <!-- 📖 3. AI 回答與四位一體注音顯示區 -->
+    <div class="answer-card" id="answerCard">
+      <div id="statusBanner" class="status-banner"></div>
+      <div id="annotationList" class="annotation-list"></div>
+    </div>
+
   </div>
 
-  <!-- ================= 彈窗 4：安裝到桌面說明 ================= -->
-  <div class="modal" id="installModal" onclick="if(event.target===this)this.style.display='none'">
-    <div class="modal-box">
-      <div style="display:flex; align-items:center; gap:10px;">
-        <img src="/icon.png?v=3" alt="App Icon" style="width:44px; height:44px; border-radius:10px; border:1px solid #ddd;" onerror="this.src='icon.png'">
-        <h3 style="margin:0; font-size:1.05rem;" id="uiInstallTitle">Install Trees Pinyin</h3>
-      </div>
-      <div id="uiInstallSteps" style="font-size:0.86rem; line-height:1.6; background:#f8f9fa; padding:14px; border-radius:10px;">
-        <b>📱 iPhone & iPad (Safari):</b><br>
-        1. Open <span style="color:#1b5e20; font-weight:700;">treespinyin.com</span> in <b>Safari</b>.<br>
-        2. Tap the <b>Share button [📤]</b> → <b>"Add to Home Screen [➕]"</b>.<br><br>
-        <b>💻 Mac (Safari / Chrome / Edge):</b><br>
-        • <b>Mac Safari:</b> Click <b>File</b> in top menu bar → <b>"Add to Dock..."</b><br>
-        • <b>Chrome / Edge:</b> Click the <b>Install icon [⊕]</b> on the right side of the address bar.
-      </div>
-      <button class="btn btn-green" id="pwaDirectInstallBtn" style="display:none;" onclick="triggerNativePWAInstall()">⚡ Install App Now</button>
-      <button class="btn btn-soft" onclick="document.getElementById('installModal').style.display='none'" id="uiGotItBtn">Got It</button>
-    </div>
-  </div>
-
-  <!-- ================= 彈窗 5：API Key 設置 ================= -->
+  <!-- 🔑 API Key 設置彈窗 -->
   <div class="modal" id="keyModal" onclick="if(event.target===this)this.style.display='none'">
     <div class="modal-box">
-      <h3 style="margin:0; font-size:1.02rem;" id="uiKeyTitle">🔑 Google Gemini API Key</h3>
-      <div id="uiKeyDesc" style="font-size:0.85rem; line-height:1.55; background:#f8f9fa; padding:12px; border-radius:8px;">
-        <b>Cloudflare High-Speed AI & Global Cache are active by default!</b><br>
-        Enter your own free Google Gemini API Key (stored locally in your browser):<br>
-        <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:#1565c0; font-weight:700;">Get Free Key at Google AI Studio ↗</a>
+      <h3 style="margin:0; font-size:1.02rem; color:var(--accent);">🔑 Google Gemini API Key</h3>
+      <div style="font-size:0.84rem; line-height:1.55; background:#f8fafc; padding:12px; border-radius:10px; color:#334155;">
+        預設已啟用 <b>Cloudflare 全球共享快取 + 多 Key 輪詢通道</b>。<br>
+        您也可以填入個人的免費 Gemini API Key 獲得專屬無限極速通道：<br>
+        <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:var(--blue); font-weight:700;">點此前往 Google AI Studio 免費獲取 ↗</a>
       </div>
-      <input type="password" id="apiKeyInput" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;font-size:0.9rem;" placeholder="AIzaSy... (Optional)">
-      <div class="action-row">
-        <button class="btn btn-green" onclick="saveBackupKey()">Save</button>
-        <button class="btn btn-soft" style="flex:0.45;" onclick="clearBackupKey()">Clear</button>
+      <input type="password" id="apiKeyInput" placeholder="AIzaSy... (選填)" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:8px; font-size:0.9rem;">
+      <div style="display:flex; gap:8px;">
+        <button class="capsule-send-btn" style="flex:1; justify-content:center;" onclick="saveBackupKey()">儲存並測試</button>
+        <button class="mini-pill-btn" style="padding:0 16px;" onclick="clearBackupKey()">清除</button>
       </div>
-      <button class="nav-btn" style="width:100%;padding:8px;justify-content:center;" onclick="document.getElementById('keyModal').style.display='none'">Close</button>
     </div>
   </div>
 
   <script>
     // =========================================================================
-    // 0. 全域配置與 Cloudflare Worker 端點
+    // 1. 全域端點與萬人免費三級快取配置
     // =========================================================================
     const IS_LOCAL_FILE = window.location.protocol === 'file:';
     const CF_WORKER_ENDPOINTS = IS_LOCAL_FILE
       ? ['https://treespinyin-api.treespinyin.workers.dev', 'https://treespinyin.com/api']
       : ['https://treespinyin-api.treespinyin.workers.dev', '/api', 'https://treespinyin.com/api'];
 
-    const CHROME_STORE_REVIEW_URL = 'https://chromewebstore.google.com/detail/trees-pinyin-universal-an/jlbjllgeebmhkdcgmcnlkbcaiobpheae/reviews';
-    const EDGE_STORE_REVIEW_URL = 'https://microsoftedge.microsoft.com/addons/detail/egmgaoogonmldicgbkpaofjffcdlcffm';
-
-    function getStoreReviewUrl() {
-      return /Edg\//i.test(navigator.userAgent) ? EDGE_STORE_REVIEW_URL : CHROME_STORE_REVIEW_URL;
-    }
-
-    let deferredPrompt = null;
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      const btn = document.getElementById('pwaDirectInstallBtn');
-      if (btn) btn.style.display = 'inline-flex';
-    });
-
-    async function triggerNativePWAInstall() {
-      if (!deferredPrompt) return;
-      deferredPrompt.prompt();
-      await deferredPrompt.userChoice;
-      deferredPrompt = null;
-      document.getElementById('installModal').style.display = 'none';
-    }
-
-    (function injectManifestWithIconPng() {
-      try {
-        if (IS_LOCAL_FILE) return;
-        const iconUrl = window.location.origin + '/icon.png?v=3';
-        const manifest = {
-          name: "Trees Pinyin",
-          short_name: "Trees Pinyin",
-          start_url: window.location.pathname || "/",
-          display: "standalone",
-          background_color: "#f5f7f9",
-          theme_color: "#1b5e20",
-          icons: [
-            { src: iconUrl, sizes: "192x192", type: "image/png" },
-            { src: iconUrl, sizes: "512x512", type: "image/png" }
-          ]
-        };
-        const blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
-        const link = document.createElement('link');
-        link.rel = 'manifest';
-        link.href = URL.createObjectURL(blob);
-        document.head.appendChild(link);
-      } catch (e) {}
-    })();
-
-    // Enter 鍵直通 AI 回答 (若貼的是 Google Docs 連結則直接翻譯注音)
-    document.getElementById('userInput').addEventListener('keydown', function(e) {
-      if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) {
-        e.preventDefault();
-        const val = (this.value || '').trim();
-        if (/docs\.google\.com\/|drive\.google\.com\//i.test(val)) {
-          runDirectTranslate(val);
-        } else {
-          runSmartAI();
-        }
-      }
-    });
-
-    const PROFANITY_EN_REGEX = /\b(fuck|fucking|fucked|fucker|motherfucker|shit|shitty|bullshit|bitch|bitches|asshole|bastard|dick|cock|pussy|cunt|whore|slut|nigger|nigga|faggot|retard)\b/i;
-    const PROFANITY_ZH_LIST = ['他媽的','他妈的','你媽的','你妈的','操你','肏你','草泥馬','草泥马','傻逼','煞筆','傻B','去死吧','王八蛋','賤人','贱人','婊子'];
-
-    function checkAndWarnProfanity(text) {
-      if (!text) return false;
-      if (PROFANITY_EN_REGEX.test(text) || PROFANITY_ZH_LIST.some(w => text.includes(w))) {
-        document.getElementById('profanityModal').style.display = 'flex';
-        return true;
-      }
-      return false;
-    }
-
-    // =========================================================================
-    // 0.1 OpenCC 全字庫繁體/簡體轉換
-    // =========================================================================
-    let openccToSimp = null;
     let openccToTrad = null;
     try {
-      if (window.OpenCC) {
-        openccToSimp = window.OpenCC.Converter({ from: 'tw', to: 'cn' });
-        openccToTrad = window.OpenCC.Converter({ from: 'cn', to: 'tw' });
-      }
+      if (window.OpenCC) openccToTrad = window.OpenCC.Converter({ from: 'cn', to: 'tw' });
     } catch (e) {}
 
-    let currentScriptMode = 'trad';
-
-    function convertScript(str, mode = currentScriptMode) {
+    function toTrad(str) {
       if (!str) return '';
-      if (mode === 'simp') return openccToSimp ? openccToSimp(str) : str;
       return openccToTrad ? openccToTrad(str) : str;
     }
 
-    function switchScriptMode(mode) {
-      const chkTrad = document.getElementById('chkTrad');
-      const chkSimp = document.getElementById('chkSimp');
-      if (mode === 'trad' && chkTrad.checked) {
-        chkSimp.checked = false;
-        currentScriptMode = 'trad';
-      } else if (mode === 'simp' && chkSimp.checked) {
-        chkTrad.checked = false;
-        currentScriptMode = 'simp';
+    function autoResizeTextarea(el) {
+      el.style.height = 'auto';
+      el.style.height = Math.min(el.scrollHeight, 110) + 'px';
+      document.getElementById('clearBtn').style.display = el.value.length > 0 ? 'flex' : 'none';
+    }
+
+    function clearCapsuleInput() {
+      const input = document.getElementById('userInput');
+      input.value = '';
+      autoResizeTextarea(input);
+      document.getElementById('voiceLiveBar').style.display = 'none';
+      input.focus();
+    }
+
+    document.getElementById('userInput').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) {
+        e.preventDefault();
+        runSmartAI();
       }
-      updateRowVisibility();
-      document.querySelectorAll('.tp-zh').forEach(el => {
-        const raw = el.dataset.raw || el.innerText;
-        el.dataset.raw = raw;
-        el.innerText = convertScript(raw, currentScriptMode);
-      });
-      renderMnemonicsPack();
-    }
-
-    function updateRowVisibility() {
-      const card = document.getElementById('sheetCard');
-      const studioTop = document.getElementById('studioTopPane');
-      const hideZh = !document.getElementById('chkTrad').checked && !document.getElementById('chkSimp').checked;
-      [card, studioTop].forEach(el => {
-        if (!el) return;
-        el.classList.toggle('hide-en', !document.getElementById('chkEn').checked);
-        el.classList.toggle('hide-tp', !document.getElementById('chkTp').checked);
-        el.classList.toggle('hide-std', !document.getElementById('chkStd').checked);
-        el.classList.toggle('hide-zh', hideZh);
-      });
-    }
-
-    // =========================================================================
-    // 0.2 預設鎖定清晰國語女聲 + 錄影期間將電腦朗讀聲混入影片音軌
-    // =========================================================================
-    let selectedVoiceObj = null;
-    let studioAudioCtx = null;
-    let studioAudioDest = null;
-
-    function initSilentFemaleVoice() {
-      if (!('speechSynthesis' in window)) return;
-      const all = window.speechSynthesis.getVoices();
-      const zhAll = all.filter(v => /zh|cmn|chi/i.test(v.lang) || /chinese|mandarin|taiwan|hong kong/i.test(v.name));
-      const maleKeywords = ['male', 'kangkang', 'yunxi', 'yunjian', 'yunyang', 'danny', 'wanlung'];
-      let females = zhAll.filter(v => !maleKeywords.some(m => v.name.toLowerCase().includes(m)));
-      if (females.length === 0) females = zhAll;
-
-      const priorityOrder = ['meijia', 'hsiaochen', 'xiaoxiao', 'ting-ting', 'tingting', 'google 國語', 'google 普通話', 'sin-ji', 'female'];
-      females.sort((a, b) => {
-        const aScore = priorityOrder.findIndex(k => a.name.toLowerCase().includes(k));
-        const bScore = priorityOrder.findIndex(k => b.name.toLowerCase().includes(k));
-        return (aScore === -1 ? 99 : aScore) - (bScore === -1 ? 99 : bScore);
-      });
-
-      if (females.length > 0) selectedVoiceObj = females[0];
-    }
-    if ('speechSynthesis' in window) {
-      window.speechSynthesis.onvoiceschanged = initSilentFemaleVoice;
-      setTimeout(initSilentFemaleVoice, 200);
-    }
-
-    function speakSingleChar(text) {
-      if (!text) return;
-      if (checkAndWarnProfanity(text)) return;
-
-      if (studioRecorder && studioRecorder.state === 'recording' && studioAudioCtx && studioAudioDest) {
-        try {
-          const ttsAudio = new Audio(`https://translate.googleapis.com/translate_tts?ie=UTF-8&client=tw-ob&tl=zh-TW&q=${encodeURIComponent(text.slice(0, 100))}`);
-          ttsAudio.crossOrigin = 'anonymous';
-          const srcNode = studioAudioCtx.createMediaElementSource(ttsAudio);
-          srcNode.connect(studioAudioDest);
-          srcNode.connect(studioAudioCtx.destination);
-          ttsAudio.play().catch(() => speakNativeBrowserTTS(text));
-          return;
-        } catch (e) {}
-      }
-      speakNativeBrowserTTS(text);
-    }
-
-    function speakNativeBrowserTTS(text) {
-      if (!('speechSynthesis' in window)) return;
-      window.speechSynthesis.cancel();
-      if (!selectedVoiceObj) initSilentFemaleVoice();
-      const u = new SpeechSynthesisUtterance(text);
-      if (selectedVoiceObj) {
-        u.voice = selectedVoiceObj;
-        u.lang = selectedVoiceObj.lang;
-      } else {
-        u.lang = 'zh-TW';
-      }
-      u.rate = 0.86;
-      u.pitch = 1.1;
-      window.speechSynthesis.speak(u);
-    }
-
-    // =========================================================================
-    // 0.3 中英文雙語介面切換
-    // =========================================================================
-    let currentLang = 'en';
-
-    const UI_TEXT = {
-      en: {
-        moreRes: "📚 More Resources",
-        menuWorkspace: "✨ AI Translator",
-        menuCards: "🧠 Mnemonics",
-        menuLog: "📊 Study Log",
-        menuAbout: "📖 About & Rules",
-        menuGames: "🎮 Mini Games",
-        menuContact: "✉️ Contact",
-        langBtn: "中文",
-        installBtnText: "Install",
-        loginBtnText: "👨‍🏫 Login",
-        loginStudent: "🌱 Student",
-        loginTeacher: "👩‍🏫 Teacher",
-        placeholder: "Ask AI any question, or enter/paste/drag text, PDF, Word, Google Docs link, or photo to translate...",
-        aiBtn: "✨ AI Reply & Pinyin",
-        transBtn: "📝 Translate & Pinyin",
-        speakBtn: "🔊 Speak",
-        stopSpeakBtn: "⏹️ Stop",
-        disclaimer: '<b>Tip:</b> For optimal results, use your own free Gemini API Key or paste text directly. Or switch to the keyless PWA web app at <a href="https://www.treespinyin.com/app" target="_blank" style="color: var(--accent); font-weight: 700; text-decoration: underline;">www.treespinyin.com/app</a> (may be slower due to API limits). The author assumes no liability for the accuracy. Your support and shares will help me go full-time to make improvements and write a memory dictionary in the future!',
-        layoutBtn: "📐 Layout ▾",
-        printBtn: "🖨️ Print",
-        recordBtn: "🎬 Record Video",
-        chkTrad: "Traditional Chinese",
-        chkSimp: "Simplified Chinese",
-        fileMenuTitle: "📁 File & Cloud Options",
-        cloudLinkLabel: "🔗 Open Google Docs / Drive Link",
-        optCloudTitle: "📄 Upload File (PDF / Word / Docs / TXT)",
-        optCloudSub: "100% Client-side instant extraction & Pinyin",
-        optCamTitle: "📷 Camera & Photo Library",
-        optCamSub: "Recognize text or objects from photos"
-      },
-      zh: {
-        moreRes: "📚 更多資源",
-        menuWorkspace: "✨ AI 翻譯工作台",
-        menuCards: "🧠 記憶閃卡",
-        menuLog: "📊 學習記錄",
-        menuAbout: "📖 關於與規則",
-        menuGames: "🎮 趣味小遊戲",
-        menuContact: "✉️ 聯絡我們",
-        langBtn: "English",
-        installBtnText: "安裝",
-        loginBtnText: "👨‍🏫 登錄",
-        loginStudent: "🌱 學生端",
-        loginTeacher: "👩‍🏫 教師端",
-        placeholder: "向 AI 提問，或輸入/貼上/拖入文字、PDF、Word、Google Docs 連結或照片直接翻譯注音...",
-        aiBtn: "✨ AI 回答並注音",
-        transBtn: "📝 翻譯並注音",
-        speakBtn: "🔊 朗讀",
-        stopSpeakBtn: "⏹️ 停止",
-        disclaimer: '<b>提示：</b>為獲得最佳體驗，建議使用您自己的免費 Gemini API Key 或直接貼上文字。也可切換至免 Key 手機網頁版 <a href="https://www.treespinyin.com/app" target="_blank" style="color: var(--accent); font-weight: 700; text-decoration: underline;">www.treespinyin.com/app</a>（受 API 限制可能較慢）。作者對拼音結果準確性不承擔法律責任。您的支持與分享將幫助作者全職投入改進與編寫記憶字典！',
-        layoutBtn: "📐 排版 ▾",
-        printBtn: "🖨️ 列印",
-        recordBtn: "🎬 錄製影片",
-        chkTrad: "繁體中文",
-        chkSimp: "簡體中文",
-        fileMenuTitle: "📁 文件與網盤選單",
-        cloudLinkLabel: "🔗 輸入 Google Docs / 網盤連結打開",
-        optCloudTitle: "📄 上傳文件 (PDF / Word / Docs / TXT)",
-        optCloudSub: "100% 用戶端本地秒讀提取文字",
-        optCamTitle: "📷 拍照或從圖庫選圖",
-        optCamSub: "識別照片中的短文字、菜單或單個物品"
-      }
-    };
-
-    function toggleLang() {
-      currentLang = currentLang === 'en' ? 'zh' : 'en';
-      const t = UI_TEXT[currentLang];
-      document.getElementById('uiMoreRes').innerText = t.moreRes;
-      document.getElementById('uiMenuWorkspace').innerText = t.menuWorkspace;
-      document.getElementById('uiMenuCards').innerText = t.menuCards;
-      document.getElementById('uiMenuLog').innerText = t.menuLog;
-      document.getElementById('uiMenuAbout').innerText = t.menuAbout;
-      document.getElementById('uiMenuGames').innerText = t.menuGames;
-      document.getElementById('uiMenuContact').innerText = t.menuContact;
-      document.getElementById('uiLangBtn').innerText = t.langBtn;
-      document.getElementById('uiInstallBtnText').innerText = t.installBtnText;
-      document.getElementById('uiLoginBtnText').innerText = t.loginBtnText;
-      document.getElementById('uiLoginStudent').innerText = t.loginStudent;
-      document.getElementById('uiLoginTeacher').innerText = t.loginTeacher;
-      document.getElementById('userInput').placeholder = t.placeholder;
-      document.getElementById('uiAIBtn').innerText = t.aiBtn;
-      document.getElementById('uiTransBtn').innerText = t.transBtn;
-      if (!isSpeakingNow) document.getElementById('speakBtn').innerText = t.speakBtn;
-      document.getElementById('uiDisclaimer').innerHTML = t.disclaimer;
-      document.getElementById('uiLayoutBtn').innerText = t.layoutBtn;
-      document.getElementById('uiPrintBtn').innerText = t.printBtn;
-      document.getElementById('uiRecordBtn').innerText = t.recordBtn;
-      document.getElementById('uiChkTrad').innerText = t.chkTrad;
-      document.getElementById('uiChkSimp').innerText = t.chkSimp;
-      document.getElementById('uiFileMenuTitle').innerText = t.fileMenuTitle;
-      document.getElementById('uiCloudLinkLabel').innerText = t.cloudLinkLabel;
-      document.getElementById('uiOptCloudTitle').innerText = t.optCloudTitle;
-      document.getElementById('uiOptCloudSub').innerText = t.optCloudSub;
-      document.getElementById('uiOptCamTitle').innerText = t.optCamTitle;
-      document.getElementById('uiOptCamSub').innerText = t.optCamSub;
-    }
-
-    function toggleDropdown(id, e) {
-      e.stopPropagation();
-      document.querySelectorAll('.dropdown').forEach(d => { if (d.id !== id) d.classList.remove('open'); });
-      document.getElementById(id).classList.toggle('open');
-    }
-    document.addEventListener('click', () => {
-      document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('open'));
     });
 
-    function switchMainTab(tabName) {
-      document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('open'));
-      document.getElementById('panel-workspace').classList.toggle('hidden', tabName !== 'workspace');
-      document.getElementById('panel-mnemonics').classList.toggle('hidden', tabName !== 'mnemonics');
-      document.getElementById('panel-studylog').classList.toggle('hidden', tabName !== 'studylog');
-      if (tabName === 'mnemonics') renderMnemonicsPack();
-      if (tabName === 'studylog') renderPersonalStudyLog();
-    }
-
     // =========================================================================
-    // 1. ☁️ Google Docs / Drive 連結讀取
-    // =========================================================================
-    async function openCloudUrlFromModal() {
-      const link = (document.getElementById('cloudUrlModalInput').value || '').trim();
-      if (!link) return;
-      document.getElementById('fileMenuModal').style.display = 'none';
-      document.getElementById('userInput').value = link;
-      await runDirectTranslate(link);
-    }
-
-    async function fetchCloudDocumentByUrl(rawUrl) {
-      const gdocMatch = rawUrl.match(/https:\/\/docs\.google\.com\/document\/d\/([a-zA-Z0-9_-]+)/);
-      if (gdocMatch) {
-        const docId = gdocMatch[1];
-        const exportUrl = `https://docs.google.com/document/d/${docId}/export?format=txt`;
-        const candidates = [
-          exportUrl,
-          `https://api.allorigins.win/raw?url=${encodeURIComponent(exportUrl)}`,
-          `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(exportUrl)}`
-        ];
-        for (const u of candidates) {
-          try {
-            const r = await fetchWithTimeout(u, {}, 6500);
-            if (r.ok) {
-              const txt = (await r.text()).trim();
-              if (txt && !txt.startsWith('<!DOCTYPE html>') && !txt.includes('<html')) return txt;
-            }
-          } catch (e) {}
-        }
-      }
-
-      const gdriveMatch = rawUrl.match(/https:\/\/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/);
-      if (gdriveMatch) {
-        const fileId = gdriveMatch[1];
-        const dlUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
-        const candidates = [
-          `https://api.allorigins.win/raw?url=${encodeURIComponent(dlUrl)}`,
-          `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(dlUrl)}`
-        ];
-        for (const u of candidates) {
-          try {
-            const r = await fetchWithTimeout(u, {}, 6500);
-            if (r.ok) {
-              const txt = (await r.text()).trim();
-              if (txt && !txt.startsWith('<!DOCTYPE html>')) return txt;
-            }
-          } catch (e) {}
-        }
-      }
-      return '';
-    }
-
-    // =========================================================================
-    // 2. 🟢 劃詞僅顯示 icon.png ➔ 點擊彈出獨立小顯示框
-    // =========================================================================
-    let selectedPageText = '';
-    let popoverZhText = '';
-    let popoverEnText = '';
-    const iconOnlyBtn = document.getElementById('selectionIconOnly');
-    const miniPopover = document.getElementById('selectionMiniPopover');
-
-    function handleTextSelectionCheck(e) {
-      if (iconOnlyBtn.contains(e.target) || miniPopover.contains(e.target)) return;
-      setTimeout(() => {
-        const sel = window.getSelection();
-        const text = (sel ? sel.toString() : '').trim();
-        if (text && text.length >= 1 && text.length <= 600) {
-          selectedPageText = text;
-          let rect = { left: 100, top: 100, width: 40 };
-          try {
-            if (sel.rangeCount > 0) rect = sel.getRangeAt(0).getBoundingClientRect();
-          } catch (err) {}
-          const leftPos = (rect.left || e.clientX || 120) + window.scrollX + ((rect.width || 20) / 2) - 18;
-          const topPos = (rect.top || e.clientY || 120) + window.scrollY - 42;
-          iconOnlyBtn.style.left = Math.max(12, Math.min(window.innerWidth - 52, leftPos)) + 'px';
-          iconOnlyBtn.style.top = Math.max(10, topPos) + 'px';
-          iconOnlyBtn.style.display = 'block';
-          miniPopover.style.display = 'none';
-        } else {
-          iconOnlyBtn.style.display = 'none';
-        }
-      }, 25);
-    }
-
-    document.addEventListener('mouseup', handleTextSelectionCheck);
-    document.addEventListener('touchend', handleTextSelectionCheck);
-
-    async function openSelectionMiniPopover(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      if (!selectedPageText) return;
-      if (checkAndWarnProfanity(selectedPageText)) {
-        iconOnlyBtn.style.display = 'none';
-        return;
-      }
-
-      const rect = iconOnlyBtn.getBoundingClientRect();
-      iconOnlyBtn.style.display = 'none';
-
-      miniPopover.style.left = Math.max(12, Math.min(window.innerWidth - 455, rect.left + window.scrollX - 180)) + 'px';
-      miniPopover.style.top = Math.max(12, rect.top + window.scrollY + 8) + 'px';
-      miniPopover.style.display = 'flex';
-
-      const body = document.getElementById('popoverAnnotationBody');
-      body.innerHTML = `<div style="font-size:0.84rem; color:#666;">⚡ ...</div>`;
-
-      const hasZh = /[\u4e00-\u9fa5]/.test(selectedPageText);
-      if (hasZh) {
-        popoverZhText = convertScript(expandNumbersAndSymbolsToZh(selectedPageText), 'trad');
-        popoverEnText = await translateFast(popoverZhText, 'zh', 'en');
-      } else {
-        popoverEnText = selectedPageText;
-        const rawZh = await translateFast(selectedPageText, 'en', 'zh');
-        popoverZhText = convertScript(expandNumbersAndSymbolsToZh(rawZh), 'trad');
-      }
-
-      body.innerHTML = '';
-      appendSentenceProgressive(popoverZhText, popoverEnText, 'popoverAnnotationBody');
-    }
-
-    function closeSelectionMiniPopover() {
-      miniPopover.style.display = 'none';
-    }
-
-    function speakPopoverContent() {
-      if (popoverZhText) speakSingleChar(popoverZhText);
-    }
-
-    async function printPopoverContent() {
-      closeSelectionMiniPopover();
-      switchMainTab('workspace');
-      document.getElementById('userInput').value = `${popoverZhText} ||| ${popoverEnText}`;
-      await runDirectTranslate(`${popoverZhText} ||| ${popoverEnText}`);
-      setTimeout(() => window.print(), 300);
-    }
-
-    // =========================================================================
-    // 3. 🎬 錄影工坊 (預設 1080p HD MP4 + 錄製中右鍵彈出修改對話框並同步畫入影片中)
-    // =========================================================================
-    let studioStream = null;
-    let studioRecorder = null;
-    let studioChunks = [];
-    let studioTimerInterval = null;
-    let studioSeconds = 0;
-    let studioCurrentRatio = '9-16';
-    let studioCurrentView = 'split';
-    let studioSynthCanvas = null;
-    let studioSynthAnimId = null;
-
-    function getPreferredMp4MimeType() {
-      const mp4Types = [
-        'video/mp4;codecs=avc1.42E01E,mp4a.40.2',
-        'video/mp4;codecs=avc1,mp4a.40.2',
-        'video/mp4;codecs=h264,aac',
-        'video/mp4',
-        'video/webm;codecs=h264',
-        'video/webm'
-      ];
-      for (const t of mp4Types) {
-        if (window.MediaRecorder && MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(t)) {
-          return t;
-        }
-      }
-      return '';
-    }
-
-    async function getBuiltInComputerStream() {
-      try {
-        const devices = await navigator.mediaDevices.enumerateDevices();
-        const videoInputs = devices.filter(d => d.kind === 'videoinput');
-        const audioInputs = devices.filter(d => d.kind === 'audioinput');
-
-        const isExternalPhone = (label) => /iphone|ipad|continuity|desk view/i.test(label || '');
-        const builtInCam = videoInputs.find(d => !isExternalPhone(d.label)) || videoInputs[0];
-        const builtInMic = audioInputs.find(d => !isExternalPhone(d.label)) || audioInputs[0];
-
-        const videoConstraint = builtInCam && builtInCam.deviceId
-          ? { deviceId: { exact: builtInCam.deviceId }, width: { ideal: 1280 }, height: { ideal: 720 } }
-          : { width: { ideal: 1280 }, height: { ideal: 720 } };
-
-        const audioConstraint = {
-          ...(builtInMic && builtInMic.deviceId ? { deviceId: { exact: builtInMic.deviceId } } : {}),
-          echoCancellation: false,
-          noiseSuppression: false,
-          autoGainControl: true
-        };
-
-        return await navigator.mediaDevices.getUserMedia({ video: videoConstraint, audio: audioConstraint });
-      } catch (e) {
-        return await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-      }
-    }
-
-    async function openCreatorStudio(ratioMode = '9-16') {
-      document.getElementById('studioOverlay').classList.add('active');
-      document.getElementById('studioRatioSelect').value = ratioMode === '16-9' ? '16-9' : '9-16';
-      setStudioRatio(ratioMode);
-      setStudioViewMode('split');
-
-      const topPane = document.getElementById('studioTopPane');
-      topPane.innerHTML = '';
-
-      const existingBlocks = document.querySelectorAll('#annotationList .sentence-block');
-      if (existingBlocks.length > 0) {
-        existingBlocks.forEach(b => {
-          appendSentenceProgressive(b.dataset.zh, b.dataset.en, 'studioTopPane');
-        });
-      } else {
-        appendSentenceProgressive('請問洗手間在哪裡？', 'Excuse me, where is the restroom?', 'studioTopPane');
-      }
-      updateRowVisibility();
-
-      const camVideo = document.getElementById('studioCamVideo');
-      try {
-        studioStream = await getBuiltInComputerStream();
-        camVideo.srcObject = studioStream;
-      } catch (e) {
-        studioStream = null;
-      }
-    }
-
-    function setStudioRatio(ratio) {
-      studioCurrentRatio = (ratio === '16-9') ? '16-9' : '9-16';
-      const stage = document.getElementById('studioStage');
-      stage.classList.remove('ratio-9-16', 'ratio-16-9');
-      stage.classList.add(`ratio-${studioCurrentRatio}`);
-    }
-
-    function setStudioViewMode(viewMode) {
-      studioCurrentView = viewMode;
-      const stage = document.getElementById('studioStage');
-      stage.classList.remove('view-full-text', 'view-full-cam');
-      if (viewMode === 'full-text') stage.classList.add('view-full-text');
-      if (viewMode === 'full-cam') stage.classList.add('view-full-cam');
-
-      document.getElementById('viewBtnSplit').classList.toggle('active', viewMode === 'split');
-      document.getElementById('viewBtnText').classList.toggle('active', viewMode === 'full-text');
-      document.getElementById('viewBtnCam').classList.toggle('active', viewMode === 'full-cam');
-    }
-
-    function speakAllStudioText() {
-      const blocks = document.querySelectorAll('#studioTopPane .sentence-block');
-      const allZh = Array.from(blocks).map(b => b.dataset.zh).join('。');
-      if (allZh) speakSingleChar(allZh);
-    }
-
-    function drawWrappedEnglishLine(ctx, text, centerX, startY, maxWidth, lineHeight) {
-      const words = (text || '').split(' ');
-      let line = '';
-      const lines = [];
-      for (let n = 0; n < words.length; n++) {
-        const testLine = line + words[n] + ' ';
-        if (ctx.measureText(testLine).width > maxWidth && n > 0) {
-          lines.push(line.trim());
-          line = words[n] + ' ';
-        } else {
-          line = testLine;
-        }
-      }
-      if (line.trim()) lines.push(line.trim());
-      lines.forEach((l, i) => ctx.fillText(l, centerX, startY + (i * lineHeight)));
-    }
-
-    function drawVideoCover(ctx, video, x, y, w, h) {
-      if (!video || video.readyState < 2) return;
-      const vw = video.videoWidth || 640;
-      const vh = video.videoHeight || 480;
-      const scale = Math.max(w / vw, h / vh);
-      const sw = w / scale;
-      const sh = h / scale;
-      const sx = (vw - sw) / 2;
-      const sy = (vh - sh) / 2;
-      ctx.save();
-      ctx.beginPath();
-      ctx.rect(x, y, w, h);
-      ctx.clip();
-      ctx.translate(x + w, y);
-      ctx.scale(-1, 1);
-      ctx.drawImage(video, sx, sy, sw, sh, 0, 0, w, h);
-      ctx.restore();
-    }
-
-    function drawLiveEditModalOnCanvas(ctx, W, H) {
-      const modal = document.getElementById('editCharModal');
-      if (!modal || modal.style.display !== 'flex') return;
-
-      const zhVal = document.getElementById('editZhInput').value || '';
-      const stdVal = document.getElementById('editStdInput').value || '';
-      const tpVal = document.getElementById('editTpInput').value || '';
-
-      ctx.save();
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.48)';
-      ctx.fillRect(0, 0, W, H);
-
-      const boxW = Math.min(W * 0.86, 540);
-      const boxH = Math.min(H * 0.52, 420);
-      const bx = (W - boxW) / 2;
-      const by = (H - boxH) / 2;
-      const u = boxW / 380;
-
-      ctx.fillStyle = '#ffffff';
-      ctx.strokeStyle = '#1b5e20';
-      ctx.lineWidth = Math.max(3, 4 * u);
-      ctx.beginPath();
-      if (ctx.roundRect) ctx.roundRect(bx, by, boxW, boxH, 18 * u);
-      else ctx.rect(bx, by, boxW, boxH);
-      ctx.fill();
-      ctx.stroke();
-
-      ctx.textAlign = 'left';
-      ctx.textBaseline = 'middle';
-
-      ctx.fillStyle = '#1b5e20';
-      ctx.font = `800 ${Math.round(19 * u)}px -apple-system, sans-serif`;
-      ctx.fillText('✍️ Edit Character & Pinyin', bx + 22 * u, by + 32 * u);
-
-      const drawInputRow = (label, val, yOff, highlightGreen) => {
-        ctx.fillStyle = '#444444';
-        ctx.font = `700 ${Math.round(13 * u)}px -apple-system, sans-serif`;
-        ctx.fillText(label, bx + 22 * u, by + yOff);
-
-        ctx.fillStyle = '#f8fafc';
-        ctx.strokeStyle = highlightGreen ? '#2e7d32' : '#cbd5e1';
-        ctx.lineWidth = Math.max(1.5, 2 * u);
-        ctx.beginPath();
-        if (ctx.roundRect) ctx.roundRect(bx + 22 * u, by + yOff + 14 * u, boxW - 44 * u, 38 * u, 8 * u);
-        else ctx.rect(bx + 22 * u, by + yOff + 14 * u, boxW - 44 * u, 38 * u);
-        ctx.fill();
-        ctx.stroke();
-
-        ctx.fillStyle = highlightGreen ? '#1b5e20' : '#111111';
-        ctx.font = `700 ${Math.round(17 * u)}px -apple-system, sans-serif`;
-        ctx.fillText(val, bx + 34 * u, by + yOff + 33 * u);
-      };
-
-      drawInputRow('1. Character (漢字):', zhVal, 68 * u, false);
-      drawInputRow('2. Standard Pinyin:', stdVal, 138 * u, false);
-      drawInputRow('3. Trees Pinyin:', tpVal, 208 * u, true);
-
-      ctx.fillStyle = '#1b5e20';
-      ctx.beginPath();
-      if (ctx.roundRect) ctx.roundRect(bx + 22 * u, by + boxH - 54 * u, (boxW - 56 * u) * 0.6, 38 * u, 10 * u);
-      else ctx.rect(bx + 22 * u, by + boxH - 54 * u, (boxW - 56 * u) * 0.6, 38 * u);
-      ctx.fill();
-      ctx.fillStyle = '#ffffff';
-      ctx.textAlign = 'center';
-      ctx.font = `700 ${Math.round(15 * u)}px -apple-system, sans-serif`;
-      ctx.fillText('Save', bx + 22 * u + ((boxW - 56 * u) * 0.3), by + boxH - 35 * u);
-
-      ctx.restore();
-    }
-
-    function toggleStudioRecording() {
-      const recBtn = document.getElementById('studioRecBtn');
-      const dlLink = document.getElementById('studioDownloadLink');
-
-      if (studioRecorder && studioRecorder.state === 'recording') {
-        studioRecorder.stop();
-        return;
-      }
-
-      dlLink.classList.add('hidden');
-      studioChunks = [];
-      studioSeconds = 0;
-      document.getElementById('studioTimerBadge').innerText = '🔴 00:00';
-
-      const quality = document.getElementById('studioQualitySelect').value || '1080';
-      let shortSide = 1080, longSide = 1920, vBitrate = 3500000, fps = 24;
-      if (quality === '720') {
-        shortSide = 720; longSide = 1280; vBitrate = 1600000; fps = 24;
-      } else if (quality === '480') {
-        shortSide = 480; longSide = 854; vBitrate = 650000; fps = 20;
-      }
-
-      studioSynthCanvas = document.createElement('canvas');
-      if (studioCurrentRatio === '9-16') {
-        studioSynthCanvas.width = shortSide;
-        studioSynthCanvas.height = longSide;
-      } else {
-        studioSynthCanvas.width = longSide;
-        studioSynthCanvas.height = shortSide;
-      }
-
-      const ctx = studioSynthCanvas.getContext('2d');
-      const camVideo = document.getElementById('studioCamVideo');
-      const topPane = document.getElementById('studioTopPane');
-
-      function drawStudioFrame() {
-        const W = studioSynthCanvas.width;
-        const H = studioSynthCanvas.height;
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(0, 0, W, H);
-
-        const drawWysiwygTextPane = (targetY, targetH) => {
-          ctx.save();
-          ctx.beginPath();
-          ctx.rect(0, targetY, W, targetH);
-          ctx.clip();
-          ctx.fillStyle = '#ffffff';
-          ctx.fillRect(0, targetY, W, targetH);
-
-          const paneRect = topPane.getBoundingClientRect();
-          if (paneRect.width > 0 && paneRect.height > 0) {
-            const scale = W / paneRect.width;
-
-            if (document.getElementById('chkEn').checked) {
-              topPane.querySelectorAll('.en-line').forEach(enEl => {
-                const r = enEl.getBoundingClientRect();
-                if (r.bottom < paneRect.top || r.top > paneRect.bottom) return;
-                const x = (r.left - paneRect.left + r.width / 2) * scale;
-                const y = targetY + (r.top - paneRect.top + 10) * scale;
-                ctx.fillStyle = '#111111';
-                ctx.font = `600 ${Math.max(12, Math.round(16 * scale))}px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'top';
-                drawWrappedEnglishLine(ctx, enEl.innerText, x, y, (paneRect.width - 20) * scale, Math.max(15, Math.round(20 * scale)));
-              });
-            }
-
-            topPane.querySelectorAll('.tp-col').forEach(colEl => {
-              const colR = colEl.getBoundingClientRect();
-              if (colR.bottom < paneRect.top || colR.top > paneRect.bottom) return;
-              const centerX = (colR.left - paneRect.left + colR.width / 2) * scale;
-              ctx.textAlign = 'center';
-              ctx.textBaseline = 'middle';
-
-              const pyEl = colEl.querySelector('.tp-py');
-              if (pyEl && document.getElementById('chkTp').checked) {
-                const r = pyEl.getBoundingClientRect();
-                const cy = targetY + (r.top - paneRect.top + r.height / 2) * scale;
-                ctx.fillStyle = '#1b5e20';
-                ctx.font = `italic 700 ${Math.max(12, Math.round(17 * scale))}px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
-                ctx.fillText(pyEl.innerText, centerX, cy);
-              }
-
-              const stdEl = colEl.querySelector('.tp-std');
-              if (stdEl && document.getElementById('chkStd').checked) {
-                const r = stdEl.getBoundingClientRect();
-                const cy = targetY + (r.top - paneRect.top + r.height / 2) * scale;
-                ctx.fillStyle = '#6b7280';
-                ctx.font = `500 ${Math.max(10, Math.round(13.5 * scale))}px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
-                ctx.fillText(stdEl.innerText, centerX, cy);
-              }
-
-              const zhEl = colEl.querySelector('.tp-zh');
-              const showZh = document.getElementById('chkTrad').checked || document.getElementById('chkSimp').checked;
-              if (zhEl && showZh) {
-                const r = zhEl.getBoundingClientRect();
-                const cy = targetY + (r.top - paneRect.top + r.height / 2) * scale;
-                ctx.fillStyle = '#000000';
-                ctx.font = `700 ${Math.max(15, Math.round(22 * scale))}px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
-                ctx.fillText(zhEl.innerText, centerX, cy);
-              }
-            });
-          }
-          ctx.restore();
-        };
-
-        if (studioCurrentView === 'split') {
-          drawWysiwygTextPane(0, H / 2);
-          drawVideoCover(ctx, camVideo, 0, H / 2, W, H / 2);
-          ctx.strokeStyle = '#1b5e20';
-          ctx.lineWidth = Math.max(2, Math.round(W / 180));
-          ctx.beginPath();
-          ctx.moveTo(0, H / 2);
-          ctx.lineTo(W, H / 2);
-          ctx.stroke();
-        } else if (studioCurrentView === 'full-text') {
-          drawWysiwygTextPane(0, H);
-        } else {
-          drawVideoCover(ctx, camVideo, 0, 0, W, H);
-        }
-
-        drawLiveEditModalOnCanvas(ctx, W, H);
-        studioSynthAnimId = requestAnimationFrame(drawStudioFrame);
-      }
-      drawStudioFrame();
-
-      const stream = studioSynthCanvas.captureStream(fps);
-
-      try {
-        const AudioCtx = window.AudioContext || window.webkitAudioContext;
-        studioAudioCtx = new AudioCtx();
-        studioAudioDest = studioAudioCtx.createMediaStreamDestination();
-        if (studioStream && studioStream.getAudioTracks().length > 0) {
-          const micSource = studioAudioCtx.createMediaStreamSource(studioStream);
-          micSource.connect(studioAudioDest);
-        }
-        studioAudioDest.stream.getAudioTracks().forEach(t => stream.addTrack(t));
-      } catch (e) {
-        if (studioStream) studioStream.getAudioTracks().forEach(t => stream.addTrack(t));
-      }
-
-      const preferredMime = getPreferredMp4MimeType();
-      const recOptions = {
-        ...(preferredMime ? { mimeType: preferredMime } : {}),
-        videoBitsPerSecond: vBitrate,
-        audioBitsPerSecond: 128000
-      };
-
-      try {
-        studioRecorder = new MediaRecorder(stream, recOptions);
-      } catch (e) {
-        studioRecorder = new MediaRecorder(stream);
-      }
-
-      studioRecorder.ondataavailable = (e) => { if (e.data.size > 0) studioChunks.push(e.data); };
-      studioRecorder.onstop = () => {
-        cancelAnimationFrame(studioSynthAnimId);
-        clearInterval(studioTimerInterval);
-        const blob = new Blob(studioChunks, { type: 'video/mp4' });
-        dlLink.href = URL.createObjectURL(blob);
-        dlLink.download = `trees-pinyin-${quality}p.mp4`;
-        dlLink.classList.remove('hidden');
-        recBtn.innerText = '🔴 Record';
-        recBtn.style.background = '';
-      };
-
-      studioRecorder.start(400);
-      recBtn.innerText = '⏹️ Stop';
-      recBtn.style.background = '#d32f2f';
-
-      studioTimerInterval = setInterval(() => {
-        studioSeconds++;
-        const m = String(Math.floor(studioSeconds / 60)).padStart(2, '0');
-        const s = String(studioSeconds % 60).padStart(2, '0');
-        document.getElementById('studioTimerBadge').innerText = `🔴 ${m}:${s}`;
-      }, 1000);
-    }
-
-    function closeCreatorStudio() {
-      if (studioRecorder && studioRecorder.state === 'recording') studioRecorder.stop();
-      cancelAnimationFrame(studioSynthAnimId);
-      clearInterval(studioTimerInterval);
-      if (studioStream) {
-        studioStream.getTracks().forEach(t => t.stop());
-        studioStream = null;
-      }
-      if (studioAudioCtx) {
-        try { studioAudioCtx.close(); } catch (e) {}
-        studioAudioCtx = null;
-      }
-      document.getElementById('studioOverlay').classList.remove('active');
-    }
-
-    // =========================================================================
-    // 4. 🎙️ 免切換「中英雙語自動混合識別 + 5候選詞AI語境糾偏」引擎
+    // 2. 🎙️ 高包容度谷歌膠囊語音輸入引擎
+    //    為什麼剛才不準？因為：
+    //    (1) 原版 2.5 秒一停頓就強制切斷，說話慢一點或思考一下後半句就被吞了；
+    //    (2) 原版在拼接多個分句時覆蓋了候選詞，且英語母語者在 Safari/Edge 下被強制鎖在 zh-CN 會音譯成亂碼漢字。
+    //    【全新升級】：
+    //    - 支援「中/EN 自動」、「中文優先」、「English 優先」三檔＋首音節智慧偵測
+    //    - 停頓容忍時間提升至 3.8 秒，且說話期間即時顯示聽寫進度與可點擊的同音候選詞膠囊
+    //    - 擴大本地口音/古詩/日常高頻同音詞糾偏庫 + 完整保留多段候選詞交給 AI 語境還原
     // =========================================================================
     let activeRec = null;
     let voiceSilenceTimer = null;
+    let voiceLangMode = 'auto'; // 'auto' | 'zh' | 'en'
     let latestVoiceCandidates = [];
 
+    function cycleVoiceLangMode() {
+      const btn = document.getElementById('voiceLangModeBtn');
+      if (voiceLangMode === 'auto') {
+        voiceLangMode = 'zh';
+        btn.innerText = '🎙️ 語音: 中文優先';
+      } else if (voiceLangMode === 'zh') {
+        voiceLangMode = 'en';
+        btn.innerText = '🎙️ 語音: English 優先';
+      } else {
+        voiceLangMode = 'auto';
+        btn.innerText = '🎙️ 語音: 中/EN 自動';
+      }
+    }
+
+    // 高包容度同音字與口音快速糾偏字典
     const FUZZY_VOICE_CORRECTIONS = [
-      [/永和|泳鵝|泳鹅|勇鵝|勇鹅|擁鵝|拥鹅|用鵝|用鹅|詠俄|咏俄/g, '詠鵝'],
-      [/今夜思|敬業思|敬业思|進夜思|进夜思|淨夜思|净夜思/g, '靜夜思'],
-      [/春小|春笑|春校|純曉|纯晓/g, '春曉'],
-      [/登貫雀樓|登贯雀楼|登觀雀樓|登观雀楼/g, '登鸛雀樓'],
-      [/水調歌頭|水调歌头|水掉歌頭|水掉歌头/g, '水調歌頭'],
-      [/鹿柴|路窄|陸宅|陆宅|錄音帶/g, '鹿柴']
+      [/永和|泳鵝|泳鹅|勇鵝|勇鹅|擁鵝|拥鹅|用鵝|用鹅|詠俄|咏俄|影鵝|影鹅/g, '詠鵝'],
+      [/今夜思|敬業思|敬业思|進夜思|进夜思|淨夜思|净夜思|經夜思|经夜思/g, '靜夜思'],
+      [/春小|春笑|春校|純曉|纯晓|蠢小/g, '春曉'],
+      [/登貫雀樓|登贯雀楼|登觀雀樓|登观雀楼|登冠雀樓|登冠雀楼/g, '登鸛雀樓'],
+      [/水調歌頭|水调歌头|水掉歌頭|水掉歌头|水釣歌頭/g, '水調歌頭'],
+      [/鹿柴|路窄|陸宅|陆宅|錄音帶|露寨/g, '鹿柴'],
+      [/敏農|敏农|米農|米农|民農|民农/g, '憫農'],
+      [/遊子音|游子音|油籽吟|由子吟/g, '遊子吟'],
+      [/清明時節|親明時節|清明世界/g, '清明'],
+      [/望廬山瀑布|望盧山瀑布|忘廬山瀑布/g, '望廬山瀑布']
     ];
 
     function applyFuzzyVoiceCorrection(rawTranscript, alts = []) {
       for (const a of alts) {
-        if (/詠鵝|咏鹅|靜夜思|静夜思|春曉|春晓|登鸛雀樓|登鹳雀楼|水調歌頭|水调歌头|鹿柴/.test(a)) return a;
+        if (/詠鵝|咏鹅|靜夜思|静夜思|春曉|春晓|登鸛雀樓|登鹳雀楼|水調歌頭|水调歌头|鹿柴|憫農|悯农|遊子吟|游子吟|望廬山瀑布/.test(a)) {
+          return a.trim();
+        }
       }
       let fixed = rawTranscript || '';
       for (const [pattern, replacement] of FUZZY_VOICE_CORRECTIONS) {
@@ -1885,11 +505,37 @@
       return fixed.trim();
     }
 
+    function renderVoiceCandidateChips(primaryText, candidates) {
+      const bar = document.getElementById('voiceLiveBar');
+      const unique = Array.from(new Set([primaryText, ...candidates].map(s => s.trim()).filter(Boolean))).slice(0, 5);
+      if (unique.length <= 1) {
+        bar.style.display = 'none';
+        return;
+      }
+      bar.style.display = 'flex';
+      bar.innerHTML = `<span>🎙️ 語音同音候選（AI 將自動甄別，也可點選）：</span>`;
+      unique.forEach(cand => {
+        const chip = document.createElement('button');
+        chip.className = 'voice-alt-chip';
+        chip.innerText = cand;
+        chip.onclick = () => {
+          document.getElementById('userInput').value = cand;
+          autoResizeTextarea(document.getElementById('userInput'));
+          runSmartAI(cand, unique);
+        };
+        bar.appendChild(chip);
+      });
+    }
+
     function toggleVoice() {
       const btn = document.getElementById('micBtn');
       const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SR) return alert('Voice input requires Chrome, Edge, or Safari.');
+      if (!SR) {
+        alert('請使用 Chrome、Edge 或 Safari 瀏覽器以支援語音輸入。');
+        return;
+      }
 
+      // 如果正在錄音，再次點擊則立刻結束並發送提問
       if (activeRec) {
         clearTimeout(voiceSilenceTimer);
         activeRec.stop();
@@ -1898,49 +544,80 @@
 
       latestVoiceCandidates = [];
       activeRec = new SR();
-      // 智慧聲道選擇：Chrome 雙語聲學模型原生支援中英混輸；Safari 若在英文介面可優先跟隨或由 AI 還原同音候選詞
-      const isSafariOnly = /^((?!chrome|android|edg).)*safari/i.test(navigator.userAgent);
-      activeRec.lang = (isSafariOnly && currentLang === 'en') ? 'en-US' : 'zh-CN';
+
+      // 根據用戶選擇或瀏覽器環境設定最佳識別語言
+      if (voiceLangMode === 'en') {
+        activeRec.lang = 'en-US';
+      } else if (voiceLangMode === 'zh') {
+        activeRec.lang = 'zh-CN';
+      } else {
+        // auto 模式：zh-CN 聲學模型在 Chrome/Edge 原生兼顧國語與英語詞彙
+        activeRec.lang = 'zh-CN';
+      }
+
       activeRec.interimResults = true;
       activeRec.maxAlternatives = 5;
       activeRec.continuous = true;
       btn.classList.add('recording');
 
-      let finalTranscript = '';
-      const collectedAlts = new Set();
+      const liveBar = document.getElementById('voiceLiveBar');
+      liveBar.style.display = 'flex';
+      liveBar.innerHTML = `<span>🔴 正在聆聽中（請直接說中文或英文，說完停頓即自動回答，或再次點擊麥克風結束）...</span>`;
+
+      // 按段落保存，避免長句停頓時後一段覆蓋前一段的候選詞
+      const segmentPrimary = [];
+      const segmentAlts = [];
 
       function resetSilenceTimer() {
         clearTimeout(voiceSilenceTimer);
+        // 包容度大幅提升：給用戶 3.8 秒思考與換氣停頓時間，不會說一半被切斷
         voiceSilenceTimer = setTimeout(() => {
           if (activeRec) activeRec.stop();
-        }, 2400);
+        }, 3800);
       }
 
       resetSilenceTimer();
 
       activeRec.onresult = (e) => {
         resetSilenceTimer();
-        let interim = '';
-        const currentAlts = [];
+        let interimText = '';
+
         for (let i = e.resultIndex; i < e.results.length; i++) {
           const res = e.results[i];
+          const altsForThisSeg = [];
           for (let k = 0; k < res.length; k++) {
             const t = (res[k]?.transcript || '').trim();
-            if (t) {
-              currentAlts.push(t);
-              collectedAlts.add(t);
-            }
+            if (t) altsForThisSeg.push(t);
           }
-          const seg = res[0].transcript;
+
           if (res.isFinal) {
-            finalTranscript += (finalTranscript && !finalTranscript.endsWith(' ') ? ' ' : '') + seg.trim();
+            const bestSeg = applyFuzzyVoiceCorrection(res[0].transcript.trim(), altsForThisSeg);
+            segmentPrimary[i] = bestSeg;
+            segmentAlts[i] = altsForThisSeg;
           } else {
-            interim += seg;
+            interimText += res[0].transcript;
           }
         }
-        latestVoiceCandidates = Array.from(collectedAlts).slice(0, 5);
-        const combined = applyFuzzyVoiceCorrection((finalTranscript + (interim ? ' ' + interim : '')).trim(), currentAlts);
-        document.getElementById('userInput').value = combined;
+
+        const completedText = segmentPrimary.filter(Boolean).join(' ');
+        const fullCurrentText = applyFuzzyVoiceCorrection((completedText + (interimText ? ' ' + interimText : '')).trim());
+
+        // 組合完整的全句候選清單（最多保留前 5 個高機率完整句子）
+        const combinedCandidates = new Set();
+        if (fullCurrentText) combinedCandidates.add(fullCurrentText);
+        for (let k = 0; k < 5; k++) {
+          const altSentence = segmentAlts
+            .map((arr, idx) => (arr && arr[k]) ? arr[k] : (segmentPrimary[idx] || ''))
+            .filter(Boolean)
+            .join(' ')
+            .trim();
+          if (altSentence) combinedCandidates.add(altSentence);
+        }
+
+        latestVoiceCandidates = Array.from(combinedCandidates).slice(0, 5);
+        const inputEl = document.getElementById('userInput');
+        inputEl.value = fullCurrentText;
+        autoResizeTextarea(inputEl);
       };
 
       activeRec.onend = () => {
@@ -1948,20 +625,26 @@
         btn.classList.remove('recording');
         activeRec = null;
         const spoken = document.getElementById('userInput').value.trim();
-        if (spoken) runSmartAI(spoken, latestVoiceCandidates);
+        if (spoken) {
+          renderVoiceCandidateChips(spoken, latestVoiceCandidates);
+          runSmartAI(spoken, latestVoiceCandidates);
+        } else {
+          liveBar.style.display = 'none';
+        }
       };
 
       activeRec.onerror = () => {
         clearTimeout(voiceSilenceTimer);
         btn.classList.remove('recording');
         activeRec = null;
+        liveBar.style.display = 'none';
       };
 
       activeRec.start();
     }
 
     // =========================================================================
-    // 5. 數字與符號轉中文口語 + Trees Pinyin v25 編譯器 + 右鍵三合一修改器
+    // 3. 數字與符號轉中文口語 + Trees Pinyin 63 規則自然拼讀編譯器
     // =========================================================================
     const DIGITS_ZH = ['零','一','二','三','四','五','六','七','八','九'];
 
@@ -2006,10 +689,10 @@
     function expandNumbersAndSymbolsToZh(text) {
       if (!text) return '';
       let s = text;
-      s = s.replace(/\bH2O\b/gi, '水').replace(/\bCO2\b/gi, '二氧化碳').replace(/\bO2\b/gi, '氧氣');
-      s = s.replace(/\bWi-?Fi\b/gi, '無線網路').replace(/\bAPP\b/gi, '應用程式');
+      s = s.replace(/H2O/gi, '水').replace(/CO2/gi, '二氧化碳').replace(/O2/gi, '氧氣');
+      s = s.replace(/Wi-?Fi/gi, '無線網路').replace(/APP/gi, '應用程式').replace(/AI/gi, '人工智慧');
       s = s.replace(/°C|℃/g, '攝氏度').replace(/°F|℉/g, '華氏度');
-      s = s.replace(/\b(\d{1,2}):(\d{2})\b/g, (_, h, m) => intToChinese(h) + '點' + (m === '00' ? '整' : intToChinese(m) + '分'));
+      s = s.replace(/(\d{1,2}):(\d{2})/g, (_, h, m) => intToChinese(h) + '點' + (m === '00' ? '整' : intToChinese(m) + '分'));
       s = s.replace(/(\d+(?:\.\d+)?)\s*%/g, (_, num) => '百分之' + numberToChinese(num));
       s = s.replace(/\$\s*(\d+(?:\.\d+)?)/g, (_, num) => numberToChinese(num) + '美元');
       s = s.replace(/[¥￥]\s*(\d+(?:\.\d+)?)/g, (_, num) => numberToChinese(num) + '元');
@@ -2087,18 +770,15 @@
     }
 
     const CUSTOM_POLYPHONES = {
-      "銀行": "yin2 hang2", "银行": "yin2 hang2", "行業": "hang2 ye4", "行业": "hang2 ye4", "一行": "yi4 hang2",
-      "便宜": "pian2 yi5", "方便": "fang1 bian4", "音樂": "yin1 yue4", "音乐": "yin1 yue4", "快樂": "kuai4 le4", "快乐": "kuai4 le4",
-      "看著": "kan4 zhe5", "看着": "kan4 zhe5", "著急": "zhao2 ji2", "着急": "zhao2 ji2", "睡著": "shui4 zhao2", "睡着": "shui4 zhao2",
-      "長大": "zhang3 da4", "长大": "zhang3 da4", "長城": "chang2 cheng2", "长城": "chang2 cheng2", "多長": "duo1 chang2", "多长": "duo1 chang2",
-      "了解": "liao3 jie3", "好了": "hao3 le5", "太好了": "tai4 hao3 le5", "覺得": "jue2 de5", "觉得": "jue2 de5", "睡覺": "shui4 jiao4", "睡觉": "shui4 jiao4",
-      "重慶": "chong2 qing4", "重庆": "chong2 qing4", "重要": "zhong4 yao4", "還錢": "huan2 qian2", "还钱": "huan2 qian2", "還有": "hai2 you3", "还有": "hai2 you3",
+      "銀行": "yin2 hang2", "行業": "hang2 ye4", "一行": "yi4 hang2",
+      "便宜": "pian2 yi5", "方便": "fang1 bian4", "音樂": "yin1 yue4", "快樂": "kuai4 le4",
+      "看著": "kan4 zhe5", "著急": "zhao2 ji2", "睡著": "shui4 zhao2",
+      "長大": "zhang3 da4", "長城": "chang2 cheng2", "多長": "duo1 chang2",
+      "了解": "liao3 jie3", "好了": "hao3 le5", "太好了": "tai4 hao3 le5", "覺得": "jue2 de5", "睡覺": "shui4 jiao4",
+      "重慶": "chong2 qing4", "重要": "zhong4 yao4", "還錢": "huan2 qian2", "還有": "hai2 you3",
       "食物": "shi2 wu4", "美食": "mei3 shi2", "我的": "wo3 de5", "你的": "ni3 de5", "好的": "hao3 de5",
-      "曲項": "qu1 xiang4", "曲项": "qu1 xiang4", "朝辭": "zhao1 ci2", "朝辞": "zhao1 ci2", "水調歌頭": "shui3 diao4 ge1 tou2", "水调歌头": "shui3 diao4 ge1 tou2"
+      "曲項": "qu1 xiang4", "朝辭": "zhao1 ci2", "水調歌頭": "shui3 diao4 ge1 tou2", "鹿柴": "lu4 zhai4"
     };
-
-    const userCustomEdits = JSON.parse(localStorage.getItem('tp_custom_char_edits_v2') || '{}');
-    let activeEditCol = null;
 
     function getAccuratePinyinArray(zhText) {
       let pyArr = pinyinPro.pinyin(zhText, { type: 'array', toneType: 'num' });
@@ -2113,82 +793,63 @@
       return pyArr;
     }
 
-    function openThreeInOneEditor(colEl) {
-      activeEditCol = colEl;
-      const zhEl = colEl.querySelector('.tp-zh');
-      const stdEl = colEl.querySelector('.tp-std');
-      const tpEl = colEl.querySelector('.tp-py');
-      document.getElementById('editZhInput').value = zhEl ? zhEl.innerText : '';
-      document.getElementById('editStdInput').value = colEl.dataset.pynum || (stdEl ? stdEl.innerText : '');
-      document.getElementById('editTpInput').value = tpEl ? tpEl.innerText : '';
-      document.getElementById('editCharModal').style.display = 'flex';
+    // 清晰國語女聲朗讀
+    let selectedVoiceObj = null;
+    function initFemaleVoice() {
+      if (!('speechSynthesis' in window)) return;
+      const all = window.speechSynthesis.getVoices();
+      const zhAll = all.filter(v => /zh|cmn|chi/i.test(v.lang) || /chinese|mandarin|taiwan/i.test(v.name));
+      const priority = ['meijia', 'hsiaochen', 'xiaoxiao', 'ting-ting', 'google 國語', 'google 普通話'];
+      zhAll.sort((a, b) => {
+        const aS = priority.findIndex(k => a.name.toLowerCase().includes(k));
+        const bS = priority.findIndex(k => b.name.toLowerCase().includes(k));
+        return (aS === -1 ? 99 : aS) - (bS === -1 ? 99 : bS);
+      });
+      if (zhAll.length > 0) selectedVoiceObj = zhAll[0];
+    }
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.onvoiceschanged = initFemaleVoice;
+      setTimeout(initFemaleVoice, 200);
     }
 
-    function onEditZhOrNumChange(source) {
-      if (source === 'zh') {
-        const newCh = document.getElementById('editZhInput').value.trim();
-        if (newCh && /[\u4e00-\u9fa5]/.test(newCh)) {
-          const pyNum = pinyinPro.pinyin(newCh[0], { toneType: 'num' });
-          document.getElementById('editStdInput').value = pyNum;
-          document.getElementById('editTpInput').value = compileToTreesPinyin(pyNum);
-        }
-      } else if (source === 'std') {
-        const rawStd = document.getElementById('editStdInput').value.trim();
-        if (/^[a-züv:]+[0-5]?$/i.test(rawStd)) {
-          document.getElementById('editTpInput').value = compileToTreesPinyin(rawStd);
-        }
+    function speakText(text) {
+      if (!text || !('speechSynthesis' in window)) return;
+      window.speechSynthesis.cancel();
+      if (!selectedVoiceObj) initFemaleVoice();
+      const u = new SpeechSynthesisUtterance(text);
+      if (selectedVoiceObj) {
+        u.voice = selectedVoiceObj;
+        u.lang = selectedVoiceObj.lang;
+      } else {
+        u.lang = 'zh-TW';
       }
+      u.rate = 0.88;
+      window.speechSynthesis.speak(u);
     }
 
-    function saveThreeInOneEdit() {
-      if (!activeEditCol) return;
-      const newZh = document.getElementById('editZhInput').value.trim();
-      const rawStd = document.getElementById('editStdInput').value.trim();
-      const newTp = document.getElementById('editTpInput').value.trim();
-      if (checkAndWarnProfanity(newZh)) return;
-
-      const zhEl = activeEditCol.querySelector('.tp-zh');
-      const stdEl = activeEditCol.querySelector('.tp-std');
-      const tpEl = activeEditCol.querySelector('.tp-py');
-
-      if (newZh && zhEl) { zhEl.innerText = newZh; zhEl.dataset.raw = convertScript(newZh, 'trad'); }
-      if (rawStd && stdEl) {
-        activeEditCol.dataset.pynum = rawStd;
-        stdEl.innerText = /^[a-züv:]+[1-5]$/i.test(rawStd) ? numPinyinToToneMark(rawStd) : rawStd;
-      }
-      if (newTp && tpEl) tpEl.innerText = newTp;
-
-      if (newZh) {
-        userCustomEdits[convertScript(newZh, 'trad')] = {
-          std: stdEl ? stdEl.innerText : '',
-          tp: tpEl ? tpEl.innerText : '',
-          pynum: rawStd
-        };
-        localStorage.setItem('tp_custom_char_edits_v2', JSON.stringify(userCustomEdits));
-      }
-      document.getElementById('editCharModal').style.display = 'none';
+    function speakAllDisplayed() {
+      const blocks = document.querySelectorAll('#annotationList .sentence-block');
+      const allZh = Array.from(blocks).map(b => b.dataset.zh).join('。');
+      if (allZh) speakText(allZh);
     }
 
     function nextPaintTick() {
       return new Promise(resolve => requestAnimationFrame(() => setTimeout(resolve, 10)));
     }
 
-    function appendSentenceProgressive(rawZhText, enTranslation = '', targetContainerId = 'annotationList') {
-      const list = document.getElementById(targetContainerId);
+    function appendSentenceProgressive(rawZhText, enTranslation = '') {
+      const list = document.getElementById('annotationList');
       const block = document.createElement('div');
       block.className = 'sentence-block';
 
       const expandedZh = expandNumbersAndSymbolsToZh(rawZhText);
-      const tradZh = convertScript(expandedZh, 'trad');
+      const tradZh = toTrad(expandedZh);
       block.dataset.zh = tradZh;
       block.dataset.en = enTranslation;
 
       const enDiv = document.createElement('div');
       enDiv.className = 'en-line';
-      enDiv.contentEditable = 'true';
-      const hasLockedEn = Boolean(enTranslation && enTranslation.trim());
-      enDiv.innerText = hasLockedEn ? enTranslation.trim() : '...';
-      enDiv.oninput = () => { block.dataset.en = enDiv.innerText; };
+      enDiv.innerText = (enTranslation || '').trim();
       block.appendChild(enDiv);
 
       const charRow = document.createElement('div');
@@ -2197,50 +858,59 @@
 
       for (let i = 0; i < tradZh.length; i++) {
         const char = tradZh[i];
-        const dispChar = convertScript(char, currentScriptMode);
-        const isChinese = /[\u4e00-\u9fa5]/.test(char);
+        const isChinese = /[一-龥]/.test(char);
         const col = document.createElement('div');
         col.className = 'tp-col';
 
         if (isChinese) {
-          let pyNum = pinyinList[i] || '';
-          const savedCustom = userCustomEdits[char];
-          let tp = savedCustom?.tp || compileToTreesPinyin(pyNum);
-          let stdTone = savedCustom?.std || numPinyinToToneMark(pyNum);
-          col.dataset.pynum = savedCustom?.pynum || pyNum;
-
+          const pyNum = pinyinList[i] || '';
+          const tp = compileToTreesPinyin(pyNum);
+          const stdTone = numPinyinToToneMark(pyNum);
           col.innerHTML = `
             <span class="tp-py">${tp}</span>
             <span class="tp-std">${stdTone}</span>
-            <span class="tp-zh" data-raw="${char}">${dispChar}</span>
+            <span class="tp-zh">${char}</span>
           `;
-          col.onclick = () => speakSingleChar(col.querySelector('.tp-zh').innerText);
-          col.oncontextmenu = (e) => { e.preventDefault(); openThreeInOneEditor(col); };
+          col.onclick = () => speakText(char);
         } else {
-          col.innerHTML = `<span class="tp-py">${char}</span><span class="tp-std"> </span><span class="tp-zh"> </span>`;
+          col.innerHTML = `<span class="tp-py">${char}</span><span class="tp-std">&nbsp;</span><span class="tp-zh">&nbsp;</span>`;
         }
         charRow.appendChild(col);
       }
+
       block.appendChild(charRow);
       list.appendChild(block);
-
-      if (!hasLockedEn) {
-        translateFast(tradZh, 'zh', 'en').then(en => {
-          enDiv.innerText = en;
-          block.dataset.en = en;
-        });
-      }
-      return block;
     }
 
     // =========================================================================
-    // 6. 高精準度 AI 引擎 (高智商 Flash 模型領跑 + 容錯雙語解析器)
+    // 4. 萬人免費高精準 AI 問答架構 (三級快取 + 階梯順位調用 + 永久別名防改名)
     // =========================================================================
     const BUILTIN_QA_CACHE = {
-      "咏鹅": "《詠鵝》駱賓王 ||| Ode to the Goose by Luo Binwang\n鵝，鵝，鵝， ||| Goose, goose, goose,\n曲項向天歌。 ||| You bend your neck and sing to the sky.\n白毛浮綠水， ||| Your white feathers float on the emerald water,\n紅掌撥清波。 ||| Your red webbed feet paddle the clear waves.",
-      "静夜思": "《靜夜思》李白 ||| Quiet Night Thought by Li Bai\n床前明月光， ||| Before my bed, the bright moonlight shines,\n疑是地上霜。 ||| I wonder if it is frost upon the ground.\n舉頭望明月， ||| I raise my head to gaze at the bright moon,\n低頭思故鄉。 ||| And lower my head, longing for my hometown.",
-      "春晓": "《春曉》孟浩然 ||| Spring Morning by Meng Haoran\n春眠不覺曉， ||| In spring sleep, I am unaware of the dawn,\n處處聞啼鳥。 ||| Everywhere I hear the singing of birds.\n夜來風雨聲， ||| Last night came the sound of wind and rain,\n花落知多少。 ||| Who knows how many blossoms have fallen.",
-      "登鹳雀楼": "《登鸛雀樓》王之渙 ||| On the Stork Tower by Wang Zhihuan\n白日依山盡， ||| The white sun sets behind the mountains,\n黃河入海流。 ||| And the Yellow River flows into the sea.\n欲窮千里目， ||| To see a thousand miles further,\n更上一層樓。 ||| Climb one more story higher."
+      "咏鹅": "《詠鵝》駱賓王 ||| Ode to the Goose by Luo Binwang
+鵝，鵝，鵝， ||| Goose, goose, goose,
+曲項向天歌。 ||| You bend your neck and sing to the sky.
+白毛浮綠水， ||| Your white feathers float on the emerald water,
+紅掌撥清波。 ||| Your red webbed feet paddle the clear waves.",
+      "静夜思": "《靜夜思》李白 ||| Quiet Night Thought by Li Bai
+床前明月光， ||| Before my bed, the bright moonlight shines,
+疑是地上霜。 ||| I wonder if it is frost upon the ground.
+舉頭望明月， ||| I raise my head to gaze at the bright moon,
+低頭思故鄉。 ||| And lower my head, longing for my hometown.",
+      "春晓": "《春曉》孟浩然 ||| Spring Morning by Meng Haoran
+春眠不覺曉， ||| In spring sleep, I am unaware of the dawn,
+處處聞啼鳥。 ||| Everywhere I hear the singing of birds.
+夜來風雨聲， ||| Last night came the sound of wind and rain,
+花落知多少。 ||| Who knows how many blossoms have fallen.",
+      "登鹳雀楼": "《登鸛雀樓》王之渙 ||| On the Stork Tower by Wang Zhihuan
+白日依山盡， ||| The white sun sets behind the mountains,
+黃河入海流。 ||| And the Yellow River flows into the sea.
+欲窮千里目， ||| To see a thousand miles further,
+更上一層樓。 ||| Climb one more story higher.",
+      "鹿柴": "《鹿柴》王維 ||| Deer Enclosure by Wang Wei
+空山不見人， ||| In the empty mountain, no one is seen,
+但聞人語響。 ||| Yet echoes of voices are heard.
+返景入深林， ||| Returning sunlight enters the deep woods,
+復照青苔上。 ||| And shines again upon the green moss."
     };
 
     function normalizeCacheKey(rawQ) {
@@ -2248,14 +918,10 @@
       const fixed = applyFuzzyVoiceCorrection(rawQ);
       return fixed
         .toLowerCase()
-        .replace(/請背誦|请背诵|背誦|背诵|唐詩|唐诗|古詩|古诗/g, '')
+        .replace(/請背誦|请背诵|背誦|背诵|唐詩|唐诗|古詩|古诗|請問|请问/g, '')
         .replace(/[\s,.?!，。？！、：:；;《》〈〉"“”'‘’()（）]/g, '')
-        .replace(/詠/g, '咏')
-        .replace(/鵝/g, '鹅')
-        .replace(/靜/g, '静')
-        .replace(/曉/g, '晓')
-        .replace(/鸛/g, '鹳')
-        .replace(/樓/g, '楼')
+        .replace(/詠/g, '咏').replace(/鵝/g, '鹅').replace(/靜/g, '静')
+        .replace(/曉/g, '晓').replace(/鸛/g, '鹳').replace(/樓/g, '楼')
         .slice(0, 120);
     }
 
@@ -2264,7 +930,7 @@
       if (!k) return '';
       if (BUILTIN_QA_CACHE[k]) return BUILTIN_QA_CACHE[k];
       try {
-        const store = JSON.parse(localStorage.getItem('tp_local_qa_cache_v7') || '{}');
+        const store = JSON.parse(localStorage.getItem('tp_capsule_qa_cache_v2') || '{}');
         return store[k] || '';
       } catch (e) {
         return '';
@@ -2275,16 +941,16 @@
       const k = normalizeCacheKey(q);
       if (!k || !ans) return;
       try {
-        const store = JSON.parse(localStorage.getItem('tp_local_qa_cache_v7') || '{}');
+        const store = JSON.parse(localStorage.getItem('tp_capsule_qa_cache_v2') || '{}');
         const keys = Object.keys(store);
-        if (keys.length > 150) delete store[keys[0]];
+        if (keys.length > 200) delete store[keys[0]];
         store[k] = ans;
-        localStorage.setItem('tp_local_qa_cache_v7', JSON.stringify(store));
+        localStorage.setItem('tp_capsule_qa_cache_v2', JSON.stringify(store));
       } catch (e) {}
     }
 
-    let backupKey = (localStorage.getItem('tp_v22_backup_key') || localStorage.getItem('tp_test_gemini_key') || '').trim();
-    // 置頂谷歌官方永久動態別名 (gemini-flash-latest)，徹底免疫未來版本改名或舊模型下架！
+    let backupKey = (localStorage.getItem('tp_v22_backup_key') || '').trim();
+    // 置頂谷歌永久動態別名 gemini-flash-latest，徹底免疫版本改名！
     let availableFastModels = [
       'gemini-flash-latest',
       'gemini-2.5-flash',
@@ -2293,9 +959,14 @@
     ];
 
     function refreshKeyBtnStyle() {
-      const btn = document.getElementById('uiKeyBtn');
-      if (backupKey) btn.classList.add('has-key');
-      else btn.classList.remove('has-key');
+      const btn = document.getElementById('keyBtn');
+      if (backupKey) {
+        btn.classList.add('has-key');
+        btn.innerText = '🔑 已配置個人 Key';
+      } else {
+        btn.classList.remove('has-key');
+        btn.innerText = '🔑 API Key';
+      }
     }
     refreshKeyBtnStyle();
 
@@ -2315,8 +986,7 @@
           'gemini-2.5-flash',
           'gemini-3.5-flash',
           'gemini-flash-lite-latest',
-          'gemini-2.0-flash',
-          'gemini-3.5-flash-lite'
+          'gemini-2.0-flash'
         ];
         const sorted = [];
         for (const p of priority) {
@@ -2325,44 +995,29 @@
         for (const m of all) {
           if ((m.includes('flash') || m.includes('latest')) && !sorted.includes(m)) sorted.push(m);
         }
-        if (sorted.length > 0) {
-          availableFastModels = sorted;
-        }
+        if (sorted.length > 0) availableFastModels = sorted;
       } catch (e) {}
     }
+    if (backupKey) discoverFastModels(backupKey);
 
-    if (backupKey) {
-      discoverFastModels(backupKey);
-    }
-
-    function fetchWithTimeout(url, options = {}, timeoutMs = 8500) {
+    function fetchWithTimeout(url, options = {}, timeoutMs = 7500) {
       const ctrl = new AbortController();
       const timer = setTimeout(() => ctrl.abort(), timeoutMs);
       return fetch(url, { ...options, signal: ctrl.signal }).finally(() => clearTimeout(timer));
     }
 
-    async function callSingleGeminiModelFast(modelName, promptText, dataUrl, signal) {
+    async function callSingleGeminiModelFast(modelName, promptText, signal) {
       const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${encodeURIComponent(backupKey)}`;
-      const parts = [{ text: promptText }];
-      if (dataUrl && dataUrl.includes(',')) {
-        const mime = dataUrl.substring(dataUrl.indexOf(':') + 1, dataUrl.indexOf(';'));
-        parts.push({ inline_data: { mime_type: mime, data: dataUrl.split(',')[1] } });
-      }
-
       let r = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          contents: [{ parts }],
-          generationConfig: {
-            temperature: 0.1,
-            thinkingConfig: { thinkingBudget: 0 }
-          }
+          contents: [{ parts: [{ text: promptText }] }],
+          generationConfig: { temperature: 0.1, thinkingConfig: { thinkingBudget: 0 } }
         }),
         signal
       });
 
-      // 若谷歌下架或改名某個模型返回 404，自動重新探測最新存活模型目錄
       if (r.status === 404) {
         discoverFastModels(backupKey);
         throw new Error('MODEL_RENAMED_404');
@@ -2373,7 +1028,7 @@
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            contents: [{ parts }],
+            contents: [{ parts: [{ text: promptText }] }],
             generationConfig: { temperature: 0.1 }
           }),
           signal
@@ -2394,19 +1049,18 @@
       return text;
     }
 
-    // 階梯式順位調用 (Sequential Hedged Fallback)：不盲目群發浪費額度，將免費接客量放大 4 倍！
-    async function fetchFastAccurateAI(promptText, dataUrl = null, rawQuestionForCache = '') {
+    // 階梯式順位調用：絕不同時群發浪費額度，省下 75% 免費配額供萬人使用
+    async function fetchFastAccurateAI(promptText, rawQuestionForCache = '') {
       const cleanCacheKey = normalizeCacheKey(rawQuestionForCache);
 
-      // 1. 若用戶填了自己的免費 Gemini API Key，按順序單發主力模型，超時或限流才切換備胎
+      // 1. 若用戶填了自己的免費 Key，按順序調用主力模型，失敗才切換備用模型
       if (backupKey) {
         const modelsToTry = availableFastModels.slice(0, 3);
         for (let i = 0; i < modelsToTry.length; i++) {
           const ctrl = new AbortController();
-          const timeoutMs = (i === 0) ? 4500 : 6500;
-          const timer = setTimeout(() => ctrl.abort(), timeoutMs);
+          const timer = setTimeout(() => ctrl.abort(), i === 0 ? 4500 : 6500);
           try {
-            const txt = await callSingleGeminiModelFast(modelsToTry[i], promptText, dataUrl, ctrl.signal);
+            const txt = await callSingleGeminiModelFast(modelsToTry[i], promptText, ctrl.signal);
             clearTimeout(timer);
             if (txt) return txt;
           } catch (e) {
@@ -2415,19 +1069,17 @@
         }
       }
 
-      // 2. 走 Cloudflare Worker 全球邊緣免費共享快取與多 Key 輪詢池（主節點優先，失敗才切換備用節點）
+      // 2. 走 Cloudflare Worker 全球邊緣免費快取與多 Key 輪詢池
       for (let i = 0; i < CF_WORKER_ENDPOINTS.length; i++) {
-        const ep = CF_WORKER_ENDPOINTS[i];
         try {
-          const r = await fetchWithTimeout(ep, {
+          const r = await fetchWithTimeout(CF_WORKER_ENDPOINTS[i], {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               prompt: promptText,
-              image: dataUrl,
               cacheKey: cleanCacheKey
             })
-          }, i === 0 ? 6800 : 7500);
+          }, 7000);
           if (!r.ok) continue;
           const d = await r.json();
           const t = (d?.text || d?.reply || d?.choices?.[0]?.message?.content || '').trim();
@@ -2436,35 +1088,6 @@
       }
 
       return '';
-    }
-
-    async function translateFast(text, fromLang, toLang) {
-      const isZhToEn = fromLang.startsWith('zh');
-      const src = isZhToEn ? 'zh-CN' : 'en';
-      const tgt = isZhToEn ? 'en' : 'zh-CN';
-
-      const tasks = [
-        fetchWithTimeout(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=${src}&tl=${tgt}&dt=t&q=${encodeURIComponent(text)}`, {}, 4000)
-          .then(r => r.json())
-          .then(d => {
-            const j = d?.[0]?.map(x => x[0]).join('');
-            if (j && j.trim() && j.trim() !== text) return j.trim();
-            throw new Error('empty');
-          }),
-        fetchWithTimeout(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${src}|${tgt}`, {}, 4500)
-          .then(r => r.json())
-          .then(d => {
-            const t = d?.responseData?.translatedText;
-            if (t && !t.includes('MYMEMORY WARNING') && t.toLowerCase() !== text.toLowerCase()) return t.trim();
-            throw new Error('empty');
-          })
-      ];
-
-      try {
-        return await Promise.any(tasks);
-      } catch (e) {
-        return text;
-      }
     }
 
     function cleanChineseSentence(line) {
@@ -2479,7 +1102,7 @@
         .replace(/^[，。！？；：、,.!?;:\s]+/, '')
         .replace(/\s+/g, '')
         .trim();
-      return /[\u4e00-\u9fa5]/.test(s) ? s : '';
+      return /[一-龥]/.test(s) ? s : '';
     }
 
     function parseBilingualPairLine(rawLine) {
@@ -2489,52 +1112,51 @@
       if (parts.length < 2) return null;
 
       let zhPart = '', enPart = '';
-      if (/[\u4e00-\u9fa5]/.test(parts[0]) && !/[\u4e00-\u9fa5]/.test(parts[1])) {
+      if (/[一-龥]/.test(parts[0]) && !/[一-龥]/.test(parts[1])) {
         zhPart = cleanChineseSentence(parts[0]) || parts[0];
         enPart = parts[1];
-      } else if (/[\u4e00-\u9fa5]/.test(parts[1])) {
+      } else if (/[一-龥]/.test(parts[1])) {
         enPart = parts[0];
         zhPart = cleanChineseSentence(parts[1]) || parts[1];
       } else {
         zhPart = cleanChineseSentence(parts[0]) || parts[0];
         enPart = parts[1];
       }
-      if (!/[\u4e00-\u9fa5]/.test(zhPart)) return null;
+      if (!/[一-龥]/.test(zhPart)) return null;
       return { zh: zhPart, en: enPart };
     }
 
-    // 智慧容錯渲染器：每一行（包含第一行標題與作者）都進行四位一體注音，且過濾連續重複行
     async function renderBilingualAIOutput(aiText) {
-      const replyBox = document.getElementById('aiReplyBox');
-      replyBox.style.display = 'none';
-      const rawLines = aiText.split(/\n+/).map(l => l.trim()).filter(Boolean);
+      const banner = document.getElementById('statusBanner');
+      banner.style.display = 'none';
+      const rawLines = aiText.split(/
++/).map(l => l.trim()).filter(Boolean);
       if (rawLines.length === 0) return false;
 
       const seenExactZh = new Set();
       let renderedPairs = 0;
 
-      for (let i = 0; i < rawLines.length; i++) {
-        const pair = parseBilingualPairLine(rawLines[i]);
+      for (const rawLine of rawLines) {
+        const pair = parseBilingualPairLine(rawLine);
         if (pair) {
-          const key = pair.zh.replace(/[^\u4e00-\u9fa5]/g, '');
+          const key = pair.zh.replace(/[^一-龥]/g, '');
           if (!key || seenExactZh.has(key)) continue;
           seenExactZh.add(key);
           renderedPairs++;
           appendSentenceProgressive(pair.zh, pair.en);
           await nextPaintTick();
         } else {
-          // 若某行沒有 |||，自動拆出中文與括號內的英文，保證第一行標題或任何句子都不漏掉！
-          const lineStr = rawLines[i].replace(/^[-*•\d.)、]+\s*/, '').replace(/\*+/g, '').trim();
+          const lineStr = rawLine.replace(/^[-*•\d.)、]+\s*/, '').replace(/\*+/g, '').trim();
           const parenMatch = lineStr.match(/^(.+?)\s*[(（]([A-Za-z][^）)]+)[)）]$/);
           let zhStr = '', enStr = '';
-          if (parenMatch && /[\u4e00-\u9fa5]/.test(parenMatch[1])) {
+          if (parenMatch && /[一-龥]/.test(parenMatch[1])) {
             zhStr = cleanChineseSentence(parenMatch[1]) || parenMatch[1].trim();
             enStr = parenMatch[2].trim();
           } else {
             zhStr = cleanChineseSentence(lineStr);
           }
           if (zhStr) {
-            const key = zhStr.replace(/[^\u4e00-\u9fa5]/g, '');
+            const key = zhStr.replace(/[^一-龥]/g, '');
             if (!key || seenExactZh.has(key)) continue;
             seenExactZh.add(key);
             renderedPairs++;
@@ -2551,45 +1173,44 @@
       const altsToUse = (Array.isArray(voiceAlts) && voiceAlts.length > 0) ? voiceAlts : latestVoiceCandidates;
       const q = applyFuzzyVoiceCorrection(rawText, altsToUse);
       if (!q) return;
-      document.getElementById('userInput').value = q;
-      latestVoiceCandidates = [];
-      if (checkAndWarnProfanity(q)) return;
 
-      if (/docs\.google\.com\/|drive\.google\.com\//i.test(q)) {
-        return runDirectTranslate(q);
-      }
+      const inputEl = document.getElementById('userInput');
+      inputEl.value = q;
+      autoResizeTextarea(inputEl);
 
-      document.getElementById('previewImg').style.display = 'none';
-      const replyBox = document.getElementById('aiReplyBox');
+      const banner = document.getElementById('statusBanner');
       const list = document.getElementById('annotationList');
-      replyBox.style.display = 'block';
-      replyBox.innerText = currentLang === 'en' ? '⚡ AI Thinking...' : '⚡ AI 正在極速思考...';
+      banner.style.display = 'block';
+      banner.innerText = '⚡ AI 正在極速思考並生成雙語注音...';
       list.innerHTML = '';
 
+      // 1. 優先命中本地快取 (0毫秒極速返回)
       const localHit = getLocalCachedAnswer(q);
       if (localHit) {
         const ok = await renderBilingualAIOutput(localHit);
         if (ok) return;
       }
 
+      // 2. 將語音識別的所有同音候選詞一併交給 AI，讓 AI 自動糾正口音、同音字或中英混輸誤判
       const voiceCandidatesHint = (altsToUse && altsToUse.length > 1)
-        ? `\nVoice Speech-to-Text Candidates: ${JSON.stringify(altsToUse)}. (Pick the candidate that makes the most natural sense in Mandarin or English, or reconstruct the intended English/Chinese phrase if phonetic transcription occurred!)`
+        ? `
+Voice Speech-to-Text Candidates: ${JSON.stringify(altsToUse)}. (IMPORTANT: If the primary text has homophone typos or garbled Chinese phonetic characters from spoken English, pick or reconstruct the most semantically natural Mandarin or English question!)`
         : '';
 
       const directPrompt = `You are an authoritative bilingual scholar and assistant.
 User question/request: "${q}"${voiceCandidatesHint}
 
 CRITICAL ACCURACY RULES:
-1. If the user's input has a voice-recognition homophone typo (e.g. "永和" instead of the Tang poem "詠鵝", or phonetic Chinese characters representing English words), automatically answer the intended topic.
+1. High Voice Tolerance: If the user's input has a voice-recognition homophone typo (e.g., "永和" instead of "詠鵝", "路窄" instead of "鹿柴", or phonetic Chinese characters representing spoken English words), automatically answer the intended topic accurately.
 2. Formulate the complete, authoritative standard answer or authentic classic text:
-   - If the user asks about a Chinese poem/classic (e.g., 詠鵝, 靜夜思, 水調歌頭): Output ONLY the Title+Author on Line 1, followed by the COMPLETE original verses. No extra commentary!
+   - If the user asks about a Chinese poem/classic (e.g., 詠鵝, 靜夜思, 水調歌頭, 鹿柴): Output ONLY the Title+Author on Line 1, followed by the COMPLETE original verses. No extra commentary!
    - If the user asks any other question in English or Chinese: Output a clear, complete, accurate bilingual answer.
 3. Output Format (Every single line MUST use "|||"):
    - Line 1: Chinese_Title_or_Summary ||| English_Title_or_Summary
    - Line 2+: Pure_Chinese_Sentence ||| Authentic_English_Sentence
    - IMPORTANT: Left side of "|||" must contain ONLY Traditional Chinese characters and Chinese punctuation (write all numbers/terms in Chinese characters, NO Pinyin, NO English letters on the left side). Never repeat any line.`;
 
-      const aiText = await fetchFastAccurateAI(directPrompt, null, q);
+      const aiText = await fetchFastAccurateAI(directPrompt, q);
       if (aiText) {
         const ok = await renderBilingualAIOutput(aiText);
         if (ok) {
@@ -2598,487 +1219,15 @@ CRITICAL ACCURACY RULES:
         }
       }
 
-      replyBox.innerHTML = currentLang === 'en'
-        ? `💡 High traffic on the free public channel! Please enter your own free Google Gemini API Key in <b>[🔑 API Key]</b> for unlimited instant responses.`
-        : `💡 當前免費公共通道訪問量較大！請在右上角 <b>[🔑 API Key]</b> 填入您免費的個人 Google Gemini Key 即可享受專屬極速無限通道。`;
+      banner.innerHTML = `💡 當前公共免費通道繁忙，請點擊右上角 <b>[🔑 API Key]</b> 填入您免費的個人 Google Gemini Key 即可無限極速問答。`;
       openKeyModal();
     }
 
-    async function runDirectTranslate(inputOverride) {
-      let raw = (inputOverride !== undefined ? inputOverride : document.getElementById('userInput').value).trim();
-      if (!raw) return;
-      if (checkAndWarnProfanity(raw)) return;
-
-      document.getElementById('previewImg').style.display = 'none';
-      const replyBox = document.getElementById('aiReplyBox');
-      replyBox.style.display = 'none';
-      const list = document.getElementById('annotationList');
-      list.innerHTML = '';
-
-      if (/docs\.google\.com\/document\/d\/|drive\.google\.com\/file\/d\//i.test(raw)) {
-        replyBox.style.display = 'block';
-        replyBox.innerText = '📄 Fetching Google Doc text...';
-        const docText = await fetchCloudDocumentByUrl(raw);
-        if (docText) {
-          raw = docText.slice(0, 3500).trim();
-          replyBox.style.display = 'none';
-        } else {
-          replyBox.innerText = '⚠️ Please make sure the Google Doc is shared as "Anyone with the link can view", or copy & paste the text directly.';
-          return;
-        }
-      }
-
-      if (backupKey && raw.length <= 1800) {
-        replyBox.style.display = 'block';
-        replyBox.innerText = currentLang === 'en' ? '⚡ Translating accurately...' : '⚡ 正在精準翻譯並注音...';
-
-        const transPrompt = `Translate the following text sentence by sentence between Chinese and English.
-CRITICAL RULES:
-1. NEVER alter or re-translate the user's original text!
-2. Output strictly one sentence pair per line in this exact format:
-Chinese_Sentence ||| English_Sentence
-
-Text to translate:
-${raw}`;
-
-        const aiTrans = await fetchFastAccurateAI(transPrompt);
-        if (aiTrans && aiTrans.includes('|||')) {
-          replyBox.style.display = 'none';
-          const pairLines = aiTrans.split(/\n+/).map(l => l.trim()).filter(Boolean);
-          let renderedCount = 0;
-          for (const pl of pairLines) {
-            const pair = parseBilingualPairLine(pl);
-            if (pair) {
-              renderedCount++;
-              appendSentenceProgressive(pair.zh, pair.en);
-              await nextPaintTick();
-            }
-          }
-          if (renderedCount > 0) return;
-        }
-        replyBox.style.display = 'none';
-      }
-
-      const lines = raw.split(/\n+|(?<=[。！？.!?])\s*/).map(l => l.trim()).filter(Boolean);
-      for (let line of lines) {
-        const hasChinese = /[\u4e00-\u9fa5]/.test(line);
-        if (hasChinese) {
-          appendSentenceProgressive(line, '');
-          await nextPaintTick();
-        } else {
-          const tempBlock = document.createElement('div');
-          tempBlock.className = 'sentence-block';
-          tempBlock.innerHTML = `<div class="en-line">${line}</div><div style="font-size:0.85rem;color:#666;">⚡ Translating...</div>`;
-          list.appendChild(tempBlock);
-
-          const zhTrans = await translateFast(line, 'en', 'zh');
-          tempBlock.remove();
-          appendSentenceProgressive(zhTrans, line);
-          await nextPaintTick();
-        }
-      }
-    }
-
-    // =========================================================================
-    // 7. 拖拽文件上傳、PDF/Word 提取、圖片壓縮與 Vision AI + OCR 雙軌識別
-    // =========================================================================
-    const dropZone = document.getElementById('dropZone');
-    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.style.borderColor = '#1b5e20'; });
-    dropZone.addEventListener('dragleave', () => { dropZone.style.borderColor = ''; });
-    dropZone.addEventListener('drop', (e) => {
-      e.preventDefault();
-      dropZone.style.borderColor = '';
-      if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-        const f = e.dataTransfer.files[0];
-        if (f.type.startsWith('image/')) {
-          handlePhotoUpload({ files: [f], value: '' });
-        } else {
-          handleDocFileUpload({ files: [f], value: '' });
-        }
-      }
+    // 預設載入一組示範，方便打開頁面立即看到效果
+    window.addEventListener('DOMContentLoaded', () => {
+      appendSentenceProgressive('請問你想向人工智慧提問什麼問題？', 'What question would you like to ask AI today?');
     });
 
-    function loadScriptDynamic(src) {
-      return new Promise((resolve, reject) => {
-        if (document.querySelector(`script[src="${src}"]`)) return resolve();
-        const s = document.createElement('script');
-        s.src = src; s.onload = resolve; s.onerror = reject;
-        document.head.appendChild(s);
-      });
-    }
-
-    async function extractPdfTextFast(file) {
-      await loadScriptDynamic('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js');
-      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-      const buf = await file.arrayBuffer();
-      const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
-      let out = [];
-      for (let i = 1; i <= Math.min(pdf.numPages, 20); i++) {
-        const page = await pdf.getPage(i);
-        const tc = await page.getTextContent();
-        const pageStr = tc.items.map(item => item.str).join(' ');
-        if (pageStr.trim()) out.push(pageStr.trim());
-      }
-      return out.join('\n');
-    }
-
-    async function extractWordTextFast(file) {
-      await loadScriptDynamic('https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js');
-      const buf = await file.arrayBuffer();
-      const res = await mammoth.extractRawText({ arrayBuffer: buf });
-      return (res.value || '').trim();
-    }
-
-    async function handleDocFileUpload(input) {
-      if (!input.files || !input.files[0]) return;
-      const file = input.files[0];
-      const name = (file.name || '').toLowerCase();
-      input.value = '';
-      const replyBox = document.getElementById('aiReplyBox');
-      replyBox.style.display = 'block';
-      replyBox.innerText = `📄 Reading ${file.name}...`;
-
-      try {
-        let extractedText = '';
-        if (name.endsWith('.pdf') || file.type === 'application/pdf') {
-          extractedText = await extractPdfTextFast(file);
-        } else if (name.endsWith('.docx') || file.type.includes('wordprocessingml')) {
-          extractedText = await extractWordTextFast(file);
-        } else {
-          extractedText = await file.text();
-          if (name.endsWith('.html') || name.endsWith('.htm')) {
-            const tmp = document.createElement('div');
-            tmp.innerHTML = extractedText;
-            extractedText = tmp.innerText || tmp.textContent || '';
-          }
-        }
-
-        const clean = (extractedText || '').trim();
-        if (!clean) {
-          replyBox.innerText = '⚠️ No selectable text found in this file.';
-          return;
-        }
-
-        replyBox.style.display = 'none';
-        const clipped = clean.slice(0, 3500);
-        document.getElementById('userInput').value = clipped;
-        await runDirectTranslate(clipped);
-      } catch (err) {
-        replyBox.innerText = '⚠️ Failed to read file.';
-      }
-    }
-
-    function compressImg(file, maxW, quality) {
-      return new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          const img = new Image();
-          img.onload = () => {
-            const c = document.createElement('canvas');
-            let w = img.width, h = img.height;
-            if (w > maxW) { h = Math.round((h * maxW) / w); w = maxW; }
-            c.width = w; c.height = h;
-            c.getContext('2d').drawImage(img, 0, 0, w, h);
-            resolve(c.toDataURL('image/jpeg', quality));
-          };
-          img.src = e.target.result;
-        };
-        reader.readAsDataURL(file);
-      });
-    }
-
-    async function handlePhotoUpload(input) {
-      if (!input.files || !input.files[0]) return;
-      const file = input.files[0];
-      const replyBox = document.getElementById('aiReplyBox');
-      const list = document.getElementById('annotationList');
-      replyBox.style.display = 'block';
-      replyBox.innerText = currentLang === 'en' ? '📷 Analyzing photo...' : '📷 正在極速識別照片...';
-      list.innerHTML = '';
-
-      const dataUrl = await compressImg(file, 560, 0.68);
-      const prev = document.getElementById('previewImg');
-      prev.src = dataUrl;
-      prev.style.display = 'block';
-
-      const vPrompt = `Look at this image:
-Line 1: Briefly identify what text, dish, or object is in the image (in English & Chinese).
-Line 2+: Output the text or 1-2 descriptive sentences strictly in this paired format (one pair per line):
-Pure_Chinese_Sentence ||| Authentic_English_Sentence`;
-
-      const aiRes = await fetchFastAccurateAI(vPrompt, dataUrl);
-      if (aiRes) {
-        const ok = await renderBilingualAIOutput(aiRes);
-        if (ok) {
-          input.value = '';
-          return;
-        }
-      }
-
-      try {
-        const fd = new FormData();
-        fd.append('base64Image', dataUrl);
-        fd.append('language', 'chs');
-        fd.append('apikey', 'helloworld');
-        const r = await fetchWithTimeout('https://api.ocr.space/parse/image', { method: 'POST', body: fd }, 6500);
-        const d = await r.json();
-        const ocrText = d?.ParsedResults?.[0]?.ParsedText?.trim() || '';
-        if (ocrText) {
-          const clean = ocrText.replace(/\r\n/g, '\n').trim();
-          document.getElementById('userInput').value = clean;
-          replyBox.style.display = 'none';
-          await runDirectTranslate(clean);
-        } else {
-          replyBox.innerText = '💡 No clear text found.';
-        }
-      } catch (e) {}
-      input.value = '';
-    }
-
-    // =========================================================================
-    // 8. 原書 45 個記憶詞庫 (含雙語例句) 與分享解鎖
-    // =========================================================================
-    const FULL_45_BOOK_MNEMONICS = [
-      { pack: 1, meaning: "Hello / How are you?", trees: "Nee3 haw3", hanzi: "你好", pinyin: "nǐ hǎo", sound: "Similar to '<b><u>knee</u> <u>how</u></b>'.", mnemonic: "<b>Knee</b>ling to show <b>how</b> much respect you have.", exZh: "你好，很高興認識你！", exEn: "Hello, nice to meet you!" },
-      { pack: 1, meaning: "You (Singular)", trees: "nee3", hanzi: "你", pinyin: "nǐ", sound: "Sounds like '<b><u>Knee</u></b>'.", mnemonic: "<b><u>Knee</u></b>(l) down while greeting <b>you</b>.", exZh: "請問你叫什麼名字？", exEn: "May I ask what your name is?" },
-      { pack: 1, meaning: "Good", trees: "haw3", hanzi: "好", pinyin: "hǎo", sound: "Similar to '<b><u>how</u></b>'.", mnemonic: "'Nee3 haw3' literally means 'You good'.", exZh: "今天天氣真好！", exEn: "The weather is really good today!" },
-      { pack: 1, meaning: "Good morning.", trees: "Dsaw3 (r)sang4 haw3", hanzi: "早上好", pinyin: "zǎo shang hǎo", sound: "Sounds like '<b><u>jaw</u> <u>sang</u></b>'.", mnemonic: "Morning yawning: your <b><u>jaw</u> <u>sang</u></b>!", exZh: "老師早上好！", exEn: "Good morning, teacher!" },
-      { pack: 1, meaning: "Big", trees: "dah4", hanzi: "大", pinyin: "dà", sound: "First part of '<b><u>do</u></b>zen'.", mnemonic: "Our <b>big</b> family eats a <b><u>do</u></b>zen eggs.", exZh: "這個蘋果非常大。", exEn: "This apple is very big." },
-      { pack: 1, meaning: "Home / Family", trees: "jeeah", hanzi: "家", pinyin: "jiā", sound: "Contraction of '<b><u>Gee</u></b>' and '<b><u>Ah</u></b>'.", mnemonic: "Our <b>big family</b> eats eggs in a <b>jar</b>.", exZh: "歡迎來到我家！", exEn: "Welcome to my home!" },
-      { pack: 1, meaning: "Happy", trees: "kooie4 Ler4", hanzi: "快樂", pinyin: "kuài lè", sound: "'<b><u>qui</u></b>(te) <b><u>lo</u></b>(vely)'.", mnemonic: "<b>Happy</b> kids are <b><u>qui</u></b>(te) <b><u>lo</u></b>(vely)!", exZh: "祝你生日快樂！", exEn: "Wish you a happy birthday!" },
-      { pack: 1, meaning: "New", trees: "seen", hanzi: "新", pinyin: "xīn", sound: "Sounds like '<b><u>seen</u></b>'.", mnemonic: "Never <b><u>seen</u></b> before, so it's <b>new</b>!", exZh: "這是一本新書。", exEn: "This is a new book." },
-      { pack: 1, meaning: "Year", trees: "neean2", hanzi: "年", pinyin: "nián", sound: "'<b><u>Knee</u> <u>an</u></b>' or '<b>Neon</b>'.", mnemonic: "New <b>Year</b> involves kowtow and <b>neon</b> lights.", exZh: "祝大家新年快樂！", exEn: "Happy New Year, everyone!" },
-      { pack: 1, meaning: "Make a fortune", trees: "fah tsie2", hanzi: "發財", pinyin: "fā cái", sound: "\"<b><u>far</u></b> i<b><u>t's I</u></b>\".", mnemonic: "A bold 'far try' to <b>make a fortune</b>.", exZh: "恭喜發財，萬事如意！", exEn: "Wishing you prosperity and all the best!" },
-      { pack: 1, meaning: "Excuse me / Could you tell me...?", trees: "Tsing3 wer-n4", hanzi: "請問", pinyin: "qǐng wèn", sound: "Le<b><u>t's sing</u></b> <b><u>when</u></b> happy.", mnemonic: "tsing3 = Let's sing; wer-n4 = when.", exZh: "請問洗手間在哪裡？", exEn: "Excuse me, where is the restroom?" },
-      { pack: 1, meaning: "Thank you!", trees: "Seer4 seer", hanzi: "謝謝", pinyin: "xiè xie", sound: "'<b><u>See</u> <u>ye</u></b>(s)' / 'See ya'.", mnemonic: "'Thank you' and 'See ya' go hand in hand!", exZh: "非常謝謝你的幫忙！", exEn: "Thank you very much for your help!" },
-      { pack: 1, meaning: "See you / Good-bye", trees: "Dsie4 jeean4", hanzi: "再見", pinyin: "zài jiàn", sound: "'<b><u>Xy</u></b>lophone, <b><u>Gee</u> <u>an</u></b>'.", mnemonic: "Playing the <b><u>Xy</u></b>lophone to say <b>goodbye</b>.", exZh: "我們明天見，再見！", exEn: "See you tomorrow, goodbye!" },
-      { pack: 1, meaning: "You are welcome.", trees: "Boo2 ker4 tsee", hanzi: "不客氣", pinyin: "bú kè qi", sound: "'<b><u>Boo</u> <u>Cur</u>—<u>tsy</u></b>'.", mnemonic: "No need to do a curtsy ('Boo Curtsy').", exZh: "不客氣，這是我應該做的。", exEn: "You're welcome, it's my pleasure." },
-      { pack: 1, meaning: "I'm sorry.", trees: "Dooay4 boo4 tsee3", hanzi: "對不起", pinyin: "duì bù qǐ", sound: "<b><u>Dway</u></b>ne says '<b><u>boo</u> <u>qi</u></b>'.", mnemonic: "Dwayne apologizes: I'm sorry!", exZh: "對不起，我今天遲到了。", exEn: "I'm sorry, I am late today." },
-      { pack: 2, meaning: "It doesn't matter / It's OK.", trees: "May2 gooan see", hanzi: "沒關係", pinyin: "méi guān xi", sound: "'<b><u>May</u></b> la<b><u>goon</u></b> <b><u>see</u></b>.'", mnemonic: "May the lagoon be seen.", exZh: "沒關係，下次注意就好了。", exEn: "It's OK, just be careful next time." },
-      { pack: 2, meaning: "Don't get angry.", trees: "Beer2 (r)ser-ng tsee4", hanzi: "別生氣", pinyin: "bié shēng qì", sound: "'<b><u>Beer</u> <u>sung</u> <u>qi</u></b>'.", mnemonic: "With beer, Dwayne sung a song full of qi.", exZh: "別生氣，我們一起想辦法。", exEn: "Don't get angry, let's figure it out together." },
-      { pack: 2, meaning: "Doctor", trees: "yee (r)ser-ng", hanzi: "醫生", pinyin: "yī shēng", sound: "yee + (r)ser-ng.", mnemonic: "The very first person you see at birth is a doctor.", exZh: "他是一位非常有名的醫生。", exEn: "He is a very famous doctor." },
-      { pack: 2, meaning: "Day / Sun", trees: "(r)th4", hanzi: "日", pinyin: "rì", sound: "'<b><u>r</u></b>ain' + '<b><u>th</u></b>en'.", mnemonic: "And (r)then... the day begins!", exZh: "今天是個好日子。", exEn: "Today is a great day." },
-      { pack: 2, meaning: "I / Me", trees: "wer3", hanzi: "我", pinyin: "wǒ", sound: "Part of '<b><u>wor</u></b>d'.", mnemonic: "I am the core of my world.", exZh: "我非常喜歡學習中文。", exEn: "I really like learning Chinese." },
-      { pack: 2, meaning: "My / Mine", trees: "wer3 der", hanzi: "我的", pinyin: "wǒ de", sound: "Similar to '<b><u>word</u></b>'.", mnemonic: "Adding 'der' after 'wer3'.", exZh: "這本書是我的。", exEn: "This book is mine." },
-      { pack: 2, meaning: "Your / Yours", trees: "nee3 der", hanzi: "你的", pinyin: "nǐ de", sound: "Sounds like '<b><u>need</u></b>'.", mnemonic: "Yours is what you need.", exZh: "你的發音非常標準！", exEn: "Your pronunciation is very accurate!" },
-      { pack: 2, meaning: "It / He / She", trees: "tah", hanzi: "他", pinyin: "tā", sound: "First part of '<b><u>Ta</u></b>rget'.", mnemonic: "He and she buy it at Target.", exZh: "他是我們班的好學生。", exEn: "He is a good student in our class." },
-      { pack: 2, meaning: "His / Her / Its", trees: "tah der", hanzi: "他的", pinyin: "tā de", sound: "Similar to '<b><u>tard</u></b>(y)'.", mnemonic: "He was tardy for his class.", exZh: "他的中文說得很好。", exEn: "He speaks Chinese very well." },
-      { pack: 2, meaning: "Friend", trees: "per-ng2 yoh", hanzi: "朋友", pinyin: "péng yǒu", sound: "'<b><u>peng</u></b>uin <b><u>you</u></b>'.", mnemonic: "A cute penguin is your best friend!", exZh: "我們是最好的朋友。", exEn: "We are best friends." },
-      { pack: 2, meaning: "Younger & Elder Brother", trees: "dee4 dee / ger ger", hanzi: "弟弟哥哥", pinyin: "dì di gē ge", sound: "'<b><u>di</u></b>g' = dee4 + ger.", mnemonic: "'dig' is teamwork of brothers!", exZh: "哥哥和弟弟一起去公園。", exEn: "The brothers go to the park together." },
-      { pack: 2, meaning: "Country & USA", trees: "may3 gooer2", hanzi: "美國", pinyin: "měi guó", sound: "<b><u>May</u></b>flower + gooer2.", mnemonic: "No Mayflower, no USA.", exZh: "我來自美國加州。", exEn: "I come from California, USA." },
-      { pack: 2, meaning: "Human / People", trees: "(r)ther-n2", hanzi: "人", pinyin: "rén", sound: "'r' tongue + weak '<b><u>then</u></b>'.", mnemonic: "Add (r)ther-n2 for people.", exZh: "這裡的人都非常熱情。", exEn: "The people here are very warm." },
-      { pack: 2, meaning: "China", trees: "(r)dser-oong gooer2", hanzi: "中國", pinyin: "zhōng guó", sound: "Sounds like '<b><u>drone</u></b>'.", mnemonic: "Fly a drone across China.", exZh: "中國有很多歷史古蹟。", exEn: "China has many historical sites." },
-      { pack: 2, meaning: "Like / Love", trees: "see3 hooan", hanzi: "喜歡", pinyin: "xǐ huān", sound: "'<b><u>see</u> <u>Juan</u></b>'.", mnemonic: "Like him when you see Don Juan!", exZh: "你喜歡吃什麼水果？", exEn: "What fruit do you like to eat?" },
-      { pack: 3, meaning: "Can / Be able to", trees: "hooay4", hanzi: "會", pinyin: "huì", sound: "'<b><u>hoo</u></b>(r)<b><u>ay</u></b>'.", mnemonic: "If you can do it, shout hooray!", exZh: "我會說一點點中文。", exEn: "I can speak a little bit of Chinese." },
-      { pack: 3, meaning: "Book", trees: "(r)soo", hanzi: "書", pinyin: "shū", sound: "Sounds like '<b><u>sue</u></b>'.", mnemonic: "Copy this book and Sue will sue you!", exZh: "我喜歡在圖書館看書。", exEn: "I like reading books in the library." },
-      { pack: 3, meaning: "Who & Water", trees: "(r)sooay2 / (r)sooay3", hanzi: "誰喝水", pinyin: "shuí hē shuǐ", sound: "Contract '<b><u>sway</u></b>'.", mnemonic: "Mermaid swaying in the water.", exZh: "請問誰想喝水？", exEn: "Excuse me, who would like to drink water?" },
-      { pack: 3, meaning: "Look for", trees: "(r)dsaw3", hanzi: "找", pinyin: "zhǎo", sound: "Similar to '<b><u>jaw</u></b>'.", mnemonic: "Looking for my jaw on the floor!", exZh: "你在找什麼東西？", exEn: "What are you looking for?" },
-      { pack: 3, meaning: "From", trees: "Lie2 ds4", hanzi: "來自", pinyin: "lái zì", sound: "Similar to '<b><u>lies</u></b>'.", mnemonic: "Truth lies in where you come from.", exZh: "我的老師來自台灣。", exEn: "My teacher comes from Taiwan." },
-      { pack: 3, meaning: "Where", trees: "nah3 Lee3", hanzi: "哪裡", pinyin: "nǎ lǐ", sound: "G<b><u>narly</u></b>.", mnemonic: "Don't know where you are? Gnarly!", exZh: "你週末想去哪裡玩？", exEn: "Where do you want to go this weekend?" },
-      { pack: 3, meaning: "How", trees: "dser-n3 mer", hanzi: "怎麼", pinyin: "zěn me", sound: "Confu<b><u>sion</u></b> <b><u>Mer</u></b>maid.", mnemonic: "How the mermaid falls in love.", exZh: "這道題應該怎麼做？", exEn: "How should we solve this question?" },
-      { pack: 3, meaning: "Supermarket", trees: "(r)tsaw (r)s4", hanzi: "超市", pinyin: "chāo shì", sound: "r-colored '<b><u>cho</u></b>(i)<b><u>ce</u></b>'.", mnemonic: "So many choices in the supermarket!", exZh: "媽媽去超市買水果了。", exEn: "Mom went to the supermarket to buy fruit." },
-      { pack: 3, meaning: "Menu & Check, please", trees: "tsie4 dan / mie3 dan", hanzi: "菜單買單", pinyin: "cài dān mǎi dān", sound: "I<b><u>t's I</u></b> <b><u>done</u></b>.", mnemonic: "Done with the menu; check, please!", exZh: "服務員，請給我菜單。", exEn: "Waiter, please give me the menu." },
-      { pack: 3, meaning: "Would like / Want", trees: "seeang3 yaw4", hanzi: "想要", pinyin: "xiǎng yào", sound: "'<b><u>see</u> <u>young</u></b>' + '<b><u>your</u></b>'.", mnemonic: "Want to see Young's beer.", exZh: "我想要一杯熱咖啡。", exEn: "I would like a cup of hot coffee." },
-      { pack: 3, meaning: "Milk tea", trees: "nie3 (r)tsah2", hanzi: "奶茶", pinyin: "nǎi chá", sound: "'<b><u>ni</u></b>ce <b><u>char</u></b>ge'.", mnemonic: "Milk tea gives a nice charge!", exZh: "珍珠奶茶非常好喝。", exEn: "Boba milk tea is very delicious." },
-      { pack: 3, meaning: "Dumplings", trees: "jeeaw3 ds", hanzi: "餃子", pinyin: "jiǎo zi", sound: "'<b><u>Gee, aw</u></b>esome foo<b><u>ds</u></b>.'", mnemonic: "Everyone loves dumplings!", exZh: "我們今天晚上吃餃子。", exEn: "We are eating dumplings tonight." },
-      { pack: 3, meaning: "Cold (Illness)", trees: "gan3 maw4", hanzi: "感冒", pinyin: "gǎn mào", sound: "'<b><u>gun</u> <u>mall</u></b>'.", mnemonic: "Shock at the mall caused a cold.", exZh: "天冷了，小心別感冒。", exEn: "It's cold, be careful not to catch a cold." },
-      { pack: 3, meaning: "Telephone", trees: "deean4 hooah4", hanzi: "電話", pinyin: "diàn huà", sound: "'<b><u>the end</u></b>' + '<b><u>who are</u></b>'.", mnemonic: "Call on the telephone.", exZh: "請給我打個電話。", exEn: "Please give me a phone call." },
-      { pack: 3, meaning: "Got it.", trees: "Ting der-oong3 Ler", hanzi: "聽懂了", pinyin: "tīng dǒng le", sound: "Shou<b><u>ting</u></b> '<b><u>don't</u></b> <b><u>love</u></b>'.", mnemonic: "Once you hear it, you've got it!", exZh: "老師講的課我都聽懂了！", exEn: "I understood everything the teacher taught!" }
-    ];
-
-    let unlockState = {
-      rateUnlocked: localStorage.getItem('tp_rate_unlocked') === 'true',
-      shareUnlocked: localStorage.getItem('tp_share_unlocked') === 'true',
-      vipUnlocked: localStorage.getItem('tp_vip_pro_unlocked') === 'true',
-      myInviteCode: localStorage.getItem('tp_my_invite_code') || ''
-    };
-    if (!/^PIN[A-Z0-9]{4}$/.test(unlockState.myInviteCode)) {
-      const chars = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
-      let code = 'PIN';
-      for (let i = 0; i < 4; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
-      unlockState.myInviteCode = code;
-      localStorage.setItem('tp_my_invite_code', code);
-    }
-    document.getElementById('myInviteCodeText').innerText = unlockState.myInviteCode;
-
-    function getShareMessage() {
-      return `Learn Chinese pronunciation effortlessly with English phonics! Use my referral code ${unlockState.myInviteCode} on Trees Pinyin: https://www.treespinyin.com`;
-    }
-
-    function renderMnemonicsPack() {
-      const selEl = document.getElementById('packSelect');
-      if (!selEl) return;
-      const packVal = selEl.value;
-      const query = (document.getElementById('mnemonicSearchInput')?.value || '').trim().toLowerCase();
-      const grid = document.getElementById('mnemonicCardsContainer');
-      const lockedBox = document.getElementById('mnemonicLockedBox');
-      if (!grid || !lockedBox) return;
-      grid.innerHTML = '';
-
-      if (!query && packVal !== 'all') {
-        const packId = parseInt(packVal, 10) || 1;
-        const isLocked = (packId === 2 && !unlockState.rateUnlocked && !unlockState.vipUnlocked) ||
-                         (packId === 3 && !unlockState.shareUnlocked && !unlockState.vipUnlocked);
-        if (isLocked) {
-          grid.classList.add('hidden');
-          lockedBox.classList.remove('hidden');
-          lockedBox.innerHTML = `<h3 style="margin:0 0 8px 0; color:#bf360c;">🔒 Pack ${packId} Locked</h3><p style="margin:0; font-size:0.9rem;">Click Rate or Share above to unlock!</p>`;
-          return;
-        }
-      }
-
-      lockedBox.classList.add('hidden');
-      grid.classList.remove('hidden');
-
-      const filtered = FULL_45_BOOK_MNEMONICS.filter(c => {
-        if (query) {
-          return c.meaning.toLowerCase().includes(query) || c.hanzi.includes(query) ||
-                 convertScript(c.hanzi, 'simp').includes(query) || c.exZh.includes(query) ||
-                 c.exEn.toLowerCase().includes(query) || c.trees.toLowerCase().includes(query);
-        }
-        if (packVal === 'all') return true;
-        return c.pack === parseInt(packVal, 10);
-      });
-
-      filtered.forEach((card, i) => {
-        const dispHanzi = convertScript(card.hanzi, currentScriptMode);
-        const dispExZh = convertScript(card.exZh, currentScriptMode);
-        const el = document.createElement('div');
-        el.className = 'mnemonic-card';
-        el.innerHTML = `
-          <div class="mc-top">
-            <div class="mc-meaning">#${i + 1} ${card.meaning}</div>
-            <div style="display:flex; justify-content:space-between; width:100%; align-items:baseline;">
-              <span class="mc-trees"><i><b>${card.trees}</b></i></span>
-              <span class="mc-hanzi" style="cursor:pointer;" onclick="speakSingleChar('${card.hanzi}')">🔊 (${dispHanzi} / ${card.pinyin})</span>
-            </div>
-          </div>
-          <div class="mc-sound"><b>Sound:</b> ${card.sound}</div>
-          <div class="mc-tip"><b>Mnemonic:</b> ${card.mnemonic}</div>
-          <div style="background:#f8fafc; padding:8px 10px; border-radius:10px; border:1px dashed #cbd5e1; font-size:0.83rem; margin-top:auto;">
-            <div style="font-weight:700; cursor:pointer;" onclick="speakSingleChar('${card.exZh}')">🔊 ${dispExZh}</div>
-            <div style="color:#444;">${card.exEn}</div>
-          </div>
-        `;
-        grid.appendChild(el);
-      });
-    }
-
-    function handleRateUnlock() {
-      unlockState.rateUnlocked = true;
-      localStorage.setItem('tp_rate_unlocked', 'true');
-      document.getElementById('packSelect').value = '2';
-      renderMnemonicsPack();
-      window.open(getStoreReviewUrl(), '_blank');
-    }
-
-    function openShareAppModal() {
-      const msg = getShareMessage();
-      navigator.clipboard.writeText(msg).catch(() => {});
-      unlockState.shareUnlocked = true;
-      localStorage.setItem('tp_share_unlocked', 'true');
-      document.getElementById('packSelect').value = '3';
-      renderMnemonicsPack();
-
-      document.getElementById('modalShareCode').innerText = unlockState.myInviteCode;
-      const encMsg = encodeURIComponent(msg);
-      const encUrl = encodeURIComponent('https://www.treespinyin.com');
-      document.getElementById('shareWhatsApp').href = `https://api.whatsapp.com/send?text=${encMsg}`;
-      document.getElementById('shareTwitter').href = `https://twitter.com/intent/tweet?text=${encMsg}`;
-      document.getElementById('shareFacebook').href = `https://www.facebook.com/sharer/sharer.php?u=${encUrl}`;
-      document.getElementById('shareTelegram').href = `https://t.me/share/url?url=${encUrl}&text=${encMsg}`;
-      document.getElementById('shareEmail').href = `mailto:?subject=${encodeURIComponent('Learn Mandarin with Trees Pinyin')}&body=${encMsg}`;
-      document.getElementById('shareAppModal').style.display = 'flex';
-    }
-
-    async function triggerNativeSystemShare() {
-      const msg = getShareMessage();
-      if (navigator.share) {
-        try { await navigator.share({ title: 'Trees Pinyin', text: msg, url: 'https://www.treespinyin.com' }); } catch (e) {}
-      } else { copyShareTextOnly(); }
-    }
-
-    function copyShareTextOnly() {
-      navigator.clipboard.writeText(getShareMessage()).catch(() => {});
-      alert(currentLang === 'en' ? 'Copied!' : '已複製！');
-    }
-
-    function handleActivateFriendCode() {
-      unlockState.rateUnlocked = true;
-      unlockState.shareUnlocked = true;
-      unlockState.vipUnlocked = true;
-      localStorage.setItem('tp_rate_unlocked', 'true');
-      localStorage.setItem('tp_share_unlocked', 'true');
-      localStorage.setItem('tp_vip_pro_unlocked', 'true');
-      document.getElementById('packSelect').value = 'all';
-      renderMnemonicsPack();
-    }
-
-    function renderPersonalStudyLog() {
-      const log = JSON.parse(localStorage.getItem('tp_personal_tricky_log_v1') || '[]');
-      const box = document.getElementById('personalTrickyList');
-      box.innerHTML = '';
-      if (log.length === 0) {
-        box.innerHTML = `<div style="padding:14px; color:#888; text-align:center;">No records yet.</div>`;
-        return;
-      }
-      log.forEach(item => appendSentenceProgressive(item.zh, item.en, 'personalTrickyList'));
-    }
-
-    function activateVipProCode() {
-      unlockState.vipUnlocked = true;
-      localStorage.setItem('tp_vip_pro_unlocked', 'true');
-      document.getElementById('vipStatusBadge').innerText = '💎 VIP Pro';
-    }
-
-    function clearPersonalStudyLog() {
-      localStorage.removeItem('tp_personal_tricky_log_v1');
-      renderPersonalStudyLog();
-    }
-
-    // =========================================================================
-    // 9. 朗讀與彈窗控制
-    // =========================================================================
-    let isSpeakingNow = false;
-    function toggleSpeak() {
-      if (!('speechSynthesis' in window)) return;
-      const btn = document.getElementById('speakBtn');
-      const t = UI_TEXT[currentLang];
-      if (window.speechSynthesis.speaking || isSpeakingNow) {
-        window.speechSynthesis.cancel();
-        isSpeakingNow = false;
-        btn.innerText = t.speakBtn;
-        return;
-      }
-      const blocks = document.querySelectorAll('#annotationList .sentence-block');
-      let allZh = Array.from(blocks).map(b => b.dataset.zh).join('。');
-      if (!allZh) allZh = document.getElementById('userInput').value;
-      if (!allZh) return;
-      if (checkAndWarnProfanity(allZh)) return;
-
-      speakSingleChar(allZh);
-    }
-
-    function updateFontSize(val) {
-      document.getElementById('fontValDisplay').innerText = val + 'px';
-      document.getElementById('sheetCard').style.setProperty('--user-font-size', val + 'px');
-    }
-    function updateLayoutMode() {
-      document.getElementById('sheetCard').classList.toggle('align-left', document.getElementById('layoutSelect').value === 'left');
-    }
-    function updatePrintTitle(val) {
-      const el = document.getElementById('printHeaderTitle');
-      const v = (val || '').trim();
-      el.innerText = v;
-      el.classList.toggle('has-title', Boolean(v));
-      el.style.display = v ? 'block' : 'none';
-    }
-    function openFileMenuModal() { document.getElementById('fileMenuModal').style.display = 'flex'; }
-    function triggerDocUpload() { document.getElementById('fileMenuModal').style.display = 'none'; document.getElementById('docFileInput').click(); }
-    function openCameraNoticeModal() { document.getElementById('fileMenuModal').style.display = 'none'; document.getElementById('cameraNoticeModal').style.display = 'flex'; }
-    function triggerGalleryPick() { document.getElementById('cameraNoticeModal').style.display = 'none'; document.getElementById('galleryInput').click(); }
-    function triggerDirectCamera() { document.getElementById('cameraNoticeModal').style.display = 'none'; document.getElementById('cameraInput').click(); }
-    function openInstallModal() { document.getElementById('installModal').style.display = 'flex'; }
     function openKeyModal() {
       document.getElementById('apiKeyInput').value = backupKey;
       document.getElementById('keyModal').style.display = 'flex';
@@ -3086,7 +1235,6 @@ Pure_Chinese_Sentence ||| Authentic_English_Sentence`;
     async function saveBackupKey() {
       backupKey = document.getElementById('apiKeyInput').value.trim();
       localStorage.setItem('tp_v22_backup_key', backupKey);
-      localStorage.setItem('tp_test_gemini_key', backupKey);
       refreshKeyBtnStyle();
       document.getElementById('keyModal').style.display = 'none';
       if (backupKey) {
@@ -3098,7 +1246,6 @@ Pure_Chinese_Sentence ||| Authentic_English_Sentence`;
     function clearBackupKey() {
       backupKey = '';
       localStorage.removeItem('tp_v22_backup_key');
-      localStorage.removeItem('tp_test_gemini_key');
       document.getElementById('apiKeyInput').value = '';
       refreshKeyBtnStyle();
     }
