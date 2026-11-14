@@ -324,7 +324,7 @@
 
     <!-- 🕒 1. 膠囊上方：顯示檔案建設時間 -->
     <div class="build-time-text">
-      🕒 Build: 2026-11-13 22:05 PST (v11.0 動態鎖定最新 3.8/Flash-Latest + 剔除下架2.5版)
+      🕒 Build: 2026-11-14 06:05 PST (v12.0 優先鎖定 gemini-3.8-flash + 20秒防掐斷超時 + 單一主Worker精準版)
     </div>
 
     <!-- 🔍 2. 谷歌膠囊 (輸入框 + EN/中文切換 + 麥克風 + 🔑) -->
@@ -384,10 +384,7 @@
     // =========================================================================
     // 1. 全域端點與基礎繁簡轉換
     // =========================================================================
-    const IS_LOCAL_FILE = window.location.protocol === 'file:';
-    const CF_WORKER_ENDPOINTS = IS_LOCAL_FILE
-      ? ['https://treespinyin-api.treespinyin.workers.dev', 'https://treespinyin.com/api']
-      : ['https://treespinyin-api.treespinyin.workers.dev', '/api', 'https://treespinyin.com/api'];
+    const CF_WORKER_ENDPOINTS = ['https://treespinyin-api.treespinyin.workers.dev'];
 
     let openccToTrad = null;
     try {
@@ -924,8 +921,8 @@
 
     // 置頂谷歌官方永久動態別名 gemini-flash-latest 與最新 3.8 系列，徹底避開已對新用戶關閉的 2.5-flash！
     let availableFastModels = [
-      'gemini-flash-latest',
       'gemini-3.8-flash',
+      'gemini-flash-latest',
       'gemma-3-27b-it',
       'gemini-flash-lite-latest',
       'gemini-3.5-flash'
@@ -954,12 +951,12 @@
           .filter(n => !/tts|image|imagen|embedding|veo|robotics|aqa|bison|gecko|thinking|2\.5-flash|1\.5-flash|2\.0-flash/i.test(n));
 
         const priority = [
-          'gemini-flash-latest',
           'gemini-3.8-flash',
-          'gemini-3.5-flash',
+          'gemini-flash-latest',
           'gemma-3-27b-it',
           'gemini-flash-lite-latest',
-          'gemini-3.8-flash-lite'
+          'gemini-3.8-flash-lite',
+          'gemini-3.5-flash'
         ];
         const sorted = [];
         for (const p of priority) {
@@ -1076,20 +1073,19 @@
 
       // 1. 若有個人 Google API Key：先確保已取得該 Key 帳號下最新授權模型列表，再按順序調用
       if (activeKey) {
-        if (availableFastModels[0] === 'gemini-flash-latest') {
-          await discoverAuthorizedModels(activeKey);
-        }
+        await discoverAuthorizedModels(activeKey);
         const modelsToTry = availableFastModels.slice(0, 4);
         for (let i = 0; i < modelsToTry.length; i++) {
           const ctrl = new AbortController();
-          const timer = setTimeout(() => ctrl.abort(), 8000);
+          const timer = setTimeout(() => ctrl.abort(), 12000);
           try {
             const txt = await callSingleGeminiModel(modelsToTry[i], fullPromptText, activeKey, ctrl.signal);
             clearTimeout(timer);
             if (txt) return { text: txt, source: `Google (${modelsToTry[i]})`, diagError: null };
           } catch (e) {
             clearTimeout(timer);
-            const msg = e.message || String(e);
+            const isTimeout = e && (e.name === 'AbortError' || /aborted/i.test(e.message || ''));
+            const msg = isTimeout ? `[${modelsToTry[i]}: Timeout 12s]` : (e.message || String(e));
             errorLogs.push(msg);
             if (/API_KEY_INVALID|key not valid/i.test(msg)) {
               break;
@@ -1098,7 +1094,7 @@
         }
       }
 
-      // 2. 走 Cloudflare Worker 全球邊緣免費快取與多 Key 輪詢池
+      // 2. 走 Cloudflare Worker 全球邊緣免費快取與多 Key 輪詢池（給予 20 秒充裕時間，絕不提前掐斷！）
       for (let i = 0; i < CF_WORKER_ENDPOINTS.length; i++) {
         try {
           const r = await fetchWithTimeout(CF_WORKER_ENDPOINTS[i], {
@@ -1108,16 +1104,18 @@
               prompt: fullPromptText,
               cacheKey: cacheKeyForCloud
             })
-          }, 7500);
+          }, 20000);
+          const d = await r.json().catch(() => ({}));
           if (!r.ok) {
-            errorLogs.push(`[Worker ${i + 1}: HTTP ${r.status}]`);
+            const detail = d?.detail || d?.error || `HTTP ${r.status}`;
+            errorLogs.push(`[Worker: ${detail}]`);
             continue;
           }
-          const d = await r.json();
           const t = (d?.text || d?.reply || d?.choices?.[0]?.message?.content || '').trim();
           if (t) return { text: t, source: 'Cloudflare Global Pool', diagError: null };
         } catch (e) {
-          errorLogs.push(`[Worker ${i + 1}: Network/CORS]`);
+          const isTimeout = e && (e.name === 'AbortError' || /aborted/i.test(e.message || ''));
+          errorLogs.push(isTimeout ? '[Worker: Timeout >20s]' : `[Worker: ${e.message || 'Network/CORS'}]`);
         }
       }
 
