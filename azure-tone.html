@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Trees Pinyin - Mandarin Intelligibility & Tone Coach</title>
+  <title>Trees Pinyin - Mandarin Tone & Intelligibility Coach</title>
   <script src="https://aka.ms/csspeech/jsbrowserpackageraw"></script>
   <script src="https://unpkg.com/pinyin-pro@3.26.0/dist/index.js"></script>
   <style>
@@ -78,12 +78,12 @@
       flex-wrap: wrap;
       justify-content: center;
       gap: 10px;
-      padding: 26px 12px;
+      padding: 28px 12px;
       background: #f8fafc;
       border: 1px dashed #cbd5e1;
       border-radius: 14px;
-      margin: 14px 0;
-      min-height: 130px;
+      margin: 16px 0;
+      min-height: 135px;
       align-items: center;
     }
     .tp-item {
@@ -95,19 +95,21 @@
       min-width: 54px;
       background: #f1f5f9;
       border: 2px solid transparent;
+      transition: all 0.2s;
     }
     .tp-tag {
-      height: 18px;
-      font-size: 13.5px;
+      height: 19px;
+      font-size: 14px;
       font-weight: 800;
       visibility: hidden;
       margin-bottom: 2px;
+      white-space: nowrap;
     }
-    .tp-hanzi { font-size: 34px; font-weight: 600; line-height: 1.1; }
+    .tp-hanzi { font-size: 35px; font-weight: 600; line-height: 1.1; }
     .tp-py { font-size: 12px; color: #64748b; margin-top: 3px; }
     .tp-punct { font-size: 26px; color: #94a3b8; align-self: flex-end; padding-bottom: 10px; }
 
-    /* Traffic Light Colors */
+    /* Traffic Light Colors (No legend text needed) */
     .tp-item.good { background: #dcfce7; color: #15803d; border-color: #86efac; }
     .tp-item.good .tp-py { color: #15803d; }
 
@@ -118,17 +120,6 @@
     .tp-item.bad { background: #fecaca; color: #b91c1c; border-color: #f87171; }
     .tp-item.bad .tp-tag { visibility: visible; color: #b91c1c; }
     .tp-item.bad .tp-py { color: #b91c1c; }
-
-    .tp-legend {
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 14px;
-      font-size: 12px;
-      color: #475569;
-      margin-bottom: 14px;
-    }
-    .tp-dot { width: 11px; height: 11px; border-radius: 50%; display: inline-block; margin-right: 4px; vertical-align: middle; }
 
     .tp-btns { display: flex; justify-content: center; gap: 12px; }
     .tp-btn {
@@ -145,15 +136,38 @@
     .tp-btn-rec:disabled { background: #94a3b8; cursor: not-allowed; }
 
     .tp-msg { text-align: center; margin-top: 12px; font-size: 14.5px; color: #334155; }
+
+    /* Blind Listener Box with Green Highlighted Matched Characters */
     .tp-heard-box {
-      margin-top: 14px;
-      padding: 12px 16px;
+      margin-top: 16px;
+      padding: 14px 16px;
       background: #f8fafc;
       border: 1px solid #e2e8f0;
       border-radius: 12px;
-      font-size: 14px;
+      font-size: 14.5px;
       display: none;
-      line-height: 1.6;
+      line-height: 1.7;
+    }
+    .tp-heard-chars {
+      display: inline-flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      vertical-align: middle;
+      margin-left: 4px;
+    }
+    .tp-h-char {
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 6px;
+      font-size: 18px;
+      font-weight: 700;
+      background: #e2e8f0;
+      color: #475569;
+    }
+    .tp-h-char.match {
+      background: #dcfce7;
+      color: #15803d;
+      border: 1px solid #86efac;
     }
   </style>
 </head>
@@ -173,7 +187,7 @@
     </div>
     <div class="tp-byok" id="byokBox">
       <div class="tp-row">
-        <input id="azKey" class="tp-input" type="password" placeholder="Optional: Paste Azure KEY 1" oninput="saveCfg()" style="flex:2; font-size:13px; padding:7px 10px;" />
+        <input id="azKey" class="tp-input" type="password" placeholder="Paste your Azure KEY 1" oninput="saveCfg()" style="flex:2; font-size:13px; padding:7px 10px;" />
         <input id="azReg" class="tp-input" type="text" placeholder="Region (westus2)" oninput="saveCfg()" style="flex:1; font-size:13px; padding:7px 10px;" />
         <button class="tp-btn" onclick="clearCfg()" style="padding:6px 12px; font-size:12px;">Clear</button>
       </div>
@@ -184,12 +198,6 @@
 
   <div class="tp-stage" id="stage"></div>
 
-  <div class="tp-legend">
-    <span><i class="tp-dot" style="background:#22c55e;"></i><b>Green</b>: Clear & Understood</span>
-    <span><i class="tp-dot" style="background:#eab308;"></i><b>Yellow (4→3)</b>: Tone Off, Still Understood</span>
-    <span><i class="tp-dot" style="background:#ef4444;"></i><b>Red (4→3)</b>: Misleading / Wrong Sound</span>
-  </div>
-
   <div class="tp-btns">
     <button class="tp-btn" onclick="speakDemo()">🔊 Listen Demo</button>
     <button class="tp-btn tp-btn-rec" id="recBtn" onclick="toggleRecord()">🎤 Start Speaking</button>
@@ -198,8 +206,14 @@
   <div class="tp-msg" id="msgBox">Click "Start Speaking", read the sentence, and click Stop to score.</div>
 
   <div class="tp-heard-box" id="heardBox">
-    <div>👂 <b>What a Chinese Listener Heard:</b> <span id="heardZh" style="font-weight:700; color:#0f172a;"></span></div>
-    <div style="margin-top:4px;">🌐 <b>English Translation:</b> <span id="heardEn" style="color:#2563eb; font-weight:600; font-style:italic;"></span></div>
+    <div>
+      👂 <b>Chinese Listener Heard:</b>
+      <span class="tp-heard-chars" id="heardZh"></span>
+    </div>
+    <div style="margin-top:8px;">
+      🌐 <b>English Translation:</b>
+      <span id="heardEn" style="color:#2563eb; font-weight:600; font-style:italic;"></span>
+    </div>
   </div>
 </div>
 
@@ -210,10 +224,11 @@
 
   let targets = [];
   let recording = false;
-  let sr = null;
-  let azRecognizer = null;
-  let heardText = '';
-  let azToneMap = {}; // Optional acoustic tone map from Azure { index: spokenTone }
+  let recognizer = null;
+  let pronWords = [];
+  let blindLexicalList = [];
+  let waitResolve = null;
+  let usedWorkerToken = false;
 
   window.onload = () => {
     document.getElementById('azKey').value = localStorage.getItem('tp_az_k') || localStorage.getItem('az_k') || '';
@@ -302,7 +317,7 @@
     speechSynthesis.cancel(); speechSynthesis.speak(u);
   }
 
-  // Western learner friendly sound matching (tolerates z/zh, c/ch, s/sh, in/ing, en/eng, an/ang, u/v)
+  // Western learner friendly sound matching (tolerates z/zh, c/ch, s/sh, in/ing, en/eng, an/ang)
   function fuzzySound(b) {
     if (!b) return '';
     return b.toLowerCase().replace(/[0-5\s]/g, '')
@@ -317,206 +332,298 @@
     return b1 === b2 || fuzzySound(b1) === fuzzySound(b2);
   }
 
-  async function toggleRecord() {
-    const btn = document.getElementById('recBtn');
-
-    // STOP & SCORE IMMEDIATELY
-    if (recording) {
-      recording = false;
-      btn.classList.remove('on');
-      btn.textContent = '🎤 Start Speaking';
-      if (sr) { try { sr.stop(); } catch (e) {} sr = null; }
-      if (azRecognizer) {
-        try { azRecognizer.stopContinuousRecognitionAsync(); azRecognizer.close(); } catch (e) {}
-        azRecognizer = null;
+  async function getSpeechConfig() {
+    usedWorkerToken = false;
+    if (hasKey()) {
+      return SpeechSDK.SpeechConfig.fromSubscription(
+        document.getElementById('azKey').value.trim(),
+        document.getElementById('azReg').value.trim() || 'westus2'
+      );
+    }
+    if (getUsed() >= DAILY_LIMIT) {
+      document.getElementById('byokBox').classList.add('open');
+      throw new Error('Daily free limit (2/2) reached. Please add your own Azure Key or support us!');
+    }
+    try {
+      const res = await fetch(WORKER_TOKEN_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'speech-token' })
+      });
+      const d = await res.json();
+      if (!res.ok || d.error === 'LIMIT_REACHED') {
+        localStorage.setItem(todayKey(), String(DAILY_LIMIT));
+        updateQuota();
+        document.getElementById('byokBox').classList.add('open');
+        throw new Error('Daily free limit (2/2) reached. Please add your own Azure Key!');
       }
-      scoreByBlindHearing();
+      if (d.token && d.region) {
+        usedWorkerToken = true;
+        return SpeechSDK.SpeechConfig.fromAuthorizationToken(d.token, d.region);
+      }
+      throw new Error('Token error');
+    } catch (e) {
+      if (e.message.includes('Daily free limit')) throw e;
+      document.getElementById('byokBox').classList.add('open');
+      throw new Error('Please click "⚙️ Add Azure Key" above and paste your Azure KEY 1 and westus2.');
+    }
+  }
+
+  async function finishRecording() {
+    if (!recording) return;
+    recording = false;
+    const btn = document.getElementById('recBtn');
+    btn.classList.remove('on');
+    btn.textContent = '⏳ Scoring...';
+
+    // Wait up to 1.2s if user clicked Stop immediately after speaking
+    if (pronWords.length === 0 && recognizer) {
+      await Promise.race([
+        new Promise(r => { waitResolve = r; }),
+        new Promise(r => setTimeout(r, 1200))
+      ]);
+    }
+
+    if (recognizer) {
+      await new Promise(r => recognizer.stopContinuousRecognitionAsync(r, r));
+      recognizer.close();
+      recognizer = null;
+    }
+
+    btn.textContent = '🎤 Start Speaking';
+    evaluateAzureResult();
+  }
+
+  async function toggleRecord() {
+    if (recording) {
+      await finishRecording();
       return;
     }
 
-    if (!hasKey() && getUsed() >= DAILY_LIMIT) {
-      document.getElementById('byokBox').classList.add('open');
-      return setMsg('⚠️ Daily free limit (2/2) reached. Please add your own Azure Key or support us!');
+    let speechConfig;
+    try {
+      speechConfig = await getSpeechConfig();
+    } catch (e) {
+      return setMsg(`⚠️ ${e.message}`);
     }
 
     renderStage();
-    heardText = '';
-    azToneMap = {};
+    pronWords = [];
+    blindLexicalList = [];
+    waitResolve = null;
     recording = true;
+
+    const btn = document.getElementById('recBtn');
     btn.classList.add('on');
     btn.textContent = '⏹ Stop & Score';
-    setMsg('🎙️ Listening... Speak naturally in Chinese.');
+    setMsg('🎙️ Listening... Please read the sentence clearly.');
 
-    // 1. Primary Engine: Fast Native Chinese Blind Listener (Browser SpeechRecognition)
-    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (SR) {
-      sr = new SR();
-      sr.lang = 'zh-CN';
-      sr.continuous = true;
-      sr.interimResults = true;
-      sr.onresult = (e) => {
-        let s = '';
-        for (let i = 0; i < e.results.length; i++) s += e.results[i][0].transcript;
-        heardText = s;
-        if (recording && s) setMsg(`👂 Hearing: <b>${s}</b>`);
-      };
-      try { sr.start(); } catch (e) {}
-    }
+    speechConfig.speechRecognitionLanguage = "zh-CN";
+    speechConfig.outputFormat = SpeechSDK.OutputFormat.Detailed;
+    speechConfig.setProperty(SpeechSDK.PropertyId.SpeechServiceConnection_InitialSilenceTimeoutMs, "8000");
+    speechConfig.setProperty(SpeechSDK.PropertyId.SpeechServiceConnection_EndSilenceTimeoutMs, "1400");
+    speechConfig.setProperty(SpeechSDK.PropertyId.Speech_SegmentationSilenceTimeoutMs, "1200");
 
-    // 2. Optional Helper: Azure background tone detector (never blocks or zeroes out score if unavailable)
-    startOptionalAzureHelper();
-  }
+    const pronCfg = SpeechSDK.PronunciationAssessmentConfig.fromJSON(JSON.stringify({
+      referenceText: document.getElementById('sentenceInput').value.trim(),
+      gradingSystem: "HundredMark",
+      granularity: "Phoneme",
+      dimension: "Comprehensive",
+      enableMiscue: true,
+      phonemeAlphabet: "SAPI",
+      nBestPhonemeCount: 5
+    }));
 
-  async function startOptionalAzureHelper() {
-    try {
-      let speechConfig = null;
-      if (hasKey()) {
-        speechConfig = SpeechSDK.SpeechConfig.fromSubscription(
-          document.getElementById('azKey').value.trim(),
-          document.getElementById('azReg').value.trim() || 'westus2'
-        );
-      } else {
-        const res = await fetch(WORKER_TOKEN_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ action: 'speech-token' })
-        });
-        if (res.ok) {
-          const d = await res.json();
-          if (d.token && d.region) speechConfig = SpeechSDK.SpeechConfig.fromAuthorizationToken(d.token, d.region);
+    recognizer = new SpeechSDK.SpeechRecognizer(speechConfig, SpeechSDK.AudioConfig.fromDefaultMicrophoneInput());
+    pronCfg.applyTo(recognizer);
+
+    recognizer.recognizing = (s, e) => {
+      if (recording && e.result.text) {
+        setMsg(`👂 Hearing: <b>${blindLexicalList.join('') + e.result.text}</b>`);
+      }
+    };
+
+    recognizer.recognized = (s, e) => {
+      if (e.result.reason === SpeechSDK.ResultReason.RecognizedSpeech) {
+        try {
+          const json = JSON.parse(e.result.properties.getProperty(SpeechSDK.PropertyId.SpeechServiceResponse_JsonResult));
+          const lex = json?.NBest?.[0]?.Lexical || json?.DisplayText || e.result.text || '';
+          if (lex) blindLexicalList.push(lex);
+          const words = json?.NBest?.[0]?.Words || [];
+          pronWords.push(...words);
+        } catch (err) {}
+
+        if (waitResolve) { waitResolve(); waitResolve = null; }
+
+        const validCount = pronWords.filter(w => /[\u4e00-\u9fa5]/.test(w.Word) && w.PronunciationAssessment?.ErrorType !== 'Insertion').length;
+        if (recording && validCount >= targets.length) {
+          finishRecording();
         }
       }
-      if (!speechConfig || !recording) return;
+    };
 
-      speechConfig.speechRecognitionLanguage = "zh-CN";
-      speechConfig.outputFormat = SpeechSDK.OutputFormat.Detailed;
-      const pronCfg = SpeechSDK.PronunciationAssessmentConfig.fromJSON(JSON.stringify({
-        referenceText: document.getElementById('sentenceInput').value.trim(),
-        gradingSystem: "HundredMark",
-        granularity: "Phoneme",
-        phonemeAlphabet: "SAPI",
-        nBestPhonemeCount: 3
-      }));
+    recognizer.canceled = (s, e) => {
+      if (!recording) return;
+      recording = false;
+      btn.classList.remove('on');
+      btn.textContent = '🎤 Start Speaking';
+      setMsg(`❌ Error: ${e.errorDetails || 'Check Azure Key & Region (westus2)'}`);
+      if (recognizer) { recognizer.close(); recognizer = null; }
+    };
 
-      azRecognizer = new SpeechSDK.SpeechRecognizer(speechConfig, SpeechSDK.AudioConfig.fromDefaultMicrophoneInput());
-      pronCfg.applyTo(azRecognizer);
-
-      azRecognizer.recognized = (s, e) => {
-        if (e.result.reason === SpeechSDK.ResultReason.RecognizedSpeech) {
-          if (!heardText && e.result.text) heardText = e.result.text;
-          try {
-            const json = JSON.parse(e.result.properties.getProperty(SpeechSDK.PropertyId.SpeechServiceResponse_JsonResult));
-            const words = (json?.NBest?.[0]?.Words || []).filter(w => /[\u4e00-\u9fa5]/.test(w.Word) && w.PronunciationAssessment?.ErrorType !== 'Insertion');
-            words.forEach((w, idx) => {
-              for (const p of (w.Phonemes || [])) {
-                const top = p.PronunciationAssessment?.NBestPhonemes?.[0]?.Phoneme || p.Phoneme || '';
-                const m = top.trim().match(/([1-5])\s*$/);
-                if (m) azToneMap[idx] = parseInt(m[1], 10) % 5;
-              }
-            });
-          } catch (err) {}
-        }
-      };
-      azRecognizer.startContinuousRecognitionAsync();
-    } catch (e) {}
+    recognizer.startContinuousRecognitionAsync();
   }
 
-  // CORE SCORING: Driven directly by What the Chinese Listener Heard (Lenient for Westerners!)
-  function scoreByBlindHearing() {
-    const cleanHeard = heardText.replace(/[^\u4e00-\u9fa5]/g, '');
-    if (!cleanHeard) {
-      return setMsg('⚠️ No speech detected. Please speak loud enough until you see "👂 Hearing: ..." on screen.');
+  // Analyze Azure Phonemes & NBestPhonemes for Western-lenient syllable check + strict tone extraction
+  function analyzeWord(pw, t) {
+    if (!pw) return { omitted: true };
+    const err = pw.PronunciationAssessment?.ErrorType || 'None';
+    const wordAcc = pw.PronunciationAssessment?.AccuracyScore ?? 0;
+    if (err === 'Omission' || wordAcc < 20) return { omitted: true };
+
+    const phonemes = pw.Phonemes || [];
+    let soundWrong = false;
+    let detectedTone = t.tone;
+    let toneScore = wordAcc;
+
+    for (const p of phonemes) {
+      const exp = (p.Phoneme || '').trim();
+      const pAcc = p.PronunciationAssessment?.AccuracyScore ?? wordAcc;
+      const nbest = p.PronunciationAssessment?.NBestPhonemes || [];
+      const top = nbest[0]?.Phoneme ? nbest[0].Phoneme.trim() : exp;
+
+      const expToneMatch = exp.match(/([1-5])\s*$/);
+      if (expToneMatch) {
+        toneScore = pAcc;
+        // 1. Check if top phoneme has a different tone number
+        const topToneMatch = top.match(/([1-5])\s*$/);
+        if (topToneMatch) {
+          detectedTone = parseInt(topToneMatch[1], 10) % 5;
+        }
+        // 2. If forced alignment biased top candidate to expected tone, check 2nd/3rd candidate when score < 86
+        if ((detectedTone === t.tone || detectedTone === t.origTone) && pAcc < 86 && nbest.length > 1) {
+          for (let k = 1; k < Math.min(4, nbest.length); k++) {
+            const cand = (nbest[k].Phoneme || '').trim();
+            const m = cand.match(/([1-5])\s*$/);
+            if (m && isSameSyllable(cand, exp)) {
+              const ct = parseInt(m[1], 10) % 5;
+              if (ct !== t.tone && ct !== t.origTone) {
+                detectedTone = ct;
+                break;
+              }
+            }
+          }
+        }
+        // Check if vowel sound itself was completely different (lenient threshold 42 for Westerners)
+        if (pAcc < 42 && !isSameSyllable(exp, top)) soundWrong = true;
+      } else {
+        // Consonant check (lenient threshold 38 for Westerners)
+        if (pAcc < 38 && !isSameSyllable(exp, top)) soundWrong = true;
+      }
     }
 
-    if (!hasKey()) addUsed();
+    return { omitted: false, wordAcc, toneScore, soundWrong, detectedTone };
+  }
 
-    // Convert heard Chinese characters into Pinyin & Tones
-    const heardPy = pinyin(cleanHeard, { type: 'array', toneType: 'num', v: true, toneSandhi: false });
-    const heardOrigPy = pinyin(cleanHeard, { type: 'array', toneType: 'num', v: true });
-    const heardChars = Array.from(cleanHeard).map((ch, i) => {
-      const p = heardPy[i] || '';
-      const pSandhi = heardOrigPy[i] || p;
-      return {
-        char: ch,
-        base: p.replace(/[0-5]/g, ''),
-        tone: parseInt((p.match(/([0-5])$/) || [0,1])[1], 10) % 5,
-        sandhiTone: parseInt((pSandhi.match(/([0-5])$/) || [0,1])[1], 10) % 5
-      };
-    });
+  // Common homophone fallback map when tone error misleads listener (e.g. 买3 -> 卖4)
+  const MISLEADING_HOMOPHONES = {
+    '买:4': '卖', '卖:3': '买', '水:4': '睡', '饺:4': '觉',
+    '好:4': '号', '把:4': '爸', '雨:4': '玉', '伞:4': '散',
+    '妈:3': '马', '马:1': '妈', '四:1': '十', '十:4': '四'
+  };
 
-    let totalPoints = 0;
-    let cursor = 0;
+  function evaluateAzureResult() {
+    const aligned = pronWords.filter(w =>
+      /[\u4e00-\u9fa5]/.test(w.Word) &&
+      w.PronunciationAssessment?.ErrorType !== 'Insertion'
+    );
+
+    if (!aligned.length) {
+      return setMsg('⚠️ No speech detected. Please speak clearly and pause 1 second before clicking Stop.');
+    }
+
+    if (usedWorkerToken && !hasKey()) {
+      addUsed();
+      usedWorkerToken = false;
+    }
+
+    const rawBlind = blindLexicalList.join('').replace(/[^\u4e00-\u9fa5]/g, '');
+    const blindPy = rawBlind ? pinyin(rawBlind, { type: 'array', toneType: 'num', v: true, toneSandhi: false }) : [];
+    const blindArr = Array.from(rawBlind).map((ch, idx) => ({
+      char: ch,
+      base: (blindPy[idx] || '').replace(/[0-5]/g, ''),
+      tone: parseInt(((blindPy[idx] || '').match(/([0-5])$/) || [0,1])[1], 10) % 5
+    }));
+
+    let totalScore = 0;
+    let heardDisplayItems = []; // { char, isMatch }
 
     targets.forEach((t, i) => {
-      // Search within a 3-character window in the blind transcript
-      let match = null;
-      for (let k = cursor; k < Math.min(cursor + 3, heardChars.length); k++) {
-        // Exact character match OR acceptable Western syllable match
-        if (heardChars[k].char === t.char || isSameSyllable(t.base, heardChars[k].base)) {
-          match = heardChars[k];
-          cursor = k + 1;
-          break;
-        }
-      }
+      const pw = aligned[i];
+      const ac = analyzeWord(pw, t);
+      const bChar = blindArr[i];
 
-      // CASE 1: Not understood / Wrong syllable (e.g. read "我 wo" as "他 ta") -> RED
-      if (!match) {
-        if (cursor < heardChars.length && heardChars.length >= targets.length) cursor++;
+      // 1. Wrong word / Wrong syllable sound (e.g. read "我 wo" as "他 ta") -> RED (no arrow)
+      const blindDiffSyllable = bChar && !isSameSyllable(t.base, bChar.base) && ac.wordAcc < 65;
+      if (ac.omitted || ac.soundWrong || blindDiffSyllable) {
         setLight(i, 'bad', null, null);
+        const wrongHeardChar = (bChar && bChar.char !== t.char) ? bChar.char : '×';
+        heardDisplayItems.push({ char: wrongHeardChar, isMatch: false });
         return;
       }
 
-      // CASE 2: Tone 1 and Neutral Tone (0) auto-pass once syllable is understood -> GREEN (100 pts)
+      // 2. Tone 1 and Neutral Tone (0) skip tone check -> GREEN
       if (t.skipTone) {
         setLight(i, 'good', null, null);
-        totalPoints += 1;
+        heardDisplayItems.push({ char: t.char, isMatch: true });
+        totalScore += 1;
         return;
       }
 
-      const heardExactChar = (match.char === t.char);
-      const azTone = azToneMap[i];
-
-      // Determine the tone the user actually produced
-      let userTone = match.tone;
-      if (heardExactChar && azTone !== undefined && azTone !== t.tone && azTone !== t.origTone) {
-        userTone = azTone;
+      // 3. Check Tone Accuracy
+      let spokenTone = ac.detectedTone;
+      if (bChar && bChar.char !== t.char && isSameSyllable(t.base, bChar.base) && bChar.tone !== t.tone) {
+        spokenTone = bChar.tone;
       }
 
-      const toneIsCorrect = (userTone === t.tone || userTone === t.origTone || match.sandhiTone === t.tone);
+      const toneCorrect = (spokenTone === t.tone || spokenTone === t.origTone);
 
-      // CASE 3: Chinese listener heard the EXACT RIGHT CHARACTER! (Meaning 100% understood)
-      if (heardExactChar) {
-        if (!toneIsCorrect) {
-          // Tone was off, but Chinese listener still understood -> YELLOW + Wrong→Correct
-          setLight(i, 'warn', userTone, t.tone);
-          totalPoints += 0.85;
+      if (!toneCorrect || ac.toneScore < 75) {
+        const wrongToneLabel = !toneCorrect ? spokenTone : '?';
+        const misledChar = MISLEADING_HOMOPHONES[`${t.char}:${spokenTone}`] || ((bChar && bChar.char !== t.char) ? bChar.char : null);
+
+        // 3A. Tone error misleads expression (changes meaning, e.g. 买3 -> 卖4, or severe tone score < 58) -> RED + Wrong→Correct
+        if (misledChar || ac.toneScore < 58 || ac.wordAcc < 58) {
+          setLight(i, 'bad', wrongToneLabel, t.tone);
+          heardDisplayItems.push({ char: misledChar || t.char, isMatch: !misledChar });
+          totalScore += 0.3;
         } else {
-          // Completely understood & tone is good -> GREEN!
-          setLight(i, 'good', null, null);
-          totalPoints += 1;
+          // 3B. Tone error, but Chinese listener still understands the right word -> YELLOW + Wrong→Correct
+          setLight(i, 'warn', wrongToneLabel, t.tone);
+          heardDisplayItems.push({ char: t.char, isMatch: true });
+          totalScore += 0.85;
         }
         return;
       }
 
-      // CASE 4: Syllable sound was right, but heard as a DIFFERENT character (e.g. 买 mǎi 3 -> 卖 mài 4)
-      if (!toneIsCorrect) {
-        // Misleading tone error that changed the word -> RED + Wrong→Correct (e.g. 4→3)
-        setLight(i, 'bad', userTone, t.tone);
-        totalPoints += 0.4;
-      } else {
-        // Homophone character with the same tone (100% sounds right to Chinese ears!) -> GREEN!
-        setLight(i, 'good', null, null);
-        totalPoints += 1;
-      }
+      // 4. Both sound & tone are good -> GREEN
+      setLight(i, 'good', null, null);
+      heardDisplayItems.push({ char: t.char, isMatch: true });
+      totalScore += 1;
     });
 
-    const finalScore = Math.round((totalPoints / targets.length) * 100);
-    setMsg(`Evaluation Complete! Intelligibility Score: <b>${finalScore}%</b>`);
+    const pct = Math.round((totalScore / targets.length) * 100);
+    setMsg(`Intelligibility Score: <b>${pct}%</b>`);
 
-    // Display Heard Chinese + English Translation
+    // Render "Chinese Listener Heard" with GREEN background on corresponding matched characters
+    const heardContainer = document.getElementById('heardZh');
+    heardContainer.innerHTML = heardDisplayItems.map(item =>
+      `<span class="tp-h-char ${item.isMatch ? 'match' : ''}">${item.char}</span>`
+    ).join('');
+
     document.getElementById('heardBox').style.display = 'block';
-    document.getElementById('heardZh').textContent = `「${heardText}」`;
-    translateToEn(heardText);
+    const sentenceForTranslation = heardDisplayItems.map(x => x.char === '×' ? '' : x.char).join('');
+    translateToEn(sentenceForTranslation);
   }
 
   function setLight(i, status, wrongTone, rightTone) {
@@ -528,6 +635,7 @@
 
   async function translateToEn(zh) {
     const el = document.getElementById('heardEn');
+    if (!zh) { el.textContent = '--'; return; }
     el.textContent = 'Translating...';
     try {
       const r = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=zh-CN&tl=en&dt=t&q=${encodeURIComponent(zh)}`);
