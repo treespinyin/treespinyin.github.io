@@ -469,6 +469,9 @@
       padding: 2px 3px;
       border-radius: 6px;
       transition: background 0.12s;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
     }
     .tp-col:hover { background: #f1f8e9; }
     .tp-col:active { background: #c8e6c9; }
@@ -2410,8 +2413,48 @@
             <span class="tp-std">${stdTone}</span>
             <span class="tp-zh" data-raw="${char}">${dispChar}</span>
           `;
-          col.onclick = () => speakSingleChar(col.querySelector('.tp-zh').innerText);
-          col.oncontextmenu = (e) => { e.preventDefault(); openThreeInOneEditor(col); };
+          let pressTimer = null;
+          let isLongPress = false;
+
+          // 1. 電腦端右鍵 + 安卓長按：直接打開三合一修改框
+          col.oncontextmenu = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            clearTimeout(pressTimer);
+            openThreeInOneEditor(col);
+          };
+
+          // 2. 手機與 iPad 端 (iOS / Android)：手指按住 0.5 秒 (500ms) 自動彈出修改框
+          col.addEventListener('touchstart', () => {
+            isLongPress = false;
+            pressTimer = setTimeout(() => {
+              isLongPress = true;
+              if (navigator.vibrate) navigator.vibrate(30); // 手機輕微震動回饋
+              openThreeInOneEditor(col);
+            }, 500);
+          }, { passive: true });
+
+          // 若手指正在上下滑動頁面，立刻取消長按計時，避免滑動時誤觸彈窗
+          col.addEventListener('touchmove', () => {
+            clearTimeout(pressTimer);
+          }, { passive: true });
+
+          col.addEventListener('touchend', (e) => {
+            clearTimeout(pressTimer);
+            if (isLongPress) {
+              // 若已觸發長按改字，阻止放開手指時又觸發 onclick 朗讀發音
+              e.preventDefault();
+            }
+          });
+
+          // 3. 輕點一下 (Tap / Click)：正常朗讀該字發音
+          col.onclick = () => {
+            if (isLongPress) {
+              isLongPress = false;
+              return;
+            }
+            speakSingleChar(col.querySelector('.tp-zh').innerText);
+          };
         } else {
           col.innerHTML = `<span class="tp-py">${char}</span><span class="tp-std"> </span><span class="tp-zh"> </span>`;
         }
