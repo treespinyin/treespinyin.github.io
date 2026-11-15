@@ -272,17 +272,14 @@
       <img src="/icon.png?v=3" alt="Trees Pinyin" class="brand-logo" onerror="this.src='icon.png'">
       <div>
         <div class="brand-title">Trees Pinyin · Teacher Workspace</div>
-        <div class="brand-sub">Fast AI Q&A · Instant Docs/PDF/Photo Translator · Live Projection · 1-Click Homework</div>
+       
       </div>
     </a>
 
     <div class="nav-right">
-      <select id="voiceSelect" class="layout-select" onchange="onVoiceSelectChange()" title="Select Clear Female Mandarin Voice">
-        <option value="">👩 Clear Female Voice (Auto)</option>
-      </select>
+     
       <button class="nav-btn" onclick="openKeyModal()" id="uiKeyBtn">🔑 API Key</button>
-      <button class="nav-btn" onclick="copySchoolWhitelistLetter()">🛡️ School IT Letter</button>
-      <button class="nav-btn primary" onclick="toggleBigFont()">🖥️ Live Projection</button>
+     
       <a href="student.html" class="nav-btn">🌱 Student View ↗</a>
     </div>
   </header>
@@ -291,14 +288,11 @@
 
     <!-- Teacher 1-Year Free Trial + Referral Unlock Banner -->
     <section class="license-banner">
-      <div>
-        🎁 <b>Teacher 1-Year Free Pass:</b> <span id="daysLeftText" style="color:var(--accent); font-weight:800;">365 Days Remaining</span>
-         |  📚 Memory Bank: <b id="unlockedBankStatus">45 Core Sentences Active</b>
-      </div>
+     
       <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
-        <span>Teacher Referral Code: <b style="color:var(--blue); font-family:monospace;">TCH-8829</b></span>
+        <span>Referral Code: <b style="color:var(--blue); font-family:monospace;">TCH-8829</b></span>
         <button class="btn btn-green" style="padding:6px 12px; font-size:0.8rem; flex:unset;" onclick="shareTeacherReferral()">
-          📤 Refer a Teacher (Unlock +50 Memory Sentences & Classical Question Bank)
+          📤 Refer to Unlock +50 
         </button>
       </div>
     </section>
@@ -306,13 +300,13 @@
     <!-- Main Navigation Tabs -->
     <div class="top-tabs">
       <button class="tab-btn active" id="tabBtnWorkspace" onclick="switchTeacherTab('workspace')">
-        ✨ 1. AI Q&A, File Translator & Publish Homework
+        ✨ 1. AI Q&A
       </button>
       <button class="tab-btn" id="tabBtnMnemonics" onclick="switchTeacherTab('mnemonics')">
-        🧠 2. 45+ Memory Sentences & Classical Question Bank
+         2. Mnemonics
       </button>
       <button class="tab-btn" id="tabBtnAnalytics" onclick="switchTeacherTab('analytics')">
-        📊 3. Student Error Radar (4-in-1 View) & Daily History
+        📊 3. Student Radar
       </button>
     </div>
 
@@ -325,8 +319,8 @@
             placeholder="Ask AI any question, or enter/paste/drag text, PDF, Word, Google Docs link, or photo to translate & annotate..."></textarea>
 
           <select id="micLangSelect" class="layout-select" style="padding:4px 6px; font-size:0.78rem;" title="Voice Input Language (Default: English)">
-            <option value="en-US" selected>🎙️ Speak EN</option>
-            <option value="zh-CN">🎙️ Speak ZH</option>
+            <option value="en-US" selected>🎙️EN</option>
+            <option value="zh-CN">🎙️ZH</option>
           </select>
 
           <button class="icon-action" id="micBtn" onclick="toggleVoice()" title="Voice Input (Speak English or Chinese)">
@@ -345,7 +339,7 @@
         <div class="action-row">
           <button class="btn btn-blue" onclick="runSmartAI(undefined, false)">✨ AI Reply & Pinyin</button>
           <button class="btn btn-green" onclick="runDirectTranslate()">📝 Translate & Pinyin</button>
-          <button class="btn btn-soft" style="flex:0.38;" onclick="runSmartAI(undefined, true)" title="Bypass cache and generate a fresh AI response">🔄 Regenerate AI</button>
+          
           <button class="btn btn-soft" style="flex:0.38;" id="speakBtn" onclick="toggleSpeak()">🔊 Speak</button>
         </div>
       </section>
@@ -353,15 +347,13 @@
       <!-- 2. 4-in-1 Display & Script Control Panel -->
       <section class="controls-panel hide-in-big">
         <div class="controls-row">
-          <div style="font-size:0.82rem; font-weight:700; color:var(--accent);">
-            🔊 Left-click character to speak · ✍️ Right-click to edit Character / Standard Pinyin / Trees Pinyin · Highlight text to pop up green icon
-          </div>
+          
           <div class="checkbox-group">
             <label><input type="checkbox" id="chkEn" checked onchange="updateRowVisibility()"> English</label>
             <label><input type="checkbox" id="chkTp" checked onchange="updateRowVisibility()"> Trees Pinyin</label>
             <label><input type="checkbox" id="chkStd" checked onchange="updateRowVisibility()"> Standard Pinyin (ā á ǎ à)</label>
-            <label><input type="checkbox" id="chkTrad" checked onchange="switchScriptMode('trad')"> Traditional Chinese</label>
-            <label><input type="checkbox" id="chkSimp" onchange="switchScriptMode('simp')"> Simplified Chinese</label>
+            <label><input type="checkbox" id="chkTrad" checked onchange="switchScriptMode('trad')"> Traditional</label>
+            <label><input type="checkbox" id="chkSimp" onchange="switchScriptMode('simp')"> Simplified</label>
           </div>
         </div>
 
@@ -399,7 +391,7 @@
           <select id="pubHwType" class="layout-select" style="padding:9px; font-weight:700;">
             <option value="reading">🗣️ Type 1: Read Aloud & Tone Score</option>
             <option value="mcq">🎯 Type 2: English-to-Hanzi MCQ Quiz</option>
-            <option value="mnemonic">🧠 Type 3: Vocabulary + Example Sentence</option>
+            <option value="mnemonic"> Type 3: Vocabulary + Example Sentence</option>
             <option value="poem">📜 Type 4: Classical Poem Recitation</option>
           </select>
           <button class="btn btn-green" style="flex:0.6;" onclick="publishBoardAsHomework()">📤 Publish Homework</button>
@@ -1826,8 +1818,7 @@ CRITICAL ACCURACY RULES:
           classCode: "CLS-101", seatAlias: "Tiger 05", avgScore: 76, timestamp: "Today 10:22 AM",
           missedChars: ["曲", "項", "請"],
           missedQuestions: [
-            { zh: "請問洗手間在哪裡？", en: "Excuse me, where is the restroom?", missedChars: ["請"] },
-            { zh: "鵝，鵝，鵝，曲項向天歌。", en: "Goose, goose, goose, bending your neck to sing to the sky.", missedChars: ["曲", "項"] }
+            
           ]
         }
       ];
@@ -1875,7 +1866,7 @@ CRITICAL ACCURACY RULES:
     }
 
     // Default Initialization
-    document.getElementById('userInput').value = '請問洗手間在哪裡？ ||| Excuse me, where is the restroom?\n鵝，鵝，鵝，曲項向天歌。 ||| Goose, goose, goose, bending your neck to sing to the sky.';
+    document.getElementById('userInput').value = ;
     runDirectTranslate();
     renderTeacherMnemonicBank();
     renderAnalyticsAndFourInOneErrors();
