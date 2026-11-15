@@ -3031,16 +3031,8 @@
             replyBox.className = 'ai-reply-box diag-info';
             replyBox.style.display = 'block';
             replyBox.innerText = `ℹ️ Answered via ${source} (Google Key Note: ${diagError.slice(0, 140)})`;
-          } else if (!backupKey && usedPublicPool) {
-            const pubCount = getAndIncrementPublicUsage();
-            if (pubCount >= FREE_PUBLIC_REMINDER_THRESHOLD) {
-              replyBox.className = 'ai-reply-box friendly-reminder';
-              replyBox.style.display = 'block';
-              replyBox.innerHTML = currentLang === 'en'
-                ? `💡 You've used the free public channel ${pubCount} times today! For fastest unlimited access, click <b>[🔑 API Key]</b> at the top right to plug in your own free Google Gemini Key.`
-                : `💡 您今日已使用公共免費池 ${pubCount} 次！建議點擊右上角 <b>[🔑 API Key]</b> 填入您免費的個人 Google Gemini Key 享受專屬極速通道。`;
-            }
-          }
+          } 
+          
           return;
         }
       }
