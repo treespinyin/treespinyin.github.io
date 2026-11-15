@@ -1,0 +1,1554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Trees Pinyin</title>
+  <meta name="theme-color" content="#1b5e20">
+  <link rel="icon" type="image/png" href="/icon.png?v=3">
+
+  <script src="https://cdn.jsdelivr.net/npm/pinyin-pro@3.19.6/dist/index.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/opencc-js@1.0.5/dist/umd/full.js"></script>
+
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --text: #111827;
+      --accent: #1b5e20;
+      --accent-hover: #2e7d32;
+      --blue: #1a73e8;
+      --border: #dfe1e5;
+      --danger: #d93025;
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+      margin: 0;
+      padding: 28px 16px 48px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 760px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* 1. 膠囊上方：顯示檔案建設時間 */
+    .build-time-text {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #1b5e20;
+      background: #e8f5e9;
+      border: 1px solid #a5d6a7;
+      padding: 4px 12px;
+      border-radius: 999px;
+      letter-spacing: 0.2px;
+    }
+
+    /* 2. 純淨谷歌膠囊搜索框 (輸入框 + EN/中文 + 麥克風 + 🔑) */
+    .google-capsule-wrap {
+      width: 100%;
+      background: #ffffff;
+      border: 1.5px solid var(--border);
+      border-radius: 32px;
+      padding: 8px 10px 8px 22px;
+      box-shadow: 0 2px 10px rgba(32, 33, 36, 0.08);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: box-shadow 0.2s, border-color 0.2s;
+    }
+    .google-capsule-wrap:focus-within {
+      border-color: var(--accent);
+      box-shadow: 0 4px 16px rgba(27, 94, 32, 0.16);
+    }
+    .capsule-input {
+      flex: 1;
+      border: none;
+      outline: none;
+      font-size: 1.05rem;
+      line-height: 1.45;
+      color: var(--text);
+      background: transparent;
+      font-family: inherit;
+      resize: none;
+      max-height: 110px;
+      padding: 4px 0;
+    }
+    .capsule-input::placeholder { color: #9aa0a6; }
+
+    /* 麥克風左側的 EN / 中文 語音切換小標籤 (預設 EN) */
+    .voice-lang-toggle {
+      height: 32px;
+      padding: 0 11px;
+      border-radius: 999px;
+      border: 1.5px solid #c8e6c9;
+      background: #e8f5e9;
+      color: #1b5e20;
+      font-size: 0.8rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      user-select: none;
+      transition: all 0.15s;
+    }
+    .voice-lang-toggle:hover {
+      background: #1b5e20;
+      color: #ffffff;
+      border-color: #1b5e20;
+    }
+    .voice-lang-toggle.zh-mode {
+      background: #e8f0fe;
+      color: #1a73e8;
+      border-color: #bfdbfe;
+    }
+    .voice-lang-toggle.zh-mode:hover {
+      background: #1a73e8;
+      color: #ffffff;
+      border-color: #1a73e8;
+    }
+
+    .mic-btn, .key-icon-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: none;
+      background: #f1f5f9;
+      color: #1a73e8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      font-size: 1rem;
+      transition: background 0.15s, transform 0.1s;
+    }
+    .mic-btn:hover, .key-icon-btn:hover { background: #e2e8f0; }
+    .mic-btn:active, .key-icon-btn:active { transform: scale(0.95); }
+    .mic-btn svg { width: 22px; height: 22px; fill: currentColor; }
+    .mic-btn.recording {
+      background: var(--danger);
+      color: #ffffff;
+      animation: micPulse 1s infinite;
+    }
+    .key-icon-btn.has-key {
+      background: #e8f5e9;
+      border: 1.5px solid #2e7d32;
+    }
+    @keyframes micPulse {
+      0% { box-shadow: 0 0 0 0 rgba(217, 48, 37, 0.45); }
+      70% { box-shadow: 0 0 0 10px rgba(217, 48, 37, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(217, 48, 37, 0); }
+    }
+
+    /* 3. AI 回答與四位一體注音顯示卡片 */
+    .answer-card {
+      width: 100%;
+      background: var(--card);
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.03);
+      padding: 18px 20px;
+      min-height: 110px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 14px;
+      --user-font-size: 20px;
+    }
+
+    .status-banner {
+      width: 100%;
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: #166534;
+      display: none;
+      word-break: break-word;
+    }
+    .status-banner.friendly-reminder {
+      background: #fffbeb;
+      border: 1.5px solid #fcd34d;
+      color: #92400e;
+    }
+    .status-banner.diag-info {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      color: #1e40af;
+      font-size: 0.8rem;
+    }
+
+    .annotation-list {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 18px;
+    }
+    .sentence-block {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      padding-bottom: 14px;
+      border-bottom: 1px dashed #e5e7eb;
+    }
+    .sentence-block:last-child { border-bottom: none; padding-bottom: 0; }
+
+    .en-line {
+      font-size: calc(var(--user-font-size) * 0.92);
+      font-weight: 600;
+      color: #1f2937;
+      line-height: 1.42;
+      max-width: 96%;
+    }
+    .char-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px 0;
+      align-items: flex-end;
+    }
+    .tp-col {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      margin: 0 0.28ch;
+      cursor: pointer;
+      padding: 2px 3px;
+      border-radius: 6px;
+      transition: background 0.12s;
+    }
+    .tp-col:hover { background: #f1f8e9; }
+    .tp-py {
+      font-size: calc(var(--user-font-size) * 0.96);
+      font-weight: 700;
+      font-style: italic;
+      color: #1b5e20;
+      line-height: 1.16;
+      white-space: nowrap;
+    }
+    .tp-std {
+      font-size: calc(var(--user-font-size) * 0.78);
+      font-weight: 500;
+      color: #6b7280;
+      line-height: 1.15;
+      white-space: nowrap;
+    }
+    .tp-zh {
+      font-size: calc(var(--user-font-size) * 1.25);
+      font-weight: 600;
+      color: #000000;
+      line-height: 1.22;
+      min-height: 1.22em;
+    }
+
+    /* 4. 下方 API Limit 專屬提示框 */
+    .api-limit-box {
+      width: 100%;
+      background: #fffdf5;
+      border: 1px solid #fde68a;
+      border-left: 4px solid #f59e0b;
+      border-radius: 12px;
+      padding: 11px 16px;
+      font-size: 0.85rem;
+      color: #374151;
+      line-height: 1.5;
+      display: none;
+      cursor: pointer;
+    }
+    .api-limit-box b { color: #b45309; }
+
+    /* 🔑 API Key 彈窗 */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+      padding: 16px;
+    }
+    .modal-box {
+      background: #fff;
+      width: 100%;
+      max-width: 420px;
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+    .modal-btn {
+      height: 40px;
+      padding: 0 16px;
+      border-radius: 10px;
+      border: none;
+      background: var(--accent);
+      color: #fff;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .modal-btn.secondary {
+      background: #f1f5f9;
+      color: #334155;
+      border: 1px solid #cbd5e1;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+
+    <!-- 🕒 1. 膠囊上方：顯示檔案建設時間 -->
+    <div class="build-time-text">
+      🕒 Build: 2026-11-15 12:25 PST (v15.0 商業化免維護版：永久動態模型適配 + 跨重整持久快取 + 防連點鎖)
+    </div>
+
+    <!-- 🔍 2. 谷歌膠囊 (輸入框 + EN/中文切換 + 麥克風 + 🔑) -->
+    <div class="google-capsule-wrap">
+      <textarea id="userInput" class="capsule-input" rows="1"
+        placeholder="Ask AI any question in English or Chinese (Press Enter or tap Mic)..."
+        oninput="handleUserInputChange(this)"></textarea>
+
+      <!-- 麥克風左邊的 EN / 中文 切換按鈕 (預設 EN 代表說英文，點擊切換為「中文」代表說中文) -->
+      <button class="voice-lang-toggle" id="voiceLangBtn" onclick="toggleVoiceLang()" title="Switch voice input language (EN / 中文)">
+        EN
+      </button>
+
+      <!-- 麥克風按鈕 -->
+      <button class="mic-btn" id="micBtn" onclick="toggleVoice()" title="Voice Input">
+        <svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.91-3c-.49 0-.9.36-.98.85C16.52 14.2 14.47 16 12 16s-4.52-1.8-4.93-4.15c-.08-.49-.49-.85-.98-.85-.61 0-1.09.54-1 1.14.49 3 2.89 5.35 5.91 5.78V20c0 .55.45 1 1 1s1-.45 1-1v-2.08c3.02-.43 5.42-2.78 5.91-5.78.1-.6-.39-1.14-1-1.14z"/></svg>
+      </button>
+
+      <!-- 🔑 個人免費 Gemini Key 輸入按鈕 -->
+      <button class="key-icon-btn" id="keyBtn" onclick="openKeyModal()" title="Enter your free Google Gemini API Key">
+        🔑
+      </button>
+    </div>
+
+    <!-- 📖 3. AI 回答與四位一體注音卡片 -->
+    <div class="answer-card" id="answerCard">
+      <div id="statusBanner" class="status-banner"></div>
+      <div id="annotationList" class="annotation-list"></div>
+    </div>
+
+    <!-- ⚠️ 4. API Limit 提示框 -->
+    <div id="apiLimitBox" class="api-limit-box" onclick="openKeyModal()">
+      <b>API limit.</b> For optimal results, use your own free Gemini API Key or paste text directly. The author assumes no liability for the accuracy. Your support and shares will help me go full-time to make improvements and write a memory dictionary in the future!
+    </div>
+
+  </div>
+
+  <!-- 🔑 Google Gemini API Key 彈窗 -->
+  <div class="modal" id="keyModal" onclick="if(event.target===this)this.style.display='none'">
+    <div class="modal-box">
+      <h3 style="margin:0; font-size:1.02rem; color:var(--accent);">🔑 Google Gemini API Key</h3>
+      <div style="font-size:0.84rem; line-height:1.55; background:#f8fafc; padding:12px; border-radius:10px; color:#334155;">
+        Enter your free Google Gemini API Key (automatically detects all active models under your key including <b>Gemini Flash</b> + <b>Gemma 3 27B</b>):<br>
+        <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:var(--blue); font-weight:700;">Get Free Key at Google AI Studio ↗</a>
+      </div>
+      <input type="text" id="apiKeyInput" autocomplete="off" spellcheck="false" placeholder="AIzaSy..." style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:8px; font-size:0.9rem; font-family:monospace;">
+      <div id="keyTestStatus" style="font-size:0.8rem; color:#475569; display:none;"></div>
+      <div style="display:flex; gap:8px;">
+        <button class="modal-btn" style="flex:1;" onclick="saveBackupKey()">Save & Verify</button>
+        <button class="modal-btn secondary" onclick="clearBackupKey()">Clear</button>
+        <button class="modal-btn secondary" onclick="document.getElementById('keyModal').style.display='none'">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // =========================================================================
+    // 1. 全域端點與基礎繁簡轉換
+    // =========================================================================
+    const CF_WORKER_ENDPOINTS = ['https://treespinyin-api.treespinyin.workers.dev'];
+
+    let openccToTrad = null;
+    try {
+      if (window.OpenCC) openccToTrad = window.OpenCC.Converter({ from: 'cn', to: 'tw' });
+    } catch (e) {}
+
+    function toTrad(str) {
+      if (!str) return '';
+      return openccToTrad ? openccToTrad(str) : str;
+    }
+
+    function autoResizeTextarea(el) {
+      el.style.height = 'auto';
+      el.style.height = Math.min(el.scrollHeight, 110) + 'px';
+    }
+
+    function setVoiceLangMode(mode) {
+      const btn = document.getElementById('voiceLangBtn');
+      const inputEl = document.getElementById('userInput');
+      spokenLang = mode;
+      try { localStorage.setItem('tp_spoken_lang', mode); } catch (e) {}
+      if (mode === 'zh') {
+        btn.innerText = '中文';
+        btn.classList.add('zh-mode');
+        inputEl.placeholder = '請向 AI 提問任何問題（按 Enter 或點麥克風說普通話）...';
+      } else {
+        btn.innerText = 'EN';
+        btn.classList.remove('zh-mode');
+        inputEl.placeholder = 'Ask AI any question in English or Chinese (Press Enter or tap Mic)...';
+      }
+    }
+
+    function handleUserInputChange(el) {
+      autoResizeTextarea(el);
+      const val = el.value || '';
+      if (/[\u4e00-\u9fa5]/.test(val) && spokenLang !== 'zh') {
+        setVoiceLangMode('zh');
+      }
+    }
+
+    document.getElementById('userInput').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) {
+        e.preventDefault();
+        runSmartAI();
+      }
+    });
+
+    // =========================================================================
+    // 1.5 🌱 文明用語友情提醒 (Mindful Language Friendly Reminder)
+    // =========================================================================
+    const PROFANITY_EN_REGEX = /\b(fuck|fucking|fucked|fucker|motherfucker|shit|shitty|bullshit|bitch|bitches|asshole|bastard|dick|cock|pussy|cunt|whore|slut|nigger|nigga|faggot|retard)\b/i;
+    const PROFANITY_ZH_LIST = ['他媽的','他妈的','你媽的','你妈的','操你','肏你','草泥馬','草泥马','傻逼','煞筆','傻B','去死吧','王八蛋','賤人','贱人','婊子','媽的','妈的'];
+
+    function checkAndRemindProfanity(text) {
+      if (!text) return false;
+      if (PROFANITY_EN_REGEX.test(text) || PROFANITY_ZH_LIST.some(w => text.includes(w))) {
+        const banner = document.getElementById('statusBanner');
+        const list = document.getElementById('annotationList');
+        document.getElementById('apiLimitBox').style.display = 'none';
+        banner.className = 'status-banner friendly-reminder';
+        banner.style.display = 'block';
+        banner.innerHTML = '🌱 <b>Friendly Reminder / 友情提醒：</b> Let\'s keep our language kind and respectful! / 請使用文明禮貌的語言提問喔！';
+        list.innerHTML = '';
+        appendSentenceProgressive('請使用文明禮貌的語言，我們一起快樂學中文！', 'Please use polite and kind language as we learn Mandarin together!');
+        return true;
+      }
+      return false;
+    }
+
+    // =========================================================================
+    // 2. 🧠 連貫對話滑動視窗記憶 (支援無限輪連貫對話，保留最近 3 輪上下文)
+    // =========================================================================
+    const MAX_MEMORY_TURNS = 3;
+    let conversationHistory = [];
+    let lastInteractionTime = 0;
+
+    function pushConversationMemory(userQ, aiRawReply) {
+      if (!userQ || !aiRawReply) return;
+      const compactReply = aiRawReply.split(/\r?\n+/).slice(0, 4).join(' / ').slice(0, 260);
+      conversationHistory.push({ q: userQ, a: compactReply });
+      if (conversationHistory.length > MAX_MEMORY_TURNS) {
+        conversationHistory.shift();
+      }
+      lastInteractionTime = Date.now();
+    }
+
+    function buildMemoryContextString() {
+      if (conversationHistory.length === 0) return '';
+      if (Date.now() - lastInteractionTime > 600000) {
+        conversationHistory = [];
+        return '';
+      }
+      const lines = conversationHistory.map((item, idx) => `Turn ${idx + 1} - User asked: "${item.q}" | AI answered: "${item.a}"`);
+      return '\nRecent Conversation History:\n' + lines.join('\n');
+    }
+
+    // =========================================================================
+    // 3. 🎙️ 膠囊內 EN / 中文 語音引擎 (預設 EN)
+    // =========================================================================
+    let spokenLang = 'en'; // 預設為英文 'en' ('en' | 'zh')
+    let activeRec = null;
+    let voiceSilenceTimer = null;
+    let latestVoiceCandidates = [];
+
+    function toggleVoiceLang() {
+      setVoiceLangMode(spokenLang === 'en' ? 'zh' : 'en');
+      if (activeRec) {
+        clearTimeout(voiceSilenceTimer);
+        activeRec.onend = null;
+        try { activeRec.stop(); } catch (e) {}
+        activeRec = null;
+        document.getElementById('micBtn').classList.remove('recording');
+        setTimeout(() => toggleVoice(), 80);
+      }
+    }
+
+    // 產生三軌聲學指紋：「帶調拼音」+「無調拼音」+「平翹舌/前後鼻音歸一化模糊音軌 (Fuzzy Skeleton)」
+    function getPhoneticTrackForAI(text) {
+      if (!text) return '';
+      if (/[\u4e00-\u9fa5]/.test(text)) {
+        try {
+          const withTone = pinyinPro.pinyin(text, { toneType: 'num' });
+          const noTone = pinyinPro.pinyin(text, { toneType: 'none' });
+          const fuzzy = noTone
+            .replace(/\bzh/g, 'z').replace(/\bch/g, 'c').replace(/\bsh/g, 's')
+            .replace(/ing\b/g, 'in').replace(/eng\b/g, 'en').replace(/ang\b/g, 'an');
+          return `Pinyin: "${withTone}" | Toneless: "${noTone}" | Fuzzy: "${fuzzy}"`;
+        } catch (e) {
+          return text;
+        }
+      }
+      return `Spoken Phonetics: "${text}"`;
+    }
+
+    function toggleVoice() {
+      const btn = document.getElementById('micBtn');
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SR) {
+        alert('Voice input requires Chrome, Edge, or Safari.');
+        return;
+      }
+
+      if (activeRec) {
+        clearTimeout(voiceSilenceTimer);
+        activeRec.stop();
+        return;
+      }
+
+      latestVoiceCandidates = [];
+      const inputEl = document.getElementById('userInput');
+      inputEl.value = '';
+      autoResizeTextarea(inputEl);
+      document.getElementById('apiLimitBox').style.display = 'none';
+
+      activeRec = new SR();
+      activeRec.lang = (spokenLang === 'en') ? 'en-US' : 'zh-CN';
+      activeRec.interimResults = true;
+      activeRec.maxAlternatives = 8;
+      activeRec.continuous = true;
+      btn.classList.add('recording');
+
+      const banner = document.getElementById('statusBanner');
+      banner.className = 'status-banner';
+      banner.style.display = 'block';
+      banner.innerText = (spokenLang === 'en')
+        ? '🔴 Listening in English (EN)... (Tap "EN" to switch to 中文 if speaking Mandarin)'
+        : '🔴 正在聽取中文語音 (中文模式)... 說完停頓 1 秒即刻回答！';
+
+      const finalizedSegments = [];
+      const segmentAlts = [];
+      let lastNonEmptyInterim = '';
+      let lastValidFullText = '';
+      let hasSpokenYet = false;
+
+      function scheduleGentleStop() {
+        clearTimeout(voiceSilenceTimer);
+        const silenceAllowance = (spokenLang === 'en') ? 1650 : 1350;
+        const waitMs = hasSpokenYet ? silenceAllowance : 5000;
+        voiceSilenceTimer = setTimeout(() => {
+          if (activeRec) activeRec.stop();
+        }, waitMs);
+      }
+
+      scheduleGentleStop();
+
+      const sep = (spokenLang === 'en') ? ' ' : '';
+
+      activeRec.onresult = (e) => {
+        hasSpokenYet = true;
+        scheduleGentleStop();
+        let currentInterim = '';
+
+        for (let i = 0; i < e.results.length; i++) {
+          const res = e.results[i];
+          const altsForSeg = [];
+          for (let k = 0; k < res.length; k++) {
+            const t = (res[k]?.transcript || '').trim();
+            if (t) altsForSeg.push(t);
+          }
+
+          if (res.isFinal) {
+            finalizedSegments[i] = res[0].transcript.trim();
+            segmentAlts[i] = altsForSeg;
+          } else {
+            currentInterim += (currentInterim ? sep : '') + res[0].transcript.trim();
+            segmentAlts[i] = altsForSeg;
+          }
+        }
+
+        if (currentInterim.trim()) {
+          lastNonEmptyInterim = currentInterim.trim();
+        } else if (e.results.length > 0 && e.results[e.results.length - 1].isFinal) {
+          lastNonEmptyInterim = '';
+        }
+
+        const completedPart = finalizedSegments.filter(Boolean).join(sep).trim();
+        const mergedNow = [completedPart, lastNonEmptyInterim].filter(Boolean).join(sep).trim();
+
+        if (mergedNow) {
+          lastValidFullText = mergedNow;
+          inputEl.value = lastValidFullText;
+          autoResizeTextarea(inputEl);
+        }
+
+        const combinedCandidates = new Set();
+        if (lastValidFullText) combinedCandidates.add(lastValidFullText);
+        for (let k = 0; k < 8; k++) {
+          const altSentence = segmentAlts
+            .map((arr, idx) => (arr && arr[k]) ? arr[k] : (finalizedSegments[idx] || ''))
+            .filter(Boolean)
+            .join(sep)
+            .trim();
+          if (altSentence) combinedCandidates.add(altSentence);
+        }
+        latestVoiceCandidates = Array.from(combinedCandidates).slice(0, 8);
+      };
+
+      activeRec.onend = () => {
+        clearTimeout(voiceSilenceTimer);
+        btn.classList.remove('recording');
+        activeRec = null;
+
+        const finalSpoken = (lastValidFullText || inputEl.value || '').trim();
+        if (finalSpoken) {
+          inputEl.value = finalSpoken;
+          autoResizeTextarea(inputEl);
+          runSmartAI(finalSpoken, latestVoiceCandidates, true);
+        } else {
+          banner.style.display = 'none';
+        }
+      };
+
+      activeRec.onerror = () => {
+        clearTimeout(voiceSilenceTimer);
+        btn.classList.remove('recording');
+        activeRec = null;
+        const finalSpoken = (lastValidFullText || inputEl.value || '').trim();
+        if (finalSpoken) {
+          runSmartAI(finalSpoken, latestVoiceCandidates, true);
+        } else {
+          banner.style.display = 'none';
+        }
+      };
+
+      try {
+        activeRec.start();
+      } catch (err) {}
+    }
+
+    // =========================================================================
+    // 4. 數字與符號轉中文口語 + Trees Pinyin 63 規則自然拼讀編譯器
+    // =========================================================================
+    const DIGITS_ZH = ['零','一','二','三','四','五','六','七','八','九'];
+
+    function intToChinese(numStr) {
+      let n = parseInt(numStr, 10);
+      if (isNaN(n)) return numStr;
+      if (n === 0) return '零';
+      if (n < 0) return '負' + intToChinese(String(-n));
+      if (numStr.length === 4 && n >= 1900 && n <= 2099) {
+        return numStr.split('').map(d => DIGITS_ZH[parseInt(d, 10)]).join('');
+      }
+      if (n < 10) return DIGITS_ZH[n];
+      if (n < 100) {
+        let ten = Math.floor(n / 10), rem = n % 10;
+        return (ten === 1 ? '十' : DIGITS_ZH[ten] + '十') + (rem > 0 ? DIGITS_ZH[rem] : '');
+      }
+      if (n < 1000) {
+        let hun = Math.floor(n / 100), rem = n % 100;
+        if (rem === 0) return DIGITS_ZH[hun] + '百';
+        if (rem < 10) return DIGITS_ZH[hun] + '百零' + DIGITS_ZH[rem];
+        return DIGITS_ZH[hun] + '百' + intToChinese(String(rem));
+      }
+      if (n < 10000) {
+        let th = Math.floor(n / 1000), rem = n % 1000;
+        if (rem === 0) return DIGITS_ZH[th] + '千';
+        if (rem < 100) return DIGITS_ZH[th] + '千零' + intToChinese(String(rem));
+        return DIGITS_ZH[th] + '千' + intToChinese(String(rem));
+      }
+      return numStr.split('').map(d => DIGITS_ZH[parseInt(d, 10)] || d).join('');
+    }
+
+    function numberToChinese(str) {
+      if (str.includes('.')) {
+        let parts = str.split('.');
+        let intPart = intToChinese(parts[0] || '0');
+        let decPart = parts[1].split('').map(d => DIGITS_ZH[parseInt(d, 10)]).join('');
+        return intPart + '點' + decPart;
+      }
+      return intToChinese(str);
+    }
+
+    function expandNumbersAndSymbolsToZh(text) {
+      if (!text) return '';
+      let s = text;
+      s = s.replace(/\bH2O\b/gi, '水').replace(/\bCO2\b/gi, '二氧化碳').replace(/\bO2\b/gi, '氧氣');
+      s = s.replace(/\bWi-?Fi\b/gi, '無線網路').replace(/\bAPP\b/gi, '應用程式').replace(/\bAI\b/gi, '人工智慧');
+      s = s.replace(/°C|℃/g, '攝氏度').replace(/°F|℉/g, '華氏度');
+      s = s.replace(/\b(\d{1,2}):(\d{2})\b/g, (_, h, m) => intToChinese(h) + '點' + (m === '00' ? '整' : intToChinese(m) + '分'));
+      s = s.replace(/(\d+(?:\.\d+)?)\s*%/g, (_, num) => '百分之' + numberToChinese(num));
+      s = s.replace(/\$\s*(\d+(?:\.\d+)?)/g, (_, num) => numberToChinese(num) + '美元');
+      s = s.replace(/[¥￥]\s*(\d+(?:\.\d+)?)/g, (_, num) => numberToChinese(num) + '元');
+      s = s.replace(/\+/g, '加').replace(/=/g, '等於').replace(/&/g, '和');
+      s = s.replace(/\d+(?:\.\d+)?/g, (match) => numberToChinese(match));
+      return s;
+    }
+
+    const OVERALL_16 = {
+      'zhi': '(r)ds', 'chi': '(r)ts', 'shi': '(r)s', 'ri': '(r)th', 'zi': 'ds', 'ci': 'ts', 'si': 's', 'yi': 'yee',
+      'wu': 'woo', 'yu': 'yee(oo)', 'ye': 'yer', 'yue': 'yee(oo)er', 'yuan': 'yee(oo)an', 'yin': 'yeen', 'yun': 'yee(oo)n', 'ying': 'ying'
+    };
+    const LOCKED_MAP = {
+      'wo': 'wer', 'de': 'der', 'le': 'Ler', 'ren': '(r)ther-n', 'wen': 'wer-n', 'shun': 'soon', 'zun': 'dsoon',
+      'guo': 'gooer', 'o': 'oh', 'qi': 'tsee', 'qing': 'tsing', 'qie': 'tseer', 'qian': 'tseean', 'qiao': 'tseeaw',
+      'qiang': 'tseeang', 'qiong': 'tseer-oong', 'qu': 'tsee(oo)', 'que': 'tsee(oo)er', 'quan': 'tsee(oo)an',
+      'qun': 'tsee(oo)n', 'qin': 'tseen', 'qia': 'tseeah', 'xi': 'see', 'xing': 'sing', 'xie': 'seer', 'xian': 'seean',
+      'xiao': 'seeaw', 'xiang': 'seeang', 'xiong': 'seer-oong', 'xu': 'see(oo)', 'xue': 'see(oo)er', 'xuan': 'see(oo)an',
+      'xun': 'see(oo)n', 'xin': 'seen', 'xia': 'seeah', 'ji': 'jee', 'jing': 'jing', 'jie': 'jeer', 'jian': 'jeean',
+      'jiao': 'jeeaw', 'jiang': 'jeeang', 'jiong': 'jeer-oong', 'ju': 'jee(oo)', 'jue': 'jee(oo)er', 'juan': 'jee(oo)an',
+      'jun': 'jee(oo)n', 'jin': 'jeen', 'jia': 'jeeah', 'lv': 'Lee(oo)', 'lü': 'Lee(oo)', 'lve': 'Lee(oo)er', 'lüe': 'Lee(oo)er',
+      'nv': 'nee(oo)', 'nü': 'nee(oo)', 'nve': 'nee(oo)er', 'nüe': 'nee(oo)er'
+    };
+    const INITIALS = {
+      'b':'b', 'p':'p', 'm':'m', 'f':'f', 'd':'d', 't':'t', 'n':'n', 'l':'L', 'g':'g', 'k':'k', 'h':'h', 'j':'j',
+      'q':'tsee', 'x':'see', 'zh':'(r)ds', 'ch':'(r)ts', 'sh':'(r)s', 'r':'(r)th', 'z':'ds', 'c':'ts', 's':'s', 'y':'y', 'w':'w'
+    };
+    const FINALS = {
+      'a':'ah', 'o':'ooer', 'e':'er', 'i':'ee', 'u':'oo', 'v':'ee(oo)', 'ü':'ee(oo)', 'ai':'ie', 'ei':'ay', 'ui':'ooay',
+      'ao':'aw', 'ou':'oh', 'iu':'eeoh', 'ie':'eer', 've':'ee(oo)er', 'üe':'ee(oo)er', 'er':'(uh)-er', 'an':'an', 'en':'er-n',
+      'in':'een', 'un':'oon', 'vn':'ee(oo)n', 'ün':'ee(oo)n', 'ang':'ang', 'eng':'er-ng', 'ing':'ing', 'ong':'er-oong',
+      'ia':'eeah', 'ian':'eean', 'iao':'eeaw', 'iang':'eeang', 'iong':'eer-oong', 'ua':'ooah', 'uai':'ooie', 'uan':'ooan',
+      'uang':'ooang', 'uo':'ooer', 'van':'ee(oo)an', 'üan':'ee(oo)an'
+    };
+
+    function compileToTreesPinyin(pyNum) {
+      if (!pyNum) return '';
+      let m = pyNum.trim().match(/^([a-züv:]+)([0-5]?)$/i);
+      if (!m) return pyNum;
+      let syl = m[1].toLowerCase().replace('ü', 'v').replace('u:', 'v');
+      let tone = m[2] || '';
+      let mapped = '';
+      if (syl === 'er') mapped = (tone === '4') ? 'uh-er' : '(uh)-er';
+      else if (OVERALL_16[syl]) mapped = OVERALL_16[syl];
+      else if (LOCKED_MAP[syl]) mapped = LOCKED_MAP[syl];
+      else {
+        let init = '', fin = syl;
+        for (let l of ['zh', 'ch', 'sh']) { if (syl.startsWith(l)) { init = l; fin = syl.slice(2); break; } }
+        if (!init && syl.length > 1 && 'bpmfdtnlgkhjqxzcsryw'.includes(syl[0])) { init = syl[0]; fin = syl.slice(1); }
+        let mappedInit = INITIALS[init] || init;
+        let mappedFin = FINALS[fin] || fin;
+        if (mappedInit.endsWith('ee') && mappedFin.startsWith('ee')) mapped = mappedInit + mappedFin.slice(2);
+        else if (mappedInit.endsWith('ee') && mappedFin.startsWith('i')) mapped = mappedInit.slice(0, -2) + mappedFin;
+        else if (init === 'y' && mappedFin.startsWith('ee')) mapped = 'y' + mappedFin;
+        else if (init === 'w' && mappedFin.startsWith('oo')) mapped = 'w' + mappedFin;
+        else mapped = mappedInit + mappedFin;
+      }
+      let toneSuffix = (tone === '2' || tone === '3' || tone === '4') ? tone : '';
+      return mapped + toneSuffix;
+    }
+
+    function numPinyinToToneMark(pyNum) {
+      if (!pyNum) return '';
+      const m = pyNum.trim().match(/^([a-züv:]+)([1-5]?)$/i);
+      if (!m) return pyNum;
+      let s = m[1].toLowerCase().replace('v', 'ü').replace('u:', 'ü');
+      const t = parseInt(m[2] || '5', 10);
+      if (t < 1 || t > 4) return s;
+      const marks = { a:['ā','á','ǎ','à'], e:['ē','é','ě','è'], i:['ī','í','ǐ','ì'], o:['ō','ó','ǒ','ò'], u:['ū','ú','ǔ','ù'], ü:['ǖ','ǘ','ǚ','ǜ'] };
+      if (s.includes('a')) return s.replace('a', marks.a[t-1]);
+      if (s.includes('e')) return s.replace('e', marks.e[t-1]);
+      if (s.includes('ou')) return s.replace('o', marks.o[t-1]);
+      for (let i = s.length - 1; i >= 0; i--) { if (marks[s[i]]) return s.slice(0, i) + marks[s[i]][t-1] + s.slice(i + 1); }
+      return s;
+    }
+
+    const CUSTOM_POLYPHONES = {
+      "銀行": "yin2 hang2", "行業": "hang2 ye4", "一行": "yi4 hang2",
+      "便宜": "pian2 yi5", "方便": "fang1 bian4", "音樂": "yin1 yue4", "快樂": "kuai4 le4",
+      "看著": "kan4 zhe5", "著急": "zhao2 ji2", "睡著": "shui4 zhao2",
+      "長大": "zhang3 da4", "長城": "chang2 cheng2", "多長": "duo1 chang2",
+      "了解": "liao3 jie3", "好了": "hao3 le5", "太好了": "tai4 hao3 le5", "覺得": "jue2 de5", "睡覺": "shui4 jiao4",
+      "重慶": "chong2 qing4", "重要": "zhong4 yao4", "還錢": "huan2 qian2", "還有": "hai2 you3",
+      "食物": "shi2 wu4", "美食": "mei3 shi2", "我的": "wo3 de5", "你的": "ni3 de5", "好的": "hao3 de5",
+      "曲項": "qu1 xiang4", "朝辭": "zhao1 ci2", "水調歌頭": "shui3 diao4 ge1 tou2", "鹿柴": "lu4 zhai4"
+    };
+
+    function getAccuratePinyinArray(zhText) {
+      let pyArr = pinyinPro.pinyin(zhText, { type: 'array', toneType: 'num' });
+      for (let word in CUSTOM_POLYPHONES) {
+        let idx = zhText.indexOf(word);
+        while (idx !== -1) {
+          let fixedPys = CUSTOM_POLYPHONES[word].split(' ');
+          for (let k = 0; k < fixedPys.length; k++) pyArr[idx + k] = fixedPys[k];
+          idx = zhText.indexOf(word, idx + 1);
+        }
+      }
+      return pyArr;
+    }
+
+    let selectedVoiceObj = null;
+    function initFemaleVoice() {
+      if (!('speechSynthesis' in window)) return;
+      const all = window.speechSynthesis.getVoices();
+      const zhAll = all.filter(v => /zh|cmn|chi/i.test(v.lang) || /chinese|mandarin|taiwan/i.test(v.name));
+      const priority = ['meijia', 'hsiaochen', 'xiaoxiao', 'ting-ting', 'google 國語', 'google 普通話'];
+      zhAll.sort((a, b) => {
+        const aS = priority.findIndex(k => a.name.toLowerCase().includes(k));
+        const bS = priority.findIndex(k => b.name.toLowerCase().includes(k));
+        return (aS === -1 ? 99 : aS) - (bS === -1 ? 99 : bS);
+      });
+      if (zhAll.length > 0) selectedVoiceObj = zhAll[0];
+    }
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.onvoiceschanged = initFemaleVoice;
+      setTimeout(initFemaleVoice, 200);
+    }
+
+    function speakText(text) {
+      if (!text || !('speechSynthesis' in window)) return;
+      window.speechSynthesis.cancel();
+      if (!selectedVoiceObj) initFemaleVoice();
+      const u = new SpeechSynthesisUtterance(text);
+      if (selectedVoiceObj) {
+        u.voice = selectedVoiceObj;
+        u.lang = selectedVoiceObj.lang;
+      } else {
+        u.lang = 'zh-TW';
+      }
+      u.rate = 0.88;
+      window.speechSynthesis.speak(u);
+    }
+
+    async function translateFastFallback(text, fromLang, toLang) {
+      const isZhToEn = fromLang.startsWith('zh');
+      const src = isZhToEn ? 'zh-CN' : 'en';
+      const tgt = isZhToEn ? 'en' : 'zh-CN';
+      const tasks = [
+        fetchWithTimeout(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=${src}&tl=${tgt}&dt=t&q=${encodeURIComponent(text)}`, {}, 4000)
+          .then(r => r.json())
+          .then(d => {
+            const j = d?.[0]?.map(x => x[0]).join('');
+            if (j && j.trim()) return j.trim();
+            throw new Error('empty');
+          }),
+        fetchWithTimeout(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${src}|${tgt}`, {}, 4500)
+          .then(r => r.json())
+          .then(d => {
+            const t = d?.responseData?.translatedText;
+            if (t && !t.includes('MYMEMORY WARNING')) return t.trim();
+            throw new Error('empty');
+          })
+      ];
+      try {
+        return await Promise.any(tasks);
+      } catch (e) {
+        return text;
+      }
+    }
+
+    function appendSentenceProgressive(rawZhText, enTranslation = '') {
+      const list = document.getElementById('annotationList');
+      const block = document.createElement('div');
+      block.className = 'sentence-block';
+
+      const expandedZh = expandNumbersAndSymbolsToZh(rawZhText);
+      const tradZh = toTrad(expandedZh);
+      block.dataset.zh = tradZh;
+      block.dataset.en = enTranslation;
+
+      const enDiv = document.createElement('div');
+      enDiv.className = 'en-line';
+      const hasEn = Boolean(enTranslation && enTranslation.trim());
+      enDiv.innerText = hasEn ? enTranslation.trim() : '...';
+      block.appendChild(enDiv);
+
+      const charRow = document.createElement('div');
+      charRow.className = 'char-row';
+      const pinyinList = getAccuratePinyinArray(tradZh);
+
+      for (let i = 0; i < tradZh.length; i++) {
+        const char = tradZh[i];
+        const isChinese = /[\u4e00-\u9fa5]/.test(char);
+        const col = document.createElement('div');
+        col.className = 'tp-col';
+
+        if (isChinese) {
+          const pyNum = pinyinList[i] || '';
+          const tp = compileToTreesPinyin(pyNum);
+          const stdTone = numPinyinToToneMark(pyNum);
+          col.innerHTML = `<span class="tp-py">${tp}</span><span class="tp-std">${stdTone}</span><span class="tp-zh">${char}</span>`;
+          col.onclick = () => speakText(char);
+        } else {
+          col.innerHTML = `<span class="tp-py">${char}</span><span class="tp-std"> </span><span class="tp-zh"> </span>`;
+        }
+        charRow.appendChild(col);
+      }
+
+      block.appendChild(charRow);
+      list.appendChild(block);
+
+      if (!hasEn) {
+        translateFastFallback(tradZh, 'zh', 'en').then(en => {
+          enDiv.innerText = en;
+          block.dataset.en = en;
+        });
+      }
+    }
+
+    // =========================================================================
+    // 5. v15.0 商業化免維護架構：
+    //    (1) 永久動態別名置頂 ('gemini-flash-latest')，0秒直連永不 404 過期
+    //    (2) 智慧版本號降序演算法，未來升級 Gemini 4.0 / 5.0 自動排入第一梯隊
+    //    (3) 跨重整持久快取 (LocalStorage + Memory Map)，常見問題 0ms 秒回零消耗
+    //    (4) 防連點與併發序號鎖 (activeRequestSeq)，杜絕重複請求浪費額度
+    // =========================================================================
+    function normalizeCloudCacheKey(rawQ) {
+      if (!rawQ) return '';
+      return rawQ
+        .toLowerCase()
+        .replace(/[\s,.?!，。？！、：:；;《》〈〉"“”'‘’()（）]/g, '')
+        .slice(0, 120);
+    }
+
+    let backupKey = '';
+    try {
+      backupKey = (localStorage.getItem('tp_v22_backup_key') || localStorage.getItem('tp_test_gemini_key') || '').trim();
+    } catch (e) {}
+
+    // 預設直接置頂 Google 官方永久動態別名 (Evergreen Aliases)，未探測前也 100% 零失誤命中最新模型！
+    let availableFastModels = [
+      'gemini-flash-latest',
+      'gemini-flash-lite-latest',
+      'gemma-3-27b-it'
+    ];
+    let modelsDiscoveredForKey = '';
+
+    // 載入 24 小時內快取的模型清單（省去每次打開網頁重複請求 /models 目錄）
+    try {
+      const cachedModelMeta = JSON.parse(localStorage.getItem('tp_v15_discovered_models') || 'null');
+      if (cachedModelMeta && cachedModelMeta.key === backupKey && (Date.now() - cachedModelMeta.ts < 86400000) && Array.isArray(cachedModelMeta.models) && cachedModelMeta.models.length > 0) {
+        availableFastModels = cachedModelMeta.models;
+        modelsDiscoveredForKey = backupKey;
+      }
+    } catch (e) {}
+
+    // 單用戶公共池免費使用次數統計：每滿 6 次溫馨提醒填入個人免費 Key，保護萬人公共池！
+    const FREE_PUBLIC_REMINDER_THRESHOLD = 6;
+    function getAndIncrementPublicUsage() {
+      try {
+        const today = new Date().toISOString().slice(0, 10);
+        const savedDate = localStorage.getItem('tp_pub_usage_date') || '';
+        let count = parseInt(localStorage.getItem('tp_pub_usage_count') || '0', 10);
+        if (savedDate !== today) {
+          count = 0;
+          localStorage.setItem('tp_pub_usage_date', today);
+        }
+        count++;
+        localStorage.setItem('tp_pub_usage_count', String(count));
+        return count;
+      } catch (e) {
+        return 1;
+      }
+    }
+
+    // 雙層快取（Memory Map + LocalStorage 持久化快取 120 條），重整頁面依然 0 毫秒極速秒回！
+    const PERSISTENT_CACHE_STORAGE_KEY = 'tp_v15_persistent_qa_cache';
+    const sessionDynamicCache = new Map();
+
+    (function loadPersistentCache() {
+      try {
+        const raw = JSON.parse(localStorage.getItem(PERSISTENT_CACHE_STORAGE_KEY) || '{}');
+        for (const [k, v] of Object.entries(raw)) {
+          if (k && typeof v === 'string' && v.trim()) {
+            sessionDynamicCache.set(k, v);
+          }
+        }
+      } catch (e) {}
+    })();
+
+    function saveAnswerToPersistentCache(cacheKey, aiText) {
+      if (!cacheKey || !aiText) return;
+      sessionDynamicCache.set(cacheKey, aiText);
+      try {
+        const store = JSON.parse(localStorage.getItem(PERSISTENT_CACHE_STORAGE_KEY) || '{}');
+        const keys = Object.keys(store);
+        if (keys.length >= 120 && !store[cacheKey]) {
+          delete store[keys[0]];
+        }
+        store[cacheKey] = aiText;
+        localStorage.setItem(PERSISTENT_CACHE_STORAGE_KEY, JSON.stringify(store));
+      } catch (e) {}
+    }
+
+    function refreshKeyBtnStyle() {
+      const btn = document.getElementById('keyBtn');
+      if (backupKey) {
+        btn.classList.add('has-key');
+      } else {
+        btn.classList.remove('has-key');
+      }
+    }
+    refreshKeyBtnStyle();
+
+    // 智慧版本號降序演算法：自動適配未來 Gemini 4.0 / 5.0 與新一代 Gemma，永遠免改程式碼！
+    async function discoverAuthorizedModels(key) {
+      if (!key) return availableFastModels;
+      const cleanKey = key.replace(/\s+/g, '');
+      if (modelsDiscoveredForKey === cleanKey && availableFastModels.length > 0) {
+        return availableFastModels;
+      }
+      try {
+        const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(cleanKey)}`);
+        if (!r.ok) return availableFastModels;
+        const data = await r.json();
+        const validModels = (data.models || [])
+          .filter(m => (m.supportedGenerationMethods || []).includes('generateContent'))
+          .map(m => m.name.replace('models/', ''))
+          .filter(n => !/tts|image|imagen|embedding|veo|robotics|aqa|bison|gecko|thinking|exp|preview|1\.5-|2\.0-/i.test(n));
+
+        // 自動提取所有標準 gemini-X.X-flash 的數字版本號，並由新到舊 (大到小) 自動排序
+        const versionedFlash = validModels
+          .filter(n => /^gemini-\d+(\.\d+)?-flash$/i.test(n))
+          .sort((a, b) => {
+            const vA = parseFloat(a.match(/gemini-(\d+(?:\.\d+)?)/i)?.[1] || '0');
+            const vB = parseFloat(b.match(/gemini-(\d+(?:\.\d+)?)/i)?.[1] || '0');
+            return vB - vA;
+          });
+
+        // 自動提取所有標準 gemini-X.X-flash-lite 的數字版本號，由新到舊排序
+        const versionedFlashLite = validModels
+          .filter(n => /^gemini-\d+(\.\d+)?-flash-lite$/i.test(n))
+          .sort((a, b) => {
+            const vA = parseFloat(a.match(/gemini-(\d+(?:\.\d+)?)/i)?.[1] || '0');
+            const vB = parseFloat(b.match(/gemini-(\d+(?:\.\d+)?)/i)?.[1] || '0');
+            return vB - vA;
+          });
+
+        // 自動提取高配額 Gemma 27B 系列並按代數由新到舊排序 (例如 gemma-4-27b-it > gemma-3-27b-it)
+        const versionedGemma = validModels
+          .filter(n => /^gemma-\d+-27b-it$/i.test(n))
+          .sort((a, b) => {
+            const vA = parseFloat(a.match(/gemma-(\d+)/i)?.[1] || '0');
+            const vB = parseFloat(b.match(/gemma-(\d+)/i)?.[1] || '0');
+            return vB - vA;
+          });
+
+        const sorted = [];
+        // 1. 置頂官方永久動態別名 + 最新一代標準版 Flash
+        if (validModels.includes('gemini-flash-latest')) sorted.push('gemini-flash-latest');
+        for (const m of versionedFlash) {
+          if (!sorted.includes(m)) sorted.push(m);
+        }
+        // 2. 放入極速輕量動態別名 + 最新一代 Flash-Lite
+        if (validModels.includes('gemini-flash-lite-latest')) sorted.push('gemini-flash-lite-latest');
+        for (const m of versionedFlashLite) {
+          if (!sorted.includes(m)) sorted.push(m);
+        }
+        // 3. 放入高配額 Gemma 大模型備援
+        for (const m of versionedGemma) {
+          if (!sorted.includes(m)) sorted.push(m);
+        }
+
+        if (sorted.length > 0) {
+          availableFastModels = sorted;
+          modelsDiscoveredForKey = cleanKey;
+          try {
+            localStorage.setItem('tp_v15_discovered_models', JSON.stringify({
+              key: cleanKey,
+              ts: Date.now(),
+              models: sorted
+            }));
+          } catch (e) {}
+        }
+        return availableFastModels;
+      } catch (e) {
+        return availableFastModels;
+      }
+    }
+    if (backupKey && modelsDiscoveredForKey !== backupKey) {
+      discoverAuthorizedModels(backupKey);
+    }
+
+    function fetchWithTimeout(url, options = {}, timeoutMs = 8500) {
+      const ctrl = new AbortController();
+      const timer = setTimeout(() => ctrl.abort(), timeoutMs);
+      return fetch(url, { ...options, signal: ctrl.signal }).finally(() => clearTimeout(timer));
+    }
+
+    // 零思考延遲 (thinkingBudget: 0 僅對支援的 Gemini Flash 啟用，Gemma 直接極速直通)
+    async function callSingleGeminiModel(modelName, fullPromptText, activeKey, signal) {
+      const cleanKey = activeKey.replace(/\s+/g, '');
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${encodeURIComponent(cleanKey)}`;
+
+      const isGemma = /gemma/i.test(modelName);
+      const genConfig = isGemma
+        ? { temperature: 0.1, maxOutputTokens: 1200 }
+        : { temperature: 0.1, maxOutputTokens: 1200, thinkingConfig: { thinkingBudget: 0 } };
+
+      let r = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: fullPromptText }] }],
+          generationConfig: genConfig
+        }),
+        signal
+      });
+
+      if (r.status === 400 && !isGemma) {
+        r = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: fullPromptText }] }],
+            generationConfig: { temperature: 0.1, maxOutputTokens: 1200 }
+          }),
+          signal
+        });
+      }
+
+      const d = await r.json();
+      if (!r.ok) {
+        const errMsg = d?.error?.message || `HTTP_${r.status}`;
+        throw new Error(`[${modelName}: ${r.status}] ${errMsg}`);
+      }
+
+      const resParts = d?.candidates?.[0]?.content?.parts || [];
+      const text = resParts
+        .filter(p => !p.thought && typeof p.text === 'string')
+        .map(p => p.text)
+        .join('')
+        .trim();
+
+      if (!text) throw new Error(`[${modelName}] EMPTY_RESPONSE`);
+      return text;
+    }
+
+    async function callKeylessFreeOpenSourceLLM(systemRules, userQuestion) {
+      try {
+        const r = await fetchWithTimeout('https://text.pollinations.ai/openai', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: 'openai-fast',
+            messages: [
+              { role: 'system', content: systemRules },
+              { role: 'user', content: userQuestion }
+            ],
+            temperature: 0.15
+          })
+        }, 8000);
+        if (r.ok) {
+          const d = await r.json();
+          const txt = (d?.choices?.[0]?.message?.content || '').trim();
+          if (txt) return txt;
+        }
+      } catch (e) {}
+      return '';
+    }
+
+    async function fetchFastAccurateAI(systemRules, userQuestion, cacheKeyForCloud = '') {
+      // 0. 若本機持久/動態快取已存在此獨立問題的真 AI 回答，0 毫秒極速返回！
+      if (cacheKeyForCloud && sessionDynamicCache.has(cacheKeyForCloud)) {
+        return { text: sessionDynamicCache.get(cacheKeyForCloud), source: 'Instant Cache', diagError: null, usedPublicPool: false };
+      }
+
+      const modalKeyVal = (document.getElementById('apiKeyInput')?.value || '').trim();
+      const activeKey = (backupKey || modalKeyVal).replace(/\s+/g, '');
+      const fullPromptText = `${systemRules}\n\nUser Question: "${userQuestion}"`;
+
+      const errorLogs = [];
+
+      // 1. 若有個人 Google API Key：優先走個人 Key（預設第一順位為永久動態別名 gemini-flash-latest，0 秒直發不卡頓）
+      if (activeKey) {
+        if (modelsDiscoveredForKey !== activeKey) {
+          discoverAuthorizedModels(activeKey);
+        }
+        const modelsToTry = availableFastModels.slice(0, 3);
+        for (let i = 0; i < modelsToTry.length; i++) {
+          const ctrl = new AbortController();
+          const timer = setTimeout(() => ctrl.abort(), 9500);
+          try {
+            const txt = await callSingleGeminiModel(modelsToTry[i], fullPromptText, activeKey, ctrl.signal);
+            clearTimeout(timer);
+            if (txt) {
+              if (cacheKeyForCloud) saveAnswerToPersistentCache(cacheKeyForCloud, txt);
+              return { text: txt, source: `Google (${modelsToTry[i]})`, diagError: null, usedPublicPool: false };
+            }
+          } catch (e) {
+            clearTimeout(timer);
+            const isTimeout = e && (e.name === 'AbortError' || /aborted/i.test(e.message || ''));
+            const msg = isTimeout ? `[${modelsToTry[i]}: Timeout]` : (e.message || String(e));
+            errorLogs.push(msg);
+            if (/API_KEY_INVALID|key not valid/i.test(msg)) {
+              break;
+            }
+          }
+        }
+      }
+
+      // 2. 走 Cloudflare Worker 全球邊緣免費快取與多 Key 輪詢池
+      for (let i = 0; i < CF_WORKER_ENDPOINTS.length; i++) {
+        try {
+          const r = await fetchWithTimeout(CF_WORKER_ENDPOINTS[i], {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              prompt: fullPromptText,
+              cacheKey: cacheKeyForCloud
+            })
+          }, 16000);
+          const d = await r.json().catch(() => ({}));
+          if (!r.ok) {
+            const detail = d?.detail || d?.error || `HTTP ${r.status}`;
+            errorLogs.push(`[Worker: ${detail}]`);
+            continue;
+          }
+          const t = (d?.text || d?.reply || d?.choices?.[0]?.message?.content || '').trim();
+          if (t) {
+            if (cacheKeyForCloud) saveAnswerToPersistentCache(cacheKeyForCloud, t);
+            const isCacheHit = r.headers.get('X-Cache') === 'HIT';
+            return { text: t, source: 'Cloudflare Global Pool', diagError: null, usedPublicPool: !isCacheHit };
+          }
+        } catch (e) {
+          const isTimeout = e && (e.name === 'AbortError' || /aborted/i.test(e.message || ''));
+          errorLogs.push(isTimeout ? '[Worker: Timeout]' : `[Worker: ${e.message || 'Network/CORS'}]`);
+        }
+      }
+
+      // 3. 免 Key 免費開源大模型直連兜底
+      const freeAiTxt = await callKeylessFreeOpenSourceLLM(systemRules, userQuestion);
+      if (freeAiTxt) {
+        if (cacheKeyForCloud) saveAnswerToPersistentCache(cacheKeyForCloud, freeAiTxt);
+        return { text: freeAiTxt, source: 'Free Open-Source AI Backup', diagError: errorLogs.join(' | '), usedPublicPool: true };
+      }
+
+      return { text: '', source: 'none', diagError: errorLogs.join(' | '), usedPublicPool: true };
+    }
+
+    function cleanChineseSentence(line) {
+      if (!line) return '';
+      let s = expandNumbersAndSymbolsToZh(line)
+        .replace(/^[-*•\d.)、]+\s*/, '')
+        .replace(/\*+/g, '')
+        .replace(/\([^)]*[A-Za-zāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ][^)]*\)/g, '')
+        .replace(/（[^）]*[A-Za-zāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ][^）]*）/g, '')
+        .replace(/[āáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜA-Za-z]{2,}/g, '')
+        .replace(/([，。！？；：、,.!?;:])\s*[，。！？；：、,.!?;:]+/g, '$1')
+        .replace(/^[，。！？；：、,.!?;:\s]+/, '')
+        .replace(/\s+/g, '')
+        .trim();
+      return /[\u4e00-\u9fa5]/.test(s) ? s : '';
+    }
+
+    // 嚴格攔截 AI 的自言自語、思考過程、糾錯解釋
+    function isAIMetaChatterLine(line) {
+      if (!line) return true;
+      const metaPattern = /^(based on context|based on phonetics|based on the|the user input|speech recognition error|phonetic track|intended question|corrected input|user meant|here is the|sure,\s*here|note:|explanation:|analysis:|reasoning:|根據語音|根據上下文|語音識別錯誤|用戶本意|糾正後)/i;
+      if (metaPattern.test(line.trim())) return true;
+      if (/speech recognition error|phonetic disambiguation|homophone typo|acoustic track/i.test(line)) return true;
+      return false;
+    }
+
+    function parseBilingualPairLine(rawLine) {
+      const cleaned = rawLine.replace(/^[-*•\d.)、]+\s*/, '').replace(/\*+/g, '').trim();
+      if (isAIMetaChatterLine(cleaned)) return null;
+
+      let parts = null;
+      if (cleaned.includes('|||')) {
+        parts = cleaned.split('|||').map(p => p.trim()).filter(Boolean);
+      } else if (cleaned.includes('｜｜｜')) {
+        parts = cleaned.split('｜｜｜').map(p => p.trim()).filter(Boolean);
+      } else if (cleaned.includes(' | ')) {
+        parts = cleaned.split(' | ').map(p => p.trim()).filter(Boolean);
+      }
+      if (!parts || parts.length < 2) return null;
+
+      let zhPart = '', enPart = '';
+      if (/[\u4e00-\u9fa5]/.test(parts[0]) && !/[\u4e00-\u9fa5]/.test(parts[1])) {
+        zhPart = cleanChineseSentence(parts[0]) || parts[0];
+        enPart = parts[1];
+      } else if (/[\u4e00-\u9fa5]/.test(parts[1])) {
+        enPart = parts[0];
+        zhPart = cleanChineseSentence(parts[1]) || parts[1];
+      } else {
+        zhPart = cleanChineseSentence(parts[0]) || parts[0];
+        enPart = parts[1];
+      }
+      if (!/[\u4e00-\u9fa5]/.test(zhPart) || isAIMetaChatterLine(enPart) || isAIMetaChatterLine(zhPart)) return null;
+      return { zh: zhPart, en: enPart };
+    }
+
+    async function renderBilingualAIOutput(aiText) {
+      const rawLines = aiText
+        .replace(/```[a-z]*\n?/gi, '')
+        .replace(/```/g, '')
+        .split(/\r?\n+/)
+        .map(l => l.trim())
+        .filter(Boolean);
+      if (rawLines.length === 0) return { ok: false, correctedQuery: '' };
+
+      const seenExactZh = new Set();
+      let renderedPairs = 0;
+      let correctedQuery = '';
+
+      for (let i = 0; i < rawLines.length; i++) {
+        const rawLine = rawLines[i];
+
+        // 若 AI 第一行回傳了 [FIXED_INPUT]: 糾偏後的用戶真實問題，自動更新膠囊輸入框顯示並記住真實意圖
+        const fixedMatch = rawLine.match(/^\[?FIXED_INPUT\]?\s*[:：]\s*(.+)$/i);
+        if (fixedMatch) {
+          correctedQuery = fixedMatch[1].replace(/^["'「『]|["'」』]$/g, '').trim();
+          if (correctedQuery) {
+            const inputEl = document.getElementById('userInput');
+            inputEl.value = correctedQuery;
+            autoResizeTextarea(inputEl);
+          }
+          continue;
+        }
+
+        if (isAIMetaChatterLine(rawLine)) continue;
+
+        const pair = parseBilingualPairLine(rawLine);
+        if (pair) {
+          const key = pair.zh.replace(/[^\u4e00-\u9fa5]/g, '');
+          if (!key || seenExactZh.has(key)) continue;
+          seenExactZh.add(key);
+          renderedPairs++;
+          appendSentenceProgressive(pair.zh, pair.en);
+          continue;
+        }
+
+        const lineStr = rawLine.replace(/^[-*•\d.)、]+\s*/, '').replace(/\*+/g, '').trim();
+        if (!lineStr || isAIMetaChatterLine(lineStr)) continue;
+
+        if (/[\u4e00-\u9fa5]/.test(lineStr)) {
+          const parenMatch = lineStr.match(/^(.+?)\s*[(（]([A-Za-z][^）)]+)[)）]$/);
+          let zhStr = '', enStr = '';
+          if (parenMatch && /[\u4e00-\u9fa5]/.test(parenMatch[1])) {
+            zhStr = cleanChineseSentence(parenMatch[1]) || parenMatch[1].trim();
+            enStr = parenMatch[2].trim();
+          } else {
+            zhStr = cleanChineseSentence(lineStr) || lineStr;
+            if (i + 1 < rawLines.length && !/[\u4e00-\u9fa5]/.test(rawLines[i + 1]) && /[A-Za-z]/.test(rawLines[i + 1]) && !rawLines[i + 1].includes('|||') && !isAIMetaChatterLine(rawLines[i + 1])) {
+              enStr = rawLines[i + 1].replace(/^[-*•\d.)、]+\s*/, '').replace(/\*+/g, '').trim();
+              i++;
+            }
+          }
+          const key = zhStr.replace(/[^\u4e00-\u9fa5]/g, '');
+          if (key && !seenExactZh.has(key)) {
+            seenExactZh.add(key);
+            renderedPairs++;
+            appendSentenceProgressive(zhStr, enStr);
+          }
+        }
+      }
+      return { ok: renderedPairs > 0, correctedQuery };
+    }
+
+    // 防連點與併發請求序號鎖：避免短時間重複送出相同問題或舊請求覆蓋新畫面
+    let activeRequestSeq = 0;
+    let lastSubmittedQuery = '';
+    let lastSubmittedTime = 0;
+
+    async function runSmartAI(overrideInput, voiceAlts = [], fromVoice = false) {
+      const q = (overrideInput !== undefined ? overrideInput : document.getElementById('userInput').value).trim();
+      const altsToUse = (Array.isArray(voiceAlts) && voiceAlts.length > 0) ? voiceAlts : latestVoiceCandidates;
+      if (!q) return;
+
+      // 800ms 內對完全相同問題的連點直接攔截，防止誤觸消耗雙倍配額
+      const now = Date.now();
+      if (q === lastSubmittedQuery && (now - lastSubmittedTime < 800)) {
+        return;
+      }
+      lastSubmittedQuery = q;
+      lastSubmittedTime = now;
+
+      const currentSeq = ++activeRequestSeq;
+
+      const inputEl = document.getElementById('userInput');
+      inputEl.value = q;
+      autoResizeTextarea(inputEl);
+
+      const limitBox = document.getElementById('apiLimitBox');
+      limitBox.style.display = 'none';
+
+      if (checkAndRemindProfanity(q)) {
+        return;
+      }
+
+      const banner = document.getElementById('statusBanner');
+      const list = document.getElementById('annotationList');
+      banner.className = 'status-banner';
+      banner.style.display = 'block';
+      banner.innerText = (spokenLang === 'en') ? '⚡ AI Thinking...' : '⚡ AI 正在思考...';
+      list.innerHTML = '';
+
+      const memoryContext = buildMemoryContextString();
+
+      const acousticInfo = `[Speech Recognition Data] Selected Mode: ${spokenLang === 'en' ? 'EN' : '中文'} | Raw Transcript: "${q}" | ${getPhoneticTrackForAI(q)} | Alternative Speech Candidates: ${JSON.stringify(altsToUse)}`;
+
+      const systemRules = [
+        'You are a crisp, authoritative bilingual Mandarin scholar and AI assistant.',
+        memoryContext,
+        acousticInfo,
+        '',
+        'STRICT EXECUTION RULES (FOLLOW EXACTLY):',
+        '1. SILENT PHONETIC & CONTEXT CORRECTION (NO META-CHATTER!):',
+        '   - Speech recognition often produces homophone errors (e.g., "永和/泳鵝"->"詠鵝", "今夜思"->"靜夜思", "禮拜"->"李白", "路窄"->"鹿柴", "春笑"->"春曉", "敏農"->"憫農", or English phonetic words like "jing yes"->"靜夜思").',
+        '   - Combine the Recent Conversation History + Acoustic Pinyin Track + Candidates to silently deduce what the user REALLY meant.',
+        '   - NEVER output explanations like "Based on context and phonetics..." or "The user input is a speech recognition error"! ZERO meta-commentary!',
+        '   - If the raw transcript had a speech recognition typo, output ONLY this tag on the very first line: [FIXED_INPUT]: Corrected_Question_Text',
+        '2. POEMS, SONGS & CLASSICS (COMPLETE & PURE):',
+        '   - When the user asks for ANY poem, classic, or lyric (or follows up asking for another poem by the same poet), output ONLY:',
+        '     Line 1: 《詩詞名稱》朝代・作者 ||| English Title by Author',
+        '     Line 2+: Every single verse of the FULL original text in exact order (一字不漏、完整全篇), one verse per line.',
+        '   - DO NOT include background intro, appreciation, analysis, or extra chatter!',
+        '3. GENERAL QUESTIONS & FOLLOW-UPS (CRISP & CONCISE):',
+        '   - Use Recent Conversation History to resolve pronouns ("他", "這首", "第二句", "還有嗎", "why", "another one", "what does it mean").',
+        '   - Answer directly and concisely in 1 to 3 crisp sentences. No filler or pleasantries.',
+        '4. STRICT BILINGUAL LINE FORMAT:',
+        '   - Every content line MUST use "|||":',
+        '     Pure_Traditional_Chinese ||| Authentic_English',
+        '   - Left side of "|||" must contain ONLY Traditional Chinese characters and Chinese punctuation (write numbers in Chinese characters; NO Pinyin or English letters on the left side).'
+      ].filter(Boolean).join('\n');
+
+      // 只要處於連續對話中 (conversationHistory.length > 0) 或帶有語音候選詞，強制結合上下文即時推理，不走靜態快取避免答非所問
+      const cloudCacheKey = (conversationHistory.length === 0 && !fromVoice) ? normalizeCloudCacheKey(q) : '';
+      const { text: aiText, source, diagError, usedPublicPool } = await fetchFastAccurateAI(systemRules, q, cloudCacheKey);
+
+      // 若在等待期間用戶又發起了新問題，直接丟棄舊結果，防止畫面閃爍或句子疊加
+      if (currentSeq !== activeRequestSeq) return;
+
+      if (aiText) {
+        const { ok, correctedQuery } = await renderBilingualAIOutput(aiText);
+        if (ok) {
+          // 若語音糾偏出了標準問題（如「泳鵝」->「詠鵝」），同時把標準問題寫入本地持久快取
+          if (correctedQuery && conversationHistory.length === 0) {
+            saveAnswerToPersistentCache(normalizeCloudCacheKey(correctedQuery), aiText);
+          }
+          pushConversationMemory(correctedQuery || q, aiText);
+          if (backupKey && diagError) {
+            banner.className = 'status-banner diag-info';
+            banner.style.display = 'block';
+            banner.innerText = `ℹ️ Answered via ${source} (Google Key Note: ${diagError.slice(0, 140)})`;
+          } else {
+            banner.style.display = 'none';
+          }
+          if (!backupKey && usedPublicPool) {
+            const pubCount = getAndIncrementPublicUsage();
+            if (pubCount >= FREE_PUBLIC_REMINDER_THRESHOLD) {
+              limitBox.style.display = 'block';
+            }
+          }
+          return;
+        }
+      }
+
+      // 4. 當所有 AI 通道皆無法連線時，給出原句雙語注音保底，並顯示具體診斷信息與 API Limit 提示框
+      const hasZh = /[\u4e00-\u9fa5]/.test(q);
+      if (hasZh) {
+        const enTrans = await translateFastFallback(q, 'zh', 'en');
+        if (currentSeq !== activeRequestSeq) return;
+        appendSentenceProgressive(q, enTrans);
+      } else {
+        const zhTrans = await translateFastFallback(q, 'en', 'zh');
+        if (currentSeq !== activeRequestSeq) return;
+        appendSentenceProgressive(zhTrans, q);
+      }
+
+      if (diagError) {
+        banner.className = 'status-banner friendly-reminder';
+        banner.style.display = 'block';
+        banner.innerText = `🔍 API 診斷信息 (Diagnostic): ${diagError.slice(0, 180)}`;
+      } else {
+        banner.style.display = 'none';
+      }
+      limitBox.style.display = 'block';
+    }
+
+    function openKeyModal() {
+      document.getElementById('apiKeyInput').value = backupKey;
+      const st = document.getElementById('keyTestStatus');
+      st.style.display = 'none';
+      document.getElementById('keyModal').style.display = 'flex';
+    }
+
+    async function saveBackupKey() {
+      const rawVal = (document.getElementById('apiKeyInput').value || '').replace(/\s+/g, '');
+      const st = document.getElementById('keyTestStatus');
+      st.style.display = 'block';
+
+      if (!rawVal) {
+        clearBackupKey();
+        st.innerText = 'Cleared.';
+        return;
+      }
+
+      st.style.color = '#1e40af';
+      st.innerText = '🔍 Verifying Key with Google AI Studio...';
+
+      backupKey = rawVal;
+      modelsDiscoveredForKey = ''; // 強制重新驗證新 Key
+      try {
+        localStorage.setItem('tp_v22_backup_key', backupKey);
+        localStorage.setItem('tp_test_gemini_key', backupKey);
+      } catch (e) {}
+      refreshKeyBtnStyle();
+
+      const models = await discoverAuthorizedModels(backupKey);
+      if (modelsDiscoveredForKey === backupKey && models.length > 0) {
+        st.style.color = '#166534';
+        st.innerText = `✅ Key Verified! Active models: ${models.slice(0, 3).join(', ')}`;
+        setTimeout(() => {
+          document.getElementById('keyModal').style.display = 'none';
+          const pendingQ = document.getElementById('userInput').value.trim();
+          if (pendingQ) runSmartAI(pendingQ);
+        }, 600);
+      } else {
+        st.style.color = '#b91c1c';
+        st.innerText = '⚠️ Could not verify key (check if key is valid or network blocks googleapis.com).';
+      }
+    }
+
+    function clearBackupKey() {
+      backupKey = '';
+      modelsDiscoveredForKey = '';
+      try {
+        localStorage.removeItem('tp_v22_backup_key');
+        localStorage.removeItem('tp_test_gemini_key');
+        localStorage.removeItem('tp_v15_discovered_models');
+      } catch (e) {}
+      document.getElementById('apiKeyInput').value = '';
+      document.getElementById('keyTestStatus').style.display = 'none';
+      refreshKeyBtnStyle();
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      try {
+        const savedLang = localStorage.getItem('tp_spoken_lang');
+        if (savedLang === 'zh' || savedLang === 'en') setVoiceLangMode(savedLang);
+      } catch (e) {}
+      appendSentenceProgressive('請問你想向人工智慧提問什麼問題？', 'What question would you like to ask AI today?');
+    });
+  </script>
+</body>
+</html>
