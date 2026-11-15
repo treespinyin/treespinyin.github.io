@@ -231,7 +231,7 @@
   let azWaitResolve = null;
   let usedWorkerToken = false;
 
-  // F0 Pitch Contour Tracker (Physical Tone Detector used by commercial language apps)
+  // F0 Pitch Contour Tracker
   let pitchAudioCtx = null;
   let pitchStream = null;
   let pitchTimer = null;
@@ -316,6 +316,13 @@
           <div class="tp-py">${pyDisp[i] || ''}</div>
         </div>`);
     });
+
+    // Allow flexible sandhi for chains of Tone 3 (e.g. "我买了一把" -> "我" can be read as Tone 2 or Tone 3)
+    for (let i = 0; i < targets.length - 1; i++) {
+      if (targets[i].origTone === 3 && targets[i + 1].origTone === 3) {
+        targets[i].allowTone2 = true;
+      }
+    }
   }
 
   function speakDemo() {
@@ -339,16 +346,15 @@
   }
 
   // ============================================================================
-  // PHYSICAL F0 PITCH TRACKER (Autocorrelation algorithm to measure vocal cord Hz)
+  // PHYSICAL F0 PITCH TRACKER (Calibrated to avoid false alarms on native speech)
   // ============================================================================
   function detectPitchHz(buf, sampleRate) {
     let size = buf.length;
     let rms = 0;
     for (let i = 0; i < size; i++) rms += buf[i] * buf[i];
     rms = Math.sqrt(rms / size);
-    if (rms < 0.012) return { f0: -1, rms }; // Silence
+    if (rms < 0.015) return { f0: -1, rms };
 
-    // Restrict search to human fundamental frequency range (75 Hz to 420 Hz)
     const minLag = Math.floor(sampleRate / 420);
     const maxLag = Math.floor(sampleRate / 75);
     let bestLag = -1;
@@ -396,23 +402,15 @@
     if (pitchAudioCtx) { pitchAudioCtx.close().catch(()=>{}); pitchAudioCtx = null; }
   }
 
-  // Classify physical F0 pitch contour for a specific character slot into Tone 1, 2, 3, or 4
   function classifyPhysicalTone(charIdx, totalChars, wordOffsetMs, wordDurationMs) {
-    if (pitchFrames.length < 6) return null;
+    // Only use physical F0 when Azure provides accurate word timing (no blind array slicing)
+    if (pitchFrames.length < 6 || !wordDurationMs || wordDurationMs <= 0) return null;
 
-    let slice = [];
-    // If Azure provided exact word timing, use it; otherwise divide voiced frames proportionally
-    if (wordDurationMs > 0) {
-      slice = pitchFrames.filter(f => f.t >= wordOffsetMs - 60 && f.t <= wordOffsetMs + wordDurationMs + 60);
-    }
-    if (slice.length < 3) {
-      const startIdx = Math.floor((charIdx / totalChars) * pitchFrames.length);
-      const endIdx = Math.max(startIdx + 2, Math.floor(((charIdx + 1) / totalChars) * pitchFrames.length));
-      slice = pitchFrames.slice(startIdx, endIdx);
-    }
+    // Trim edges slightly instead of expanding by 60ms, preventing neighbor syllable bleed
+    const pad = Math.min(25, wordDurationMs * 0.15);
+    const slice = pitchFrames.filter(f => f.t >= wordOffsetMs + pad && f.t <= wordOffsetMs + wordDurationMs - pad);
     if (slice.length < 3) return null;
 
-    // Global speaker pitch range (in semitones relative to 100Hz)
     const toSemi = hz => 12 * Math.log2(hz / 100);
     const allSemis = pitchFrames.map(f => toSemi(f.f0));
     const speakerMean = allSemis.reduce((a, b) => a + b, 0) / allSemis.length;
@@ -427,17 +425,19 @@
     const minVal = Math.min(...semis);
     const maxVal = Math.max(...semis);
 
-    const delta = avgSecond - avgFirst; // Semitone slope from start to end of syllable
+    const delta = avgSecond - avgFirst;
     const spread = maxVal - minVal;
 
-    // 1. Sharp falling pitch (Slope < -1.3 semitones) -> Tone 4 (ˋ)
-    if (delta < -1.3) return 4;
-    // 2. Clear rising pitch (Slope > +1.1 semitones) -> Tone 2 (ˊ)
-    if (delta > 1.1) return 2;
-    // 3. Flat & High/Mid pitch (Spread < 1.8 semitones and above low register) -> Tone 1 (ˉ)
-    if (Math.abs(delta) <= 1.1 && spread < 2.0 && meanVal >= speakerMean - 0.8) return 1;
-    // 4. Low dipping register -> Tone 3 (ˇ)
-    return 3;
+    // 1. Sharp high-falling pitch -> Tone 4 (Requires starting above low register so half-Tone 3 isn't misjudged as Tone 4)
+    if (delta < -1.8 && avgFirst >= speakerMean - 0.5) return 4;
+    // 2. Clear rising pitch -> Tone 2
+    if (delta > 1.35) return 2;
+    // 3. Flat & clearly High pitch -> Tone 1 (Catches Western flat monotone on Tone 2/3/4)
+    if (Math.abs(delta) <= 0.85 && spread < 1.5 && meanVal >= speakerMean + 0.3) return 1;
+    // 4. Low dipping register -> Tone 3
+    if (meanVal <= speakerMean - 0.8) return 3;
+
+    return null;
   }
 
   async function getAzureSpeechConfig() {
@@ -484,8 +484,6 @@
       webSr = null;
     }
 
-    // CRITICAL FIX: Wait up to 1.2s until ALL characters in the sentence have arrived from Azure
-    // (Prevents cutting off the second half of the sentence like "雨伞"!)
     const countValidAz = () => pronWords.filter(w => /[\u4e00-\u9fa5]/.test(w.Word) && w.PronunciationAssessment?.ErrorType !== 'Insertion').length;
     if (azRecognizer && countValidAz() < targets.length) {
       await Promise.race([
@@ -526,7 +524,6 @@
     btn.textContent = '⏹ Stop & Score';
     setMsg('🎙️ Listening... Speak naturally in Chinese.');
 
-    // Start local F0 pitch tracker
     startPitchTracker();
 
     // 1. Start Browser Native Blind Listener
@@ -615,17 +612,14 @@
         if (topMatch) {
           detectedSpokenTone = parseInt(topMatch[1], 10) % 5;
         }
-        // Scan NBest candidates if score < 92 to catch deliberate tone errors
-        if ((detectedSpokenTone === targetObj.tone || detectedSpokenTone === targetObj.origTone) && pAcc < 92 && nbest.length > 1) {
-          for (let k = 1; k < nbest.length; k++) {
-            const cand = (nbest[k].Phoneme || '').trim();
-            const m = cand.match(/([1-5])\s*$/);
-            if (m) {
-              const altTone = parseInt(m[1], 10) % 5;
-              if (altTone !== targetObj.tone && altTone !== targetObj.origTone && altTone !== 0) {
-                detectedSpokenTone = altTone;
-                break;
-              }
+        // Calibrated from < 92 down to < 76, and only check the immediate 2nd runner-up (nbest[1])
+        if ((detectedSpokenTone === targetObj.tone || detectedSpokenTone === targetObj.origTone) && pAcc < 76 && nbest.length > 1) {
+          const cand = (nbest[1].Phoneme || '').trim();
+          const m = cand.match(/([1-5])\s*$/);
+          if (m) {
+            const altTone = parseInt(m[1], 10) % 5;
+            if (altTone !== targetObj.tone && altTone !== targetObj.origTone && altTone !== 0) {
+              detectedSpokenTone = altTone;
             }
           }
         }
@@ -688,7 +682,7 @@
         }
       }
 
-      // 1. Read the wrong word / wrong syllable (e.g. "我 wo" read as "他 ta") -> RED (no arrow)
+      // 1. Read the wrong word / wrong syllable -> RED (no arrow)
       if (!blindMatch) {
         if (cursor < blindChars.length && blindChars.length >= targets.length) cursor++;
         setLight(i, 'bad', null, null);
@@ -708,30 +702,29 @@
         return;
       }
 
-      // 3. Triple-Check Tone Detection (Blind Ear Homophone + Azure Phoneme + Physical F0 Pitch Contour)
+      // 3. Calibrated Tone Detection
       let wrongSpokenTone = null;
-      const isToneAcceptable = (toneVal) => (toneVal === t.tone || toneVal === t.origTone);
+      const isToneAcceptable = (toneVal) => (
+        toneVal === t.tone ||
+        toneVal === t.origTone ||
+        (t.allowTone2 && toneVal === 2)
+      );
 
       // Check A: Did the Blind Listener hear a different character with a different tone? (e.g. 买3 -> 卖4)
       if (!heardExactChar && !isToneAcceptable(blindMatch.tone)) {
         wrongSpokenTone = blindMatch.tone;
       }
-      // Check B: Did Azure NBestPhonemes explicitly detect a different tone?
+      // Check B: Did Azure explicitly detect a different spoken tone?
       else if (azInfo && !azInfo.omitted && azInfo.detectedSpokenTone !== null && !isToneAcceptable(azInfo.detectedSpokenTone)) {
         wrongSpokenTone = azInfo.detectedSpokenTone;
       }
-      // Check C: Did the Physical F0 Pitch Contour detector catch a Western flat (Tone 1) or falling (Tone 4) pitch on a Tone 2/3 character?
-      else if (physicalTone !== null && !isToneAcceptable(physicalTone)) {
-        // Especially strict when a Tone 2 or Tone 3 character (like 雨伞) is read as flat Tone 1 or falling Tone 4!
+      // Check C: Physical F0 Pitch Contour check (Only triggers when Azure vowel score isn't already high < 88, preventing false alarms on native half-Tone 3)
+      else if (physicalTone !== null && !isToneAcceptable(physicalTone) && (!azInfo || azInfo.vowelScore < 88)) {
         if ((t.origTone === 3 || t.tone === 2 || t.tone === 3) && (physicalTone === 1 || physicalTone === 4)) {
           wrongSpokenTone = physicalTone;
-        } else if (t.tone === 4 && (physicalTone === 1 || physicalTone === 2 || physicalTone === 3)) {
+        } else if (t.tone === 4 && (physicalTone === 1 || physicalTone === 2)) {
           wrongSpokenTone = physicalTone;
         }
-      }
-      // Check D: Azure acoustic vowel score dropped (< 82)
-      else if (azInfo && !azInfo.omitted && (azInfo.vowelScore < 82 || azInfo.wordAcc < 80)) {
-        wrongSpokenTone = physicalTone || '?';
       }
 
       // Subcase 3A: MISLEADING TONE ERROR (Changed the word heard by Chinese listener) -> RED + Wrong→Correct
@@ -741,9 +734,8 @@
         return;
       }
 
-      // Subcase 3B: TONE ERROR, STILL UNDERSTOOD (e.g., 雨伞 read as Tone 1 + Tone 4, context understood) -> YELLOW + Wrong→Correct
+      // Subcase 3B: TONE ERROR, STILL UNDERSTOOD -> YELLOW + Wrong→Correct
       if (wrongSpokenTone !== null) {
-        // Display original dictionary tone as target if user missed sandhi/original tone (e.g., 1→3, 4→3)
         setLight(i, 'warn', wrongSpokenTone, t.origTone);
         totalPoints += 0.8;
         return;
