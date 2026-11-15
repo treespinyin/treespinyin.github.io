@@ -645,7 +645,110 @@
     .tp-item.bad .tp-tag { visibility: visible; color: #b91c1c; }
     .tp-item.bad .tp-py-sub { color: #b91c1c; }
 
-    .tp-btns { display: flex; justify-content: center; gap: 12px; }
+    .tp-nav-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+    .tp-nav-btn {
+      padding: 8px 14px;
+      border-radius: 10px;
+      border: 1px solid #cbd5e1;
+      background: #f8fafc;
+      color: #1e293b;
+      font-size: 13.5px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+    .tp-nav-btn:hover:not(:disabled) {
+      background: #e8f5e9;
+      border-color: #1b5e20;
+      color: #1b5e20;
+    }
+    .tp-nav-btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+    .tp-nav-badge {
+      padding: 6px 12px;
+      border-radius: 99px;
+      background: #e8f5e9;
+      color: #1b5e20;
+      font-size: 13px;
+      font-weight: 800;
+      white-space: nowrap;
+      border: 1px solid #c8e6c9;
+    }
+    .sentence-block.active-coach-sentence {
+      border-left: 4px solid #1b5e20;
+      padding-left: 10px;
+      background: #f8fdf9;
+      border-radius: 8px;
+    }
+    .tp-btns { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+    .tp-video-dock {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      margin-top: 14px;
+      padding: 14px;
+      background: #0f172a;
+      border-radius: 16px;
+      color: #fff;
+      border: 2px solid #334155;
+    }
+    .tp-video-dock.active { display: flex; }
+    .tp-video-top-bar {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      background: rgba(255,255,255,0.08);
+      padding: 8px 12px;
+      border-radius: 10px;
+    }
+    .tp-cam-preview-wrap {
+      position: relative;
+      background: #000;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 2px solid #1b5e20;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .tp-cam-preview-wrap.ratio-9-16 {
+      width: min(86vw, 280px);
+      height: min(48vh, 240px);
+    }
+    .tp-cam-preview-wrap.ratio-16-9 {
+      width: min(88vw, 480px);
+      height: min(42vh, 250px);
+    }
+    .tp-cam-preview-wrap video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: scaleX(-1);
+    }
+    .tp-video-controls {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
     .tp-btn {
       padding: 10px 24px;
       border-radius: 99px;
@@ -1096,13 +1199,55 @@
           </div>
         </div>
 
-        <input id="sentenceInput" class="tp-input" value="你好，我买了一把雨伞。" oninput="renderStage()" />
+        <div class="tp-nav-bar">
+          <button class="tp-nav-btn" id="coachPrevBtn" onclick="stepCoachSentence(-1)" title="Previous Sentence">⏮ Prev</button>
+          <span class="tp-nav-badge" id="coachSentenceCounter">1 / 1</span>
+          <input id="sentenceInput" class="tp-input" style="flex:1; min-width:180px;" value="你好，我买了一把雨伞。" oninput="renderStage()" />
+          <button class="tp-nav-btn" id="coachNextBtn" onclick="stepCoachSentence(1)" title="Next Sentence">⏭ Next Sentence</button>
+        </div>
 
         <div class="tp-stage" id="stage"></div>
 
         <div class="tp-btns">
           <button class="tp-btn" onclick="speakDemo()">🔊 Listen Demo</button>
           <button class="tp-btn tp-btn-rec" id="recBtn" onclick="toggleRecord()">🎤 Start Speaking</button>
+          <button class="tp-btn" id="tpCamToggleBtn" onclick="toggleToneCoachVideoDock()" style="border-color:#1b5e20; color:#1b5e20;">🎬 Video Record</button>
+        </div>
+
+        <!-- 🎬 Tone Coach 內嵌同步錄影工坊 (支援 9:16 / 16:9 + 1080p MP4 + 完整錄下朗讀與紅綠燈打分過程) -->
+        <div class="tp-video-dock" id="tpVideoDock">
+          <div class="tp-video-top-bar">
+            <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+              <select id="tpVideoRatioSelect" class="studio-select" onchange="setTpVideoRatio(this.value)">
+                <option value="9-16" selected>📱 9:16</option>
+                <option value="16-9">🎬 16:9</option>
+              </select>
+              <select id="tpVideoQualitySelect" class="studio-select" title="Resolution">
+                <option value="1080" selected>🌟 1080p HD</option>
+                <option value="720">⚖️ 720p HD</option>
+                <option value="480">⚡ 480p Compact</option>
+              </select>
+            </div>
+            <div style="display:flex; align-items:center; gap:6px;">
+              <button class="studio-mode-pill active" id="tpViewBtnSplit" onclick="setTpVideoViewMode('split')">🌗 Split</button>
+              <button class="studio-mode-pill" id="tpViewBtnScore" onclick="setTpVideoViewMode('score')">📄 Score</button>
+              <button class="studio-mode-pill" id="tpViewBtnCam" onclick="setTpVideoViewMode('cam')">🧑 Cam</button>
+            </div>
+            <button class="studio-mode-pill" style="background:#d32f2f; border-color:#ef5350;" onclick="closeToneCoachVideoDock()">✕</button>
+          </div>
+
+          <div id="tpCamPreviewWrap" class="tp-cam-preview-wrap ratio-9-16">
+            <video id="tpCoachCamVideo" autoplay playsinline muted></video>
+          </div>
+
+          <div class="tp-video-controls">
+            <span id="tpVideoTimerBadge" style="font-family:monospace; font-size:0.92rem; font-weight:800; background:#1e293b; padding:6px 10px; border-radius:8px;">⏺️ 00:00</span>
+            <button class="btn btn-green" id="tpVideoRecBtn" style="flex:unset; padding:8px 16px;" onclick="toggleTpCoachVideoRecording()">🔴 Record Video</button>
+            <a id="tpVideoDownloadLink" class="btn btn-blue hidden" style="flex:unset; padding:8px 16px; text-decoration:none;" download="trees-pinyin-tone-score.mp4">💾 Save MP4</a>
+          </div>
+          <div style="font-size:12px; color:#cbd5e1; text-align:center;">
+            💡 Tip: Click <b>🎤 Start Speaking</b> to auto-record both your reading & final score, or click <b>🔴 Record Video</b> to record multiple sentences continuously!
+          </div>
         </div>
 
         <div class="tp-msg" id="msgBox">Click "Start Speaking", read the sentence, and click Stop to score.</div>
@@ -1446,6 +1591,11 @@
         el.dataset.raw = raw;
         el.innerText = convertScript(raw, currentScriptMode);
       });
+      const sInput = document.getElementById('sentenceInput');
+      if (sInput && sInput.value) {
+        sInput.value = convertScript(sInput.value, currentScriptMode);
+        renderStage();
+      }
       renderMnemonicsPack();
     }
 
@@ -2671,6 +2821,7 @@
 
     function appendSentenceProgressive(rawZhText, enTranslation = '', targetContainerId = 'annotationList') {
       const list = document.getElementById(targetContainerId);
+      const isFirstBlockInList = (targetContainerId === 'annotationList' && list && list.children.length === 0);
       const block = document.createElement('div');
       block.className = 'sentence-block';
 
@@ -2678,15 +2829,6 @@
       const tradZh = convertScript(expandedZh, 'trad');
       block.dataset.zh = tradZh;
       block.dataset.en = enTranslation;
-
-      // 同步更新到下方語音打分輸入框
-      if (targetContainerId === 'annotationList') {
-        const sInput = document.getElementById('sentenceInput');
-        if (sInput) {
-          sInput.value = convertScript(tradZh, currentScriptMode);
-          renderStage();
-        }
-      }
 
       const enDiv = document.createElement('div');
       enDiv.className = 'en-line';
@@ -2729,10 +2871,17 @@
       block.appendChild(charRow);
       list.appendChild(block);
 
+      if (targetContainerId === 'annotationList') {
+        registerBlockForToneCoach(block, tradZh, enTranslation, isFirstBlockInList);
+      }
+
       if (!hasLockedEn) {
         translateFastFallback(tradZh, 'zh', 'en').then(en => {
           enDiv.innerText = en;
           block.dataset.en = en;
+          if (targetContainerId === 'annotationList') {
+            updateBlockEnInToneCoach(block, en);
+          }
         });
       }
       return block;
@@ -3704,6 +3853,16 @@ Chinese_Sentence ||| English_Sentence`;
 
       btn.textContent = '🎤 Start Speaking';
       evaluateAll();
+
+      // 若是點擊「🎤 Start Speaking」自動觸發的同步錄影，等待 2.2 秒將紅黃綠燈打分結果與翻譯完整錄入 MP4 後自動停止
+      if (tpAutoVideoTriggered && tpCoachRecorder && tpCoachRecorder.state === 'recording') {
+        tpAutoVideoTriggered = false;
+        setTimeout(() => {
+          if (tpCoachRecorder && tpCoachRecorder.state === 'recording') {
+            tpCoachRecorder.stop();
+          }
+        }, 2200);
+      }
     }
 
     async function toggleRecord() {
@@ -3715,6 +3874,13 @@ Chinese_Sentence ||| English_Sentence`;
       if (!hasKey() && getUsed() >= DAILY_LIMIT) {
         document.getElementById('byokBox').classList.add('open');
         return setMsg('⚠️ Daily free limit (2/2) reached. Please add your own Azure Key or support us!');
+      }
+
+      // 若已打開錄影面板且尚未手動開錄，點擊 Start Speaking 即自動同步啟動 MP4 錄影
+      const dock = document.getElementById('tpVideoDock');
+      if (dock && dock.classList.contains('active') && (!tpCoachRecorder || tpCoachRecorder.state !== 'recording')) {
+        tpAutoVideoTriggered = true;
+        startTpCoachVideoRecording();
       }
 
       renderStage();
@@ -3991,6 +4157,438 @@ Chinese_Sentence ||| English_Sentence`;
     }
 
     function setMsg(t) { document.getElementById('msgBox').innerHTML = t; }
+
+    // =========================================================================
+    // 7.6 ⏭ Tone Coach 逐句切分與「上一句 / 下一句」聯動控制器
+    // =========================================================================
+    let coachSentences = []; // [{ zhTrad, en, blockEl }]
+    let coachCurrentIdx = 0;
+
+    function splitTextIntoCoachClauses(tradZh) {
+      if (!tradZh) return [];
+      const rawSentences = tradZh
+        .split(/(?<=[。！？!?；;\n])/)
+        .map(s => s.trim())
+        .filter(s => /[\u4e00-\u9fa5]/.test(s));
+
+      const result = [];
+      for (const sent of rawSentences) {
+        const hanziCount = (sent.match(/[\u4e00-\u9fa5]/g) || []).length;
+        if (hanziCount > 24 && /[，,]/.test(sent)) {
+          const clauses = sent.split(/(?<=[，,])/).map(c => c.trim()).filter(c => /[\u4e00-\u9fa5]/.test(c));
+          let buf = '';
+          for (const c of clauses) {
+            if ((buf + c).length <= 22) {
+              buf += c;
+            } else {
+              if (buf) result.push(buf);
+              buf = c;
+            }
+          }
+          if (buf) result.push(buf);
+        } else {
+          result.push(sent);
+        }
+      }
+      return result.length > 0 ? result : (/[\u4e00-\u9fa5]/.test(tradZh) ? [tradZh] : []);
+    }
+
+    function registerBlockForToneCoach(blockEl, tradZh, enText, resetQueue) {
+      if (resetQueue) {
+        coachSentences = [];
+        coachCurrentIdx = 0;
+      }
+      const wasEmpty = (coachSentences.length === 0);
+      const clauses = splitTextIntoCoachClauses(tradZh);
+      const firstIndexForBlock = coachSentences.length;
+
+      clauses.forEach(clause => {
+        coachSentences.push({
+          zhTrad: clause,
+          en: enText || '',
+          blockEl: blockEl
+        });
+      });
+
+      // 點擊上方句子卡片背景或英文行可立即切入該句打分
+      blockEl.addEventListener('click', (e) => {
+        if (e.target.closest('.tp-col') || e.target.isContentEditable) return;
+        loadCoachSentenceAt(firstIndexForBlock);
+      });
+
+      if (wasEmpty && coachSentences.length > 0) {
+        loadCoachSentenceAt(0);
+      } else {
+        updateCoachNavUI();
+      }
+    }
+
+    function updateBlockEnInToneCoach(blockEl, enText) {
+      coachSentences.forEach(item => {
+        if (item.blockEl === blockEl) item.en = enText;
+      });
+    }
+
+    function loadCoachSentenceAt(idx) {
+      if (!coachSentences.length) {
+        updateCoachNavUI();
+        return;
+      }
+      coachCurrentIdx = Math.max(0, Math.min(coachSentences.length - 1, idx));
+      const item = coachSentences[coachCurrentIdx];
+      const sInput = document.getElementById('sentenceInput');
+      if (sInput && item) {
+        sInput.value = convertScript(item.zhTrad, currentScriptMode);
+        renderStage();
+        setMsg('Click "Start Speaking", read the sentence, and click Stop to score.');
+      }
+      document.querySelectorAll('#annotationList .sentence-block').forEach(b => {
+        b.classList.toggle('active-coach-sentence', item && b === item.blockEl);
+      });
+      updateCoachNavUI();
+    }
+
+    function stepCoachSentence(delta) {
+      if (!coachSentences.length) return;
+      const nextIdx = coachCurrentIdx + delta;
+      if (nextIdx >= 0 && nextIdx < coachSentences.length) {
+        loadCoachSentenceAt(nextIdx);
+      }
+    }
+
+    function updateCoachNavUI() {
+      const total = Math.max(1, coachSentences.length);
+      const curr = coachSentences.length ? (coachCurrentIdx + 1) : 1;
+      const badge = document.getElementById('coachSentenceCounter');
+      const prevBtn = document.getElementById('coachPrevBtn');
+      const nextBtn = document.getElementById('coachNextBtn');
+      if (badge) badge.textContent = `${curr} / ${total}`;
+      if (prevBtn) prevBtn.disabled = (coachCurrentIdx <= 0 || coachSentences.length <= 1);
+      if (nextBtn) nextBtn.disabled = (coachCurrentIdx >= coachSentences.length - 1 || coachSentences.length <= 1);
+    }
+
+    // =========================================================================
+    // 7.7 🎬 Tone Coach 同步打分錄像引擎 (支援 9:16 & 16:9 / 1080p MP4)
+    // =========================================================================
+    let tpCoachStream = null;
+    let tpCoachRecorder = null;
+    let tpCoachChunks = [];
+    let tpCoachTimerInterval = null;
+    let tpCoachSeconds = 0;
+    let tpCoachRatio = '9-16';
+    let tpCoachViewMode = 'split';
+    let tpCoachCanvas = null;
+    let tpCoachAnimId = null;
+    let tpCoachAudioCtx = null;
+    let tpCoachAudioDest = null;
+    let tpAutoVideoTriggered = false;
+
+    async function toggleToneCoachVideoDock() {
+      const dock = document.getElementById('tpVideoDock');
+      if (!dock) return;
+      if (dock.classList.contains('active')) {
+        closeToneCoachVideoDock();
+        return;
+      }
+      dock.classList.add('active');
+      setTpVideoRatio(document.getElementById('tpVideoRatioSelect').value || '9-16');
+      const camVideo = document.getElementById('tpCoachCamVideo');
+      try {
+        tpCoachStream = await getBuiltInComputerStream();
+        camVideo.srcObject = tpCoachStream;
+      } catch (e) {
+        tpCoachStream = null;
+      }
+    }
+
+    function closeToneCoachVideoDock() {
+      if (tpCoachRecorder && tpCoachRecorder.state === 'recording') {
+        tpCoachRecorder.stop();
+      }
+      cancelAnimationFrame(tpCoachAnimId);
+      clearInterval(tpCoachTimerInterval);
+      if (tpCoachStream) {
+        tpCoachStream.getTracks().forEach(t => t.stop());
+        tpCoachStream = null;
+      }
+      if (tpCoachAudioCtx) {
+        try { tpCoachAudioCtx.close(); } catch (e) {}
+        tpCoachAudioCtx = null;
+      }
+      document.getElementById('tpVideoDock').classList.remove('active');
+    }
+
+    function setTpVideoRatio(ratio) {
+      tpCoachRatio = (ratio === '16-9') ? '16-9' : '9-16';
+      const wrap = document.getElementById('tpCamPreviewWrap');
+      if (!wrap) return;
+      wrap.classList.remove('ratio-9-16', 'ratio-16-9');
+      wrap.classList.add(`ratio-${tpCoachRatio}`);
+    }
+
+    function setTpVideoViewMode(mode) {
+      tpCoachViewMode = mode;
+      document.getElementById('tpViewBtnSplit').classList.toggle('active', mode === 'split');
+      document.getElementById('tpViewBtnScore').classList.toggle('active', mode === 'score');
+      document.getElementById('tpViewBtnCam').classList.toggle('active', mode === 'cam');
+    }
+
+    function toggleTpCoachVideoRecording() {
+      tpAutoVideoTriggered = false;
+      if (tpCoachRecorder && tpCoachRecorder.state === 'recording') {
+        tpCoachRecorder.stop();
+      } else {
+        startTpCoachVideoRecording();
+      }
+    }
+
+    function startTpCoachVideoRecording() {
+      const recBtn = document.getElementById('tpVideoRecBtn');
+      const dlLink = document.getElementById('tpVideoDownloadLink');
+      dlLink.classList.add('hidden');
+      tpCoachChunks = [];
+      tpCoachSeconds = 0;
+      document.getElementById('tpVideoTimerBadge').innerText = '🔴 00:00';
+
+      const quality = document.getElementById('tpVideoQualitySelect').value || '1080';
+      let shortSide = 1080, longSide = 1920, vBitrate = 3500000, fps = 24;
+      if (quality === '720') {
+        shortSide = 720; longSide = 1280; vBitrate = 1600000; fps = 24;
+      } else if (quality === '480') {
+        shortSide = 480; longSide = 854; vBitrate = 650000; fps = 20;
+      }
+
+      tpCoachCanvas = document.createElement('canvas');
+      if (tpCoachRatio === '9-16') {
+        tpCoachCanvas.width = shortSide;
+        tpCoachCanvas.height = longSide;
+      } else {
+        tpCoachCanvas.width = longSide;
+        tpCoachCanvas.height = shortSide;
+      }
+
+      const ctx = tpCoachCanvas.getContext('2d');
+      const camVideo = document.getElementById('tpCoachCamVideo');
+
+      function drawToneCoachScorePane(targetY, targetH) {
+        const W = tpCoachCanvas.width;
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(0, targetY, W, targetH);
+        ctx.clip();
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, targetY, W, targetH);
+
+        const u = W / 900;
+        const padX = 36 * u;
+
+        // 1. 頂部標題與句數進度
+        ctx.fillStyle = '#1b5e20';
+        ctx.font = `800 ${Math.round(24 * u)}px -apple-system, sans-serif`;
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'top';
+        const counterTxt = document.getElementById('coachSentenceCounter')?.innerText || '1 / 1';
+        ctx.fillText(`🎤 Trees Pinyin Tone Coach (${counterTxt})`, padX, targetY + 20 * u);
+
+        // 顯示當前句英文翻譯（若有）
+        const curItem = coachSentences[coachCurrentIdx];
+        let curY = targetY + 58 * u;
+        if (curItem && curItem.en) {
+          ctx.fillStyle = '#475569';
+          ctx.font = `600 ${Math.round(20 * u)}px -apple-system, sans-serif`;
+          ctx.textAlign = 'center';
+          drawWrappedEnglishLine(ctx, curItem.en, W / 2, curY, W - padX * 2, Math.round(26 * u));
+          curY += 42 * u;
+        }
+
+        // 2. 繪製 #stage 中的每個漢字打分卡（同步顯示綠/黃/紅燈與聲調糾錯箭頭）
+        const stageChildren = Array.from(document.getElementById('stage').children);
+        const cardW = Math.round(88 * u);
+        const cardH = Math.round(118 * u);
+        const gapX = Math.round(14 * u);
+        const gapY = Math.round(14 * u);
+        const maxPerRow = Math.max(4, Math.floor((W - padX * 2 + gapX) / (cardW + gapX)));
+
+        const totalRows = Math.ceil(stageChildren.length / maxPerRow);
+        for (let r = 0; r < totalRows; r++) {
+          const rowSlice = stageChildren.slice(r * maxPerRow, (r + 1) * maxPerRow);
+          const rowW = rowSlice.length * cardW + (rowSlice.length - 1) * gapX;
+          let startX = (W - rowW) / 2;
+          const rowY = curY + r * (cardH + gapY);
+
+          rowSlice.forEach(el => {
+            if (el.classList.contains('tp-punct')) {
+              ctx.fillStyle = '#94a3b8';
+              ctx.font = `700 ${Math.round(36 * u)}px -apple-system, sans-serif`;
+              ctx.textAlign = 'center';
+              ctx.textBaseline = 'bottom';
+              ctx.fillText(el.innerText, startX + cardW / 2, rowY + cardH - 16 * u);
+              startX += cardW + gapX;
+              return;
+            }
+
+            let bg = '#f1f5f9', border = '#cbd5e1', txtColor = '#1e293b', tagColor = '#b45309';
+            if (el.classList.contains('good')) {
+              bg = '#dcfce7'; border = '#86efac'; txtColor = '#15803d';
+            } else if (el.classList.contains('warn')) {
+              bg = '#fef08a'; border = '#facc15'; txtColor = '#a16207'; tagColor = '#b45309';
+            } else if (el.classList.contains('bad')) {
+              bg = '#fecaca'; border = '#f87171'; txtColor = '#b91c1c'; tagColor = '#b91c1c';
+            }
+
+            ctx.fillStyle = bg;
+            ctx.strokeStyle = border;
+            ctx.lineWidth = Math.max(2, 3 * u);
+            ctx.beginPath();
+            if (ctx.roundRect) ctx.roundRect(startX, rowY, cardW, cardH, 14 * u);
+            else ctx.rect(startX, rowY, cardW, cardH);
+            ctx.fill();
+            ctx.stroke();
+
+            const tagTxt = el.querySelector('.tp-tag')?.innerText || '';
+            const hanziTxt = el.querySelector('.tp-hanzi')?.innerText || '';
+            const pyTxt = el.querySelector('.tp-py-sub')?.innerText || '';
+
+            ctx.textAlign = 'center';
+            if (tagTxt && (el.classList.contains('warn') || el.classList.contains('bad'))) {
+              ctx.fillStyle = tagColor;
+              ctx.font = `800 ${Math.round(18 * u)}px -apple-system, sans-serif`;
+              ctx.textBaseline = 'top';
+              ctx.fillText(tagTxt, startX + cardW / 2, rowY + 8 * u);
+            }
+
+            ctx.fillStyle = txtColor;
+            ctx.font = `700 ${Math.round(44 * u)}px -apple-system, sans-serif`;
+            ctx.textBaseline = 'middle';
+            ctx.fillText(hanziTxt, startX + cardW / 2, rowY + cardH * 0.52);
+
+            ctx.fillStyle = txtColor;
+            ctx.font = `600 ${Math.round(16 * u)}px -apple-system, sans-serif`;
+            ctx.textBaseline = 'bottom';
+            ctx.fillText(pyTxt, startX + cardW / 2, rowY + cardH - 8 * u);
+
+            startX += cardW + gapX;
+          });
+        }
+
+        curY += totalRows * (cardH + gapY) + 12 * u;
+
+        // 3. 繪製即時狀態或總分 (#msgBox)
+        const msgRaw = (document.getElementById('msgBox')?.innerText || '').trim();
+        if (msgRaw) {
+          ctx.fillStyle = '#0f172a';
+          ctx.font = `700 ${Math.round(23 * u)}px -apple-system, sans-serif`;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'top';
+          ctx.fillText(msgRaw, W / 2, curY);
+          curY += 36 * u;
+        }
+
+        // 4. 繪製底部識別結果框 (#heardBox: 👂 Chinese Listener Heard & 🌐 English Translation)
+        const heardBox = document.getElementById('heardBox');
+        if (heardBox && heardBox.style.display !== 'none') {
+          const heardChars = Array.from(document.querySelectorAll('#heardZh .tp-h-char')).map(c => c.innerText).join('');
+          const heardEn = (document.getElementById('heardEn')?.innerText || '').trim();
+
+          ctx.fillStyle = '#f8fafc';
+          ctx.strokeStyle = '#cbd5e1';
+          ctx.lineWidth = Math.max(1.5, 2 * u);
+          const boxH = Math.round(88 * u);
+          ctx.beginPath();
+          if (ctx.roundRect) ctx.roundRect(padX, curY, W - padX * 2, boxH, 12 * u);
+          else ctx.rect(padX, curY, W - padX * 2, boxH);
+          ctx.fill();
+          ctx.stroke();
+
+          ctx.textAlign = 'left';
+          ctx.textBaseline = 'top';
+          ctx.fillStyle = '#15803d';
+          ctx.font = `700 ${Math.round(20 * u)}px -apple-system, sans-serif`;
+          ctx.fillText(`👂 Chinese Listener Heard: ${heardChars}`, padX + 16 * u, curY + 14 * u);
+
+          ctx.fillStyle = '#2563eb';
+          ctx.font = `italic 600 ${Math.round(19 * u)}px -apple-system, sans-serif`;
+          ctx.fillText(`🌐 English: ${heardEn}`, padX + 16 * u, curY + 48 * u);
+        }
+
+        ctx.restore();
+      }
+
+      function renderTpCoachFrame() {
+        const W = tpCoachCanvas.width;
+        const H = tpCoachCanvas.height;
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, W, H);
+
+        if (tpCoachViewMode === 'split') {
+          drawToneCoachScorePane(0, H * 0.54);
+          drawVideoCover(ctx, camVideo, 0, H * 0.54, W, H * 0.46);
+          ctx.strokeStyle = '#1b5e20';
+          ctx.lineWidth = Math.max(3, Math.round(W / 160));
+          ctx.beginPath();
+          ctx.moveTo(0, H * 0.54);
+          ctx.lineTo(W, H * 0.54);
+          ctx.stroke();
+        } else if (tpCoachViewMode === 'score') {
+          drawToneCoachScorePane(0, H);
+        } else {
+          drawVideoCover(ctx, camVideo, 0, 0, W, H);
+        }
+
+        tpCoachAnimId = requestAnimationFrame(renderTpCoachFrame);
+      }
+      renderTpCoachFrame();
+
+      const stream = tpCoachCanvas.captureStream(fps);
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        tpCoachAudioCtx = new AudioCtx();
+        tpCoachAudioDest = tpCoachAudioCtx.createMediaStreamDestination();
+        if (tpCoachStream && tpCoachStream.getAudioTracks().length > 0) {
+          const micSource = tpCoachAudioCtx.createMediaStreamSource(tpCoachStream);
+          micSource.connect(tpCoachAudioDest);
+        }
+        tpCoachAudioDest.stream.getAudioTracks().forEach(t => stream.addTrack(t));
+      } catch (e) {
+        if (tpCoachStream) tpCoachStream.getAudioTracks().forEach(t => stream.addTrack(t));
+      }
+
+      const preferredMime = getPreferredMp4MimeType();
+      const recOptions = {
+        ...(preferredMime ? { mimeType: preferredMime } : {}),
+        videoBitsPerSecond: vBitrate,
+        audioBitsPerSecond: 128000
+      };
+
+      try {
+        tpCoachRecorder = new MediaRecorder(stream, recOptions);
+      } catch (e) {
+        tpCoachRecorder = new MediaRecorder(stream);
+      }
+
+      tpCoachRecorder.ondataavailable = (e) => { if (e.data.size > 0) tpCoachChunks.push(e.data); };
+      tpCoachRecorder.onstop = () => {
+        cancelAnimationFrame(tpCoachAnimId);
+        clearInterval(tpCoachTimerInterval);
+        const blob = new Blob(tpCoachChunks, { type: 'video/mp4' });
+        dlLink.href = URL.createObjectURL(blob);
+        dlLink.download = `trees-pinyin-tone-${quality}p.mp4`;
+        dlLink.classList.remove('hidden');
+        recBtn.innerText = '🔴 Record Video';
+        recBtn.style.background = '';
+      };
+
+      tpCoachRecorder.start(400);
+      recBtn.innerText = '⏹️ Stop Video';
+      recBtn.style.background = '#d32f2f';
+
+      tpCoachTimerInterval = setInterval(() => {
+        tpCoachSeconds++;
+        const m = String(Math.floor(tpCoachSeconds / 60)).padStart(2, '0');
+        const s = String(tpCoachSeconds % 60).padStart(2, '0');
+        document.getElementById('tpVideoTimerBadge').innerText = `🔴 ${m}:${s}`;
+      }, 1000);
+    }
 
     // =========================================================================
     // 8. 原書 45 個記憶詞庫 (含雙語例句) 與分享解鎖
