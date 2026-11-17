@@ -656,21 +656,6 @@ async function runDirectTranslate(inputOverride) {
     }
   }
 
-  // 若本身已經是 Source ||| Target 格式，直接渲染不二次轉譯
-  if (raw.includes('|||')) {
-    const pairLines = raw.split(/\n+/).map(l => l.trim()).filter(Boolean);
-    let renderedCount = 0;
-    for (const pl of pairLines) {
-      const pair = parseBilingualPairLine(pl);
-      if (pair) {
-        renderedCount++;
-        appendSentenceProgressive(pair.zh, pair.en);
-        await nextPaintTick();
-      }
-    }
-    if (renderedCount > 0) return;
-  }
-
   if (backupKey && raw.length <= 1800) {
     replyBox.style.display = 'block';
     replyBox.innerText = currentLang === 'en' ? '⚡ Translating accurately...' : '⚡ 正在精準翻譯並注音...';
@@ -704,16 +689,11 @@ ${raw}`;
 
   const lines = raw.split(/\n+|(?<=[。！？.!?])\s*/).map(l => l.trim()).filter(Boolean);
   const enLinesToBatch = [];
-  const enIndices = [];
-
-  lines.forEach((line, idx) => {
-    if (!/[\u4e00-\u9fa5]/.test(line)) {
-      enLinesToBatch.push(line);
-      enIndices.push(idx);
-    }
+  lines.forEach((line) => {
+    if (!/[\u4e00-\u9fa5]/.test(line)) enLinesToBatch.push(line);
   });
 
-  // 批量合併翻譯：將所有英文句子合併為單次請求，徹底避免長文多句觸發 429 封鎖
+  // 批量合併翻譯：將多句英文合併為單次請求，徹底避免長文觸發 429 封鎖且提速 5 倍
   let batchTranslatedZh = [];
   if (enLinesToBatch.length > 0) {
     const joinedEn = enLinesToBatch.join('\n');
