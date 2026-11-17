@@ -6,9 +6,10 @@
 // 0. 全域配置與 Cloudflare Worker 端點
 // =========================================================================
 const IS_LOCAL_FILE = window.location.protocol === 'file:';
-const CF_WORKER_ENDPOINTS = IS_LOCAL_FILE
-  ? ['https://treespinyin-api.treespinyin.workers.dev', 'https://treespinyin.com/api']
-  : ['https://treespinyin-api.treespinyin.workers.dev', '/api', 'https://treespinyin.com/api'];
+// 僅保留真實有效的 Cloudflare Worker 端點，徹底根除 GitHub Pages 靜態目錄 /api 返回 HTTP 405 的錯誤
+const CF_WORKER_ENDPOINTS = [
+  'https://treespinyin-api.treespinyin.workers.dev'
+];
 
 const CHROME_STORE_REVIEW_URL = 'https://chromewebstore.google.com/detail/trees-pinyin-universal-an/jlbjllgeebmhkdcgmcnlkbcaiobpheae/reviews';
 const EDGE_STORE_REVIEW_URL = 'https://microsoftedge.microsoft.com/addons/detail/egmgaoogonmldicgbkpaofjffcdlcffm';
@@ -340,45 +341,46 @@ async function openCloudUrlFromModal() {
 }
 
 async function fetchCloudDocumentByUrl(rawUrl) {
-  const gdocMatch = rawUrl.match(/https:\/\/docs\.google\.com\/document\/d\/([a-zA-Z0-9_-]+)/);
-  if (gdocMatch) {
-    const docId = gdocMatch[1];
-    const exportUrl = `https://docs.google.com/document/d/${docId}/export?format=txt`;
-    const candidates = [
-      exportUrl,
-      `https://api.allorigins.win/raw?url=${encodeURIComponent(exportUrl)}`,
-      `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(exportUrl)}`
-    ];
-    for (const u of candidates) {
-      try {
-        const r = await fetchWithTimeout(u, {}, 6500);
-        if (r.ok) {
-          const txt = (await r.text()).trim();
-          if (txt && !txt.startsWith('<!DOCTYPE html>') && !txt.includes('<html')) return txt;
-        }
-      } catch (e) {}
-    }
+  let exportUrl = '';
+  const u = (rawUrl || '').trim();
+  const pubMatch = u.match(/docs\.google\.com\/document\/d\/([a-zA-Z0-9_-]+)\/pub/);
+  const docMatch = u.match(/docs\.google\.com\/document\/(?:u\/\d+\/)?d\/([a-zA-Z0-9_-]+)/);
+  const driveMatch = u.match(/drive\.google\.com\/(?:file\/d\/|open\?id=|uc\?id=)([a-zA-Z0-9_-]+)/);
+
+  if (pubMatch) {
+    exportUrl = `https://docs.google.com/document/d/${pubMatch[1]}/pub?output=txt`;
+  } else if (docMatch) {
+    exportUrl = `https://docs.google.com/document/d/${docMatch[1]}/export?format=txt`;
+  } else if (driveMatch) {
+    exportUrl = `https://drive.google.com/uc?export=download&id=${driveMatch[1]}`;
+  } else if (u.includes('dropbox.com')) {
+    exportUrl = u.replace(/\?dl=0$/, '?dl=1');
+  } else {
+    return '';
   }
 
-  const gdriveMatch = rawUrl.match(/https:\/\/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/);
-  if (gdriveMatch) {
-    const fileId = gdriveMatch[1];
-    const dlUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
-    const candidates = [
-      `https://api.allorigins.win/raw?url=${encodeURIComponent(dlUrl)}`,
-      `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(dlUrl)}`
-    ];
-    for (const u of candidates) {
-      try {
-        const r = await fetchWithTimeout(u, {}, 6500);
-        if (r.ok) {
-          const txt = (await r.text()).trim();
-          if (txt && !txt.startsWith('<!DOCTYPE html>')) return txt;
-        }
-      } catch (e) {}
-    }
+  const candidates = [
+    exportUrl,
+    `https://api.allorigins.win/raw?url=${encodeURIComponent(exportUrl)}`,
+    `https://corsproxy.io/?${encodeURIComponent(exportUrl)}`,
+    `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(exportUrl)}`
+  ];
+
+  try {
+    const tasks = candidates.map(async (proxyUrl) => {
+      const r = await fetchWithTimeout(proxyUrl, {}, 7500);
+      if (!r.ok) throw new Error('HTTP_' + r.status);
+      const buf = await r.arrayBuffer();
+      const txt = new TextDecoder('utf-8').decode(buf).replace(/^\uFEFF/, '').trim();
+      if (!txt || txt.startsWith('<!DOCTYPE') || txt.includes('<html') || txt.includes('accounts.google.com')) {
+        throw new Error('AUTH_OR_HTML');
+      }
+      return txt;
+    });
+    return await Promise.any(tasks);
+  } catch (e) {
+    return '';
   }
-  return '';
 }
 
 // =========================================================================

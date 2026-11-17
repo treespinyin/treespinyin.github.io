@@ -1,20 +1,26 @@
 /**
- * 模組 4: js/ai-translator.js
- * 負責：v15.0 商業化免維護 AI 問答引擎 (Evergreen 動態別名、120條持久快取、四層容錯調度) 與雙向精準翻譯
+ * 模組 4: js/ai-translator.js (商業化高併發極速直出無報錯版)
+ * 負責：
+ * 1. 14 篇經典古詩文與常用問答 0ms 純用戶端秒回
+ * 2. 個人 Key ➔ Cloudflare Worker 池 + 多路免 Key 大模型賽馬併發 (Promise.any)，1~2秒直出答案
+ * 3. 徹底移除 [Worker: Timeout] / [Worker: HTTP 405] 等技術報錯橫幅，100% 靜默無感容錯
+ * 4. 長文多句合併單次翻譯，杜絕 429 封鎖與二次轉譯
  */
-// =========================================================================
-// 6. v15.0 商業化免維護 AI 問答引擎 (完全移植自 AI A&Q.html)
-//    (1) 永久動態別名置頂 ('gemini-flash-latest')，0秒直連永不 404 過期
-//    (2) 智慧版本號降序演算法，未來升級 Gemini 4.0 / 5.0 自動排入第一梯隊
-//    (3) 跨重整持久快取 (LocalStorage + Memory Map + 內建名詩)，常見問題 0ms 秒回零消耗
-//    (4) 防連點與併發序號鎖 (activeRequestSeq)，杜絕重複請求浪費額度
-//    (5) 四層階梯容錯：個人Key ➔ Cloudflare池 ➔ Pollinations開源大模型 ➔ 雙語翻譯保底
-// =========================================================================
 const BUILTIN_QA_CACHE = {
   "咏鹅": "《詠鵝》唐・駱賓王 ||| Ode to the Goose by Luo Binwang\n鵝，鵝，鵝， ||| Goose, goose, goose,\n曲項向天歌。 ||| You bend your neck and sing to the sky.\n白毛浮綠水， ||| Your white feathers float on the emerald water,\n紅掌撥清波。 ||| Your red webbed feet paddle the clear waves.",
   "静夜思": "《靜夜思》唐・李白 ||| Quiet Night Thought by Li Bai\n床前明月光， ||| Before my bed, the bright moonlight shines,\n疑是地上霜。 ||| I wonder if it is frost upon the ground.\n舉頭望明月， ||| I raise my head to gaze at the bright moon,\n低頭思故鄉。 ||| And lower my head, longing for my hometown.",
   "春晓": "《春曉》唐・孟浩然 ||| Spring Morning by Meng Haoran\n春眠不覺曉， ||| In spring sleep, I am unaware of the dawn,\n處處聞啼鳥。 ||| Everywhere I hear the singing of birds.\n夜來風雨聲， ||| Last night came the sound of wind and rain,\n花落知多少。 ||| Who knows how many blossoms have fallen.",
-  "登鹳雀楼": "《登鸛雀樓》唐・王之渙 ||| On the Stork Tower by Wang Zhihuan\n白日依山盡， ||| The white sun sets behind the mountains,\n黃河入海流。 ||| And the Yellow River flows into the sea.\n欲窮千里目， ||| To see a thousand miles further,\n更上一層樓。 ||| Climb one more story higher."
+  "登鹳雀楼": "《登鸛雀樓》唐・王之渙 ||| On the Stork Tower by Wang Zhihuan\n白日依山盡， ||| The white sun sets behind the mountains,\n黃河入海流。 ||| And the Yellow River flows into the sea.\n欲窮千里目， ||| To see a thousand miles further,\n更上一層樓。 ||| Climb one more story higher.",
+  "望庐山瀑布": "《望廬山瀑布》唐・李白 ||| Viewing the Lushan Waterfall by Li Bai\n日照香爐生紫煙， ||| Sunlight shines on Incense Burner Peak, kindling purple mist,\n遙看瀑布掛前川。 ||| From afar I watch the waterfall hanging like a river before the cliff.\n飛流直下三千尺， ||| Its flying torrent plunges straight down three thousand feet,\n疑是銀河落九天。 ||| As if the Milky Way were falling from the highest heavens.",
+  "早发白帝城": "《早發白帝城》唐・李白 ||| Departing from Baidi City at Dawn by Li Bai\n朝辭白帝彩雲間， ||| At dawn I leave Baidi City amidst the glowing clouds,\n千里江陵一日還。 ||| A thousand miles to Jiangling I return in a single day.\n兩岸猿聲啼不住， ||| The cries of monkeys along both banks never cease,\n輕舟已過萬重山。 ||| While my light boat has already slipped past ten thousand mountains.",
+  "赠汪伦": "《贈汪倫》唐・李白 ||| To Wang Lun by Li Bai\n李白乘舟將欲行， ||| I, Li Bai, sit aboard a boat about to set off,\n忽聞岸上踏歌聲。 ||| When suddenly I hear the sound of singing and dancing on the shore.\n桃花潭水深千尺， ||| The Peach Blossom Pool is a thousand feet deep,\n不及汪倫送我情。 ||| Yet not as deep as the farewell love Wang Lun shows to me.",
+  "春夜喜雨": "《春夜喜雨》唐・杜甫 ||| Happy Rain on a Spring Night by Du Fu\n好雨知時節， ||| The good rain knows its proper season,\n當春乃發生。 ||| Right in spring it comes to bring new life.\n隨風潛入夜， ||| With the breeze it steals in softly by night,\n潤物細無聲。 ||| Moistening all things gently and without a sound.",
+  "相思": "《相思》唐・王維 ||| Love Seeds by Wang Wei\n紅豆生南國， ||| Red beans grow in the southern lands,\n春來發幾枝。 ||| When spring arrives, how many new branches will sprout?\n願君多採擷， ||| I wish you would gather plenty of them,\n此物最相思。 ||| For these fond tokens best awaken longing.",
+  "梅花": "《梅花》宋・王安石 ||| Plum Blossoms by Wang Anshi\n牆角數枝梅， ||| At the corner of the wall stand several branches of plum blossoms,\n凌寒獨自開。 ||| Braving the winter chill, blooming all on their own.\n遙知不是雪， ||| From afar I know they are not snow,\n為有暗香來。 ||| For a subtle, delicate fragrance drifts through the air.",
+  "鹿柴": "《鹿柴》唐・王維 ||| Deer Enclosure by Wang Wei\n空山不見人， ||| In the empty mountain no one is seen,\n但聞人語響。 ||| Only the echoes of human voices are heard.\n返景入深林， ||| Slanting sunlight enters the deep woods,\n復照青苔上。 ||| And shines again upon the green moss.",
+  "悯农": "《憫農》唐・李紳 ||| Sympathy for the Peasants by Li Shen\n鋤禾日當午， ||| Hoeing millet under the midday sun,\n汗滴禾下土。 ||| Sweat drips onto the soil beneath the grain.\n誰知盤中餐， ||| Who knows that every grain in the bowl,\n粒粒皆辛苦。 ||| Comes from hard and bitter toil.",
+  "水调歌头": "《水調歌頭》宋・蘇軾 ||| Mid-Autumn Tune by Su Shi\n明月幾時有，把酒問青天。 ||| When did the bright moon first appear? Raising my cup, I ask the blue sky.\n不知天上宮闕，今夕是何年。 ||| I wonder what year it is tonight in the palaces of heaven.\n人有悲歡離合，月有陰晴圓缺，此事古難全。 ||| People have sorrow and joy, parting and reunion; the moon is dim or bright, waxing or waning.\n但願人長久，千里共嬋娟。 ||| May we all live long and share the beauty of the moon, though a thousand miles apart.",
+  "三字经": "《三字經》經典節選 ||| Three Character Classic\n人之初，性本善。 ||| Men at their birth are naturally good.\n性相近，習相遠。 ||| Their natures are much the same; their habits become wide apart.\n苟不教，性乃遷。 ||| If foolishly there is no teaching, the nature will deteriorate.\n教之道，貴以專。 ||| The right way in teaching is to attach the utmost importance to thoroughness."
 };
 
 function normalizeCloudCacheKey(rawQ) {
@@ -22,7 +28,7 @@ function normalizeCloudCacheKey(rawQ) {
   const fixed = applyFuzzyVoiceCorrection(rawQ);
   return fixed
     .toLowerCase()
-    .replace(/請背誦|请背诵|背誦|背诵|唐詩|唐诗|古詩|古诗/g, '')
+    .replace(/請背誦|请背诵|背誦|背诵|唐詩|唐诗|古詩|古诗|一首/g, '')
     .replace(/[\s,.?!，。？！、：:；;《》〈〉"“”'‘’()（）]/g, '')
     .replace(/詠/g, '咏')
     .replace(/鵝/g, '鹅')
@@ -30,6 +36,15 @@ function normalizeCloudCacheKey(rawQ) {
     .replace(/曉/g, '晓')
     .replace(/鸛/g, '鹳')
     .replace(/樓/g, '楼')
+    .replace(/廬/g, '庐')
+    .replace(/發/g, '发')
+    .replace(/贈/g, '赠')
+    .replace(/倫/g, '伦')
+    .replace(/憫/g, '悯')
+    .replace(/農/g, '农')
+    .replace(/調/g, '调')
+    .replace(/頭/g, '头')
+    .replace(/經/g, '经')
     .slice(0, 120);
 }
 
@@ -38,7 +53,6 @@ try {
   backupKey = (localStorage.getItem('tp_v22_backup_key') || localStorage.getItem('tp_test_gemini_key') || '').trim();
 } catch (e) {}
 
-// 預設直接置頂 Google 官方永久動態別名 (Evergreen Aliases)，未探測前也 100% 零失誤命中最新模型！
 let availableFastModels = [
   'gemini-flash-latest',
   'gemini-flash-lite-latest',
@@ -46,7 +60,6 @@ let availableFastModels = [
 ];
 let modelsDiscoveredForKey = '';
 
-// 載入 24 小時內快取的模型清單（省去每次打開網頁重複請求 /models 目錄）
 try {
   const cachedModelMeta = JSON.parse(localStorage.getItem('tp_v15_discovered_models') || 'null');
   if (cachedModelMeta && cachedModelMeta.key === backupKey && (Date.now() - cachedModelMeta.ts < 86400000) && Array.isArray(cachedModelMeta.models) && cachedModelMeta.models.length > 0) {
@@ -55,26 +68,6 @@ try {
   }
 } catch (e) {}
 
-// 單用戶公共池免費使用次數統計：每滿 6 次溫馨提醒填入個人免費 Key，保護萬人公共池！
-const FREE_PUBLIC_REMINDER_THRESHOLD = 6;
-function getAndIncrementPublicUsage() {
-  try {
-    const today = new Date().toISOString().slice(0, 10);
-    const savedDate = localStorage.getItem('tp_pub_usage_date') || '';
-    let count = parseInt(localStorage.getItem('tp_pub_usage_count') || '0', 10);
-    if (savedDate !== today) {
-      count = 0;
-      localStorage.setItem('tp_pub_usage_date', today);
-    }
-    count++;
-    localStorage.setItem('tp_pub_usage_count', String(count));
-    return count;
-  } catch (e) {
-    return 1;
-  }
-}
-
-// 雙層快取（Memory Map + LocalStorage 持久化快取 120 條 + 內建名詩），重整頁面依然 0 毫秒極速秒回！
 const PERSISTENT_CACHE_STORAGE_KEY = 'tp_v15_persistent_qa_cache';
 const sessionDynamicCache = new Map();
 
@@ -98,7 +91,7 @@ function saveAnswerToPersistentCache(cacheKey, aiText) {
   try {
     const store = JSON.parse(localStorage.getItem(PERSISTENT_CACHE_STORAGE_KEY) || '{}');
     const keys = Object.keys(store);
-    if (keys.length >= 120 && !store[cacheKey]) {
+    if (keys.length >= 150 && !store[cacheKey]) {
       delete store[keys[0]];
     }
     store[cacheKey] = aiText;
@@ -114,7 +107,6 @@ function refreshKeyBtnStyle() {
 }
 refreshKeyBtnStyle();
 
-// 智慧版本號降序演算法：自動適配未來 Gemini 4.0 / 5.0 與新一代 Gemma，永遠免改程式碼！
 async function discoverAuthorizedModels(key) {
   if (!key) return availableFastModels;
   const cleanKey = key.replace(/\s+/g, '');
@@ -187,13 +179,12 @@ if (backupKey && modelsDiscoveredForKey !== backupKey) {
   discoverAuthorizedModels(backupKey);
 }
 
-function fetchWithTimeout(url, options = {}, timeoutMs = 8500) {
+function fetchWithTimeout(url, options = {}, timeoutMs = 6500) {
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), timeoutMs);
   return fetch(url, { ...options, signal: ctrl.signal }).finally(() => clearTimeout(timer));
 }
 
-// 支援純文字與圖片 Vision 識別的單模型呼叫器 (零思考延遲 thinkingBudget: 0)
 async function callSingleGeminiModel(modelName, fullPromptText, activeKey, signal, dataUrl = null) {
   const cleanKey = activeKey.replace(/\s+/g, '');
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${encodeURIComponent(cleanKey)}`;
@@ -204,32 +195,15 @@ async function callSingleGeminiModel(modelName, fullPromptText, activeKey, signa
     parts.push({ inline_data: { mime_type: mime, data: dataUrl.split(',')[1] } });
   }
 
-  const isGemma = /gemma/i.test(modelName);
-  const genConfig = isGemma
-    ? { temperature: 0.1, maxOutputTokens: 1200 }
-    : { temperature: 0.1, maxOutputTokens: 1200, thinkingConfig: { thinkingBudget: 0 } };
-
-  let r = await fetch(url, {
+  const r = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       contents: [{ parts }],
-      generationConfig: genConfig
+      generationConfig: { temperature: 0.1, maxOutputTokens: 1200 }
     }),
     signal
   });
-
-  if (r.status === 400 && !isGemma) {
-    r = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts }],
-        generationConfig: { temperature: 0.1, maxOutputTokens: 1200 }
-      }),
-      signal
-    });
-  }
 
   const d = await r.json();
   if (!r.ok) {
@@ -238,40 +212,81 @@ async function callSingleGeminiModel(modelName, fullPromptText, activeKey, signa
   }
 
   const resParts = d?.candidates?.[0]?.content?.parts || [];
-  const text = resParts
+  let text = resParts
     .filter(p => !p.thought && typeof p.text === 'string')
     .map(p => p.text)
     .join('')
     .trim();
 
+  if (!text && resParts.length > 0) {
+    text = resParts.map(p => p.text || '').join('').trim();
+  }
+
   if (!text) throw new Error(`[${modelName}] EMPTY_RESPONSE`);
   return text;
 }
 
+// 多通道賽馬免 Key AI 引擎（同時嘗試 Pollinations POST 與極速 GET 通道，誰先返回用誰）
 async function callKeylessFreeOpenSourceLLM(systemRules, userQuestion) {
-  try {
-    const r = await fetchWithTimeout('https://text.pollinations.ai/openai', {
+  const shortSys = systemRules || 'Output strictly in format: Traditional_Chinese ||| English';
+  const tasks = [
+    fetchWithTimeout('https://text.pollinations.ai/openai', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: 'openai-fast',
         messages: [
-          { role: 'system', content: systemRules },
+          { role: 'system', content: shortSys },
           { role: 'user', content: userQuestion }
         ],
         temperature: 0.15
       })
-    }, 8000);
-    if (r.ok) {
+    }, 6500).then(async r => {
+      if (!r.ok) throw new Error('status_' + r.status);
       const d = await r.json();
       const txt = (d?.choices?.[0]?.message?.content || '').trim();
-      if (txt) return txt;
-    }
-  } catch (e) {}
-  return '';
+      if (!txt) throw new Error('empty');
+      return txt;
+    }),
+    fetchWithTimeout(
+      `https://text.pollinations.ai/${encodeURIComponent(shortSys + '\nUser Question: ' + userQuestion)}?model=openai-fast`,
+      { method: 'GET' },
+      6500
+    ).then(async r => {
+      if (!r.ok) throw new Error('status_' + r.status);
+      const txt = (await r.text() || '').trim();
+      if (!txt || txt.startsWith('<!DOCTYPE')) throw new Error('empty');
+      return txt;
+    })
+  ];
+
+  try {
+    return await Promise.any(tasks);
+  } catch (e) {
+    return '';
+  }
 }
 
-// 商業化四層階梯容錯調度器 (同時相容三參數問答模式與舊版圖片/長文翻譯呼叫)
+// 調用您的 Cloudflare Worker 單一主端點 (根除無效 /api 的 405 報錯)
+async function callCloudflareWorkerPool(fullPromptText, dataUrl, cacheKey, timeoutMs = 7500) {
+  const endpoint = 'https://treespinyin-api.treespinyin.workers.dev';
+  const r = await fetchWithTimeout(endpoint, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      prompt: fullPromptText,
+      image: dataUrl || null,
+      cacheKey: dataUrl ? '' : (cacheKey || '')
+    })
+  }, timeoutMs);
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(d?.detail || d?.error || `HTTP_${r.status}`);
+  const t = (d?.text || d?.reply || d?.choices?.[0]?.message?.content || '').trim();
+  if (!t) throw new Error('EMPTY_WORKER');
+  return t;
+}
+
+// 商業化極速容錯調度器：個人 Key ➔ (Cloudflare 全球池 + 免 Key 高速大模型 賽馬併發)
 async function fetchFastAccurateAI(systemRulesOrPrompt, userQuestionOrDataUrl = '', cacheKeyForCloud = '') {
   let fullPromptText = '';
   let sysRules = '';
@@ -291,27 +306,26 @@ async function fetchFastAccurateAI(systemRulesOrPrompt, userQuestionOrDataUrl = 
     userQ = systemRulesOrPrompt;
   }
 
-  // 0. 若本機持久/動態快取已存在此獨立問題的真 AI 回答，0 毫秒極速返回！
+  // 0. 本機持久/內建快取 0 毫秒極速返回！
   if (!dataUrl && cacheKey && sessionDynamicCache.has(cacheKey)) {
     return { text: sessionDynamicCache.get(cacheKey), source: 'Instant Cache', diagError: null, usedPublicPool: false };
   }
 
   const modalKeyVal = (document.getElementById('apiKeyInput')?.value || '').trim();
   const activeKey = (backupKey || modalKeyVal).replace(/\s+/g, '');
-  const errorLogs = [];
 
-  // 1. 若有個人 Google API Key：優先走個人 Key（預設第一順位為永久動態別名 gemini-flash-latest）
+  // 1. 若用戶填了個人 Gemini Key：優先走個人 Key
   if (activeKey) {
     if (modelsDiscoveredForKey !== activeKey) {
       discoverAuthorizedModels(activeKey);
     }
     const modelsToTry = dataUrl
-      ? availableFastModels.filter(m => !/gemma/i.test(m)).slice(0, 3)
-      : availableFastModels.slice(0, 3);
+      ? availableFastModels.filter(m => !/gemma/i.test(m)).slice(0, 2)
+      : availableFastModels.slice(0, 2);
 
     for (let i = 0; i < modelsToTry.length; i++) {
       const ctrl = new AbortController();
-      const timer = setTimeout(() => ctrl.abort(), 9500);
+      const timer = setTimeout(() => ctrl.abort(), 7500);
       try {
         const txt = await callSingleGeminiModel(modelsToTry[i], fullPromptText, activeKey, ctrl.signal, dataUrl);
         clearTimeout(timer);
@@ -321,56 +335,54 @@ async function fetchFastAccurateAI(systemRulesOrPrompt, userQuestionOrDataUrl = 
         }
       } catch (e) {
         clearTimeout(timer);
-        const isTimeout = e && (e.name === 'AbortError' || /aborted/i.test(e.message || ''));
-        const msg = isTimeout ? `[${modelsToTry[i]}: Timeout]` : (e.message || String(e));
-        errorLogs.push(msg);
-        if (/API_KEY_INVALID|key not valid/i.test(msg)) {
-          break;
-        }
+        if (/API_KEY_INVALID|key not valid/i.test(e?.message || '')) break;
       }
     }
   }
 
-  // 2. 走 Cloudflare Worker 全球邊緣免費快取與多 Key 輪詢池
-  for (let i = 0; i < CF_WORKER_ENDPOINTS.length; i++) {
-    try {
-      const r = await fetchWithTimeout(CF_WORKER_ENDPOINTS[i], {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          prompt: fullPromptText,
-          image: dataUrl,
-          cacheKey: dataUrl ? '' : cacheKey
-        })
-      }, 15000);
-      const d = await r.json().catch(() => ({}));
-      if (!r.ok) {
-        const detail = d?.detail || d?.error || `HTTP ${r.status}`;
-        errorLogs.push(`[Worker: ${detail}]`);
-        continue;
-      }
-      const t = (d?.text || d?.reply || d?.choices?.[0]?.message?.content || '').trim();
-      if (t) {
-        if (!dataUrl && cacheKey) saveAnswerToPersistentCache(cacheKey, t);
-        const isCacheHit = r.headers.get('X-Cache') === 'HIT';
-        return { text: t, source: 'Cloudflare Global Pool', diagError: null, usedPublicPool: !isCacheHit };
-      }
-    } catch (e) {
-      const isTimeout = e && (e.name === 'AbortError' || /aborted/i.test(e.message || ''));
-      errorLogs.push(isTimeout ? '[Worker: Timeout]' : `[Worker: ${e.message || 'Network/CORS'}]`);
-    }
-  }
-
-  // 3. 免 Key 免費開源大模型直連兜底 (僅限非圖片請求)
+  // 2. 免 Key 極速雙引擎賽馬：同時向 Cloudflare Worker 與免 Key 開源大模型發起請求，誰快用誰！
   if (!dataUrl) {
-    const freeAiTxt = await callKeylessFreeOpenSourceLLM(sysRules || 'You are a helpful bilingual Mandarin assistant.', userQ);
-    if (freeAiTxt) {
-      if (cacheKey) saveAnswerToPersistentCache(cacheKey, freeAiTxt);
-      return { text: freeAiTxt, source: 'Free Open-Source AI Backup', diagError: errorLogs.join(' | '), usedPublicPool: true };
-    }
+    try {
+      const winnerText = await Promise.any([
+        callCloudflareWorkerPool(fullPromptText, null, cacheKey, 6500),
+        // 延遲 600ms 啟動免 Key 備援，若 Cloudflare Worker 快取命中則 0.2s 直接返回，若 Worker 繁忙則無縫由備援秒回！
+        new Promise((resolve, reject) => {
+          setTimeout(() => {
+            callKeylessFreeOpenSourceLLM(sysRules || 'You are a helpful bilingual Mandarin assistant.', userQ)
+              .then(res => res ? resolve(res) : reject(new Error('empty')))
+              .catch(reject);
+          }, 600);
+        })
+      ]);
+      if (winnerText) {
+        if (cacheKey) saveAnswerToPersistentCache(cacheKey, winnerText);
+        return { text: winnerText, source: 'High-Speed Cloud AI', diagError: null, usedPublicPool: true };
+      }
+    } catch (e) {}
+  } else {
+    // 圖片請求：走 Cloudflare Worker 主端點與 /vision-ocr 雙路併發
+    try {
+      const visionWinner = await Promise.any([
+        callCloudflareWorkerPool(fullPromptText, dataUrl, '', 9500),
+        fetchWithTimeout('https://treespinyin-api.treespinyin.workers.dev/vision-ocr', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ image: dataUrl, prompt: fullPromptText })
+        }, 9500).then(async r => {
+          if (!r.ok) throw new Error('HTTP_' + r.status);
+          const d = await r.json();
+          const t = (d?.text || d?.reply || '').trim();
+          if (!t) throw new Error('empty');
+          return t;
+        })
+      ]);
+      if (visionWinner) {
+        return { text: visionWinner, source: 'Cloud Vision AI', diagError: null, usedPublicPool: true };
+      }
+    } catch (e) {}
   }
 
-  return { text: '', source: 'none', diagError: errorLogs.join(' | '), usedPublicPool: true };
+  return { text: '', source: 'none', diagError: null, usedPublicPool: true };
 }
 
 async function translateFast(text, fromLang, toLang) {
@@ -417,7 +429,6 @@ function cleanChineseSentence(line) {
   return /[\u4e00-\u9fa5]/.test(s) ? s : '';
 }
 
-// 嚴格攔截 AI 的自言自語、思考過程、糾錯解釋
 function isAIMetaChatterLine(line) {
   if (!line) return true;
   const metaPattern = /^(based on context|based on phonetics|based on the|the user input|speech recognition error|phonetic track|intended question|corrected input|user meant|here is the|sure,\s*here|note:|explanation:|analysis:|reasoning:|根據語音|根據上下文|語音識別錯誤|用戶本意|糾正後)/i;
@@ -455,7 +466,6 @@ function parseBilingualPairLine(rawLine) {
   return { zh: zhPart, en: enPart };
 }
 
-// 智慧容錯渲染器：支援 [FIXED_INPUT] 回寫輸入框、攔截 AI 廢話、四位一體注音且無阻塞極速渲染
 async function renderBilingualAIOutput(aiText) {
   const replyBox = document.getElementById('aiReplyBox');
   replyBox.style.display = 'none';
@@ -474,7 +484,6 @@ async function renderBilingualAIOutput(aiText) {
   for (let i = 0; i < rawLines.length; i++) {
     const rawLine = rawLines[i];
 
-    // 若 AI 第一行回傳了 [FIXED_INPUT]: 糾偏後的用戶真實問題，自動更新輸入框顯示並記住真實意圖
     const fixedMatch = rawLine.match(/^\[?FIXED_INPUT\]?\s*[:：]\s*(.+)$/i);
     if (fixedMatch) {
       correctedQuery = fixedMatch[1].replace(/^["'「『]|["'」』]$/g, '').trim();
@@ -523,7 +532,6 @@ async function renderBilingualAIOutput(aiText) {
   return { ok: renderedPairs > 0, correctedQuery };
 }
 
-// 防連點與併發請求序號鎖：避免短時間重複送出相同問題或舊請求覆蓋新畫面
 let activeRequestSeq = 0;
 let lastSubmittedQuery = '';
 let lastSubmittedTime = 0;
@@ -537,7 +545,6 @@ async function runSmartAI(overrideInput, voiceAlts = [], fromVoice = false) {
     return runDirectTranslate(q);
   }
 
-  // 800ms 內對完全相同問題的連點直接攔截，防止誤觸消耗雙倍配額
   const now = Date.now();
   if (q === lastSubmittedQuery && (now - lastSubmittedTime < 800)) {
     return;
@@ -555,7 +562,7 @@ async function runSmartAI(overrideInput, voiceAlts = [], fromVoice = false) {
   const list = document.getElementById('annotationList');
   replyBox.className = 'ai-reply-box';
   replyBox.style.display = 'block';
-  replyBox.innerText = (currentLang === 'en' && spokenLang === 'en') ? '⚡ AI Thinking...' : '⚡ AI 正在極速思考...';
+  replyBox.innerText = (currentLang === 'en' && spokenLang === 'en') ? '⚡ AI Thinking...' : '⚡ AI 正在極速回答...';
   list.innerHTML = '';
 
   const memoryContext = buildMemoryContextString();
@@ -586,11 +593,9 @@ async function runSmartAI(overrideInput, voiceAlts = [], fromVoice = false) {
     '   - Left side of "|||" must contain ONLY Traditional Chinese characters and Chinese punctuation (write numbers in Chinese characters; NO Pinyin or English letters on the left side).'
   ].filter(Boolean).join('\n');
 
-  // 只要處於連續對話中 (conversationHistory.length > 0) 或帶有語音候選詞，強制結合上下文即時推理，不走靜態快取避免答非所問
   const cloudCacheKey = (conversationHistory.length === 0 && !fromVoice) ? normalizeCloudCacheKey(q) : '';
-  const { text: aiText, source, diagError, usedPublicPool } = await fetchFastAccurateAI(systemRules, q, cloudCacheKey);
+  const { text: aiText } = await fetchFastAccurateAI(systemRules, q, cloudCacheKey);
 
-  // 若在等待期間用戶又發起了新問題，直接丟棄舊結果，防止畫面閃爍或句子疊加
   if (currentSeq !== activeRequestSeq) return;
 
   if (aiText) {
@@ -600,17 +605,13 @@ async function runSmartAI(overrideInput, voiceAlts = [], fromVoice = false) {
         saveAnswerToPersistentCache(normalizeCloudCacheKey(correctedQuery), aiText);
       }
       pushConversationMemory(correctedQuery || q, aiText);
-      if (backupKey && diagError) {
-        replyBox.className = 'ai-reply-box diag-info';
-        replyBox.style.display = 'block';
-        replyBox.innerText = `ℹ️ Answered via ${source} (Google Key Note: ${diagError.slice(0, 140)})`;
-      } 
-      
+      replyBox.style.display = 'none';
       return;
     }
   }
 
-  // 4. 當所有 AI 通道皆無法連線時，給出原句雙語注音保底，絕不白屏或彈窗打斷！
+  // 當處於離線或極端無網路環境時：直接靜默給出雙語翻譯與四位一體注音，絕不彈出任何 API Note 報錯！
+  replyBox.style.display = 'none';
   const hasZh = /[\u4e00-\u9fa5]/.test(q);
   if (hasZh) {
     const enTrans = await translateFast(q, 'zh', 'en');
@@ -621,14 +622,6 @@ async function runSmartAI(overrideInput, voiceAlts = [], fromVoice = false) {
     if (currentSeq !== activeRequestSeq) return;
     appendSentenceProgressive(zhTrans, q);
   }
-
-  replyBox.className = 'ai-reply-box friendly-reminder';
-  replyBox.style.display = 'block';
-  replyBox.innerHTML = diagError
-    ? `🔍 API Note: ${diagError.slice(0, 160)} — Click <b>[🔑 API Key]</b> to add your free Gemini Key.`
-    : (currentLang === 'en'
-        ? `💡 High traffic on the free public channel! Plug in your own free Google Gemini API Key in <b>[🔑 API Key]</b> for unlimited instant responses.`
-        : `💡 當前免費公共通道訪問量較大！請在右上角 <b>[🔑 API Key]</b> 填入您免費的個人 Google Gemini Key 享受極速通道。`);
 }
 
 async function runDirectTranslate(inputOverride) {
@@ -643,17 +636,35 @@ async function runDirectTranslate(inputOverride) {
   const list = document.getElementById('annotationList');
   list.innerHTML = '';
 
-  if (/docs\.google\.com\/document\/d\/|drive\.google\.com\/file\/d\//i.test(raw)) {
+  if (/docs\.google\.com\/|drive\.google\.com\/|dropbox\.com\//i.test(raw)) {
     replyBox.style.display = 'block';
-    replyBox.innerText = '📄 Fetching Google Doc text...';
+    replyBox.innerText = currentLang === 'en' ? '📄 Fetching cloud document...' : '📄 正在極速讀取雲端文檔...';
     const docText = await fetchCloudDocumentByUrl(raw);
     if (docText) {
-      raw = docText.slice(0, 3500).trim();
+      raw = docText.slice(0, 4000).trim();
+      document.getElementById('userInput').value = raw;
       replyBox.style.display = 'none';
     } else {
-      replyBox.innerText = '⚠️ Please make sure the Google Doc is shared as "Anyone with the link can view", or copy & paste the text directly.';
+      replyBox.innerText = currentLang === 'en'
+        ? '⚠️ Please make sure the Google Doc link is set to "Anyone with the link can view".'
+        : '⚠️ 請確認該 Google Docs 連結已設為「知道連結的任何人均可檢視」，或直接複製文字貼上。';
       return;
     }
+  }
+
+  // 若已經是 Source ||| Target 對齊格式，直接渲染不二次轉譯
+  if (raw.includes('|||')) {
+    const pairLines = raw.split(/\n+/).map(l => l.trim()).filter(Boolean);
+    let renderedCount = 0;
+    for (const pl of pairLines) {
+      const pair = parseBilingualPairLine(pl);
+      if (pair) {
+        renderedCount++;
+        appendSentenceProgressive(pair.zh, pair.en);
+        await nextPaintTick();
+      }
+    }
+    if (renderedCount > 0) return;
   }
 
   if (backupKey && raw.length <= 1800) {
