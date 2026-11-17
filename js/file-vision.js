@@ -1,25 +1,27 @@
 /**
- * 模組 5: js/file-vision.js
- * 負責：拖拽文件上傳、PDF/Word 本地秒速解析、圖片輕量壓縮與 Vision AI + OCR 雙軌識別
+ * 模組 5: js/file-vision.js (高併發防刷加固版)
+ * 負責：拖拽文件上傳、PDF/Word 本地秒速解析、960px 圖片壓縮、本機快取與 3級分流識圖
  */
-// =========================================================================
-// 7. 拖拽文件上傳、PDF/Word 提取、圖片壓縮與 Vision AI + OCR 雙軌識別
-// =========================================================================
+const CF_VISION_ENDPOINT = 'https://treespinyin-api.treespinyin.workers.dev/vision-ocr';
+const photoVisionCache = new Map();
+
 const dropZone = document.getElementById('dropZone');
-dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.style.borderColor = '#1b5e20'; });
-dropZone.addEventListener('dragleave', () => { dropZone.style.borderColor = ''; });
-dropZone.addEventListener('drop', (e) => {
-  e.preventDefault();
-  dropZone.style.borderColor = '';
-  if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-    const f = e.dataTransfer.files[0];
-    if (f.type.startsWith('image/')) {
-      handlePhotoUpload({ files: [f], value: '' });
-    } else {
-      handleDocFileUpload({ files: [f], value: '' });
+if (dropZone) {
+  dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.style.borderColor = '#1b5e20'; });
+  dropZone.addEventListener('dragleave', () => { dropZone.style.borderColor = ''; });
+  dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropZone.style.borderColor = '';
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      const f = e.dataTransfer.files[0];
+      if (f.type.startsWith('image/')) {
+        handlePhotoUpload({ files: [f], value: '' });
+      } else {
+        handleDocFileUpload({ files: [f], value: '' });
+      }
     }
-  }
-});
+  });
+}
 
 function loadScriptDynamic(src) {
   return new Promise((resolve, reject) => {
@@ -92,7 +94,7 @@ async function handleDocFileUpload(input) {
   }
 }
 
-function compressImg(file, maxW, quality) {
+function compressImg(file, maxW = 960, quality = 0.72) {
   return new Promise((resolve) => {
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -114,48 +116,90 @@ function compressImg(file, maxW, quality) {
 async function handlePhotoUpload(input) {
   if (!input.files || !input.files[0]) return;
   const file = input.files[0];
+  input.value = '';
+
   const replyBox = document.getElementById('aiReplyBox');
   const list = document.getElementById('annotationList');
   replyBox.className = 'ai-reply-box';
   replyBox.style.display = 'block';
-  replyBox.innerText = currentLang === 'en' ? '📷 Analyzing photo...' : '📷 正在極速識別照片...';
+  replyBox.innerText = currentLang === 'en' ? '📷 Scanning photo...' : '📷 正在極速識別照片...';
   list.innerHTML = '';
 
-  const dataUrl = await compressImg(file, 560, 0.68);
+  const dataUrl = await compressImg(file, 960, 0.72);
   const prev = document.getElementById('previewImg');
   prev.src = dataUrl;
   prev.style.display = 'block';
 
-  const vPrompt = `Look at this image:
-Line 1: Briefly identify what text, dish, or object is in the image (in English & Chinese).
-Line 2+: Output the text or 1-2 descriptive sentences strictly in this paired format (one pair per line):
-Pure_Chinese_Sentence ||| Authentic_English_Sentence`;
-
-  const { text: aiRes } = await fetchFastAccurateAI(vPrompt, dataUrl);
-  if (aiRes) {
-    const { ok } = await renderBilingualAIOutput(aiRes);
-    if (ok) {
-      input.value = '';
-      return;
-    }
+  // 0. 檢查本機快取，避免同一張照片重複點擊消耗額度
+  const imgCacheKey = dataUrl.slice(0, 120) + '_' + dataUrl.length;
+  if (photoVisionCache.has(imgCacheKey)) {
+    const cachedText = photoVisionCache.get(imgCacheKey);
+    const { ok } = await renderBilingualAIOutput(cachedText);
+    if (!ok) await runDirectTranslate(cachedText);
+    return;
   }
 
-  try {
-    const fd = new FormData();
-    fd.append('base64Image', dataUrl);
-    fd.append('language', 'chs');
-    fd.append('apikey', 'helloworld');
-    const r = await fetchWithTimeout('https://api.ocr.space/parse/image', { method: 'POST', body: fd }, 6500);
-    const d = await r.json();
-    const ocrText = d?.ParsedResults?.[0]?.ParsedText?.trim() || '';
-    if (ocrText) {
-      const clean = ocrText.replace(/\r\n/g, '\n').trim();
+  let text = '';
+
+  // 1. 第一級：瀏覽器原生 TextDetector (純本地 0 毫秒、0 流量)
+  if ('TextDetector' in window) {
+    try {
+      const img = new Image();
+      img.src = dataUrl;
+      await img.decode();
+      const detector = new window.TextDetector();
+      const blocks = await detector.detect(img);
+      if (blocks && blocks.length > 0) {
+        const raw = blocks.map(b => b.rawValue).join('\n').trim();
+        if (raw && !/[\u4e00-\u9fa5]/.test(raw) && raw.length >= 3) text = raw;
+      }
+    } catch (e) {}
+  }
+
+  // 2. 第二級：若用戶填了個人 Gemini Key，走個人 Key 視覺直連
+  if (!text && backupKey) {
+    const vPrompt = [
+      'Extract all Chinese and English text from this image accurately, then provide its faithful sentence-by-sentence translation.',
+      'CRITICAL RULES:',
+      '1. Keep the exact original text on the left side of "|||" and its translation on the right side.',
+      '2. Output strictly one sentence pair per line in format: Source_Text ||| Translated_Text',
+      '3. Do NOT output any intro, explanation, or markdown formatting.'
+    ].join('\n');
+    const { text: aiRes } = await fetchFastAccurateAI(vPrompt, dataUrl);
+    if (aiRes) text = aiRes;
+  }
+
+  // 3. 第三級：走您的 Cloudflare Worker 託管通道 (/vision-ocr)，免 Key 且受每日 30 次防刷保護
+  if (!text) {
+    try {
+      const r = await fetchWithTimeout(CF_VISION_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image: dataUrl })
+      }, 12000);
+      const d = await r.json();
+      if (d.success && d.text) {
+        text = d.text;
+      } else if (r.status === 429 && d.message) {
+        replyBox.className = 'ai-reply-box friendly-reminder';
+        replyBox.innerText = '💡 ' + d.message;
+        return;
+      }
+    } catch (e) {}
+  }
+
+  if (text && text.trim()) {
+    photoVisionCache.set(imgCacheKey, text);
+    const { ok } = await renderBilingualAIOutput(text);
+    if (!ok) {
+      const clean = text.replace(/\r\n/g, '\n').trim();
       document.getElementById('userInput').value = clean;
       replyBox.style.display = 'none';
       await runDirectTranslate(clean);
-    } else {
-      replyBox.innerText = '💡 No clear text found.';
     }
-  } catch (e) {}
-  input.value = '';
+  } else {
+    replyBox.innerText = currentLang === 'en'
+      ? '💡 No clear text found. Plug in your free Gemini Key in [🔑 API Key] for enhanced AI Vision.'
+      : '💡 未識別出清晰文字。您可在右上角 [🔑 API Key] 填入免費 Gemini Key 獲得增強識別。';
+  }
 }
