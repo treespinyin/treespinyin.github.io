@@ -19,7 +19,7 @@
   <script defer src="https://cdn.jsdelivr.net/npm/pinyin-pro@3.19.6/dist/index.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/opencc-js@1.0.5/dist/umd/full.js"></script>
 
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=1116b">
 </head>
 <body>
 
@@ -172,7 +172,6 @@
 
           <input type="file" id="docFileInput" accept=".txt,.md,.csv,.json,.html,.rtf,.pdf,.docx,.doc,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword,text/plain" style="display:none" onchange="handleDocFileUpload(this)">
           <input type="file" id="galleryInput" accept="image/*" style="display:none" onchange="handlePhotoUpload(this)">
-          <input type="file" id="cameraInput" accept="image/*" style="display:none" onchange="handlePhotoUpload(this)">
         </div>
 
         <div class="action-row">
@@ -327,10 +326,18 @@
         <span>➔</span>
       </button>
 
-      <button class="option-card-btn" onclick="openCameraNoticeModal()">
+      <button class="option-card-btn" onclick="openCameraModal(); document.getElementById('fileMenuModal').style.display='none';">
         <div>
-          <div id="uiOptCamTitle">📷 Camera & Photo Library</div>
-          <div style="font-size:0.78rem; color:#555; font-weight:400; margin-top:3px;" id="uiOptCamSub">Recognize text or objects from photos</div>
+          <div id="uiOptLiveCamTitle">📸 Instant Camera / 現場實時拍照翻譯</div>
+          <div style="font-size:0.78rem; color:#555; font-weight:400; margin-top:3px;" id="uiOptLiveCamSub">Open live camera viewfinder & snap directly</div>
+        </div>
+        <span>➔</span>
+      </button>
+
+      <button class="option-card-btn" onclick="triggerGalleryPick(); document.getElementById('fileMenuModal').style.display='none';">
+        <div>
+          <div id="uiOptCamTitle">🖼️ Photo Library / 選擇相冊圖片</div>
+          <div style="font-size:0.78rem; color:#555; font-weight:400; margin-top:3px;" id="uiOptCamSub">Choose an existing photo from your device</div>
         </div>
         <span>➔</span>
       </button>
@@ -351,9 +358,24 @@
       </div>
       <div class="action-row">
         <button class="btn btn-green" onclick="triggerGalleryPick()">🖼️ Photo Library</button>
-        <button class="btn btn-blue" onclick="triggerDirectCamera()">📸 Take Photo</button>
+        <button class="btn btn-blue" onclick="openCameraModal(); document.getElementById('cameraNoticeModal').style.display='none';">📸 Take Photo</button>
       </div>
       <button class="nav-btn" style="width:100%; padding:9px; justify-content:center;" onclick="document.getElementById('cameraNoticeModal').style.display='none'">Back</button>
+    </div>
+  </div>
+
+  <!-- ================= 📸 實時相機視訊串流彈窗 (100% 移植自參考文件) ================= -->
+  <div class="modal" id="cameraModal" onclick="if(event.target===this)closeCameraModal()">
+    <div class="modal-box" style="align-items:center; max-width:480px;">
+      <h3 style="margin:0; font-size:1.05rem; color:var(--accent);">📸 現場即時拍照 / Live Camera</h3>
+      <div style="width:100%; background:#000; border-radius:12px; overflow:hidden; position:relative; aspect-ratio:4/3; display:flex; justify-content:center; align-items:center;">
+        <video id="cameraVideo" autoplay playsinline muted style="width:100%; height:100%; object-fit:cover;"></video>
+      </div>
+      <canvas id="cameraCanvas" style="display:none;"></canvas>
+      <div style="display:flex; gap:10px; width:100%; margin-top:4px;">
+        <button type="button" class="btn btn-green" style="flex:1; background:#d93025; color:#fff;" onclick="takeSnapshot()">📸 立即拍照 / Snap</button>
+        <button type="button" class="btn btn-soft" style="flex:1;" onclick="closeCameraModal()">取消 / Cancel</button>
+      </div>
     </div>
   </div>
 
@@ -419,11 +441,11 @@
   </div>
 
     <!-- 核心邏輯模組 (按職責拆分，支援雙擊本地打開與 GitHub Pages 極速並發加載) -->
-  <script defer src="js/core-ui.js"></script>
-  <script defer src="js/video-studio.js"></script>
-  <script defer src="js/voice-pinyin.js"></script>
-  <script defer src="js/ai-translator.js"></script>
-  <script defer src="js/file-vision.js"></script>
-  <script defer src="js/mnemonics-app.js"></script>
+  <script defer src="js/core-ui.js?v=1116b"></script>
+  <script defer src="js/video-studio.js?v=1116b"></script>
+  <script defer src="js/voice-pinyin.js?v=1116b"></script>
+  <script defer src="js/ai-translator.js?v=1116b"></script>
+  <script defer src="js/file-vision.js?v=1116b"></script>
+  <script defer src="js/mnemonics-app.js?v=1116b"></script>
 </body>
 </html>
