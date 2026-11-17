@@ -656,6 +656,21 @@ async function runDirectTranslate(inputOverride) {
     }
   }
 
+  // 若本身已經是 Source ||| Target 格式，直接渲染不二次轉譯
+  if (raw.includes('|||')) {
+    const pairLines = raw.split(/\n+/).map(l => l.trim()).filter(Boolean);
+    let renderedCount = 0;
+    for (const pl of pairLines) {
+      const pair = parseBilingualPairLine(pl);
+      if (pair) {
+        renderedCount++;
+        appendSentenceProgressive(pair.zh, pair.en);
+        await nextPaintTick();
+      }
+    }
+    if (renderedCount > 0) return;
+  }
+
   if (backupKey && raw.length <= 1800) {
     replyBox.style.display = 'block';
     replyBox.innerText = currentLang === 'en' ? '⚡ Translating accurately...' : '⚡ 正在精準翻譯並注音...';
@@ -688,21 +703,34 @@ ${raw}`;
   }
 
   const lines = raw.split(/\n+|(?<=[。！？.!?])\s*/).map(l => l.trim()).filter(Boolean);
-  for (let line of lines) {
-    const hasChinese = /[\u4e00-\u9fa5]/.test(line);
-    if (hasChinese) {
-      appendSentenceProgressive(line, '');
-      await nextPaintTick();
-    } else {
-      const tempBlock = document.createElement('div');
-      tempBlock.className = 'sentence-block';
-      tempBlock.innerHTML = `<div class="en-line">${line}</div><div style="font-size:0.85rem;color:#666;">⚡ Translating...</div>`;
-      list.appendChild(tempBlock);
+  const enLinesToBatch = [];
+  const enIndices = [];
 
-      const zhTrans = await translateFast(line, 'en', 'zh');
-      tempBlock.remove();
-      appendSentenceProgressive(zhTrans, line);
-      await nextPaintTick();
+  lines.forEach((line, idx) => {
+    if (!/[\u4e00-\u9fa5]/.test(line)) {
+      enLinesToBatch.push(line);
+      enIndices.push(idx);
     }
+  });
+
+  // 批量合併翻譯：將所有英文句子合併為單次請求，徹底避免長文多句觸發 429 封鎖
+  let batchTranslatedZh = [];
+  if (enLinesToBatch.length > 0) {
+    const joinedEn = enLinesToBatch.join('\n');
+    const joinedZh = await translateFast(joinedEn, 'en', 'zh');
+    batchTranslatedZh = joinedZh.split(/\n+/).map(s => s.trim());
+  }
+
+  let enCursor = 0;
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (/[\u4e00-\u9fa5]/.test(line)) {
+      appendSentenceProgressive(line, '');
+    } else {
+      const zhTrans = batchTranslatedZh[enCursor] || (await translateFast(line, 'en', 'zh'));
+      enCursor++;
+      appendSentenceProgressive(zhTrans, line);
+    }
+    await nextPaintTick();
   }
 }
