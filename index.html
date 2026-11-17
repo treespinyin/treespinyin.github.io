@@ -19,7 +19,7 @@
   <script defer src="https://cdn.jsdelivr.net/npm/pinyin-pro@3.19.6/dist/index.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/opencc-js@1.0.5/dist/umd/full.js"></script>
 
-  <link rel="stylesheet" href="style.css?v=1118">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -148,27 +148,31 @@
     <!-- ==================== PANEL 1: AI 問答與文件翻譯工作區 ==================== -->
     <div id="panel-workspace" class="tab-panel">
 
-      <!-- 1. 膠囊輸入面板 -->
+      <!-- 1. 膠囊輸入面板 (整合 EN/中文 語音切換按鈕 + 麥克風 + 文件夾按鈕) -->
       <section class="panel">
         <div class="search-box" id="dropZone">
           <textarea id="userInput" rows="2"
             placeholder="Ask AI any question, or enter/paste/drag text, PDF, Word, Google Docs link, or photo to translate..."
             oninput="handleUserInputChange(this)"></textarea>
 
+          <!-- 麥克風左邊的 EN / 中文 語音切換按鈕 (預設 EN 代表說英文，點擊切換為「中文」代表說普通話) -->
           <button class="voice-lang-toggle" id="voiceLangBtn" onclick="toggleVoiceLang()" title="Switch voice input language (EN / 中文)">
             EN
           </button>
 
+          <!-- 語音輸入按鈕 -->
           <button class="icon-action" id="micBtn" onclick="toggleVoice()" title="Voice Input">
             <svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.91-3c-.49 0-.9.36-.98.85C16.52 14.2 14.47 16 12 16s-4.52-1.8-4.93-4.15c-.08-.49-.49-.85-.98-.85-.61 0-1.09.54-1 1.14.49 3 2.89 5.35 5.91 5.78V20c0 .55.45 1 1 1s1-.45 1-1v-2.08c3.02-.43 5.42-2.78 5.91-5.78.1-.6-.39-1.14-1-1.14z"/></svg>
           </button>
 
+          <!-- 文件夾按鈕 -->
           <button class="icon-action" id="fileMenuBtn" onclick="openFileMenuModal()" title="Open File, Google Docs Link or Photo">
             <svg viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2zm4 10h2v2h-2v2h-2v-2h-2v-2h2v-2h2v2z"/></svg>
           </button>
 
-          <input type="file" id="docFileInput" accept=".txt,.md,.csv,.json,.html,.rtf,.pdf,.docx,.doc,.gdoc,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword,text/plain" style="display:none" onchange="handleDocFileUpload(this)">
+          <input type="file" id="docFileInput" accept=".txt,.md,.csv,.json,.html,.rtf,.pdf,.docx,.doc,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword,text/plain" style="display:none" onchange="handleDocFileUpload(this)">
           <input type="file" id="galleryInput" accept="image/*" style="display:none" onchange="handlePhotoUpload(this)">
+          <input type="file" id="cameraInput" accept="image/*" style="display:none" onchange="handlePhotoUpload(this)">
         </div>
 
         <div class="action-row">
@@ -186,25 +190,13 @@
         <div class="annotation-list" id="annotationList"></div>
       </section>
 
-      <!-- 3. 免責聲明 -->
+      <!-- 3. 免責聲明 (100% 原版內容，點擊可直接打開 API Key 彈窗) -->
       <section class="disclaimer-banner" id="uiDisclaimer" onclick="openKeyModal()" style="cursor:pointer;">
         <b>Tip:</b> Trees Pinyin focuses on intuitive Mandarin speaking, rather than AI Q&A (which is a bit beyond my solo capacity right now!). For the best experience, simply plug in your own free Gemini API key or paste your text directly. The author assumes no liability for the accuracy. Your support and shares will help me go full-time to make improvements and write a memory dictionary in the future!
       </section>
 
-      <!-- 4. 底部控制區：直接外置「繁體中文 / 簡體中文」一鍵切換選項 + Layout, Print, Record Video -->
-      <section class="bottom-bar" style="flex-wrap:wrap; gap:10px;">
-        <div style="display:inline-flex; align-items:center; gap:12px; background:#ffffff; border:1px solid #cbd5e1; padding:7px 14px; border-radius:10px; font-size:0.86rem; font-weight:700; color:#111; box-shadow:0 1px 3px rgba(0,0,0,0.04);">
-          <label style="display:inline-flex; align-items:center; gap:5px; cursor:pointer; user-select:none;">
-            <input type="checkbox" id="chkTrad" checked onchange="switchScriptMode('trad')" style="accent-color:#1b5e20; width:16px; height:16px; cursor:pointer;">
-            <span id="uiChkTrad">繁體 (Traditional)</span>
-          </label>
-          <span style="color:#cbd5e1;">|</span>
-          <label style="display:inline-flex; align-items:center; gap:5px; cursor:pointer; user-select:none;">
-            <input type="checkbox" id="chkSimp" onchange="switchScriptMode('simp')" style="accent-color:#1b5e20; width:16px; height:16px; cursor:pointer;">
-            <span id="uiChkSimp">简体 (Simplified)</span>
-          </label>
-        </div>
-
+      <!-- 4. 極簡底部控制區：僅保留 Layout, Print, Record Video -->
+      <section class="bottom-bar">
         <div class="dropdown" id="layoutDropdown">
           <button class="btn btn-dark" onclick="toggleDropdown('layoutDropdown', event)" id="uiLayoutBtn">📐 Layout ▾</button>
           <div class="layout-popover" onclick="event.stopPropagation()">
@@ -212,6 +204,8 @@
               <label><input type="checkbox" id="chkEn" checked onchange="updateRowVisibility()"> <span id="uiChkEn">English</span></label>
               <label><input type="checkbox" id="chkTp" checked onchange="updateRowVisibility()"> <span id="uiChkTp">Trees Pinyin</span></label>
               <label><input type="checkbox" id="chkStd" checked onchange="updateRowVisibility()"> <span id="uiChkStd">Standard Pinyin (ā á ǎ à)</span></label>
+              <label><input type="checkbox" id="chkTrad" checked onchange="switchScriptMode('trad')"> <span id="uiChkTrad">Traditional Chinese</span></label>
+              <label><input type="checkbox" id="chkSimp" onchange="switchScriptMode('simp')"> <span id="uiChkSimp">Simplified Chinese</span></label>
             </div>
             <div class="dropdown-divider"></div>
             <div>
@@ -289,7 +283,7 @@
 
   </main>
 
-  <!-- ✍️ 右鍵三合一修改器彈窗 -->
+  <!-- ✍️ 右鍵三合一修改器彈窗 (z-index: 200005，在錄影中也立即顯示並同步畫入影片) -->
   <div class="modal" id="editCharModal" onclick="if(event.target===this)this.style.display='none'">
     <div class="modal-box" id="editCharModalBox">
       <h3 style="margin:0; color:var(--accent); font-size:1rem;">✍️ Edit Character & Pinyin</h3>
@@ -333,18 +327,10 @@
         <span>➔</span>
       </button>
 
-      <button class="option-card-btn" onclick="openCameraModal(); document.getElementById('fileMenuModal').style.display='none';">
+      <button class="option-card-btn" onclick="openCameraNoticeModal()">
         <div>
-          <div id="uiOptLiveCamTitle">📸 Instant Camera / 現場實時拍照翻譯</div>
-          <div style="font-size:0.78rem; color:#555; font-weight:400; margin-top:3px;" id="uiOptLiveCamSub">Open live camera viewfinder & snap directly</div>
-        </div>
-        <span>➔</span>
-      </button>
-
-      <button class="option-card-btn" onclick="triggerGalleryPick(); document.getElementById('fileMenuModal').style.display='none';">
-        <div>
-          <div id="uiOptCamTitle">🖼️ Photo Library / 選擇相冊圖片</div>
-          <div style="font-size:0.78rem; color:#555; font-weight:400; margin-top:3px;" id="uiOptCamSub">Choose an existing photo from your device</div>
+          <div id="uiOptCamTitle">📷 Camera & Photo Library</div>
+          <div style="font-size:0.78rem; color:#555; font-weight:400; margin-top:3px;" id="uiOptCamSub">Recognize text or objects from photos</div>
         </div>
         <span>➔</span>
       </button>
@@ -365,24 +351,9 @@
       </div>
       <div class="action-row">
         <button class="btn btn-green" onclick="triggerGalleryPick()">🖼️ Photo Library</button>
-        <button class="btn btn-blue" onclick="openCameraModal(); document.getElementById('cameraNoticeModal').style.display='none';">📸 Take Photo</button>
+        <button class="btn btn-blue" onclick="triggerDirectCamera()">📸 Take Photo</button>
       </div>
       <button class="nav-btn" style="width:100%; padding:9px; justify-content:center;" onclick="document.getElementById('cameraNoticeModal').style.display='none'">Back</button>
-    </div>
-  </div>
-
-  <!-- ================= 📸 實時相機視訊串流彈窗 ================= -->
-  <div class="modal" id="cameraModal" onclick="if(event.target===this)closeCameraModal()">
-    <div class="modal-box" style="align-items:center; max-width:480px;">
-      <h3 style="margin:0; font-size:1.05rem; color:var(--accent);">📸 現場即時拍照 / Live Camera</h3>
-      <div style="width:100%; background:#000; border-radius:12px; overflow:hidden; position:relative; aspect-ratio:4/3; display:flex; justify-content:center; align-items:center;">
-        <video id="cameraVideo" autoplay playsinline muted style="width:100%; height:100%; object-fit:cover;"></video>
-      </div>
-      <canvas id="cameraCanvas" style="display:none;"></canvas>
-      <div style="display:flex; gap:10px; width:100%; margin-top:4px;">
-        <button type="button" class="btn btn-green" style="flex:1; background:#d93025; color:#fff;" onclick="takeSnapshot()">📸 立即拍照 / Snap</button>
-        <button type="button" class="btn btn-soft" style="flex:1;" onclick="closeCameraModal()">取消 / Cancel</button>
-      </div>
     </div>
   </div>
 
@@ -428,13 +399,13 @@
     </div>
   </div>
 
-  <!-- ================= 彈窗 5：API Key 設置 ================= -->
+  <!-- ================= 彈窗 5：API Key 設置 (支援自動驗證可用模型) ================= -->
   <div class="modal" id="keyModal" onclick="if(event.target===this)this.style.display='none'">
     <div class="modal-box">
       <h3 style="margin:0; font-size:1.02rem;" id="uiKeyTitle">🔑 Google Gemini API Key</h3>
       <div id="uiKeyDesc" style="font-size:0.85rem; line-height:1.55; background:#f8f9fa; padding:12px; border-radius:8px;">
         <b>Cloudflare High-Speed AI & Global Cache are active by default!</b><br>
-        Enter your own free Google Gemini API Key:<br>
+        Enter your own free Google Gemini API Key (automatically detects all active models under your key including <b>Gemini Flash</b> + <b>Gemma 3 27B</b>):<br>
         <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:#1565c0; font-weight:700;">Get Free Key at Google AI Studio ↗</a>
       </div>
       <input type="text" id="apiKeyInput" autocomplete="off" spellcheck="false" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;font-size:0.9rem;font-family:monospace;" placeholder="AIzaSy... (Optional)">
@@ -447,12 +418,12 @@
     </div>
   </div>
 
-  <!-- 核心邏輯模組 -->
-  <script defer src="js/core-ui.js?v=1118"></script>
-  <script defer src="js/video-studio.js?v=1118"></script>
-  <script defer src="js/voice-pinyin.js?v=1118"></script>
-  <script defer src="js/ai-translator.js?v=1118"></script>
-  <script defer src="js/file-vision.js?v=1118"></script>
-  <script defer src="js/mnemonics-app.js?v=1118"></script>
+    <!-- 核心邏輯模組 (按職責拆分，支援雙擊本地打開與 GitHub Pages 極速並發加載) -->
+  <script defer src="js/core-ui.js"></script>
+  <script defer src="js/video-studio.js"></script>
+  <script defer src="js/voice-pinyin.js"></script>
+  <script defer src="js/ai-translator.js"></script>
+  <script defer src="js/file-vision.js"></script>
+  <script defer src="js/mnemonics-app.js"></script>
 </body>
 </html>
