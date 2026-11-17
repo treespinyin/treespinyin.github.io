@@ -368,3 +368,5 @@ async function handleDocFileUpload(input) {
     replyBox.innerText = '⚠️ Failed to read file.';
   }
 }
+
+window.openLiveCameraModal = openCameraModal;
