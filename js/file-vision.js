@@ -1,109 +1,270 @@
 /**
- * 模組 5: js/file-vision.js (實時相機視訊串流 + 3級分流識圖 + 高併發防刷版)
- * 負責：現場即時拍照串流 (getUserMedia)、拖拽/貼上圖片、PDF/Word 本地秒速解析、960px 輕量壓縮與 3級分流識圖
+ * 模組 5: js/file-vision.js (單文件終極修復版：100% 移植參考文件實時相機串流 + 攔截相冊跳轉)
+ * 只需替換此 1 個文件，無需修改其他文件！
  */
 const CF_VISION_ENDPOINT = 'https://treespinyin-api.treespinyin.workers.dev/vision-ocr';
-const photoVisionCache = new Map();
-let liveCameraStream = null;
+const visionResultCache = new Map();
+let mediaStream = null;
 
-// 自動注入「📸 現場即時拍照視訊串流彈窗 (liveCameraModal)」(若頁面尚未存在)
-function ensureLiveCameraModalExists() {
-  if (document.getElementById('liveCameraModal')) return;
+// 1. 動態建立與參考文件完全一致的「📸 實時相機視訊串流彈窗 (#cameraModal)」
+function ensureCameraModalInjected() {
+  if (document.getElementById('cameraModal')) return;
   const modal = document.createElement('div');
-  modal.id = 'liveCameraModal';
+  modal.id = 'cameraModal';
   modal.className = 'modal';
-  modal.onclick = (e) => { if (e.target === modal) closeLiveCameraModal(); };
+  modal.onclick = function(event) {
+    if (event.target === modal) closeCameraModal();
+  };
   modal.innerHTML = `
     <div class="modal-box" style="align-items:center; max-width:480px;">
-      <h3 style="margin:0; font-size:1.05rem; color:var(--accent);" id="uiLiveCamTitle">📸 Instant Camera Capture / 現場即時拍照</h3>
+      <h3 style="margin:0; font-size:1.05rem; color:var(--accent);">📸 現場即時拍照 / Live Camera</h3>
       <div style="width:100%; background:#000; border-radius:12px; overflow:hidden; position:relative; aspect-ratio:4/3; display:flex; justify-content:center; align-items:center;">
-        <video id="liveCameraVideo" autoplay playsinline muted style="width:100%; height:100%; object-fit:cover;"></video>
+        <video id="cameraVideo" autoplay playsinline style="width:100%; height:100%; object-fit:cover;"></video>
       </div>
-      <canvas id="liveCameraCanvas" style="display:none;"></canvas>
+      <canvas id="cameraCanvas" style="display:none;"></canvas>
       <div style="display:flex; gap:10px; width:100%; margin-top:4px;">
-        <button type="button" class="btn btn-green" style="flex:1; background:#d32f2f; color:#fff;" onclick="takeLiveSnapshot()">📸 Snap & Translate / 立即拍照</button>
-        <button type="button" class="btn btn-soft" style="flex:0.6;" onclick="closeLiveCameraModal()">Cancel / 取消</button>
+        <button type="button" class="btn btn-green" style="flex:1; background:#d93025; color:#fff;" onclick="takeSnapshot()">📸 立即拍照 / Snap</button>
+        <button type="button" class="btn btn-soft" style="flex:1;" onclick="closeCameraModal()">取消 / Cancel</button>
       </div>
     </div>
   `;
   document.body.appendChild(modal);
 }
 
-// 覆蓋原本跳轉相冊的 triggerDirectCamera()，改為直接開啟現場即時相機鏡頭串流！
-async function openLiveCameraModal() {
-  ensureLiveCameraModalExists();
+// 2. 完全按照參考文件 (文件图片识别无网盘evergreen_2.html) 的 openCameraModal 思路與代碼
+async function openCameraModal() {
+  ensureCameraModalInjected();
+
+  // 關閉前序彈窗
+  const fileMenu = document.getElementById('fileMenuModal');
+  if (fileMenu) fileMenu.style.display = 'none';
   const noticeModal = document.getElementById('cameraNoticeModal');
   if (noticeModal) noticeModal.style.display = 'none';
-  const fileModal = document.getElementById('fileMenuModal');
-  if (fileModal) fileModal.style.display = 'none';
 
-  const modal = document.getElementById('liveCameraModal');
-  const video = document.getElementById('liveCameraVideo');
+  const modal = document.getElementById('cameraModal');
+  const video = document.getElementById('cameraVideo');
   modal.style.display = 'flex';
 
   try {
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      throw new Error('NO_GETUSERMEDIA');
-    }
     try {
-      liveCameraStream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 960 } },
+      // 優先嘗試後置高清鏡頭 (與參考文件一致)
+      mediaStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'environment', width: { ideal: 1024 }, height: { ideal: 768 } },
         audio: false
       });
-    } catch (innerErr) {
-      liveCameraStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+    } catch (e1) {
+      // 兼容電腦端鏡頭
+      mediaStream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: false
+      });
     }
-    video.srcObject = liveCameraStream;
+    video.srcObject = mediaStream;
   } catch (err) {
-    closeLiveCameraModal();
-    // 若設備無鏡頭或未授權，平滑降級喚起原生相機 capture="environment"
-    const camInput = document.getElementById('cameraInput');
-    if (camInput) {
-      camInput.setAttribute('capture', 'environment');
-      camInput.click();
-    } else {
-      alert(currentLang === 'en'
-        ? 'Could not access camera. Please check browser camera permissions or choose Photo Library.'
-        : '無法訪問相機鏡頭，請檢查瀏覽器相機權限或使用「相冊選圖」。');
-    }
+    alert('無法訪問相機鏡頭，請檢查瀏覽器權限或使用「選擇本地相冊圖片」。');
+    modal.style.display = 'none';
   }
 }
 
-function closeLiveCameraModal() {
-  const modal = document.getElementById('liveCameraModal');
+function closeCameraModal() {
+  const modal = document.getElementById('cameraModal');
   if (modal) modal.style.display = 'none';
-  if (liveCameraStream) {
-    liveCameraStream.getTracks().forEach(track => track.stop());
-    liveCameraStream = null;
+  if (mediaStream) {
+    mediaStream.getTracks().forEach(track => track.stop());
+    mediaStream = null;
   }
 }
 
-async function takeLiveSnapshot() {
-  const video = document.getElementById('liveCameraVideo');
-  const canvas = document.getElementById('liveCameraCanvas');
+function takeSnapshot() {
+  const video = document.getElementById('cameraVideo');
+  const canvas = document.getElementById('cameraCanvas');
   if (!video || !video.videoWidth) return;
-
   const maxW = 960;
   let w = video.videoWidth, h = video.videoHeight;
-  if (w > maxW) {
-    h = Math.round((h * maxW) / w);
-    w = maxW;
-  }
+  if (w > maxW) { h = Math.round((h * maxW) / w); w = maxW; }
   canvas.width = w;
   canvas.height = h;
   const ctx = canvas.getContext('2d');
   ctx.drawImage(video, 0, 0, w, h);
   const dataUrl = canvas.toDataURL('image/jpeg', 0.72);
-  closeLiveCameraModal();
-  await processImageDataUrl(dataUrl);
+  closeCameraModal();
+  processImageBase64(dataUrl);
 }
 
-// 讓全域的 triggerDirectCamera 直接調用實時相機視窗
-window.triggerDirectCamera = openLiveCameraModal;
-window.openLiveCameraModal = openLiveCameraModal;
-window.closeLiveCameraModal = closeLiveCameraModal;
-window.takeLiveSnapshot = takeLiveSnapshot;
+// 3. 徹底攔截所有跳轉相冊的舊邏輯（在所有腳本載入後強制接管）
+function hijackCameraTriggers() {
+  ensureCameraModalInjected();
 
+  // 強制覆蓋 mnemonics-app.js 後載入的同名函數
+  window.triggerDirectCamera = function() {
+    openCameraModal();
+  };
+  window.openCameraModal = openCameraModal;
+  window.closeCameraModal = closeCameraModal;
+  window.takeSnapshot = takeSnapshot;
+
+  // 攔截 #cameraInput.click()，就算舊代碼呼叫它也強制打開實時相機！
+  const camInput = document.getElementById('cameraInput');
+  if (camInput) {
+    camInput.click = function(e) {
+      if (e && e.preventDefault) e.preventDefault();
+      openCameraModal();
+    };
+  }
+}
+
+// 立即執行一次，並在 DOMContentLoaded (所有 defer 腳本執行完畢後) 再強制覆蓋一次！
+hijackCameraTriggers();
+window.addEventListener('DOMContentLoaded', hijackCameraTriggers);
+setTimeout(hijackCameraTriggers, 100);
+
+// =========================================================================
+// 4. 圖片壓縮與三級分流極速識別 (完全對齊參考文件 processImageBase64)
+// =========================================================================
+function compressImg(file, maxW = 960, quality = 0.72) {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let w = img.width, h = img.height;
+        if (w > maxW) { h = Math.round((h * maxW) / w); w = maxW; }
+        canvas.width = w;
+        canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+async function tryNativeBrowserTextDetector(dataUrl) {
+  if (!('TextDetector' in window)) return '';
+  try {
+    const img = new Image();
+    img.src = dataUrl;
+    await img.decode();
+    const detector = new window.TextDetector();
+    const blocks = await detector.detect(img);
+    if (blocks && blocks.length > 0) {
+      const raw = blocks.map(b => b.rawValue).join('\n').trim();
+      if (raw && !/[\u4e00-\u9fa5]/.test(raw) && raw.length >= 3) {
+        return raw;
+      }
+    }
+  } catch (e) {}
+  return '';
+}
+
+async function fetchGeminiVisionText(dataUrl) {
+  const activeKey = (typeof backupKey !== 'undefined' && backupKey) ? backupKey : (localStorage.getItem('tp_v22_backup_key') || '');
+  if (!activeKey) return '';
+  const mime = dataUrl.substring(dataUrl.indexOf(':') + 1, dataUrl.indexOf(';'));
+  const base64Data = dataUrl.split(',')[1];
+  const prompt = [
+    'Extract all Chinese and English text from this image accurately, then provide its faithful sentence-by-sentence translation.',
+    'CRITICAL RULES:',
+    '1. Keep the exact original text on the left side of "|||" and its translation on the right side.',
+    '2. Output strictly one sentence pair per line in format: Source_Text ||| Translated_Text',
+    '3. Do NOT output any intro, explanation, or markdown formatting.'
+  ].join('\n');
+  try {
+    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${encodeURIComponent(activeKey)}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }, { inline_data: { mime_type: mime, data: base64Data } }] }],
+        generationConfig: { temperature: 0.1 }
+      })
+    });
+    const d = await r.json();
+    return d?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
+  } catch (e) {
+    return '';
+  }
+}
+
+async function processImageBase64(dataUrl) {
+  const replyBox = document.getElementById('aiReplyBox');
+  const list = document.getElementById('annotationList');
+  replyBox.className = 'ai-reply-box';
+  replyBox.style.display = 'block';
+  replyBox.innerText = currentLang === 'en' ? '⚡ Scanning image text...' : '⚡ 正在極速識別圖片文字...';
+  list.innerHTML = '';
+
+  const prev = document.getElementById('previewImg');
+  if (prev) {
+    prev.src = dataUrl;
+    prev.style.display = 'block';
+  }
+
+  if (visionResultCache.has(dataUrl)) {
+    const cached = visionResultCache.get(dataUrl);
+    const { ok } = await renderBilingualAIOutput(cached);
+    if (!ok) await runDirectTranslate(cached);
+    return;
+  }
+
+  let text = '';
+  // 第 1 級：瀏覽器原生 TextDetector
+  text = await tryNativeBrowserTextDetector(dataUrl);
+
+  // 第 2 級：用戶專屬 Gemini Key
+  if (!text && typeof backupKey !== 'undefined' && backupKey) {
+    replyBox.innerText = '✨ 正在透過您的專屬 Gemini Key 極速識別...';
+    text = await fetchGeminiVisionText(dataUrl);
+  }
+
+  // 第 3 級：Cloudflare Worker 雲端視覺引擎 (免 API Key)
+  if (!text) {
+    try {
+      replyBox.innerText = '☁️ 正在透過雲端視覺引擎識別圖片（免 API Key）...';
+      const r = await fetch(CF_VISION_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image: dataUrl })
+      });
+      const d = await r.json();
+      if (d.success && d.text) {
+        text = d.text;
+      } else if (r.status === 429 && d.message) {
+        replyBox.className = 'ai-reply-box friendly-reminder';
+        replyBox.innerText = '💡 ' + d.message;
+        return;
+      }
+    } catch (err) {
+      console.error('Worker Vision OCR error:', err);
+    }
+  }
+
+  if (text && text.trim()) {
+    visionResultCache.set(dataUrl, text);
+    replyBox.style.display = 'none';
+    const { ok } = await renderBilingualAIOutput(text);
+    if (!ok) {
+      const clean = text.replace(/\r?\n/g, '\n').trim();
+      document.getElementById('userInput').value = clean.slice(0, 4000);
+      await runDirectTranslate(clean);
+    }
+  } else {
+    replyBox.innerText = '⚠️ 圖片未識別出文字。若高峰期雲端繁忙，可點擊右上角 🔑 填入您的免費 Gemini Key 獲得專屬高速通道。';
+  }
+}
+
+async function handlePhotoUpload(input) {
+  if (!input.files || !input.files[0]) return;
+  const file = input.files[0];
+  input.value = '';
+  const compressedDataUrl = await compressImg(file, 960, 0.72);
+  await processImageBase64(compressedDataUrl);
+}
+
+// =========================================================================
+// 5. 拖拽、貼上圖片與 PDF / Word 文件解析
+// =========================================================================
 const dropZone = document.getElementById('dropZone');
 if (dropZone) {
   dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.style.borderColor = '#1b5e20'; });
@@ -122,17 +283,15 @@ if (dropZone) {
   });
 }
 
-// 支援全域 Ctrl+V / Cmd+V 直接貼上截圖識別
 document.addEventListener('paste', async (e) => {
   const items = (e.clipboardData || window.clipboardData)?.items;
   if (!items) return;
   for (const item of items) {
     if (item.type && item.type.indexOf('image') !== -1) {
-      e.preventDefault();
       const file = item.getAsFile();
       if (file) {
-        const dataUrl = await compressImg(file, 960, 0.72);
-        await processImageDataUrl(dataUrl);
+        const compressedDataUrl = await compressImg(file, 960, 0.72);
+        await processImageBase64(compressedDataUrl);
       }
       break;
     }
@@ -208,121 +367,4 @@ async function handleDocFileUpload(input) {
   } catch (err) {
     replyBox.innerText = '⚠️ Failed to read file.';
   }
-}
-
-function compressImg(file, maxW = 960, quality = 0.72) {
-  return new Promise((resolve) => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const img = new Image();
-      img.onload = () => {
-        const c = document.createElement('canvas');
-        let w = img.width, h = img.height;
-        if (w > maxW) { h = Math.round((h * maxW) / w); w = maxW; }
-        c.width = w; c.height = h;
-        c.getContext('2d').drawImage(img, 0, 0, w, h);
-        resolve(c.toDataURL('image/jpeg', quality));
-      };
-      img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
-  });
-}
-
-// 統一處理拍照截圖或相冊上傳的 Base64 圖像 (3級分流識圖 + 快取 + 0%二次轉譯)
-async function processImageDataUrl(dataUrl) {
-  const replyBox = document.getElementById('aiReplyBox');
-  const list = document.getElementById('annotationList');
-  replyBox.className = 'ai-reply-box';
-  replyBox.style.display = 'block';
-  replyBox.innerText = currentLang === 'en' ? '📷 Scanning image text...' : '📷 正在極速識別照片文字...';
-  list.innerHTML = '';
-
-  const prev = document.getElementById('previewImg');
-  if (prev) {
-    prev.src = dataUrl;
-    prev.style.display = 'block';
-  }
-
-  const imgCacheKey = dataUrl.slice(0, 120) + '_' + dataUrl.length;
-  if (photoVisionCache.has(imgCacheKey)) {
-    const cachedText = photoVisionCache.get(imgCacheKey);
-    const { ok } = await renderBilingualAIOutput(cachedText);
-    if (!ok) await runDirectTranslate(cachedText);
-    return;
-  }
-
-  let text = '';
-
-  // 1. 第一級：瀏覽器原生 TextDetector (純本地 0 毫秒、0 流量)
-  if ('TextDetector' in window) {
-    try {
-      const img = new Image();
-      img.src = dataUrl;
-      await img.decode();
-      const detector = new window.TextDetector();
-      const blocks = await detector.detect(img);
-      if (blocks && blocks.length > 0) {
-        const raw = blocks.map(b => b.rawValue).join('\n').trim();
-        if (raw && !/[\u4e00-\u9fa5]/.test(raw) && raw.length >= 3) text = raw;
-      }
-    } catch (e) {}
-  }
-
-  // 2. 第二級：若用戶填了個人 Gemini Key，走個人 Key 視覺直連
-  if (!text && backupKey) {
-    replyBox.innerText = currentLang === 'en' ? '✨ Scanning with your Gemini Key...' : '✨ 正在透過您的專屬 Gemini Key 極速識別...';
-    const vPrompt = [
-      'Extract all Chinese and English text from this image accurately, then provide its faithful sentence-by-sentence translation.',
-      'CRITICAL RULES:',
-      '1. Keep the exact original text on the left side of "|||" and its translation on the right side.',
-      '2. Output strictly one sentence pair per line in format: Source_Text ||| Translated_Text',
-      '3. Do NOT output any intro, explanation, or markdown formatting.'
-    ].join('\n');
-    const { text: aiRes } = await fetchFastAccurateAI(vPrompt, dataUrl);
-    if (aiRes) text = aiRes;
-  }
-
-  // 3. 第三級：走您的 Cloudflare Worker 託管通道 (/vision-ocr)，免 Key 兜底
-  if (!text) {
-    try {
-      replyBox.innerText = currentLang === 'en' ? '☁️ Cloud Vision OCR (No Key required)...' : '☁️ 正在透過雲端視覺引擎識別圖片（免 API Key）...';
-      const r = await fetchWithTimeout(CF_VISION_ENDPOINT, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ image: dataUrl })
-      }, 12000);
-      const d = await r.json();
-      if (d.success && d.text) {
-        text = d.text;
-      } else if (r.status === 429 && d.message) {
-        replyBox.className = 'ai-reply-box friendly-reminder';
-        replyBox.innerText = '💡 ' + d.message;
-        return;
-      }
-    } catch (e) {}
-  }
-
-  if (text && text.trim()) {
-    photoVisionCache.set(imgCacheKey, text);
-    const { ok } = await renderBilingualAIOutput(text);
-    if (!ok) {
-      const clean = text.replace(/\r?\n/g, '\n').trim();
-      document.getElementById('userInput').value = clean;
-      replyBox.style.display = 'none';
-      await runDirectTranslate(clean);
-    }
-  } else {
-    replyBox.innerText = currentLang === 'en'
-      ? '💡 No clear text found. Plug in your free Gemini Key in [🔑 API Key] for enhanced AI Vision.'
-      : '💡 未識別出清晰文字。您可在右上角 [🔑 API Key] 填入免費 Gemini Key 獲得增強識別。';
-  }
-}
-
-async function handlePhotoUpload(input) {
-  if (!input.files || !input.files[0]) return;
-  const file = input.files[0];
-  input.value = '';
-  const dataUrl = await compressImg(file, 960, 0.72);
-  await processImageDataUrl(dataUrl);
 }
