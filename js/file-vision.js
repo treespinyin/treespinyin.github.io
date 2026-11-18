@@ -236,7 +236,7 @@ async function handleDocFileUpload(input) {
   }
 }
 
-function compressImg(file, maxW = 960, quality = 0.72) {
+function compressImg(file, maxW = 1024, quality = 0.78) {
   return new Promise((resolve) => {
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -244,15 +244,145 @@ function compressImg(file, maxW = 960, quality = 0.72) {
       img.onload = () => {
         const c = document.createElement('canvas');
         let w = img.width, h = img.height;
-        if (w > maxW) { h = Math.round((h * maxW) / w); w = maxW; }
+        if (w > maxW || h > maxW) {
+          if (w >= h) { h = Math.round((h * maxW) / w); w = maxW; }
+          else { w = Math.round((w * maxW) / h); h = maxW; }
+        }
         c.width = w; c.height = h;
-        c.getContext('2d').drawImage(img, 0, 0, w, h);
+        const ctx = c.getContext('2d');
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(0, 0, w, h);
+        ctx.drawImage(img, 0, 0, w, h);
         resolve(c.toDataURL('image/jpeg', quality));
       };
+      img.onerror = () => resolve('');
       img.src = e.target.result;
     };
+    reader.onerror = () => resolve('');
     reader.readAsDataURL(file);
   });
+}
+
+// 內部專用：帶超時的極速請求
+async function fetchVisionWithTimeout(url, options, timeoutMs = 7000) {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), timeoutMs);
+  try {
+    return await fetch(url, { ...options, signal: ctrl.signal });
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+// 內部專用：極速直連 Gemini Vision / Cloudflare Worker 並發引擎（1~2秒秒出）
+async function recognizeImageDirectFast(dataUrl, activeKey) {
+  if (!dataUrl || !dataUrl.includes(',')) return '';
+  const base64Data = dataUrl.split(',')[1];
+  const mimeType = (dataUrl.match(/^data:(image\/[a-zA-Z0-9.+-]+);base64,/) || [])[1] || 'image/jpeg';
+
+  const visionPrompt = [
+    'Extract all visible text from this image accurately (if no text, briefly describe the main object/scene in 1-2 sentences).',
+    'Output strictly sentence-by-sentence in this exact bilingual format (one pair per line):',
+    'Traditional_Chinese_Sentence ||| Authentic_English_Sentence',
+    'CRITICAL RULES:',
+    '1. Left side of "|||" MUST be Traditional Chinese; right side MUST be authentic English.',
+    '2. Keep the original meaning 100% faithful without altering original sentences.',
+    '3. Do NOT output any intro, markdown, or explanation.'
+  ].join('\n');
+
+  const geminiPayload = {
+    contents: [{
+      parts: [
+        { text: visionPrompt },
+        { inline_data: { mime_type: mimeType, data: base64Data } }
+      ]
+    }],
+    generationConfig: {
+      temperature: 0.1,
+      maxOutputTokens: 1500
+    }
+  };
+
+  // 通道 A：只要有 API Key，直接並發競速 Google 官方極速模型 (1.2秒秒出，不走慢速輪詢)
+  if (activeKey && activeKey.startsWith('AIza')) {
+    const models = ['gemini-flash-lite-latest', 'gemini-flash-latest', 'gemini-2.0-flash'];
+    const callDirectModel = async (model) => {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(activeKey)}`;
+      const res = await fetchVisionWithTimeout(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(geminiPayload)
+      }, 7500);
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const data = await res.json();
+      const text = data?.candidates?.[0]?.content?.parts?.map(p => p.text || '').join('\n').trim();
+      if (!text) throw new Error('Empty');
+      return text;
+    };
+
+    try {
+      return await Promise.any(models.map(m => callDirectModel(m)));
+    } catch (e) {}
+  }
+
+  // 通道 B：免 Key 用戶端點 + 外部 fetchFastAccurateAI 並發競速 (絕不串行卡 30 秒)
+  const workerTasks = [];
+
+  // 任務 1：調用主 Worker 端點 (相容標準 POST payload 與 image 參數)
+  workerTasks.push((async () => {
+    const res = await fetchVisionWithTimeout('https://treespinyin-api.treespinyin.workers.dev/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        prompt: visionPrompt,
+        image: dataUrl,
+        imageBase64: base64Data,
+        mimeType: mimeType,
+        contents: geminiPayload.contents
+      })
+    }, 7000);
+    if (!res.ok) throw new Error('Worker root failed');
+    const d = await res.json();
+    const txt = (
+      d?.text ||
+      d?.reply ||
+      d?.result ||
+      d?.candidates?.[0]?.content?.parts?.[0]?.text ||
+      ''
+    ).trim();
+    if (!txt) throw new Error('Empty root response');
+    return txt;
+  })());
+
+  // 任務 2：調用 Worker /vision-ocr 端點
+  workerTasks.push((async () => {
+    const res = await fetchVisionWithTimeout('https://treespinyin-api.treespinyin.workers.dev/vision-ocr', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ image: dataUrl, prompt: visionPrompt })
+    }, 7000);
+    if (!res.ok) throw new Error('Vision OCR failed');
+    const d = await res.json();
+    const txt = (d?.text || d?.reply || '').trim();
+    if (!txt) throw new Error('Empty vision-ocr');
+    return txt;
+  })());
+
+  // 任務 3：如果全域有定義 fetchFastAccurateAI，一併納入並發競速
+  if (typeof fetchFastAccurateAI === 'function') {
+    workerTasks.push((async () => {
+      const r = await fetchFastAccurateAI(visionPrompt, dataUrl);
+      const txt = (r?.text || '').trim();
+      if (!txt) throw new Error('Empty fetchFastAccurateAI');
+      return txt;
+    })());
+  }
+
+  try {
+    return await Promise.any(workerTasks);
+  } catch (e) {
+    return '';
+  }
 }
 
 async function handlePhotoUpload(input) {
@@ -265,14 +395,36 @@ async function handlePhotoUpload(input) {
   replyBox.innerText = currentLang === 'en' ? '📷 Scanning image text...' : '📷 正在極速識別圖片文字...';
   list.innerHTML = '';
 
-  const dataUrl = await compressImg(file, 960, 0.72);
+  const dataUrl = await compressImg(file, 1024, 0.78);
+  if (!dataUrl) {
+    replyBox.innerText = currentLang === 'en' ? '⚠️ Failed to load image.' : '⚠️ 圖片讀取失敗。';
+    input.value = '';
+    return;
+  }
+
   const prev = document.getElementById('previewImg');
-  prev.src = dataUrl;
-  prev.style.display = 'block';
+  if (prev) {
+    prev.src = dataUrl;
+    prev.style.display = 'block';
+  }
 
-  let recognizedText = '';
+  // 全方位抓取用戶可能填入的 API Key
+  const modalKeyVal = (document.getElementById('apiKeyInput')?.value || '').trim();
+  const savedKeyVal = (
+    localStorage.getItem('tp_v22_backup_key') ||
+    localStorage.getItem('tp_test_gemini_key') ||
+    localStorage.getItem('tp_gemini_api_key') ||
+    localStorage.getItem('gemini_api_key') ||
+    ''
+  ).trim();
+  const globalKey = (typeof backupKey !== 'undefined' && backupKey) ? String(backupKey).trim() : '';
+  const activeKey = (modalKeyVal || globalKey || savedKeyVal).replace(/\s+/g, '');
 
-  if ('TextDetector' in window) {
+  // 第一順位：極速雲端 Vision 並發識圖（支援中英混排、古詩詞、菜單、手寫與實物拍照，1~2秒直出）
+  let recognizedText = await recognizeImageDirectFast(dataUrl, activeKey);
+
+  // 第二順位：若雲端完全離線，使用瀏覽器原生硬體加速 TextDetector 0成本兜底純英文/數字圖片
+  if (!recognizedText && 'TextDetector' in window) {
     try {
       const img = new Image();
       img.src = dataUrl;
@@ -281,57 +433,29 @@ async function handlePhotoUpload(input) {
       const blocks = await detector.detect(img);
       if (blocks && blocks.length > 0) {
         const raw = blocks.map(b => b.rawValue).join('\n').trim();
-        if (raw && !/[\u4e00-\u9fa5]/.test(raw) && raw.length >= 3) {
+        if (raw && raw.length >= 2) {
           recognizedText = raw;
         }
       }
     } catch (e) {}
   }
 
-  const modalKeyVal = (document.getElementById('apiKeyInput')?.value || '').trim();
-  const savedKeyVal = (localStorage.getItem('tp_v22_backup_key') || localStorage.getItem('tp_test_gemini_key') || '').trim();
-  const activeKey = (backupKey || modalKeyVal || savedKeyVal).replace(/\s+/g, '');
-
-  if (!recognizedText && activeKey) {
-    const vPrompt = [
-      'Extract all Chinese and English text from this image accurately, then provide its faithful sentence-by-sentence translation.',
-      'CRITICAL RULES:',
-      '1. Keep the exact original text on the left side of "|||" and its translation on the right side.',
-      '2. Output strictly one sentence pair per line in format: Source_Text ||| Translated_Text',
-      '3. Do NOT output any intro, explanation, or markdown formatting.'
-    ].join('\n');
-    const { text: aiRes } = await fetchFastAccurateAI(vPrompt, dataUrl);
-    if (aiRes) recognizedText = aiRes;
-  }
-
-  if (!recognizedText) {
-    try {
-      const r = await fetchWithTimeout('https://treespinyin-api.treespinyin.workers.dev/vision-ocr', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ image: dataUrl })
-      }, 15000);
-      const d = await r.json();
-      if (d && d.success && d.text) recognizedText = d.text;
-    } catch (e) {}
-  }
-
-  if (!recognizedText) {
-    const vPrompt = `Look at this image:
-Line 1: Briefly identify what text, dish, or object is in the image (in English & Chinese).
-Line 2+: Output the text or 1-2 descriptive sentences strictly in this paired format (one pair per line):
-Pure_Chinese_Sentence ||| Authentic_English_Sentence`;
-    const { text: aiRes } = await fetchFastAccurateAI(vPrompt, dataUrl);
-    if (aiRes) recognizedText = aiRes;
-  }
-
   if (recognizedText && recognizedText.trim()) {
+    const cleanText = recognizedText
+      .replace(/^```[a-zA-Z]*\n?/gm, '')
+      .replace(/```$/gm, '')
+      .trim();
+
     replyBox.style.display = 'none';
-    const { ok } = await renderBilingualAIOutput(recognizedText);
-    if (!ok) {
-      const clean = recognizedText.replace(/\r\n/g, '\n').trim();
-      document.getElementById('userInput').value = clean;
-      await runDirectTranslate(clean);
+    let rendered = false;
+    if (typeof renderBilingualAIOutput === 'function') {
+      const res = await renderBilingualAIOutput(cleanText);
+      rendered = !!(res && res.ok);
+    }
+    if (!rendered) {
+      const userInputEl = document.getElementById('userInput');
+      if (userInputEl) userInputEl.value = cleanText;
+      await runDirectTranslate(cleanText);
     }
   } else {
     replyBox.innerText = currentLang === 'en'
@@ -423,7 +547,7 @@ function takeLiveCameraSnapshot() {
   const video = document.getElementById('liveCameraVideo');
   const canvas = document.getElementById('liveCameraCanvas');
   if (!video || !video.videoWidth) return;
-  const maxW = 960;
+  const maxW = 1024;
   let w = video.videoWidth, h = video.videoHeight;
   if (w > maxW) { h = Math.round((h * maxW) / w); w = maxW; }
   canvas.width = w;
@@ -434,7 +558,7 @@ function takeLiveCameraSnapshot() {
     if (blob) {
       handlePhotoUpload({ files: [new File([blob], 'camera_snapshot.jpg', { type: 'image/jpeg' })], value: '' });
     }
-  }, 'image/jpeg', 0.72);
+  }, 'image/jpeg', 0.78);
 }
 
 // 關鍵：在所有 defer 腳本（包括排在最後的 mnemonics-app.js）執行完畢後，強制將 triggerDirectCamera 指向實時相機！
