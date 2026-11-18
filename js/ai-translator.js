@@ -1,15 +1,7 @@
 /**
  * 模組 4: js/ai-translator.js
- * 負責：商業化免維護 AI 問答引擎 (Evergreen 動態別名、14篇經典名篇+120條持久快取、四層容錯調度) 與極速批量雙向翻譯
+ * 負責：商業化免維護 AI 問答引擎 (100% 用戶端資源優先、防卡死超時鎖、14篇經典名篇+120條持久快取、五層容錯調度) 與極速批量雙向翻譯
  */
-// =========================================================================
-// 6. 商業化免維護 AI 問答引擎
-//    (1) 極速別名置頂 ('gemini-flash-lite-latest', 'gemini-flash-latest')，0秒直連永不 404 過期
-//    (2) 智慧版本號降序演算法，未來升級 Gemini 4.0 / 5.0 自動排入第一梯隊
-//    (3) 跨重整持久快取 (LocalStorage + Memory Map + 14篇內建名篇)，常見問題 0ms 秒回零消耗
-//    (4) 防連點與併發序號鎖 (activeRequestSeq)，杜絕重複請求浪費額度
-//    (5) 四層階梯容錯：本地端側AI/快取 ➔ 個人Key ➔ Cloudflare全球池 ➔ 開源大模型/雙語翻譯保底
-// =========================================================================
 const VERIFIED_CLASSICS = [
   {
     match: /靜夜思|静夜思|床前明月光|\bquiet night thoughts?\b/i,
@@ -29,7 +21,7 @@ const VERIFIED_CLASSICS = [
   {
     match: /贈汪倫|赠汪伦|桃花潭水深千尺/i,
     key: "赠汪伦",
-    reply: "《贈汪倫》唐・李白 ||| To Wang Lun by Li Bai\n李白乘舟將欲行， ||| I, Li Bai, sit aboard a boat about to set off,\n忽聞岸上踏歌聲。 ||| When suddenly I hear the sound of singing and dancing on the shore.\n桃花潭水深千尺， ||| The Peach Blossom Pool is a thousand feet deep,\n不及汪倫送我情。 ||| Yet not as deep as the farewell love Wang Lun shows to me."
+    reply: "《贈汪倫》唐・李白 ||| To Wang Lun by Li Bai\n李白乘舟將欲行， ||| I, Li Bai, sit aboard a boat about to set off,\n忽聞岸上踏歌聲。 ||| When suddenly I hear the sound of singing and dancing on the shore.\n桃花潭潭水深千尺， ||| The Peach Blossom Pool is a thousand feet deep,\n不及汪倫送我情。 ||| Yet not as deep as the farewell love Wang Lun shows to me."
   },
   {
     match: /春夜喜雨|好雨知時節/i,
@@ -85,7 +77,7 @@ const VERIFIED_CLASSICS = [
 
 function normalizeCloudCacheKey(rawQ) {
   if (!rawQ) return '';
-  const fixed = applyFuzzyVoiceCorrection(rawQ);
+  const fixed = typeof applyFuzzyVoiceCorrection === 'function' ? applyFuzzyVoiceCorrection(rawQ) : rawQ;
   return fixed
     .toLowerCase()
     .replace(/請背誦|请背诵|背誦|背诵|唐詩|唐诗|古詩|古诗/g, '')
@@ -104,14 +96,12 @@ try {
   backupKey = (localStorage.getItem('tp_v22_backup_key') || localStorage.getItem('tp_test_gemini_key') || '').trim();
 } catch (e) {}
 
-// 置頂極速模型 gemini-flash-lite-latest，移除已下線會報 404 的 gemma-3-27b-it
 let availableFastModels = [
   'gemini-flash-lite-latest',
   'gemini-flash-latest'
 ];
 let modelsDiscoveredForKey = '';
 
-// 載入 24 小時內快取的模型清單
 try {
   const cachedModelMeta = JSON.parse(localStorage.getItem('tp_v15_discovered_models') || 'null');
   if (cachedModelMeta && cachedModelMeta.key === backupKey && (Date.now() - cachedModelMeta.ts < 86400000) && Array.isArray(cachedModelMeta.models) && cachedModelMeta.models.length > 0) {
@@ -138,7 +128,6 @@ function getAndIncrementPublicUsage() {
   }
 }
 
-// 雙層快取（Memory Map + LocalStorage 持久化快取 120 條 + 14 篇內建名詩）
 const PERSISTENT_CACHE_STORAGE_KEY = 'tp_v15_persistent_qa_cache';
 const sessionDynamicCache = new Map();
 
@@ -178,7 +167,6 @@ function refreshKeyBtnStyle() {
 }
 refreshKeyBtnStyle();
 
-// 智慧版本號降序演算法：極速 Lite 優先，排除已下線的 gemma-3-27b-it
 async function discoverAuthorizedModels(key) {
   if (!key) return availableFastModels;
   const cleanKey = key.replace(/\s+/g, '');
@@ -246,7 +234,40 @@ function fetchWithTimeout(url, options = {}, timeoutMs = 8500) {
   return fetch(url, { ...options, signal: ctrl.signal }).finally(() => clearTimeout(timer));
 }
 
-// 移除會引起 400 Bad Request 重試延遲的 thinkingBudget: 0，一次請求直接成功
+// 瀏覽器端側本地 AI (Gemini Nano) — 連同 .create() 一起加上 1.2 秒防卡死鎖！有就用本地算力，沒下載好就秒跳過！
+let chromeAISession = null;
+async function tryFastLocalBrowserAI(fullPromptText) {
+  const runLocal = async () => {
+    const factory = (typeof window.LanguageModel !== 'undefined' && typeof window.LanguageModel.create === 'function')
+      ? window.LanguageModel
+      : (window.ai && window.ai.languageModel ? window.ai.languageModel : null);
+    if (!factory) return '';
+
+    if (typeof factory.availability === 'function') {
+      const avail = await factory.availability();
+      if (avail !== 'readily' && avail !== 'available') return '';
+    } else if (typeof factory.capabilities === 'function') {
+      const caps = await factory.capabilities();
+      if (!caps || (caps.available !== 'readily' && caps.available !== 'available')) return '';
+    }
+
+    if (!chromeAISession) {
+      chromeAISession = await factory.create({ temperature: 0.1, topK: 2 });
+    }
+    const res = await chromeAISession.prompt(fullPromptText);
+    return (res || '').trim();
+  };
+
+  try {
+    return await Promise.race([
+      runLocal(),
+      new Promise((resolve) => setTimeout(() => resolve(''), 1500))
+    ]);
+  } catch (e) {
+    return '';
+  }
+}
+
 async function callSingleGeminiModel(modelName, fullPromptText, activeKey, signal, dataUrl = null) {
   const cleanKey = activeKey.replace(/\s+/g, '');
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${encodeURIComponent(cleanKey)}`;
@@ -313,28 +334,6 @@ async function callKeylessFreeOpenSourceLLM(systemRules, userQuestion) {
   return '';
 }
 
-// 瀏覽器原生本地 AI (Chrome Gemini Nano) 0 成本推理器
-let chromeAISession = null;
-async function tryBrowserLocalAI(fullPromptText) {
-  try {
-    const factory = (typeof window.LanguageModel !== 'undefined' && typeof window.LanguageModel.create === 'function')
-      ? window.LanguageModel
-      : (window.ai && window.ai.languageModel ? window.ai.languageModel : null);
-    if (!factory) return '';
-    if (!chromeAISession) {
-      chromeAISession = await factory.create({ temperature: 0.1, topK: 2 });
-    }
-    const res = await Promise.race([
-      chromeAISession.prompt(fullPromptText),
-      new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 4500))
-    ]);
-    return (res || '').trim();
-  } catch (e) {
-    return '';
-  }
-}
-
-// 商業化四層階梯容錯調度器
 async function fetchFastAccurateAI(systemRulesOrPrompt, userQuestionOrDataUrl = '', cacheKeyForCloud = '') {
   let fullPromptText = '';
   let sysRules = '';
@@ -354,24 +353,25 @@ async function fetchFastAccurateAI(systemRulesOrPrompt, userQuestionOrDataUrl = 
     userQ = systemRulesOrPrompt;
   }
 
-  // 0. 若本機持久/動態快取已存在此獨立問題的回答，0 毫秒極速返回！
+  // 第 1 層：本機持久/動態快取命中 (100% 用戶端記憶體/LocalStorage，0ms 直出)
   if (!dataUrl && cacheKey && sessionDynamicCache.has(cacheKey)) {
     return { text: sessionDynamicCache.get(cacheKey), source: 'Instant Cache', diagError: null, usedPublicPool: false };
   }
 
   const modalKeyVal = (document.getElementById('apiKeyInput')?.value || '').trim();
-  const activeKey = (backupKey || modalKeyVal).replace(/\s+/g, '');
+  const savedKeyVal = (localStorage.getItem('tp_v22_backup_key') || localStorage.getItem('tp_test_gemini_key') || '').trim();
+  const activeKey = (backupKey || modalKeyVal || savedKeyVal).replace(/\s+/g, '');
 
-  // 0.5 若未填寫個人 Key 且為文字請求，優先嘗試瀏覽器本地 Gemini Nano (0 伺服器成本)
+  // 第 2 層：若用戶未填 Key，優先嘗試瀏覽器內建本地 AI (帶 1.5s 防卡死鎖，0 伺服器成本)
   if (!activeKey && !dataUrl) {
-    const localTxt = await tryBrowserLocalAI(fullPromptText);
+    const localTxt = await tryFastLocalBrowserAI(fullPromptText);
     if (localTxt && localTxt.includes('|||')) {
       if (cacheKey) saveAnswerToPersistentCache(cacheKey, localTxt);
       return { text: localTxt, source: 'Local Browser AI', diagError: null, usedPublicPool: false };
     }
   }
 
-  // 1. 若有個人 Google API Key：優先走個人 Key (gemini-flash-lite-latest -> gemini-flash-latest)
+  // 第 3 層：用戶個人 Google API Key 直連 (100% 使用用戶自己的 Key 與網路，不消耗伺服器)
   if (activeKey) {
     if (modelsDiscoveredForKey !== activeKey) {
       await discoverAuthorizedModels(activeKey);
@@ -382,7 +382,7 @@ async function fetchFastAccurateAI(systemRulesOrPrompt, userQuestionOrDataUrl = 
 
     for (let i = 0; i < modelsToTry.length; i++) {
       const ctrl = new AbortController();
-      const timer = setTimeout(() => ctrl.abort(), 10500);
+      const timer = setTimeout(() => ctrl.abort(), 11000);
       try {
         const txt = await callSingleGeminiModel(modelsToTry[i], fullPromptText, activeKey, ctrl.signal, dataUrl);
         clearTimeout(timer);
@@ -400,10 +400,14 @@ async function fetchFastAccurateAI(systemRulesOrPrompt, userQuestionOrDataUrl = 
     }
   }
 
-  // 2. 走 Cloudflare Worker 全球邊緣免費快取與多 Key 輪詢池
-  for (let i = 0; i < CF_WORKER_ENDPOINTS.length; i++) {
+  // 第 4 層：Cloudflare Worker 全球邊緣免費快取與輪詢池
+  const endpoints = (typeof CF_WORKER_ENDPOINTS !== 'undefined' && Array.isArray(CF_WORKER_ENDPOINTS))
+    ? CF_WORKER_ENDPOINTS
+    : ['https://treespinyin-api.treespinyin.workers.dev'];
+
+  for (let i = 0; i < endpoints.length; i++) {
     try {
-      const r = await fetchWithTimeout(CF_WORKER_ENDPOINTS[i], {
+      const r = await fetchWithTimeout(endpoints[i], {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -423,7 +427,7 @@ async function fetchFastAccurateAI(systemRulesOrPrompt, userQuestionOrDataUrl = 
     } catch (e) {}
   }
 
-  // 3. 免 Key 免費開源大模型直連兜底 (僅限非圖片請求)
+  // 第 5 層：用戶端 IP 直連免費開源大模型兜底 (0 伺服器成本)
   if (!dataUrl) {
     const freeAiTxt = await callKeylessFreeOpenSourceLLM(sysRules || 'You are a helpful bilingual Mandarin assistant.', userQ);
     if (freeAiTxt) {
@@ -442,16 +446,27 @@ async function translateFast(text, fromLang, toLang) {
   const src = isZhToEn ? 'zh-CN' : 'en';
   const tgt = isZhToEn ? 'en' : 'zh-CN';
 
-  // 1. 優先使用客戶端瀏覽器內建離線神經網路翻譯 (window.Translator - 0 成本、0 延遲)
+  // 1. 優先嘗試用戶端瀏覽器原生離線翻譯 (window.Translator — 加上 900ms 防卡死鎖，防止未下載語言包時掛起)
   try {
     if (window.Translator && typeof window.Translator.create === 'function') {
-      const t = await window.Translator.create({ sourceLanguage: src.slice(0, 2), targetLanguage: tgt.slice(0, 2) });
-      const r = await t.translate(clean);
-      if (r && r.trim() && r.trim() !== clean) return r.trim();
+      const localTrans = await Promise.race([
+        (async () => {
+          if (typeof window.Translator.availability === 'function') {
+            const avail = await window.Translator.availability({ sourceLanguage: src.slice(0, 2), targetLanguage: tgt.slice(0, 2) });
+            if (avail !== 'readily' && avail !== 'available') return '';
+          }
+          const t = await window.Translator.create({ sourceLanguage: src.slice(0, 2), targetLanguage: tgt.slice(0, 2) });
+          return await t.translate(clean);
+        })(),
+        new Promise((resolve) => setTimeout(() => resolve(''), 900))
+      ]);
+      if (localTrans && localTrans.trim() && localTrans.trim() !== clean) {
+        return localTrans.trim();
+      }
     }
   } catch (e) {}
 
-  // 2. 雙通道免費極速神經翻譯並發競速
+  // 2. 用戶端直接並發調用免費極速神經翻譯通道 (不經過你的伺服器)
   const tasks = [
     fetchWithTimeout(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=${src}&tl=${tgt}&dt=t&q=${encodeURIComponent(clean)}`, {}, 4500)
       .then(r => r.json())
@@ -540,7 +555,7 @@ function parseBilingualPairLine(rawLine) {
 
 async function renderBilingualAIOutput(aiText) {
   const replyBox = document.getElementById('aiReplyBox');
-  replyBox.style.display = 'none';
+  if (replyBox) replyBox.style.display = 'none';
   const rawLines = aiText
     .replace(/```[a-z]*\n?/gi, '')
     .replace(/```/g, '')
@@ -609,7 +624,8 @@ let lastSubmittedQuery = '';
 let lastSubmittedTime = 0;
 
 async function runSmartAI(overrideInput, voiceAlts = [], fromVoice = false) {
-  const q = applyFuzzyVoiceCorrection((overrideInput !== undefined ? overrideInput : document.getElementById('userInput').value).trim(), voiceAlts);
+  const rawInput = (overrideInput !== undefined ? overrideInput : document.getElementById('userInput').value).trim();
+  const q = typeof applyFuzzyVoiceCorrection === 'function' ? applyFuzzyVoiceCorrection(rawInput, voiceAlts) : rawInput;
   const altsToUse = (Array.isArray(voiceAlts) && voiceAlts.length > 0) ? voiceAlts : latestVoiceCandidates;
   if (!q) return;
 
@@ -637,7 +653,7 @@ async function runSmartAI(overrideInput, voiceAlts = [], fromVoice = false) {
   replyBox.innerText = (currentLang === 'en' && spokenLang === 'en') ? '⚡ AI Thinking...' : '⚡ AI 正在極速思考...';
   list.innerHTML = '';
 
-  // 1. 14 篇經典古詩文 0ms 離線秒回（零伺服器消耗）
+  // 1. 14 篇經典古詩文 0ms 離線秒回
   if (conversationHistory.length === 0 && !fromVoice) {
     for (const item of VERIFIED_CLASSICS) {
       if (item.match.test(q)) {
@@ -649,7 +665,6 @@ async function runSmartAI(overrideInput, voiceAlts = [], fromVoice = false) {
   }
 
   const memoryContext = buildMemoryContextString();
-  // 打字提問 (!fromVoice) 精簡 70% 語音聲學提示詞，速度翻倍且杜絕 Worker Timeout
   const acousticInfo = fromVoice
     ? `[Speech Recognition Data] Selected Mode: ${spokenLang === 'en' ? 'EN' : '中文'} | Raw Transcript: "${q}" | ${getPhoneticTrackForAI(q)} | Alternative Speech Candidates: ${JSON.stringify(altsToUse)}`
     : '';
@@ -695,8 +710,7 @@ async function runSmartAI(overrideInput, voiceAlts = [], fromVoice = false) {
     }
   }
 
-  // 當雲端皆滿載時，靜默給出原句雙語注音保底，絕不展示技術報錯干擾用戶
-  replyBox.style.display = 'none';
+  // 當雲端滿載時，給出雙語翻譯注音保底並溫馨提示填入免費 Key
   const hasZh = /[\u4e00-\u9fa5]/.test(q);
   if (hasZh) {
     const enTrans = await translateFast(q, 'zh', 'en');
@@ -707,6 +721,12 @@ async function runSmartAI(overrideInput, voiceAlts = [], fromVoice = false) {
     if (currentSeq !== activeRequestSeq) return;
     appendSentenceProgressive(zhTrans, q);
   }
+
+  replyBox.className = 'ai-reply-box friendly-reminder';
+  replyBox.style.display = 'block';
+  replyBox.innerHTML = currentLang === 'en'
+    ? `💡 Tip: Click <b>[🔑 API Key]</b> at the top right to add your free Google Gemini Key for instant AI Q&A!`
+    : `💡 提示：點擊右上角 <b>[🔑 API Key]</b> 填入您免費的個人 Google Gemini Key 即可享受極速 AI 問答！`;
 }
 
 async function runDirectTranslate(inputOverride) {
@@ -737,7 +757,6 @@ async function runDirectTranslate(inputOverride) {
     }
   }
 
-  // 若輸入本身已包含 "|||" 雙語對齊格式，直接本地 0ms 渲染
   if (raw.includes('|||')) {
     const pairLines = raw.split(/\r?\n+/).map(l => l.trim()).filter(Boolean);
     let renderedCount = 0;
@@ -792,7 +811,6 @@ ${raw}`;
 
   if (lines.length === 0) return;
 
-  // 商業化高併發優化：將所有英文句子合併為單次 "\n" 批量請求，速度提升 5 倍且杜絕 429 封鎖
   const enIndices = [];
   const enLinesToBatch = [];
   const results = new Array(lines.length);

@@ -2,9 +2,6 @@
  * 模組 5: js/file-vision.js
  * 負責：拖拽/剪貼簿貼圖上傳、Word(.docx/.doc)/PDF/Google Docs(.gdoc)/SRT 本地秒速解析、現場實時相機拍照與三級分流識圖
  */
-// =========================================================================
-// 7. 拖拽文件上傳、Ctrl+V 貼圖、PDF/Word 本地極速提取與三級視覺 OCR
-// =========================================================================
 const dropZone = document.getElementById('dropZone');
 if (dropZone) {
   dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.style.borderColor = '#1b5e20'; });
@@ -23,7 +20,6 @@ if (dropZone) {
   });
 }
 
-// 支援頁面任意位置 Ctrl+V 直接貼上截圖識別
 window.addEventListener('paste', (e) => {
   const items = e.clipboardData?.items;
   if (!items) return;
@@ -48,7 +44,6 @@ function loadScriptDynamic(src) {
   });
 }
 
-// 100% 客戶端原生解壓 .docx (支援 Google Docs / 新版 Word 的 Data Descriptor Bit 3，0 外部依賴)
 async function extractDocxTextNative(arrayBuffer) {
   const bytes = new Uint8Array(arrayBuffer);
   const view = new DataView(arrayBuffer);
@@ -132,7 +127,6 @@ async function extractDocxTextNative(arrayBuffer) {
   return '';
 }
 
-// 100% 客戶端提取舊版二進制 .doc (MS Word 97-2003) 文字
 function extractLegacyDocTextNative(arrayBuffer) {
   try {
     const utf16 = new TextDecoder('utf-16le').decode(arrayBuffer);
@@ -162,18 +156,15 @@ async function extractPdfTextFast(file) {
 
 async function extractWordTextFast(file) {
   const buf = await file.arrayBuffer();
-  // 1. 優先使用瀏覽器原生 DecompressionStream 0.05 秒離線解壓
   let text = await extractDocxTextNative(buf);
   if (text) return text;
 
-  // 2. 備選動態載入 mammoth.js
   try {
     await loadScriptDynamic('https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js');
     const res = await mammoth.extractRawText({ arrayBuffer: buf });
     if (res && res.value && res.value.trim()) return res.value.trim();
   } catch (e) {}
 
-  // 3. 舊版 .doc 掃描器兜底
   return extractLegacyDocTextNative(buf);
 }
 
@@ -188,7 +179,6 @@ async function handleDocFileUpload(input) {
   replyBox.innerText = currentLang === 'en' ? `📄 Reading ${file.name}...` : `📄 正在讀取並翻譯 ${file.name}...`;
 
   try {
-    // 支援本地 Google Drive 同步的 .gdoc 捷徑檔（自動解析 JSON 網址並抓取雲端正文）
     if (name.endsWith('.gdoc') || name.endsWith('.gsheet') || name.endsWith('.gslides')) {
       const rawJson = await file.text();
       try {
@@ -282,7 +272,6 @@ async function handlePhotoUpload(input) {
 
   let recognizedText = '';
 
-  // 第 1 級：優先嘗試用戶瀏覽器原生 TextDetector (純本地 0 流量、0 伺服器成本)
   if ('TextDetector' in window) {
     try {
       const img = new Image();
@@ -299,9 +288,10 @@ async function handlePhotoUpload(input) {
     } catch (e) {}
   }
 
-  // 第 2 級：若用戶填寫了個人 Key，走直連多模態精準識別
   const modalKeyVal = (document.getElementById('apiKeyInput')?.value || '').trim();
-  const activeKey = (backupKey || modalKeyVal).replace(/\s+/g, '');
+  const savedKeyVal = (localStorage.getItem('tp_v22_backup_key') || localStorage.getItem('tp_test_gemini_key') || '').trim();
+  const activeKey = (backupKey || modalKeyVal || savedKeyVal).replace(/\s+/g, '');
+
   if (!recognizedText && activeKey) {
     const vPrompt = [
       'Extract all Chinese and English text from this image accurately, then provide its faithful sentence-by-sentence translation.',
@@ -314,7 +304,6 @@ async function handlePhotoUpload(input) {
     if (aiRes) recognizedText = aiRes;
   }
 
-  // 第 3 級：走 Cloudflare Worker 託管視覺通道 (/vision-ocr)，免 Key 兜底
   if (!recognizedText) {
     try {
       const r = await fetchWithTimeout('https://treespinyin-api.treespinyin.workers.dev/vision-ocr', {
@@ -327,7 +316,6 @@ async function handlePhotoUpload(input) {
     } catch (e) {}
   }
 
-  // 第 4 級：若為風景或單一物品照片，走一般 Vision AI 描述兜底
   if (!recognizedText) {
     const vPrompt = `Look at this image:
 Line 1: Briefly identify what text, dish, or object is in the image (in English & Chinese).
@@ -354,7 +342,7 @@ Pure_Chinese_Sentence ||| Authentic_English_Sentence`;
 }
 
 // =========================================================================
-// 📸 現場實時相機拍照視訊視窗 (支援電腦攝像頭與手機後置鏡頭直接取景拍照)
+// 📸 現場實時相機拍照視訊視窗 (確保在 DOMContentLoaded 後覆蓋 mnemonics-app.js 的同名函數)
 // =========================================================================
 let liveCamStream = null;
 
@@ -391,7 +379,11 @@ async function openLiveCameraModal() {
   const fileModal = document.getElementById('fileMenuModal');
   if (fileModal) fileModal.style.display = 'none';
 
+  // 注意：若直接用雙擊本地檔案 (file://) 打開且非 localhost，瀏覽器安全機制可能禁止調用攝像頭，此時溫馨提示
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    alert(currentLang === 'en'
+      ? 'Live camera requires HTTPS (e.g. treespinyin.com) or localhost. Opening photo picker instead.'
+      : '現場相機需要透過網址 (https:// 或 localhost) 打開才能存取鏡頭，現在為您打開圖片選擇器。');
     document.getElementById('cameraInput').click();
     return;
   }
@@ -412,7 +404,9 @@ async function openLiveCameraModal() {
     video.srcObject = liveCamStream;
   } catch (err) {
     modal.style.display = 'none';
-    document.getElementById('cameraInput').click();
+    alert(currentLang === 'en'
+      ? 'Camera permission denied or camera unavailable. Please allow camera access in browser settings.'
+      : '無法開啟相機鏡頭（請確認瀏覽器已允許相機權限，且透過 https 網址開啟）。');
   }
 }
 
@@ -443,5 +437,9 @@ function takeLiveCameraSnapshot() {
   }, 'image/jpeg', 0.72);
 }
 
-// 升級原本的 triggerDirectCamera：優先打開實時相機取景視窗，不支援時才退回 input[type=file]
+// 關鍵：在所有 defer 腳本（包括排在最後的 mnemonics-app.js）執行完畢後，強制將 triggerDirectCamera 指向實時相機！
 window.triggerDirectCamera = openLiveCameraModal;
+window.addEventListener('DOMContentLoaded', () => {
+  ensureLiveCameraModal();
+  window.triggerDirectCamera = openLiveCameraModal;
+});
