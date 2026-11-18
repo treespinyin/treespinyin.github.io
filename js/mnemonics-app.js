@@ -244,7 +244,15 @@ function openFileMenuModal() { document.getElementById('fileMenuModal').style.di
 function triggerDocUpload() { document.getElementById('fileMenuModal').style.display = 'none'; document.getElementById('docFileInput').click(); }
 function openCameraNoticeModal() { document.getElementById('fileMenuModal').style.display = 'none'; document.getElementById('cameraNoticeModal').style.display = 'flex'; }
 function triggerGalleryPick() { document.getElementById('cameraNoticeModal').style.display = 'none'; document.getElementById('galleryInput').click(); }
-function triggerDirectCamera() { document.getElementById('cameraNoticeModal').style.display = 'none'; document.getElementById('cameraInput').click(); }
+function triggerDirectCamera() {
+  document.getElementById('cameraNoticeModal').style.display = 'none';
+  if (typeof openLiveCameraModal === 'function') {
+    openLiveCameraModal();
+  } else {
+    document.getElementById('cameraInput').click();
+  }
+}
+
 function openInstallModal() { document.getElementById('installModal').style.display = 'flex'; }
 function openKeyModal() {
   document.getElementById('apiKeyInput').value = backupKey;
