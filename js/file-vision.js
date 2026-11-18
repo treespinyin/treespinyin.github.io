@@ -1,6 +1,6 @@
 /**
  * 模組 5: js/file-vision.js
- * 負責：拖拽/剪貼簿貼圖上傳、Word(.docx/.doc)/PDF/Google Docs(.gdoc)/SRT 本地秒速解析、現場實時相機拍照與三級分流識圖
+ * 負責：拖拽/剪貼簿貼圖上傳、Word(.docx/.doc)/PDF/Google Docs(.gdoc)/SRT 本地秒速解析、現場實時相機拍照（防常亮即時斷電）與本地硬體+雲端並發極速識圖
  */
 const dropZone = document.getElementById('dropZone');
 if (dropZone) {
@@ -264,7 +264,7 @@ function compressImg(file, maxW = 1024, quality = 0.78) {
 }
 
 // 內部專用：帶超時的極速請求
-async function fetchVisionWithTimeout(url, options, timeoutMs = 7000) {
+async function fetchVisionWithTimeout(url, options, timeoutMs = 6500) {
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), timeoutMs);
   try {
@@ -274,7 +274,31 @@ async function fetchVisionWithTimeout(url, options, timeoutMs = 7000) {
   }
 }
 
-// 內部專用：極速直連 Gemini Vision / Cloudflare Worker 並發引擎（1~2秒秒出）
+// 第一層：0.05秒手機/電腦端側硬體原生 OCR (NPU/GPU 加速，0流量、0延遲)
+async function detectImageTextClientHardware(dataUrl) {
+  if (!('TextDetector' in window)) return '';
+  try {
+    const img = new Image();
+    img.src = dataUrl;
+    await img.decode();
+    const detector = new window.TextDetector();
+    const blocks = await detector.detect(img);
+    if (blocks && blocks.length > 0) {
+      const raw = blocks
+        .map(b => (b.rawValue || '').trim())
+        .filter(Boolean)
+        .join('\n')
+        .trim();
+      // 只要包含有效中文字或至少 3 個英數字元，直接採納本地硬體極速結果
+      if (/[\u4e00-\u9fa5]/.test(raw) || /[A-Za-z0-9]{3,}/.test(raw)) {
+        return raw;
+      }
+    }
+  } catch (e) {}
+  return '';
+}
+
+// 第二層：極速直連 Gemini Vision / Cloudflare Worker 並發引擎（1~2秒秒出）
 async function recognizeImageDirectFast(dataUrl, activeKey) {
   if (!dataUrl || !dataUrl.includes(',')) return '';
   const base64Data = dataUrl.split(',')[1];
@@ -303,7 +327,7 @@ async function recognizeImageDirectFast(dataUrl, activeKey) {
     }
   };
 
-  // 通道 A：只要有 API Key，直接並發競速 Google 官方極速模型 (1.2秒秒出，不走慢速輪詢)
+  // 通道 A：只要有 API Key，直接並發競速 Google 官方極速模型 (1.2秒秒出)
   if (activeKey && activeKey.startsWith('AIza')) {
     const models = ['gemini-flash-lite-latest', 'gemini-flash-latest', 'gemini-2.0-flash'];
     const callDirectModel = async (model) => {
@@ -312,7 +336,7 @@ async function recognizeImageDirectFast(dataUrl, activeKey) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(geminiPayload)
-      }, 7500);
+      }, 7000);
       if (!res.ok) throw new Error('HTTP ' + res.status);
       const data = await res.json();
       const text = data?.candidates?.[0]?.content?.parts?.map(p => p.text || '').join('\n').trim();
@@ -328,7 +352,6 @@ async function recognizeImageDirectFast(dataUrl, activeKey) {
   // 通道 B：免 Key 用戶端點 + 外部 fetchFastAccurateAI 並發競速 (絕不串行卡 30 秒)
   const workerTasks = [];
 
-  // 任務 1：調用主 Worker 端點 (相容標準 POST payload 與 image 參數)
   workerTasks.push((async () => {
     const res = await fetchVisionWithTimeout('https://treespinyin-api.treespinyin.workers.dev/', {
       method: 'POST',
@@ -340,7 +363,7 @@ async function recognizeImageDirectFast(dataUrl, activeKey) {
         mimeType: mimeType,
         contents: geminiPayload.contents
       })
-    }, 7000);
+    }, 6500);
     if (!res.ok) throw new Error('Worker root failed');
     const d = await res.json();
     const txt = (
@@ -354,13 +377,12 @@ async function recognizeImageDirectFast(dataUrl, activeKey) {
     return txt;
   })());
 
-  // 任務 2：調用 Worker /vision-ocr 端點
   workerTasks.push((async () => {
     const res = await fetchVisionWithTimeout('https://treespinyin-api.treespinyin.workers.dev/vision-ocr', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ image: dataUrl, prompt: visionPrompt })
-    }, 7000);
+    }, 6500);
     if (!res.ok) throw new Error('Vision OCR failed');
     const d = await res.json();
     const txt = (d?.text || d?.reply || '').trim();
@@ -368,7 +390,6 @@ async function recognizeImageDirectFast(dataUrl, activeKey) {
     return txt;
   })());
 
-  // 任務 3：如果全域有定義 fetchFastAccurateAI，一併納入並發競速
   if (typeof fetchFastAccurateAI === 'function') {
     workerTasks.push((async () => {
       const r = await fetchFastAccurateAI(visionPrompt, dataUrl);
@@ -386,6 +407,9 @@ async function recognizeImageDirectFast(dataUrl, activeKey) {
 }
 
 async function handlePhotoUpload(input) {
+  // 任何上傳或拍照觸發識圖時，第一時間強制斷開所有相機硬體軌道，防止鏡頭常亮
+  stopAllCameraStreams();
+
   if (!input.files || !input.files[0]) return;
   const file = input.files[0];
   const replyBox = document.getElementById('aiReplyBox');
@@ -408,7 +432,7 @@ async function handlePhotoUpload(input) {
     prev.style.display = 'block';
   }
 
-  // 全方位抓取用戶可能填入的 API Key
+  // 全方位讀取用戶可能填入的 API Key
   const modalKeyVal = (document.getElementById('apiKeyInput')?.value || '').trim();
   const savedKeyVal = (
     localStorage.getItem('tp_v22_backup_key') ||
@@ -420,25 +444,22 @@ async function handlePhotoUpload(input) {
   const globalKey = (typeof backupKey !== 'undefined' && backupKey) ? String(backupKey).trim() : '';
   const activeKey = (modalKeyVal || globalKey || savedKeyVal).replace(/\s+/g, '');
 
-  // 第一順位：極速雲端 Vision 並發識圖（支援中英混排、古詩詞、菜單、手寫與實物拍照，1~2秒直出）
-  let recognizedText = await recognizeImageDirectFast(dataUrl, activeKey);
+  // 第一優先：0.05秒調用手機/電腦底層硬體 TextDetector (同時在背景預熱雲端並發請求，做到 0 等待)
+  const cloudPromise = recognizeImageDirectFast(dataUrl, activeKey);
+  let recognizedText = await detectImageTextClientHardware(dataUrl);
 
-  // 第二順位：若雲端完全離線，使用瀏覽器原生硬體加速 TextDetector 0成本兜底純英文/數字圖片
-  if (!recognizedText && 'TextDetector' in window) {
-    try {
-      const img = new Image();
-      img.src = dataUrl;
-      await img.decode();
-      const detector = new window.TextDetector();
-      const blocks = await detector.detect(img);
-      if (blocks && blocks.length > 0) {
-        const raw = blocks.map(b => b.rawValue).join('\n').trim();
-        if (raw && raw.length >= 2) {
-          recognizedText = raw;
-        }
-      }
-    } catch (e) {}
+  // 若本地硬體成功掃出高純度文字（且用戶未強制使用雲端視覺描述，或掃出的文字可直接本地極速翻譯）
+  if (recognizedText) {
+    replyBox.style.display = 'none';
+    const userInputEl = document.getElementById('userInput');
+    if (userInputEl) userInputEl.value = recognizedText;
+    await runDirectTranslate(recognizedText);
+    input.value = '';
+    return;
   }
+
+  // 第二順位：本地硬體不支援該語系（如手機端純中文圖）時，直接取用已並發啟動的雲端 Vision 結果
+  recognizedText = await cloudPromise;
 
   if (recognizedText && recognizedText.trim()) {
     const cleanText = recognizedText
@@ -448,7 +469,7 @@ async function handlePhotoUpload(input) {
 
     replyBox.style.display = 'none';
     let rendered = false;
-    if (typeof renderBilingualAIOutput === 'function') {
+    if (typeof renderBilingualAIOutput === 'function' && cleanText.includes('|||')) {
       const res = await renderBilingualAIOutput(cleanText);
       rendered = !!(res && res.ok);
     }
@@ -466,9 +487,38 @@ async function handlePhotoUpload(input) {
 }
 
 // =========================================================================
-// 📸 現場實時相機拍照視訊視窗 (確保在 DOMContentLoaded 後覆蓋 mnemonics-app.js 的同名函數)
+// 📸 現場實時相機拍照視訊視窗 (含徹底斷電防常亮機制)
 // =========================================================================
 let liveCamStream = null;
+
+// 強制切斷頁面上所有相機硬體軌道與 video 綁定，徹底消除鏡頭綠燈/紅點常亮
+function stopAllCameraStreams() {
+  if (liveCamStream) {
+    try {
+      liveCamStream.getTracks().forEach(t => {
+        t.enabled = false;
+        t.stop();
+      });
+    } catch (e) {}
+    liveCamStream = null;
+  }
+  // 遍歷頁面上所有 video 元素（防止其他腳本如 mnemonics-app.js 或殘留預覽綁定了舊 stream）
+  document.querySelectorAll('video').forEach(v => {
+    if (v.srcObject) {
+      try {
+        const s = v.srcObject;
+        if (s && typeof s.getTracks === 'function') {
+          s.getTracks().forEach(t => {
+            t.enabled = false;
+            t.stop();
+          });
+        }
+      } catch (e) {}
+      v.srcObject = null;
+      try { v.pause(); v.removeAttribute('src'); v.load(); } catch (e) {}
+    }
+  });
+}
 
 function ensureLiveCameraModal() {
   if (document.getElementById('liveCameraModal')) return;
@@ -494,16 +544,26 @@ function ensureLiveCameraModal() {
   document.body.appendChild(modal);
   document.getElementById('btnSnapLiveCam').addEventListener('click', takeLiveCameraSnapshot);
   document.getElementById('btnCloseLiveCam').addEventListener('click', closeLiveCameraModal);
+
+  // 監聽彈窗顯示狀態：只要彈窗被外部任何按鈕設為 display:none，立即切斷攝像頭電源
+  const observer = new MutationObserver(() => {
+    if (modal.style.display === 'none' || modal.hidden) {
+      stopAllCameraStreams();
+    }
+  });
+  observer.observe(modal, { attributes: true, attributeFilter: ['style', 'class', 'hidden'] });
 }
 
 async function openLiveCameraModal() {
   ensureLiveCameraModal();
+  // 開啟前先清場，確保沒有任何殘留軌道佔用鏡頭
+  stopAllCameraStreams();
+
   const noticeModal = document.getElementById('cameraNoticeModal');
   if (noticeModal) noticeModal.style.display = 'none';
   const fileModal = document.getElementById('fileMenuModal');
   if (fileModal) fileModal.style.display = 'none';
 
-  // 注意：若直接用雙擊本地檔案 (file://) 打開且非 localhost，瀏覽器安全機制可能禁止調用攝像頭，此時溫馨提示
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
     alert(currentLang === 'en'
       ? 'Live camera requires HTTPS (e.g. treespinyin.com) or localhost. Opening photo picker instead.'
@@ -525,8 +585,14 @@ async function openLiveCameraModal() {
     } catch (e1) {
       liveCamStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
     }
+    // 若在等待權限期間用戶已經關閉了彈窗，立刻停止剛拿到的 stream
+    if (modal.style.display === 'none') {
+      stopAllCameraStreams();
+      return;
+    }
     video.srcObject = liveCamStream;
   } catch (err) {
+    stopAllCameraStreams();
     modal.style.display = 'none';
     alert(currentLang === 'en'
       ? 'Camera permission denied or camera unavailable. Please allow camera access in browser settings.'
@@ -535,34 +601,51 @@ async function openLiveCameraModal() {
 }
 
 function closeLiveCameraModal() {
+  stopAllCameraStreams();
   const modal = document.getElementById('liveCameraModal');
   if (modal) modal.style.display = 'none';
-  if (liveCamStream) {
-    liveCamStream.getTracks().forEach(t => t.stop());
-    liveCamStream = null;
-  }
 }
 
 function takeLiveCameraSnapshot() {
   const video = document.getElementById('liveCameraVideo');
   const canvas = document.getElementById('liveCameraCanvas');
-  if (!video || !video.videoWidth) return;
+  if (!video || !video.videoWidth) {
+    closeLiveCameraModal();
+    return;
+  }
   const maxW = 1024;
   let w = video.videoWidth, h = video.videoHeight;
   if (w > maxW) { h = Math.round((h * maxW) / w); w = maxW; }
   canvas.width = w;
   canvas.height = h;
+  // 1. 瞬間將當前畫面幀繪製到畫布
   canvas.getContext('2d').drawImage(video, 0, 0, w, h);
+
+  // 2. 畫面抓完的同一毫秒，立即同步切斷攝像頭硬體電源並關閉視窗（不等 toBlob，綠燈立刻熄滅！）
+  closeLiveCameraModal();
+
+  // 3. 轉為圖片 Blob 送入極速識別流程
   canvas.toBlob((blob) => {
-    closeLiveCameraModal();
     if (blob) {
       handlePhotoUpload({ files: [new File([blob], 'camera_snapshot.jpg', { type: 'image/jpeg' })], value: '' });
     }
   }, 'image/jpeg', 0.78);
 }
 
-// 關鍵：在所有 defer 腳本（包括排在最後的 mnemonics-app.js）執行完畢後，強制將 triggerDirectCamera 指向實時相機！
+// 全域防常亮保護：按下 ESC、切換瀏覽器分頁、手機退回背景或關閉網頁時，一律強制關閉相機
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeLiveCameraModal();
+});
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) closeLiveCameraModal();
+});
+window.addEventListener('pagehide', closeLiveCameraModal);
+window.addEventListener('beforeunload', stopAllCameraStreams);
+
+// 確保在所有 defer 腳本（包含 mnemonics-app.js）載入後，全域相機按鈕統一指向此防常亮相機模組
 window.triggerDirectCamera = openLiveCameraModal;
+window.closeLiveCameraModal = closeLiveCameraModal;
+window.stopAllCameraStreams = stopAllCameraStreams;
 window.addEventListener('DOMContentLoaded', () => {
   ensureLiveCameraModal();
   window.triggerDirectCamera = openLiveCameraModal;
