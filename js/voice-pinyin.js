@@ -3,7 +3,7 @@
  * 負責：EN/中文雙語語音識別、3輪上下文記憶、數字/符號轉中文口語、Trees Pinyin v25 編譯器與長按0.5秒三合一修改器
  */
 // =========================================================================
-// 4. 🎙️ 膠囊內 EN / 中文 語音引擎 + 3 輪上下文記憶 + 三軌聲學指紋 (來自 AI A&Q v15.0)
+// 4. 🎙️ 膠囊內 EN / 中文 語音引擎 + 3 輪上下文記憶 + 三軌聲學指紋
 // =========================================================================
 const MAX_MEMORY_TURNS = 3;
 let conversationHistory = [];
@@ -91,15 +91,16 @@ function getPhoneticTrackForAI(text) {
   if (!text) return '';
   if (/[\u4e00-\u9fa5]/.test(text)) {
     try {
-      const withTone = pinyinPro.pinyin(text, { toneType: 'num' });
-      const noTone = pinyinPro.pinyin(text, { toneType: 'none' });
-      const fuzzy = noTone
-        .replace(/\bzh/g, 'z').replace(/\bch/g, 'c').replace(/\bsh/g, 's')
-        .replace(/ing\b/g, 'in').replace(/eng\b/g, 'en').replace(/ang\b/g, 'an');
-      return `Pinyin: "${withTone}" | Toneless: "${noTone}" | Fuzzy: "${fuzzy}"`;
-    } catch (e) {
-      return text;
-    }
+      if (typeof window.pinyinPro !== 'undefined' && window.pinyinPro.pinyin) {
+        const withTone = window.pinyinPro.pinyin(text, { toneType: 'num' });
+        const noTone = window.pinyinPro.pinyin(text, { toneType: 'none' });
+        const fuzzy = noTone
+          .replace(/\bzh/g, 'z').replace(/\bch/g, 'c').replace(/\bsh/g, 's')
+          .replace(/ing\b/g, 'in').replace(/eng\b/g, 'en').replace(/ang\b/g, 'an');
+        return `Pinyin: "${withTone}" | Toneless: "${noTone}" | Fuzzy: "${fuzzy}"`;
+      }
+    } catch (e) {}
+    return text;
   }
   return `Spoken Phonetics: "${text}"`;
 }
@@ -281,8 +282,19 @@ function numberToChinese(str) {
 function expandNumbersAndSymbolsToZh(text) {
   if (!text) return '';
   let s = text;
-  s = s.replace(/\bH2O\b/gi, '水').replace(/\bCO2\b/gi, '二氧化碳').replace(/\bO2\b/gi, '氧氣');
-  s = s.replace(/\bWi-?Fi\b/gi, '無線網路').replace(/\bAPP\b/gi, '應用程式').replace(/\bAI\b/gi, '人工智慧');
+  const preservedTokens = [];
+  s = s.replace(/\b(AI|VIP|APP|PPT|PDF|WIFI|Wi-Fi|USB|DNA|RNA|CPU|GPU|5G|4G|3D|4K|8K|MP3|MP4|PM2\.5|pH|CEO|GDP|CPI)\b/g, (m) => {
+    const idx = preservedTokens.length;
+    preservedTokens.push(m);
+    return `@@KEEP${idx}@@`;
+  });
+  s = s.replace(/\bH[2₂]SO[4₄]\b/gi, '硫酸')
+       .replace(/\bCaCO[3₃]\b/gi, '碳酸鈣')
+       .replace(/\bNaOH\b/gi, '氫氧化鈉')
+       .replace(/\bNaCl\b/gi, '氯化鈉')
+       .replace(/\bH[2₂]O\b/gi, '水')
+       .replace(/\bCO[2₂]\b/gi, '二氧化碳')
+       .replace(/\bO[2₂]\b/gi, '氧氣');
   s = s.replace(/°C|℃/g, '攝氏度').replace(/°F|℉/g, '華氏度');
   s = s.replace(/\b(\d{1,2}):(\d{2})\b/g, (_, h, m) => intToChinese(h) + '點' + (m === '00' ? '整' : intToChinese(m) + '分'));
   s = s.replace(/(\d+(?:\.\d+)?)\s*%/g, (_, num) => '百分之' + numberToChinese(num));
@@ -290,6 +302,7 @@ function expandNumbersAndSymbolsToZh(text) {
   s = s.replace(/[¥￥]\s*(\d+(?:\.\d+)?)/g, (_, num) => numberToChinese(num) + '元');
   s = s.replace(/\+/g, '加').replace(/=/g, '等於').replace(/&/g, '和');
   s = s.replace(/\d+(?:\.\d+)?/g, (match) => numberToChinese(match));
+  s = s.replace(/@@KEEP(\d+)@@/g, (_, idx) => preservedTokens[parseInt(idx, 10)] || '');
   return s;
 }
 
@@ -376,7 +389,9 @@ const userCustomEdits = JSON.parse(localStorage.getItem('tp_custom_char_edits_v2
 let activeEditCol = null;
 
 function getAccuratePinyinArray(zhText) {
-  let pyArr = pinyinPro.pinyin(zhText, { type: 'array', toneType: 'num' });
+  let pyArr = (typeof window.pinyinPro !== 'undefined' && window.pinyinPro.pinyin)
+    ? window.pinyinPro.pinyin(zhText, { type: 'array', toneType: 'num' })
+    : new Array(zhText.length).fill('');
   for (let word in CUSTOM_POLYPHONES) {
     let idx = zhText.indexOf(word);
     while (idx !== -1) {
@@ -402,8 +417,8 @@ function openThreeInOneEditor(colEl) {
 function onEditZhOrNumChange(source) {
   if (source === 'zh') {
     const newCh = document.getElementById('editZhInput').value.trim();
-    if (newCh && /[\u4e00-\u9fa5]/.test(newCh)) {
-      const pyNum = pinyinPro.pinyin(newCh[0], { toneType: 'num' });
+    if (newCh && /[\u4e00-\u9fa5]/.test(newCh) && typeof window.pinyinPro !== 'undefined') {
+      const pyNum = window.pinyinPro.pinyin(newCh[0], { toneType: 'num' });
       document.getElementById('editStdInput').value = pyNum;
       document.getElementById('editTpInput').value = compileToTreesPinyin(pyNum);
     }
@@ -426,7 +441,10 @@ function saveThreeInOneEdit() {
   const stdEl = activeEditCol.querySelector('.tp-std');
   const tpEl = activeEditCol.querySelector('.tp-py');
 
-  if (newZh && zhEl) { zhEl.innerText = newZh; zhEl.dataset.raw = convertScript(newZh, 'trad'); }
+  if (newZh && zhEl) {
+    zhEl.dataset.raw = newZh;
+    zhEl.innerText = convertScript(newZh, currentScriptMode);
+  }
   if (rawStd && stdEl) {
     activeEditCol.dataset.pynum = rawStd;
     stdEl.innerText = /^[a-züv:]+[1-5]$/i.test(rawStd) ? numPinyinToToneMark(rawStd) : rawStd;
@@ -434,11 +452,13 @@ function saveThreeInOneEdit() {
   if (newTp && tpEl) tpEl.innerText = newTp;
 
   if (newZh) {
-    userCustomEdits[convertScript(newZh, 'trad')] = {
+    const tradKey = convertScript(newZh, 'trad');
+    userCustomEdits[tradKey] = {
       std: stdEl ? stdEl.innerText : '',
       tp: tpEl ? tpEl.innerText : '',
       pynum: rawStd
     };
+    userCustomEdits[newZh] = userCustomEdits[tradKey];
     localStorage.setItem('tp_custom_char_edits_v2', JSON.stringify(userCustomEdits));
   }
   document.getElementById('editCharModal').style.display = 'none';
@@ -450,12 +470,14 @@ function nextPaintTick() {
 
 function appendSentenceProgressive(rawZhText, enTranslation = '', targetContainerId = 'annotationList') {
   const list = document.getElementById(targetContainerId);
+  if (!list) return null;
   const block = document.createElement('div');
   block.className = 'sentence-block';
 
   const expandedZh = expandNumbersAndSymbolsToZh(rawZhText);
-  const tradZh = convertScript(expandedZh, 'trad');
-  block.dataset.zh = tradZh;
+  // 保留原始輸入字符作為基準，不再強行先轉一次繁體再轉回簡體
+  const sourceZh = expandedZh;
+  block.dataset.zh = sourceZh;
   block.dataset.en = enTranslation;
 
   const enDiv = document.createElement('div');
@@ -468,10 +490,10 @@ function appendSentenceProgressive(rawZhText, enTranslation = '', targetContaine
 
   const charRow = document.createElement('div');
   charRow.className = 'char-row';
-  const pinyinList = getAccuratePinyinArray(tradZh);
+  const pinyinList = getAccuratePinyinArray(sourceZh);
 
-  for (let i = 0; i < tradZh.length; i++) {
-    const char = tradZh[i];
+  for (let i = 0; i < sourceZh.length; i++) {
+    const char = sourceZh[i];
     const dispChar = convertScript(char, currentScriptMode);
     const isChinese = /[\u4e00-\u9fa5]/.test(char);
     const col = document.createElement('div');
@@ -479,7 +501,8 @@ function appendSentenceProgressive(rawZhText, enTranslation = '', targetContaine
 
     if (isChinese) {
       let pyNum = pinyinList[i] || '';
-      const savedCustom = userCustomEdits[char];
+      const tradChar = convertScript(char, 'trad');
+      const savedCustom = userCustomEdits[char] || userCustomEdits[tradChar];
       let tp = savedCustom?.tp || compileToTreesPinyin(pyNum);
       let stdTone = savedCustom?.std || numPinyinToToneMark(pyNum);
       col.dataset.pynum = savedCustom?.pynum || pyNum;
@@ -505,12 +528,11 @@ function appendSentenceProgressive(rawZhText, enTranslation = '', targetContaine
         isLongPress = false;
         pressTimer = setTimeout(() => {
           isLongPress = true;
-          if (navigator.vibrate) navigator.vibrate(30); // 手機輕微震動回饋
+          if (navigator.vibrate) navigator.vibrate(30);
           openThreeInOneEditor(col);
         }, 500);
       }, { passive: true });
 
-      // 若手指正在上下滑動頁面，立刻取消長按計時，避免滑動時誤觸彈窗
       col.addEventListener('touchmove', () => {
         clearTimeout(pressTimer);
       }, { passive: true });
@@ -518,7 +540,6 @@ function appendSentenceProgressive(rawZhText, enTranslation = '', targetContaine
       col.addEventListener('touchend', (e) => {
         clearTimeout(pressTimer);
         if (isLongPress) {
-          // 若已觸發長按改字，阻止放開手指時又觸發 onclick 朗讀發音
           e.preventDefault();
         }
       });
@@ -540,7 +561,7 @@ function appendSentenceProgressive(rawZhText, enTranslation = '', targetContaine
   list.appendChild(block);
 
   if (!hasLockedEn) {
-    translateFast(tradZh, 'zh', 'en').then(en => {
+    translateFast(sourceZh, 'zh', 'en').then(en => {
       enDiv.innerText = en;
       block.dataset.en = en;
     });
