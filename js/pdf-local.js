@@ -90,7 +90,7 @@
     }
   }
 
-  function decodePdfLiteralString(raw) {
+  function decodePdfLiteralString(raw, cmap) {
     const bytes = [];
     for (let i = 0; i < raw.length; i++) {
       const ch = raw[i];
@@ -125,6 +125,35 @@
         s += String.fromCharCode((bytes[i] << 8) | bytes[i + 1]);
       }
       return s;
+    }
+
+    // 若當前字型有專屬 ToUnicode CMap，優先使用該字型 CMap 解碼（避免不同字型編碼互相覆蓋把 6/7 錯解成 B/C）
+    if (cmap && cmap.size > 0 && bytes.length > 0) {
+      const hex = bytes.map(b => b.toString(16).padStart(2, '0')).join('').toUpperCase();
+      let has4Key = false;
+      for (const k of cmap.keys()) { if (k.length === 4) { has4Key = true; break; } }
+      if (has4Key && bytes.length % 2 === 0) {
+        let out4 = '';
+        let hit4 = 0;
+        for (let i = 0; i < hex.length; i += 4) {
+          const k4 = hex.slice(i, i + 4);
+          if (cmap.has(k4)) { out4 += cmap.get(k4); hit4++; }
+        }
+        if (hit4 > 0 && hit4 * 2 >= bytes.length / 2) return out4;
+      }
+      let out2 = '';
+      let hit2 = 0;
+      for (let i = 0; i < hex.length; i += 2) {
+        const k2 = hex.slice(i, i + 2);
+        if (cmap.has(k2)) {
+          out2 += cmap.get(k2);
+          hit2++;
+        } else {
+          const code = bytes[i / 2];
+          if (code >= 32 && code < 127) out2 += String.fromCharCode(code);
+        }
+      }
+      if (hit2 > 0 && hit2 * 2 >= bytes.length) return out2;
     }
 
     // 嘗試 UTF-8 解碼，否則退回 Latin1
@@ -263,11 +292,14 @@
     ];
   }
 
-  function extractTextFromContentStream(streamText, cmap) {
+  function extractTextFromContentStream(streamText, fallbackCmap, fontNameToCmap) {
     if (!streamText.includes('BT') || !streamText.includes('ET')) return '';
     const runs = [];
     let runOrder = 0;
     let blockId = 0;
+    let activeCmap = fallbackCmap;
+    let activeFontHasSpecificCmap = false;
+    let lastName = '';
 
     const readLiteral = (body, start) => {
       let depth = 1;
@@ -278,13 +310,14 @@
         else if (body[j] === ')') depth--;
         j++;
       }
-      return { text: decodePdfLiteralString(body.slice(start + 1, j - 1)), next: j };
+      // 僅在字型明確綁定了專屬 ToUnicode CMap 時才對 (...) 啟用 CMap，避免誤傷標準 ASCII 字型
+      return { text: decodePdfLiteralString(body.slice(start + 1, j - 1), activeFontHasSpecificCmap ? activeCmap : null), next: j };
     };
 
     const readHex = (body, start) => {
       const end = body.indexOf('>', start + 1);
       if (end === -1) return { text: '', next: start + 1 };
-      return { text: decodePdfHexString(body.slice(start + 1, end), cmap), next: end + 1 };
+      return { text: decodePdfHexString(body.slice(start + 1, end), activeCmap), next: end + 1 };
     };
 
     // 全串流線性掃描：完整追蹤外層 q / Q / cm 座標矩陣堆疊，徹底修復 Google Docs / Chrome 匯出 PDF 的跨行錯亂問題
@@ -411,10 +444,11 @@
         continue;
       }
 
-      // 名稱物件 /F1
+      // 名稱物件 /F1（記錄以供 Tf 切換該字型專屬 ToUnicode CMap）
       if (ch === '/') {
         let k = i + 1;
         while (k < body.length && !/[\s()<>\[\]{}\/%]/.test(body[k])) k++;
+        lastName = body.slice(i + 1, k);
         i = k;
         continue;
       }
@@ -477,6 +511,14 @@
             if (numStack.length >= 1) {
               const fs = Math.abs(numStack[numStack.length - 1]);
               if (fs > 0 && fs < 200) fontSize = fs;
+            }
+            if (lastName && fontNameToCmap && fontNameToCmap.has(lastName)) {
+              const bound = fontNameToCmap.get(lastName);
+              activeCmap = bound; // 可能為該字型專屬 Map 或 null（標準 WinAnsi 字型）
+              activeFontHasSpecificCmap = !!(bound && bound.size > 0);
+            } else {
+              activeCmap = fallbackCmap;
+              activeFontHasSpecificCmap = false;
             }
           } else if (op === 'TL') {
             if (numStack.length >= 1) {
@@ -681,7 +723,42 @@
       const bytes = new Uint8Array(arrayBuffer);
       const rawLatin1 = bytesToLatin1(bytes);
       const decodedStreams = [];
-      const cmap = new Map();
+      const fallbackCmap = new Map();
+      const cmapsByObjId = new Map();
+
+      // 掃描所有 Font 物件的 /ToUnicode 參照，以及頁面資源中的 /Font << /F1 12 0 R ... >>
+      const fontObjToCmapObj = new Map();
+      const fontObjSet = new Set();
+      const objHeaderReg = /(?:^|[\r\n])\s*(\d+)\s+\d+\s+obj\b([\s\S]*?)(?=\bstream\b|\bendobj\b)/g;
+      let objM;
+      while ((objM = objHeaderReg.exec(rawLatin1)) !== null) {
+        const objId = objM[1];
+        const dictBody = objM[2] || '';
+        if (/\/Type\s*\/Font\b/.test(dictBody) || /\/BaseFont\b/.test(dictBody)) {
+          fontObjSet.add(objId);
+          const tuMatch = dictBody.match(/\/ToUnicode\s+(\d+)\s+\d+\s+R\b/);
+          if (tuMatch) {
+            fontObjToCmapObj.set(objId, tuMatch[1]);
+          }
+        }
+      }
+
+      const fontNameToObjId = new Map();
+      const fontDictReg = /\/Font\s*<<([\s\S]*?)>>/g;
+      let fdM;
+      while ((fdM = fontDictReg.exec(rawLatin1)) !== null) {
+        const body = fdM[1] || '';
+        const pairReg = /\/([A-Za-z0-9_+.-]+)\s+(\d+)\s+\d+\s+R\b/g;
+        let pM;
+        while ((pM = pairReg.exec(body)) !== null) {
+          // 僅記錄首次或帶有 ToUnicode 綁定的字型參照
+          const fname = pM[1];
+          const fObjId = pM[2];
+          if (!fontNameToObjId.has(fname) || fontObjToCmapObj.has(fObjId)) {
+            fontNameToObjId.set(fname, fObjId);
+          }
+        }
+      }
 
       let pos = 0;
       const streamToken = 'stream';
@@ -728,7 +805,15 @@
 
           if (textStr) {
             if (textStr.includes('beginbfchar') || textStr.includes('beginbfrange')) {
-              parseCMap(textStr, cmap);
+              const perMap = new Map();
+              parseCMap(textStr, perMap);
+              parseCMap(textStr, fallbackCmap);
+              // 找出此 CMap 串流所屬的 PDF 物件編號
+              const objMatches = Array.from(dictWindow.matchAll(/(\d+)\s+\d+\s+obj\b/g));
+              if (objMatches.length > 0) {
+                const streamObjId = objMatches[objMatches.length - 1][1];
+                cmapsByObjId.set(streamObjId, perMap);
+              }
             }
             if (textStr.includes('BT') && textStr.includes('ET')) {
               decodedStreams.push(textStr);
@@ -739,9 +824,20 @@
         pos = eIdx + endToken.length;
       }
 
+      // 建立 /F1, /F2... -> 專屬 CMap 對應表（若字型無 ToUnicode 則設為 null，避免被別的字型 CMap 污染）
+      const fontNameToCmap = new Map();
+      for (const [fname, fObjId] of fontNameToObjId.entries()) {
+        const cmapObjId = fontObjToCmapObj.get(fObjId);
+        if (cmapObjId && cmapsByObjId.has(cmapObjId)) {
+          fontNameToCmap.set(fname, cmapsByObjId.get(cmapObjId));
+        } else if (fontObjSet.has(fObjId)) {
+          fontNameToCmap.set(fname, null);
+        }
+      }
+
       const extractedParts = [];
       for (const st of decodedStreams) {
-        const t = extractTextFromContentStream(st, cmap);
+        const t = extractTextFromContentStream(st, fallbackCmap, fontNameToCmap);
         if (t && t.trim()) extractedParts.push(t.trim());
       }
 
