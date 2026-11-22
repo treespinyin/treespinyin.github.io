@@ -40,6 +40,34 @@ function yearToSpokenZh(yearStr) {
   return String(yearStr).replace(/\D/g, '').split('').map(d => DIGIT_ZH[parseInt(d, 10)] || '').join('');
 }
 
+function digitsToSpokenZh(str) {
+  return String(str).replace(/\d/g, d => DIGIT_ZH[parseInt(d, 10)] || d);
+}
+
+function expandPhoneNumbersToZh(text) {
+  // 匹配常見國際/北美/中國電話格式與美國/中國郵編，逐位讀出且避免將連字號 '-' 誤讀成「負」
+  return text
+    .replace(/(?:\+(\d{1,3})[\s.-]?)?\((\d{2,4})\)[\s.-]?(\d{3,4})[\s.-]?(\d{3,4})\b/g, (_, cc, g1, g2, g3) => {
+      const parts = [];
+      if (cc) parts.push('加' + digitsToSpokenZh(cc));
+      parts.push(digitsToSpokenZh(g1), digitsToSpokenZh(g2), digitsToSpokenZh(g3));
+      return parts.join(' ');
+    })
+    .replace(/(?:\+(\d{1,3})[\s.-])?(\d{2,4})[-.\s](\d{3,4})[-.\s](\d{3,4})\b/g, (full, cc, g1, g2, g3) => {
+      const parts = [];
+      if (cc) parts.push('加' + digitsToSpokenZh(cc));
+      parts.push(digitsToSpokenZh(g1), digitsToSpokenZh(g2), digitsToSpokenZh(g3));
+      return parts.join(' ');
+    })
+    .replace(/\b(0\d{2,3})-(\d{7,8})\b/g, (_, area, num) => `${digitsToSpokenZh(area)} ${digitsToSpokenZh(num)}`)
+    // 郵編（明確關鍵詞 / 美國州名縮寫 + 5位郵編 / ZIP+4）
+    .replace(/((?:邮编|郵編|邮政编码|郵政編碼|zip(?:\s*code)?|postal(?:\s*code)?)\s*[:：#]?\s*)(\d{5,6})(?:-(\d{4}))?\b/gi, (_, pfx, z1, z2) =>
+      `${pfx}${digitsToSpokenZh(z1)}${z2 ? ' ' + digitsToSpokenZh(z2) : ''}`)
+    .replace(/\b((?:AL|AK|AZ|AR|CA|CO|CT|DE|FL|GA|HI|ID|IL|IN|IA|KS|KY|LA|ME|MD|MA|MI|MN|MS|MO|MT|NE|NV|NH|NJ|NM|NY|NC|ND|OH|OK|OR|PA|RI|SC|SD|TN|TX|UT|VT|VA|WA|WV|WI|WY|DC)\s+)(\d{5})(?:-(\d{4}))?\b/g, (_, st, z1, z2) =>
+      `${st}${digitsToSpokenZh(z1)}${z2 ? ' ' + digitsToSpokenZh(z2) : ''}`)
+    .replace(/\b(\d{5})-(\d{4})\b/g, (_, z1, z2) => `${digitsToSpokenZh(z1)} ${digitsToSpokenZh(z2)}`);
+}
+
 function numberToSpokenZh(numStr, isOrdinalOrDate = false) {
   let clean = String(numStr).replace(/,/g, '').trim();
   if (!clean) return '';
@@ -140,6 +168,10 @@ function expandMathEconTimeAndDatesToZh(inputText) {
     const unitMap = { 'US$': '美元', '$': '美元', '¥': '元', '￥': '元', '€': '歐元', '£': '英鎊' };
     return `${numberToSpokenZh(num)}${unitMap[sym] || '元'}`;
   });
+  // 電話號碼與 7 位以上純數字編號／0 開頭區號：逐位讀出，不按億／萬／科學記數法展開（排除千分位逗號與小數）
+  s = expandPhoneNumbersToZh(s);
+  s = s.replace(/(?<![\d,.])0\d{2,}(?![\d,.])/g, (m) => digitsToSpokenZh(m));
+  s = s.replace(/(?<![\d,.])\d{7,}(?![\d,.])/g, (m) => digitsToSpokenZh(m));
   s = s.replace(/\b\d[\d,]*(?:\.\d+)?\b/g, (m) => numberToSpokenZh(m));
   s = s.replace(/@@KEEP(\d+)@@/g, (_, idx) => preservedTokens[parseInt(idx, 10)] || '');
   return s;
