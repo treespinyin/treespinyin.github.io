@@ -261,6 +261,32 @@
     return String(yearStr).replace(/\D/g, '').split('').map(d => DIGIT_ZH[parseInt(d, 10)] || '').join('');
   }
 
+  function digitsToSpokenZh(str) {
+    return String(str).replace(/\d/g, d => DIGIT_ZH[parseInt(d, 10)] || d);
+  }
+
+  function expandPhoneNumbersToZh(text) {
+    return text
+      .replace(/(?:\+(\d{1,3})[\s.-]?)?\((\d{2,4})\)[\s.-]?(\d{3,4})[\s.-]?(\d{3,4})\b/g, (_, cc, g1, g2, g3) => {
+        const parts = [];
+        if (cc) parts.push('加' + digitsToSpokenZh(cc));
+        parts.push(digitsToSpokenZh(g1), digitsToSpokenZh(g2), digitsToSpokenZh(g3));
+        return parts.join(' ');
+      })
+      .replace(/(?:\+(\d{1,3})[\s.-])?(\d{2,4})[-.\s](\d{3,4})[-.\s](\d{3,4})\b/g, (_, cc, g1, g2, g3) => {
+        const parts = [];
+        if (cc) parts.push('加' + digitsToSpokenZh(cc));
+        parts.push(digitsToSpokenZh(g1), digitsToSpokenZh(g2), digitsToSpokenZh(g3));
+        return parts.join(' ');
+      })
+      .replace(/\b(0\d{2,3})-(\d{7,8})\b/g, (_, area, num) => `${digitsToSpokenZh(area)} ${digitsToSpokenZh(num)}`)
+      .replace(/((?:邮编|郵編|邮政编码|郵政編碼|zip(?:\s*code)?|postal(?:\s*code)?)\s*[:：#]?\s*)(\d{5,6})(?:-(\d{4}))?\b/gi, (_, pfx, z1, z2) =>
+        `${pfx}${digitsToSpokenZh(z1)}${z2 ? ' ' + digitsToSpokenZh(z2) : ''}`)
+      .replace(/\b((?:AL|AK|AZ|AR|CA|CO|CT|DE|FL|GA|HI|ID|IL|IN|IA|KS|KY|LA|ME|MD|MA|MI|MN|MS|MO|MT|NE|NV|NH|NJ|NM|NY|NC|ND|OH|OK|OR|PA|RI|SC|SD|TN|TX|UT|VT|VA|WA|WV|WI|WY|DC)\s+)(\d{5})(?:-(\d{4}))?\b/g, (_, st, z1, z2) =>
+        `${st}${digitsToSpokenZh(z1)}${z2 ? ' ' + digitsToSpokenZh(z2) : ''}`)
+      .replace(/\b(\d{5})-(\d{4})\b/g, (_, z1, z2) => `${digitsToSpokenZh(z1)} ${digitsToSpokenZh(z2)}`);
+  }
+
   function numberToSpokenZh(numStr, isOrdinalOrDate = false) {
     let clean = String(numStr).replace(/,/g, '').trim();
     if (!clean) return '';
@@ -366,6 +392,10 @@
     s = s.replace(/π/g, '派').replace(/≈/g, '約等於').replace(/≠/g, '不等於').replace(/≤/g, '小於等於').replace(/≥/g, '大於等於');
 
     if (expandBareNumbers) {
+      // 電話號碼與 7 位以上純數字編號／0 開頭區號：逐位讀出，不按億／萬展開（排除千分位逗號與小數）
+      s = expandPhoneNumbersToZh(s);
+      s = s.replace(/(?<![\d,.])0\d{2,}(?![\d,.])/g, (m) => digitsToSpokenZh(m));
+      s = s.replace(/(?<![\d,.])\d{7,}(?![\d,.])/g, (m) => digitsToSpokenZh(m));
       s = s.replace(/\b(19\d{2}|20\d{2})\b/g, (_, yr) => yearToSpokenZh(yr));
       s = s.replace(/\b(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?\b/g, (m) => numberToSpokenZh(m));
     }
