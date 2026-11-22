@@ -45,8 +45,11 @@ function digitsToSpokenZh(str) {
 }
 
 function expandPhoneNumbersToZh(text) {
-  // 匹配常見國際/北美/中國電話格式與美國/中國郵編，逐位讀出且避免將連字號 '-' 誤讀成「負」
+  // 匹配常見國際/北美/中國電話格式、區號 (+86)、郵編與 3 位以上門牌/房間號，逐位讀出且避免把 '-' 誤讀成「負」
   return text
+    .replace(/\(\+(\d{1,3})\)\s*([\d][\d\s.-]{4,}\d)\b/g, (_, cc, rest) =>
+      `加${digitsToSpokenZh(cc)} ${rest.replace(/[-.\s]+/g, ' ').replace(/\d+/g, d => digitsToSpokenZh(d)).trim()}`)
+    .replace(/\(\+(\d{1,3})\)/g, (_, cc) => `加${digitsToSpokenZh(cc)}`)
     .replace(/(?:\+(\d{1,3})[\s.-]?)?\((\d{2,4})\)[\s.-]?(\d{3,4})[\s.-]?(\d{3,4})\b/g, (_, cc, g1, g2, g3) => {
       const parts = [];
       if (cc) parts.push('加' + digitsToSpokenZh(cc));
@@ -65,7 +68,9 @@ function expandPhoneNumbersToZh(text) {
       `${pfx}${digitsToSpokenZh(z1)}${z2 ? ' ' + digitsToSpokenZh(z2) : ''}`)
     .replace(/\b((?:AL|AK|AZ|AR|CA|CO|CT|DE|FL|GA|HI|ID|IL|IN|IA|KS|KY|LA|ME|MD|MA|MI|MN|MS|MO|MT|NE|NV|NH|NJ|NM|NY|NC|ND|OH|OK|OR|PA|RI|SC|SD|TN|TX|UT|VT|VA|WA|WV|WI|WY|DC)\s+)(\d{5})(?:-(\d{4}))?\b/g, (_, st, z1, z2) =>
       `${st}${digitsToSpokenZh(z1)}${z2 ? ' ' + digitsToSpokenZh(z2) : ''}`)
-    .replace(/\b(\d{5})-(\d{4})\b/g, (_, z1, z2) => `${digitsToSpokenZh(z1)} ${digitsToSpokenZh(z2)}`);
+    .replace(/\b(\d{5})-(\d{4})\b/g, (_, z1, z2) => `${digitsToSpokenZh(z1)} ${digitsToSpokenZh(z2)}`)
+    // 3 位以上門牌號/房間號（如 123 号、305 室）逐位讀出，避免與 1~31 日期衝突
+    .replace(/(?<![\d,.])(\d{3,})\s*([号號室房])/g, (_, num, unit) => `${digitsToSpokenZh(num)}${unit}`);
 }
 
 function numberToSpokenZh(numStr, isOrdinalOrDate = false) {
