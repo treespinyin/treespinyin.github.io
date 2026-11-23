@@ -1411,6 +1411,19 @@ async function runDirectTranslate(inputOverride, options = {}) {
         if (classicHit.source) classicMatchedSources.add(classicHit.source);
         continue;
       }
+      // 保護純電話號碼／純數字符號（不含中英文字母）與純 Email／網址：絕不送去機器翻譯（避免免費翻譯 API 把 (+86) 00000000000 或 no_reply@example.com 翻成亂碼幻覺）
+      const trimmedLine = line.trim();
+      const isPureEmailOrUrl = /^(?:mailto:)?[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/i.test(trimmedLine)
+        || /^(?:https?:\/\/|www\.)\S+$/i.test(trimmedLine);
+      if (isPureEmailOrUrl) {
+        chunkResults[i] = { zh: trimmedLine, en: '' };
+        continue;
+      }
+      const isPureNumberOrPhone = !/[\u4e00-\u9fa5A-Za-z]/.test(trimmedLine) && /\d/.test(trimmedLine);
+      if (isPureNumberOrPhone) {
+        chunkResults[i] = { zh: trimmedLine, en: trimmedLine };
+        continue;
+      }
       if (/[\u4e00-\u9fa5]/.test(line)) {
         zhIdx.push(i);
         zhList.push(line);
