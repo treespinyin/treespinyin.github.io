@@ -303,6 +303,30 @@
             },
             {
               "id": "p1c2-6",
+              "pyNum": "yi2",
+              "trees": "yee2",
+              "pinyin": "yí",
+              "hanzi": "一",
+              "speakTw": "一"
+            },
+            {
+              "id": "p1c2-7",
+              "pyNum": "yang4",
+              "trees": "yang4",
+              "pinyin": "yàng",
+              "hanzi": "样",
+              "speakTw": "樣"
+            },
+            {
+              "id": "p1c2-8",
+              "pyNum": "liang4",
+              "trees": "Leeang4",
+              "pinyin": "liàng",
+              "hanzi": "亮",
+              "speakTw": "亮"
+            },
+            {
+              "id": "p1c2-9",
               "trees": ".",
               "pinyin": ".",
               "hanzi": "。",
@@ -541,6 +565,22 @@
             },
             {
               "id": "p2c1-4",
+              "pyNum": "ta1",
+              "trees": "tah",
+              "pinyin": "tā",
+              "hanzi": "它",
+              "speakTw": "它"
+            },
+            {
+              "id": "p2c1-5",
+              "pyNum": "de5",
+              "trees": "der",
+              "pinyin": "de",
+              "hanzi": "的",
+              "speakTw": "的"
+            },
+            {
+              "id": "p2c1-6",
               "pyNum": "hao3",
               "trees": "haw3",
               "pinyin": "hǎo",
@@ -548,7 +588,7 @@
               "speakTw": "好"
             },
             {
-              "id": "p2c1-5",
+              "id": "p2c1-7",
               "pyNum": "peng2",
               "trees": "per-ng2",
               "pinyin": "péng",
@@ -556,7 +596,7 @@
               "speakTw": "朋"
             },
             {
-              "id": "p2c1-6",
+              "id": "p2c1-8",
               "pyNum": "you3",
               "trees": "yoh3",
               "pinyin": "yǒu",
@@ -564,7 +604,7 @@
               "speakTw": "友"
             },
             {
-              "id": "p2c1-7",
+              "id": "p2c1-9",
               "trees": ".",
               "pinyin": ".",
               "hanzi": "。",
@@ -598,6 +638,30 @@
             },
             {
               "id": "p2c2-2",
+              "pyNum": "zai4",
+              "trees": "dsie4",
+              "pinyin": "zài",
+              "hanzi": "在",
+              "speakTw": "在"
+            },
+            {
+              "id": "p2c2-3",
+              "pyNum": "hua1",
+              "trees": "hooah",
+              "pinyin": "huā",
+              "hanzi": "花",
+              "speakTw": "花"
+            },
+            {
+              "id": "p2c2-4",
+              "pyNum": "jian1",
+              "trees": "jeean",
+              "pinyin": "jiān",
+              "hanzi": "间",
+              "speakTw": "間"
+            },
+            {
+              "id": "p2c2-5",
               "pyNum": "chang4",
               "trees": "(r)tsang4",
               "pinyin": "chàng",
@@ -605,7 +669,7 @@
               "speakTw": "唱"
             },
             {
-              "id": "p2c2-3",
+              "id": "p2c2-6",
               "pyNum": "ge1",
               "trees": "ger",
               "pinyin": "gē",
@@ -613,7 +677,7 @@
               "speakTw": "歌"
             },
             {
-              "id": "p2c2-4",
+              "id": "p2c2-7",
               "pyNum": "wan2",
               "trees": "wan2",
               "pinyin": "wán",
@@ -621,7 +685,7 @@
               "speakTw": "玩"
             },
             {
-              "id": "p2c2-5",
+              "id": "p2c2-8",
               "pyNum": "shua3",
               "trees": "(r)sooah3",
               "pinyin": "shuǎ",
@@ -629,7 +693,7 @@
               "speakTw": "耍"
             },
             {
-              "id": "p2c2-6",
+              "id": "p2c2-9",
               "trees": ".",
               "pinyin": ".",
               "hanzi": "。",
@@ -801,6 +865,14 @@
               },
               {
                 "id": "dp2d-6",
+                "pyNum": "o5",
+                "trees": "ooer",
+                "pinyin": "o",
+                "hanzi": "喔",
+                "speakTw": "喔"
+              },
+              {
+                "id": "dp2d-7",
                 "trees": "!",
                 "pinyin": "!",
                 "hanzi": "！",
@@ -828,14 +900,38 @@
           "tokens": [
             {
               "id": "p3c1-0",
+              "pyNum": "yi4",
+              "trees": "yee4",
+              "pinyin": "Yì",
+              "hanzi": "一",
+              "speakTw": "一"
+            },
+            {
+              "id": "p3c1-1",
+              "pyNum": "tian1",
+              "trees": "teean",
+              "pinyin": "tiān",
+              "hanzi": "天",
+              "speakTw": "天"
+            },
+            {
+              "id": "p3c1-2",
+              "trees": ",",
+              "pinyin": ",",
+              "hanzi": "，",
+              "speakTw": "",
+              "punct": true
+            },
+            {
+              "id": "p3c1-3",
               "pyNum": "you3",
               "trees": "yoh3",
-              "pinyin": "Yǒu",
+              "pinyin": "yǒu",
               "hanzi": "有",
               "speakTw": "有"
             },
             {
-              "id": "p3c1-1",
+              "id": "p3c1-4",
               "pyNum": "ren2",
               "trees": "(r)ther-n2",
               "pinyin": "rén",
@@ -843,7 +939,7 @@
               "speakTw": "人"
             },
             {
-              "id": "p3c1-2",
+              "id": "p3c1-5",
               "pyNum": "diao4",
               "trees": "deeaw4",
               "pinyin": "diào",
@@ -851,7 +947,7 @@
               "speakTw": "掉"
             },
             {
-              "id": "p3c1-3",
+              "id": "p3c1-6",
               "pyNum": "jin4",
               "trees": "jeen4",
               "pinyin": "jìn",
@@ -859,7 +955,7 @@
               "speakTw": "進"
             },
             {
-              "id": "p3c1-4",
+              "id": "p3c1-7",
               "pyNum": "da4",
               "trees": "dah4",
               "pinyin": "dà",
@@ -867,7 +963,7 @@
               "speakTw": "大"
             },
             {
-              "id": "p3c1-5",
+              "id": "p3c1-8",
               "pyNum": "he2",
               "trees": "her2",
               "pinyin": "hé",
@@ -875,7 +971,7 @@
               "speakTw": "河"
             },
             {
-              "id": "p3c1-6",
+              "id": "p3c1-9",
               "trees": ".",
               "pinyin": ".",
               "hanzi": "。",
@@ -983,6 +1079,14 @@
               },
               {
                 "id": "dp3m-2",
+                "pyNum": "a5",
+                "trees": "ah",
+                "pinyin": "a",
+                "hanzi": "啊",
+                "speakTw": "啊"
+              },
+              {
+                "id": "dp3m-3",
                 "trees": "!",
                 "pinyin": "!",
                 "hanzi": "！",
@@ -990,15 +1094,23 @@
                 "punct": true
               },
               {
-                "id": "dp3m-3",
-                "pyNum": "kuai4",
-                "trees": "kooie4",
-                "pinyin": "Kuài",
-                "hanzi": "快",
-                "speakTw": "快"
+                "id": "dp3m-4",
+                "pyNum": "shei2",
+                "trees": "(r)say2",
+                "pinyin": "Shéi",
+                "hanzi": "谁",
+                "speakTw": "誰"
               },
               {
-                "id": "dp3m-4",
+                "id": "dp3m-5",
+                "pyNum": "lai2",
+                "trees": "Lie2",
+                "pinyin": "lái",
+                "hanzi": "来",
+                "speakTw": "來"
+              },
+              {
+                "id": "dp3m-6",
                 "pyNum": "jiu4",
                 "trees": "jeeoh4",
                 "pinyin": "jiù",
@@ -1006,7 +1118,15 @@
                 "speakTw": "救"
               },
               {
-                "id": "dp3m-5",
+                "id": "dp3m-7",
+                "pyNum": "jiu4",
+                "trees": "jeeoh4",
+                "pinyin": "jiù",
+                "hanzi": "救",
+                "speakTw": "救"
+              },
+              {
+                "id": "dp3m-8",
                 "pyNum": "wo3",
                 "trees": "wer3",
                 "pinyin": "wǒ",
@@ -1014,7 +1134,7 @@
                 "speakTw": "我"
               },
               {
-                "id": "dp3m-6",
+                "id": "dp3m-9",
                 "trees": "!",
                 "pinyin": "!",
                 "hanzi": "！",
@@ -1236,6 +1356,22 @@
             },
             {
               "id": "p4c2-5",
+              "pyNum": "na4",
+              "trees": "nah4",
+              "pinyin": "nà",
+              "hanzi": "那",
+              "speakTw": "那"
+            },
+            {
+              "id": "p4c2-6",
+              "pyNum": "ge4",
+              "trees": "ger4",
+              "pinyin": "gè",
+              "hanzi": "个",
+              "speakTw": "個"
+            },
+            {
+              "id": "p4c2-7",
               "pyNum": "ren2",
               "trees": "(r)ther-n2",
               "pinyin": "rén",
@@ -1243,7 +1379,7 @@
               "speakTw": "人"
             },
             {
-              "id": "p4c2-6",
+              "id": "p4c2-8",
               "trees": ".",
               "pinyin": ".",
               "hanzi": "。",
@@ -1629,6 +1765,14 @@
               },
               {
                 "id": "dp5m-3",
+                "pyNum": "jue2",
+                "trees": "jee(oo)er2",
+                "pinyin": "jué",
+                "hanzi": "绝",
+                "speakTw": "絕"
+              },
+              {
+                "id": "dp5m-4",
                 "pyNum": "bu4",
                 "trees": "boo4",
                 "pinyin": "bù",
@@ -1636,7 +1780,7 @@
                 "speakTw": "不"
               },
               {
-                "id": "dp5m-4",
+                "id": "dp5m-5",
                 "pyNum": "gao4",
                 "trees": "gaw4",
                 "pinyin": "gào",
@@ -1644,7 +1788,7 @@
                 "speakTw": "告"
               },
               {
-                "id": "dp5m-5",
+                "id": "dp5m-6",
                 "pyNum": "su4",
                 "trees": "soo4",
                 "pinyin": "sù",
@@ -1652,7 +1796,7 @@
                 "speakTw": "訴"
               },
               {
-                "id": "dp5m-6",
+                "id": "dp5m-7",
                 "pyNum": "bie2",
                 "trees": "beer2",
                 "pinyin": "bié",
@@ -1660,7 +1804,7 @@
                 "speakTw": "別"
               },
               {
-                "id": "dp5m-7",
+                "id": "dp5m-8",
                 "pyNum": "ren2",
                 "trees": "(r)ther-n2",
                 "pinyin": "rén",
@@ -1668,7 +1812,7 @@
                 "speakTw": "人"
               },
               {
-                "id": "dp5m-8",
+                "id": "dp5m-9",
                 "trees": "!",
                 "pinyin": "!",
                 "hanzi": "！",
@@ -1734,6 +1878,46 @@
               },
               {
                 "id": "dp5d-5",
+                "trees": ",",
+                "pinyin": ",",
+                "hanzi": "，",
+                "speakTw": "",
+                "punct": true
+              },
+              {
+                "id": "dp5d-6",
+                "pyNum": "wo3",
+                "trees": "wer3",
+                "pinyin": "wǒ",
+                "hanzi": "我",
+                "speakTw": "我"
+              },
+              {
+                "id": "dp5d-7",
+                "pyNum": "de5",
+                "trees": "der",
+                "pinyin": "de",
+                "hanzi": "的",
+                "speakTw": "的"
+              },
+              {
+                "id": "dp5d-8",
+                "pyNum": "peng2",
+                "trees": "per-ng2",
+                "pinyin": "péng",
+                "hanzi": "朋",
+                "speakTw": "朋"
+              },
+              {
+                "id": "dp5d-9",
+                "pyNum": "you3",
+                "trees": "yoh3",
+                "pinyin": "yǒu",
+                "hanzi": "友",
+                "speakTw": "友"
+              },
+              {
+                "id": "dp5d-10",
                 "trees": ".",
                 "pinyin": ".",
                 "hanzi": "。",
@@ -1948,6 +2132,22 @@
               },
               {
                 "id": "dp6q-3",
+                "pyNum": "na4",
+                "trees": "nah4",
+                "pinyin": "nà",
+                "hanzi": "那",
+                "speakTw": "那"
+              },
+              {
+                "id": "dp6q-4",
+                "pyNum": "zhi1",
+                "trees": "(r)ds",
+                "pinyin": "zhī",
+                "hanzi": "只",
+                "speakTw": "隻"
+              },
+              {
+                "id": "dp6q-5",
                 "pyNum": "jiu3",
                 "trees": "jeeoh3",
                 "pinyin": "jiǔ",
@@ -1955,7 +2155,7 @@
                 "speakTw": "九"
               },
               {
-                "id": "dp6q-4",
+                "id": "dp6q-6",
                 "pyNum": "se4",
                 "trees": "ser4",
                 "pinyin": "sè",
@@ -1963,7 +2163,7 @@
                 "speakTw": "色"
               },
               {
-                "id": "dp6q-5",
+                "id": "dp6q-7",
                 "pyNum": "lu4",
                 "trees": "Loo4",
                 "pinyin": "lù",
@@ -1971,7 +2171,7 @@
                 "speakTw": "鹿"
               },
               {
-                "id": "dp6q-6",
+                "id": "dp6q-8",
                 "trees": "!",
                 "pinyin": "!",
                 "hanzi": "！",
@@ -2029,6 +2229,14 @@
               },
               {
                 "id": "dp6k-4",
+                "pyNum": "jiu4",
+                "trees": "jeeoh4",
+                "pinyin": "jiù",
+                "hanzi": "就",
+                "speakTw": "就"
+              },
+              {
+                "id": "dp6k-5",
                 "pyNum": "shang3",
                 "trees": "(r)sang3",
                 "pinyin": "shǎng",
@@ -2036,7 +2244,7 @@
                 "speakTw": "賞"
               },
               {
-                "id": "dp6k-5",
+                "id": "dp6k-6",
                 "pyNum": "huang2",
                 "trees": "hooang2",
                 "pinyin": "huáng",
@@ -2044,7 +2252,7 @@
                 "speakTw": "黃"
               },
               {
-                "id": "dp6k-6",
+                "id": "dp6k-7",
                 "pyNum": "jin1",
                 "trees": "jeen",
                 "pinyin": "jīn",
@@ -2052,7 +2260,7 @@
                 "speakTw": "金"
               },
               {
-                "id": "dp6k-7",
+                "id": "dp6k-8",
                 "trees": "!",
                 "pinyin": "!",
                 "hanzi": "！",
@@ -2096,6 +2304,14 @@
             },
             {
               "id": "p7c1-2",
+              "pyNum": "de5",
+              "trees": "der",
+              "pinyin": "de",
+              "hanzi": "的",
+              "speakTw": "的"
+            },
+            {
+              "id": "p7c1-3",
               "pyNum": "ren2",
               "trees": "(r)ther-n2",
               "pinyin": "rén",
@@ -2103,7 +2319,7 @@
               "speakTw": "人"
             },
             {
-              "id": "p7c1-3",
+              "id": "p7c1-4",
               "pyNum": "wei2",
               "trees": "way2",
               "pinyin": "wéi",
@@ -2111,7 +2327,7 @@
               "speakTw": "違"
             },
             {
-              "id": "p7c1-4",
+              "id": "p7c1-5",
               "pyNum": "bei4",
               "trees": "bay4",
               "pinyin": "bèi",
@@ -2119,7 +2335,7 @@
               "speakTw": "背"
             },
             {
-              "id": "p7c1-5",
+              "id": "p7c1-6",
               "pyNum": "nuo4",
               "trees": "nooer4",
               "pinyin": "nuò",
@@ -2127,7 +2343,7 @@
               "speakTw": "諾"
             },
             {
-              "id": "p7c1-6",
+              "id": "p7c1-7",
               "pyNum": "yan2",
               "trees": "yan2",
               "pinyin": "yán",
@@ -2135,7 +2351,7 @@
               "speakTw": "言"
             },
             {
-              "id": "p7c1-7",
+              "id": "p7c1-8",
               "trees": ".",
               "pinyin": ".",
               "hanzi": "。",
@@ -2364,6 +2580,14 @@
               },
               {
                 "id": "dp7m-5",
+                "pyNum": "jiu4",
+                "trees": "jeeoh4",
+                "pinyin": "jiù",
+                "hanzi": "就",
+                "speakTw": "就"
+              },
+              {
+                "id": "dp7m-6",
                 "pyNum": "zai4",
                 "trees": "dsie4",
                 "pinyin": "zài",
@@ -2371,7 +2595,7 @@
                 "speakTw": "在"
               },
               {
-                "id": "dp7m-6",
+                "id": "dp7m-7",
                 "pyNum": "na4",
                 "trees": "nah4",
                 "pinyin": "nà",
@@ -2379,7 +2603,7 @@
                 "speakTw": "那"
               },
               {
-                "id": "dp7m-7",
+                "id": "dp7m-8",
                 "pyNum": "li3",
                 "trees": "Lee3",
                 "pinyin": "lǐ",
@@ -2387,7 +2611,7 @@
                 "speakTw": "裡"
               },
               {
-                "id": "dp7m-8",
+                "id": "dp7m-9",
                 "trees": "!",
                 "pinyin": "!",
                 "hanzi": "！",
@@ -2642,22 +2866,30 @@
               },
               {
                 "id": "dp8d-6",
-                "pyNum": "shi1",
-                "trees": "(r)s",
-                "pinyin": "shī",
-                "hanzi": "失",
-                "speakTw": "失"
+                "pyNum": "que4",
+                "trees": "tsee(oo)er4",
+                "pinyin": "què",
+                "hanzi": "却",
+                "speakTw": "卻"
               },
               {
                 "id": "dp8d-7",
-                "pyNum": "xin4",
-                "trees": "seen4",
-                "pinyin": "xìn",
-                "hanzi": "信",
-                "speakTw": "信"
+                "pyNum": "bei4",
+                "trees": "bay4",
+                "pinyin": "bèi",
+                "hanzi": "背",
+                "speakTw": "背"
               },
               {
                 "id": "dp8d-8",
+                "pyNum": "pan4",
+                "trees": "pan4",
+                "pinyin": "pàn",
+                "hanzi": "叛",
+                "speakTw": "叛"
+              },
+              {
+                "id": "dp8d-9",
                 "pyNum": "Ler",
                 "trees": "Ler",
                 "pinyin": "le",
@@ -2665,7 +2897,15 @@
                 "speakTw": "了"
               },
               {
-                "id": "dp8d-9",
+                "id": "dp8d-10",
+                "pyNum": "wo3",
+                "trees": "wer3",
+                "pinyin": "wǒ",
+                "hanzi": "我",
+                "speakTw": "我"
+              },
+              {
+                "id": "dp8d-11",
                 "trees": ".",
                 "pinyin": ".",
                 "hanzi": "。",
@@ -2691,14 +2931,54 @@
             "tokens": [
               {
                 "id": "dp8k-0",
+                "pyNum": "cong2",
+                "trees": "tser-oong2",
+                "pinyin": "Cóng",
+                "hanzi": "从",
+                "speakTw": "從"
+              },
+              {
+                "id": "dp8k-1",
+                "pyNum": "jin1",
+                "trees": "jeen",
+                "pinyin": "jīn",
+                "hanzi": "今",
+                "speakTw": "今"
+              },
+              {
+                "id": "dp8k-2",
+                "pyNum": "yi3",
+                "trees": "yee3",
+                "pinyin": "yǐ",
+                "hanzi": "以",
+                "speakTw": "以"
+              },
+              {
+                "id": "dp8k-3",
+                "pyNum": "hou4",
+                "trees": "hoh4",
+                "pinyin": "hòu",
+                "hanzi": "后",
+                "speakTw": "後"
+              },
+              {
+                "id": "dp8k-4",
+                "trees": ",",
+                "pinyin": ",",
+                "hanzi": "，",
+                "speakTw": "",
+                "punct": true
+              },
+              {
+                "id": "dp8k-5",
                 "pyNum": "yong3",
                 "trees": "yer-oong3",
-                "pinyin": "Yǒng",
+                "pinyin": "yǒng",
                 "hanzi": "永",
                 "speakTw": "永"
               },
               {
-                "id": "dp8k-1",
+                "id": "dp8k-6",
                 "pyNum": "yuan3",
                 "trees": "yee(oo)an3",
                 "pinyin": "yuǎn",
@@ -2706,7 +2986,7 @@
                 "speakTw": "遠"
               },
               {
-                "id": "dp8k-2",
+                "id": "dp8k-7",
                 "pyNum": "bao3",
                 "trees": "baw3",
                 "pinyin": "bǎo",
@@ -2714,7 +2994,7 @@
                 "speakTw": "保"
               },
               {
-                "id": "dp8k-3",
+                "id": "dp8k-8",
                 "pyNum": "hu4",
                 "trees": "hoo4",
                 "pinyin": "hù",
@@ -2722,7 +3002,7 @@
                 "speakTw": "護"
               },
               {
-                "id": "dp8k-4",
+                "id": "dp8k-9",
                 "pyNum": "jiu3",
                 "trees": "jeeoh3",
                 "pinyin": "jiǔ",
@@ -2730,7 +3010,7 @@
                 "speakTw": "九"
               },
               {
-                "id": "dp8k-5",
+                "id": "dp8k-10",
                 "pyNum": "se4",
                 "trees": "ser4",
                 "pinyin": "sè",
@@ -2738,7 +3018,7 @@
                 "speakTw": "色"
               },
               {
-                "id": "dp8k-6",
+                "id": "dp8k-11",
                 "pyNum": "lu4",
                 "trees": "Loo4",
                 "pinyin": "lù",
@@ -2746,7 +3026,7 @@
                 "speakTw": "鹿"
               },
               {
-                "id": "dp8k-7",
+                "id": "dp8k-12",
                 "trees": "!",
                 "pinyin": "!",
                 "hanzi": "！",

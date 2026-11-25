@@ -17,6 +17,7 @@
     pageIndex: 0,
     lastUnlockedIndex: 0,
     isReadingPage: false,
+    speechSeq: 0,
     activeAudio: null,
     activeTokenId: null,
     activeSpeakerKey: null,
@@ -203,6 +204,7 @@
   }
 
   function stopSpeech() {
+    state.speechSeq += 1;
     state.isReadingPage = false;
     state.activeTokenId = null;
     state.activeSpeakerKey = null;
@@ -562,10 +564,10 @@
 
     const dlg = hotspot.dialogue;
     speak({
-      role: hotspot.voiceRole || "narrator_tw",
-      audioPath: dlg.audioTw || dlg.audio || null,
-      text: dlg.twFullText,
-      speakerKey: `${dlg.id}-tw`,
+      role: "narrator_en",
+      audioPath: dlg.audioEn || null,
+      text: dlg.english,
+      speakerKey: `${dlg.id}-en`,
     });
   }
 
@@ -871,6 +873,30 @@
     state.audioCtx = null;
   }
 
+  function autoReadPageEnglish() {
+    if (!Membership.canReadPage(state.bookEntry, state.pageIndex)) return;
+    const page = state.pages[state.pageIndex];
+    if (!page || !Array.isArray(page.cards) || !page.cards.length) return;
+
+    const queue = page.cards
+      .filter((card) => card && (card.audioEn || card.english))
+      .map((card) => ({
+        role: "narrator_en",
+        audioPath: card.audioEn || null,
+        text: card.english,
+        speakerKey: `${card.id}-en`,
+      }));
+    if (!queue.length) return;
+
+    const mySeq = state.speechSeq;
+    let i = 0;
+    const nextStep = () => {
+      if (state.speechSeq !== mySeq || i >= queue.length) return;
+      speak({ ...queue[i++], onEnd: nextStep });
+    };
+    nextStep();
+  }
+
   // =========================================================================
   // Navigation & Keyboard Shortcuts
   // =========================================================================
@@ -878,6 +904,7 @@
     if (index < 0 || index >= state.pages.length) return;
     state.pageIndex = index;
     renderPage();
+    autoReadPageEnglish();
   }
 
   btnPrev.addEventListener("click", () => goToPage(state.pageIndex - 1));
