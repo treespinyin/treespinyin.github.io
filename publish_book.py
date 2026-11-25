@@ -126,16 +126,46 @@ def create_r2_client():
     return client, bucket, public_base
 
 
+def strip_public_prefix(rel_path: str) -> str:
+    if not rel_path:
+        return rel_path
+    s = str(rel_path).strip().replace("\\", "/")
+    for prefix in ("./public/", "public/", "./"):
+        if s.startswith(prefix):
+            s = s[len(prefix):]
+    return s
+
+
 def normalize_to_webp_path(rel_path: str, uploaded_stems: set[str]) -> str:
     if not rel_path:
         return rel_path
-    p = Path(rel_path)
+    cleaned = strip_public_prefix(rel_path)
+    p = Path(cleaned)
     if p.suffix.lower() in IMAGE_EXTS and p.stem in uploaded_stems:
         return str(p.with_suffix(".webp")).replace("\\", "/")
-    return rel_path
+    return cleaned
 
 
-def update_metadata_files(book_id: str, public_media_base: str, uploaded_image_stems: set[str]) -> None:
+def sync_source_book_json(source_dir: Path, book_id: str) -> Path | None:
+    """If the external content project provides a book.json alongside public/, sync it into stories/books/<book_id>/book.json."""
+    target_path = REPO_ROOT / "stories" / "books" / book_id / "book.json"
+    candidates = [
+        source_dir.parent / "book.json",
+        source_dir / "book.json",
+    ]
+    for src in candidates:
+        if src.is_file() and src.resolve() != target_path.resolve():
+            target_path.parent.mkdir(parents=True, exist_ok=True)
+            target_path.write_text(src.read_text(encoding="utf-8"), encoding="utf-8")
+            print(f"📥 Synced latest book.json from {src} -> {target_path.relative_to(REPO_ROOT)}")
+            return target_path
+    return target_path if target_path.exists() else None
+
+
+def update_metadata_files(book_id: str, public_media_base: str, uploaded_image_stems: set[str], source_dir: Path) -> None:
+    # 0. Sync external book.json if present
+    book_json_path = sync_source_book_json(source_dir, book_id)
+
     # 1. Update stories/catalog.json
     if CATALOG_FILE.exists():
         catalog = json.loads(CATALOG_FILE.read_text(encoding="utf-8"))
@@ -153,21 +183,36 @@ def update_metadata_files(book_id: str, public_media_base: str, uploaded_image_s
         else:
             print(f"⚠️  Book id '{book_id}' not found in {CATALOG_FILE.relative_to(REPO_ROOT)}")
 
-    # 2. Update stories/books/<book_id>/book.json image paths to .webp
-    book_json_path = REPO_ROOT / "stories" / "books" / book_id / "book.json"
-    if book_json_path.exists() and uploaded_image_stems:
+    # 2. Normalize image paths (-> .webp) and audio paths (strip ./public/) in stories/books/<book_id>/book.json
+    if book_json_path and book_json_path.exists():
         book_data = json.loads(book_json_path.read_text(encoding="utf-8"))
-        changed_count = 0
+        img_changed = 0
+        audio_changed = 0
         for page in book_data.get("pages", []):
             for key in ("image", "imagePath"):
                 if page.get(key):
                     new_val = normalize_to_webp_path(page[key], uploaded_image_stems)
                     if new_val != page[key]:
                         page[key] = new_val
-                        changed_count += 1
-        if changed_count > 0:
-            book_json_path.write_text(json.dumps(book_data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-            print(f"✅ Updated {changed_count} image path(s) to .webp in {book_json_path.relative_to(REPO_ROOT)}")
+                        img_changed += 1
+            for card in page.get("cards", []):
+                for akey in ("audioEn", "audioTw", "audio"):
+                    if card.get(akey):
+                        new_val = strip_public_prefix(card[akey])
+                        if new_val != card[akey]:
+                            card[akey] = new_val
+                            audio_changed += 1
+            for h in page.get("hotspots", []):
+                dlg = h.get("dialogue")
+                if isinstance(dlg, dict):
+                    for akey in ("audioEn", "audioTw", "audio"):
+                        if dlg.get(akey):
+                            new_val = strip_public_prefix(dlg[akey])
+                            if new_val != dlg[akey]:
+                                dlg[akey] = new_val
+                                audio_changed += 1
+        book_json_path.write_text(json.dumps(book_data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        print(f"✅ Normalized {img_changed} image path(s) (.webp) & {audio_changed} audio path(s) in {book_json_path.relative_to(REPO_ROOT)}")
 
 
 def main() -> int:
@@ -233,6 +278,9 @@ def main() -> int:
         )
         print(f"🔊 Found {len(audio_files)} audio file(s) in {audio_dir}")
         for audio_path in audio_files:
+            if audio_path.stat().st_size == 0:
+                print(f"   ⏭️  Skipping empty 0-byte audio file: {audio_path.name}")
+                continue
             rel_audio = audio_path.relative_to(audio_dir).as_posix()
             r2_key = f"books/{args.book_id}/audio/{rel_audio}"
             content_type = AUDIO_MIME_MAP.get(audio_path.suffix.lower()) or mimetypes.guess_type(audio_path.name)[0] or "application/octet-stream"
@@ -252,7 +300,7 @@ def main() -> int:
 
     # 3. Update catalog.json & book.json
     if not args.dry_run:
-        update_metadata_files(args.book_id, public_media_base, uploaded_image_stems)
+        update_metadata_files(args.book_id, public_media_base, uploaded_image_stems, source_dir)
 
     print("\n🎉 Publish complete!")
     print(f"   Media Base URL: {public_media_base}")

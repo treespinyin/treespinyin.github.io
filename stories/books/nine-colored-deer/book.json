@@ -1,43 +1,47 @@
 {
-  "id": "nine-colored-deer",
   "series": "Trees Pinyin Series",
   "titleEn": "The Nine-Colored Deer",
-  "titleZh": "九色鹿",
-  "category": "myths",
+  "id": "nine-colored-deer",
   "pages": [
     {
       "id": "cover",
       "type": "cover",
       "pageLabel": "Cover",
       "chapterEn": "The Nine-Colored Deer",
-      "image": "images/cover.webp",
+      "imagePath": "images/cover.webp",
       "cards": [
         {
           "id": "cover-c1",
           "english": "The Nine-Colored Deer",
           "twFullText": "九色鹿",
-          "audioEn": "audio/cover-c1-en.mp3",
-          "audioTw": "audio/cover-c1-tw.mp3",
           "tokens": [
             {
               "id": "cov-0",
               "pyNum": "jiu3",
+              "trees": "jeeoh3",
               "pinyin": "Jiǔ",
-              "hanzi": "九"
+              "hanzi": "九",
+              "speakTw": "九"
             },
             {
               "id": "cov-1",
               "pyNum": "se4",
+              "trees": "ser4",
               "pinyin": "sè",
-              "hanzi": "色"
+              "hanzi": "色",
+              "speakTw": "色"
             },
             {
               "id": "cov-2",
               "pyNum": "lu4",
+              "trees": "Loo4",
               "pinyin": "lù",
-              "hanzi": "鹿"
+              "hanzi": "鹿",
+              "speakTw": "鹿"
             }
-          ]
+          ],
+          "audioEn": "audio/pro/cover-c1-en.mp3",
+          "audioTw": "audio/pro/cover-c1-tw.mp3"
         }
       ],
       "hotspots": [
@@ -52,31 +56,35 @@
             "id": "dlg-cov-deer",
             "english": "Hello! Welcome to my magic world.",
             "twFullText": "你好！歡迎來到魔法世界。",
-            "audioEn": "audio/dlg-cov-deer-en.mp3",
-            "audioTw": "audio/dlg-cov-deer-tw.mp3",
             "tokens": [
               {
                 "id": "dcov-0",
                 "pyNum": "ni3",
+                "trees": "nee3",
                 "pinyin": "Nǐ",
-                "hanzi": "你"
+                "hanzi": "你",
+                "speakTw": "你"
               },
               {
                 "id": "dcov-1",
                 "pyNum": "hao3",
+                "trees": "haw3",
                 "pinyin": "hǎo",
-                "hanzi": "好"
+                "hanzi": "好",
+                "speakTw": "好"
               },
               {
                 "id": "dcov-2",
-                "punct": true,
                 "trees": "!",
                 "pinyin": "!",
-                "hanzi": "！"
+                "hanzi": "！",
+                "speakTw": "",
+                "punct": true
               },
               {
                 "id": "dcov-3",
                 "pyNum": "huan1",
+                "trees": "hooan",
                 "pinyin": "Huān",
                 "hanzi": "欢",
                 "speakTw": "歡"
@@ -84,12 +92,15 @@
               {
                 "id": "dcov-4",
                 "pyNum": "ying2",
+                "trees": "ying2",
                 "pinyin": "yíng",
-                "hanzi": "迎"
+                "hanzi": "迎",
+                "speakTw": "迎"
               },
               {
                 "id": "dcov-5",
                 "pyNum": "lai2",
+                "trees": "Lie2",
                 "pinyin": "lái",
                 "hanzi": "来",
                 "speakTw": "來"
@@ -97,41 +108,54 @@
               {
                 "id": "dcov-6",
                 "pyNum": "dao4",
+                "trees": "daw4",
                 "pinyin": "dào",
-                "hanzi": "到"
+                "hanzi": "到",
+                "speakTw": "到"
               },
               {
                 "id": "dcov-7",
                 "pyNum": "mo2",
+                "trees": "mooer2",
                 "pinyin": "mó",
-                "hanzi": "魔"
+                "hanzi": "魔",
+                "speakTw": "魔"
               },
               {
                 "id": "dcov-8",
                 "pyNum": "fa3",
+                "trees": "fah3",
                 "pinyin": "fǎ",
-                "hanzi": "法"
+                "hanzi": "法",
+                "speakTw": "法"
               },
               {
                 "id": "dcov-9",
                 "pyNum": "shi4",
+                "trees": "(r)s4",
                 "pinyin": "shì",
-                "hanzi": "世"
+                "hanzi": "世",
+                "speakTw": "世"
               },
               {
                 "id": "dcov-10",
                 "pyNum": "jie4",
+                "trees": "jeer4",
                 "pinyin": "jiè",
-                "hanzi": "界"
+                "hanzi": "界",
+                "speakTw": "界"
               },
               {
                 "id": "dcov-11",
-                "punct": true,
                 "trees": ".",
                 "pinyin": ".",
-                "hanzi": "。"
+                "hanzi": "。",
+                "speakTw": "",
+                "punct": true
               }
-            ]
+            ],
+            "audioEn": "audio/pro/dlg-cov-deer-en.mp3",
+            "audioTw": "audio/pro/dlg-cov-deer-tw.mp3"
           }
         }
       ]
@@ -141,36 +165,41 @@
       "type": "spread",
       "pageLabel": "Page 1",
       "chapterEn": "Sacred River Home",
-      "image": "images/page1.webp",
+      "imagePath": "images/page1.webp",
       "cards": [
         {
           "id": "p1-c1",
           "english": "A nine-colored deer lives by a magic river.",
           "twFullText": "神奇河邊有九色鹿。",
-          "audioEn": "audio/p1-c1-en.mp3",
-          "audioTw": "audio/p1-c1-tw.mp3",
           "tokens": [
             {
               "id": "p1c1-0",
               "pyNum": "shen2",
+              "trees": "(r)ser-n2",
               "pinyin": "Shén",
-              "hanzi": "神"
+              "hanzi": "神",
+              "speakTw": "神"
             },
             {
               "id": "p1c1-1",
               "pyNum": "qi2",
+              "trees": "tsee2",
               "pinyin": "qí",
-              "hanzi": "奇"
+              "hanzi": "奇",
+              "speakTw": "奇"
             },
             {
               "id": "p1c1-2",
               "pyNum": "he2",
+              "trees": "her2",
               "pinyin": "hé",
-              "hanzi": "河"
+              "hanzi": "河",
+              "speakTw": "河"
             },
             {
               "id": "p1c1-3",
               "pyNum": "bian1",
+              "trees": "beean",
               "pinyin": "biān",
               "hanzi": "边",
               "speakTw": "邊"
@@ -178,87 +207,111 @@
             {
               "id": "p1c1-4",
               "pyNum": "you3",
+              "trees": "yoh3",
               "pinyin": "yǒu",
-              "hanzi": "有"
+              "hanzi": "有",
+              "speakTw": "有"
             },
             {
               "id": "p1c1-5",
               "pyNum": "jiu3",
+              "trees": "jeeoh3",
               "pinyin": "jiǔ",
-              "hanzi": "九"
+              "hanzi": "九",
+              "speakTw": "九"
             },
             {
               "id": "p1c1-6",
               "pyNum": "se4",
+              "trees": "ser4",
               "pinyin": "sè",
-              "hanzi": "色"
+              "hanzi": "色",
+              "speakTw": "色"
             },
             {
               "id": "p1c1-7",
               "pyNum": "lu4",
+              "trees": "Loo4",
               "pinyin": "lù",
-              "hanzi": "鹿"
+              "hanzi": "鹿",
+              "speakTw": "鹿"
             },
             {
               "id": "p1c1-8",
-              "punct": true,
               "trees": ".",
               "pinyin": ".",
-              "hanzi": "。"
+              "hanzi": "。",
+              "speakTw": "",
+              "punct": true
             }
-          ]
+          ],
+          "audioEn": "audio/pro/p1-c1-en.mp3",
+          "audioTw": "audio/pro/p1-c1-tw.mp3"
         },
         {
           "id": "p1-c2",
           "english": "Its white antlers shine like snow.",
           "twFullText": "白色鹿角像雪一樣亮。",
-          "audioEn": "audio/p1-c2-en.mp3",
-          "audioTw": "audio/p1-c2-tw.mp3",
           "tokens": [
             {
               "id": "p1c2-0",
               "pyNum": "bai2",
+              "trees": "bie2",
               "pinyin": "Bái",
-              "hanzi": "白"
+              "hanzi": "白",
+              "speakTw": "白"
             },
             {
               "id": "p1c2-1",
               "pyNum": "se4",
+              "trees": "ser4",
               "pinyin": "sè",
-              "hanzi": "色"
+              "hanzi": "色",
+              "speakTw": "色"
             },
             {
               "id": "p1c2-2",
               "pyNum": "lu4",
+              "trees": "Loo4",
               "pinyin": "lù",
-              "hanzi": "鹿"
+              "hanzi": "鹿",
+              "speakTw": "鹿"
             },
             {
               "id": "p1c2-3",
               "pyNum": "jiao3",
+              "trees": "jeeaw3",
               "pinyin": "jiǎo",
-              "hanzi": "角"
+              "hanzi": "角",
+              "speakTw": "角"
             },
             {
               "id": "p1c2-4",
               "pyNum": "xiang4",
+              "trees": "seeang4",
               "pinyin": "xiàng",
-              "hanzi": "像"
+              "hanzi": "像",
+              "speakTw": "像"
             },
             {
               "id": "p1c2-5",
               "pyNum": "xue3",
+              "trees": "see(oo)er3",
               "pinyin": "xuě",
-              "hanzi": "雪"
+              "hanzi": "雪",
+              "speakTw": "雪"
             },
             {
               "id": "p1c2-6",
-              "punct": true,
               "trees": ".",
               "pinyin": ".",
-              "hanzi": "。"
+              "hanzi": "。",
+              "speakTw": "",
+              "punct": true
             }
-          ]
+          ],
+          "audioEn": "audio/pro/p1-c2-en.mp3",
+          "audioTw": "audio/pro/p1-c2-tw.mp3"
         }
       ],
       "hotspots": [
@@ -273,42 +326,51 @@
             "id": "dlg-p1-deer",
             "english": "My coat shines with nine colors!",
             "twFullText": "我的毛有九種顏色！",
-            "audioEn": "audio/dlg-p1-deer-en.mp3",
-            "audioTw": "audio/dlg-p1-deer-tw.mp3",
             "tokens": [
               {
                 "id": "dp1d-0",
                 "pyNum": "wo3",
+                "trees": "wer3",
                 "pinyin": "Wǒ",
-                "hanzi": "我"
+                "hanzi": "我",
+                "speakTw": "我"
               },
               {
                 "id": "dp1d-1",
                 "pyNum": "de5",
+                "trees": "der",
                 "pinyin": "de",
-                "hanzi": "的"
+                "hanzi": "的",
+                "speakTw": "的"
               },
               {
                 "id": "dp1d-2",
                 "pyNum": "mao2",
+                "trees": "maw2",
                 "pinyin": "máo",
-                "hanzi": "毛"
+                "hanzi": "毛",
+                "speakTw": "毛"
               },
               {
                 "id": "dp1d-3",
                 "pyNum": "you3",
+                "trees": "yoh3",
                 "pinyin": "yǒu",
-                "hanzi": "有"
+                "hanzi": "有",
+                "speakTw": "有"
               },
               {
                 "id": "dp1d-4",
                 "pyNum": "jiu3",
+                "trees": "jeeoh3",
                 "pinyin": "jiǔ",
-                "hanzi": "九"
+                "hanzi": "九",
+                "speakTw": "九"
               },
               {
                 "id": "dp1d-5",
                 "pyNum": "zhong3",
+                "trees": "(r)dser-oong3",
                 "pinyin": "zhǒng",
                 "hanzi": "种",
                 "speakTw": "種"
@@ -316,6 +378,7 @@
               {
                 "id": "dp1d-6",
                 "pyNum": "yan2",
+                "trees": "yan2",
                 "pinyin": "yán",
                 "hanzi": "颜",
                 "speakTw": "顏"
@@ -323,17 +386,22 @@
               {
                 "id": "dp1d-7",
                 "pyNum": "se4",
+                "trees": "ser4",
                 "pinyin": "sè",
-                "hanzi": "色"
+                "hanzi": "色",
+                "speakTw": "色"
               },
               {
                 "id": "dp1d-8",
-                "punct": true,
                 "trees": "!",
                 "pinyin": "!",
-                "hanzi": "！"
+                "hanzi": "！",
+                "speakTw": "",
+                "punct": true
               }
-            ]
+            ],
+            "audioEn": "audio/pro/dlg-p1-deer-en.mp3",
+            "audioTw": "audio/pro/dlg-p1-deer-tw.mp3"
           }
         },
         {
@@ -347,36 +415,43 @@
             "id": "dlg-p1-lotus",
             "english": "The clear river is full of lotus flowers.",
             "twFullText": "清澈河面開滿蓮花。",
-            "audioEn": "audio/dlg-p1-lotus-en.mp3",
-            "audioTw": "audio/dlg-p1-lotus-tw.mp3",
             "tokens": [
               {
                 "id": "dp1l-0",
                 "pyNum": "qing1",
+                "trees": "tsing",
                 "pinyin": "Qīng",
-                "hanzi": "清"
+                "hanzi": "清",
+                "speakTw": "清"
               },
               {
                 "id": "dp1l-1",
                 "pyNum": "che4",
+                "trees": "(r)tser4",
                 "pinyin": "chè",
-                "hanzi": "澈"
+                "hanzi": "澈",
+                "speakTw": "澈"
               },
               {
                 "id": "dp1l-2",
                 "pyNum": "he2",
+                "trees": "her2",
                 "pinyin": "hé",
-                "hanzi": "河"
+                "hanzi": "河",
+                "speakTw": "河"
               },
               {
                 "id": "dp1l-3",
                 "pyNum": "mian4",
+                "trees": "meean4",
                 "pinyin": "miàn",
-                "hanzi": "面"
+                "hanzi": "面",
+                "speakTw": "面"
               },
               {
                 "id": "dp1l-4",
                 "pyNum": "kai1",
+                "trees": "kie",
                 "pinyin": "kāi",
                 "hanzi": "开",
                 "speakTw": "開"
@@ -384,6 +459,7 @@
               {
                 "id": "dp1l-5",
                 "pyNum": "man3",
+                "trees": "man3",
                 "pinyin": "mǎn",
                 "hanzi": "满",
                 "speakTw": "滿"
@@ -391,6 +467,7 @@
               {
                 "id": "dp1l-6",
                 "pyNum": "lian2",
+                "trees": "Leean2",
                 "pinyin": "lián",
                 "hanzi": "莲",
                 "speakTw": "蓮"
@@ -398,17 +475,22 @@
               {
                 "id": "dp1l-7",
                 "pyNum": "hua1",
+                "trees": "hooah",
                 "pinyin": "huā",
-                "hanzi": "花"
+                "hanzi": "花",
+                "speakTw": "花"
               },
               {
                 "id": "dp1l-8",
-                "punct": true,
                 "trees": ".",
                 "pinyin": ".",
-                "hanzi": "。"
+                "hanzi": "。",
+                "speakTw": "",
+                "punct": true
               }
-            ]
+            ],
+            "audioEn": "audio/pro/dlg-p1-lotus-en.mp3",
+            "audioTw": "audio/pro/dlg-p1-lotus-tw.mp3"
           }
         }
       ]
@@ -418,24 +500,25 @@
       "type": "spread",
       "pageLabel": "Page 2",
       "chapterEn": "Friends in the Forest",
-      "image": "images/page2.webp",
+      "imagePath": "images/page2.webp",
       "cards": [
         {
           "id": "p2-c1",
           "english": "A little crow is its best friend.",
           "twFullText": "小烏鴉是它的好朋友。",
-          "audioEn": "audio/p2-c1-en.mp3",
-          "audioTw": "audio/p2-c1-tw.mp3",
           "tokens": [
             {
               "id": "p2c1-0",
               "pyNum": "xiao3",
+              "trees": "seeaw3",
               "pinyin": "Xiǎo",
-              "hanzi": "小"
+              "hanzi": "小",
+              "speakTw": "小"
             },
             {
               "id": "p2c1-1",
               "pyNum": "wu1",
+              "trees": "woo",
               "pinyin": "wū",
               "hanzi": "乌",
               "speakTw": "烏"
@@ -443,6 +526,7 @@
             {
               "id": "p2c1-2",
               "pyNum": "ya1",
+              "trees": "yah",
               "pinyin": "yā",
               "hanzi": "鸦",
               "speakTw": "鴉"
@@ -450,52 +534,64 @@
             {
               "id": "p2c1-3",
               "pyNum": "shi4",
+              "trees": "(r)s4",
               "pinyin": "shì",
-              "hanzi": "是"
+              "hanzi": "是",
+              "speakTw": "是"
             },
             {
               "id": "p2c1-4",
               "pyNum": "hao3",
+              "trees": "haw3",
               "pinyin": "hǎo",
-              "hanzi": "好"
+              "hanzi": "好",
+              "speakTw": "好"
             },
             {
               "id": "p2c1-5",
               "pyNum": "peng2",
+              "trees": "per-ng2",
               "pinyin": "péng",
-              "hanzi": "朋"
+              "hanzi": "朋",
+              "speakTw": "朋"
             },
             {
               "id": "p2c1-6",
               "pyNum": "you3",
+              "trees": "yoh3",
               "pinyin": "yǒu",
-              "hanzi": "友"
+              "hanzi": "友",
+              "speakTw": "友"
             },
             {
               "id": "p2c1-7",
-              "punct": true,
               "trees": ".",
               "pinyin": ".",
-              "hanzi": "。"
+              "hanzi": "。",
+              "speakTw": "",
+              "punct": true
             }
-          ]
+          ],
+          "audioEn": "audio/pro/p2-c1-en.mp3",
+          "audioTw": "audio/pro/p2-c1-tw.mp3"
         },
         {
           "id": "p2-c2",
           "english": "They sing and play among glowing flowers.",
           "twFullText": "它們在花間唱歌玩耍。",
-          "audioEn": "audio/p2-c2-en.mp3",
-          "audioTw": "audio/p2-c2-tw.mp3",
           "tokens": [
             {
               "id": "p2c2-0",
               "pyNum": "ta1",
+              "trees": "tah",
               "pinyin": "Tā",
-              "hanzi": "它"
+              "hanzi": "它",
+              "speakTw": "它"
             },
             {
               "id": "p2c2-1",
               "pyNum": "men5",
+              "trees": "mer-n",
               "pinyin": "men",
               "hanzi": "们",
               "speakTw": "們"
@@ -503,35 +599,46 @@
             {
               "id": "p2c2-2",
               "pyNum": "chang4",
+              "trees": "(r)tsang4",
               "pinyin": "chàng",
-              "hanzi": "唱"
+              "hanzi": "唱",
+              "speakTw": "唱"
             },
             {
               "id": "p2c2-3",
               "pyNum": "ge1",
+              "trees": "ger",
               "pinyin": "gē",
-              "hanzi": "歌"
+              "hanzi": "歌",
+              "speakTw": "歌"
             },
             {
               "id": "p2c2-4",
               "pyNum": "wan2",
+              "trees": "wan2",
               "pinyin": "wán",
-              "hanzi": "玩"
+              "hanzi": "玩",
+              "speakTw": "玩"
             },
             {
               "id": "p2c2-5",
               "pyNum": "shua3",
+              "trees": "(r)sooah3",
               "pinyin": "shuǎ",
-              "hanzi": "耍"
+              "hanzi": "耍",
+              "speakTw": "耍"
             },
             {
               "id": "p2c2-6",
-              "punct": true,
               "trees": ".",
               "pinyin": ".",
-              "hanzi": "。"
+              "hanzi": "。",
+              "speakTw": "",
+              "punct": true
             }
-          ]
+          ],
+          "audioEn": "audio/pro/p2-c2-en.mp3",
+          "audioTw": "audio/pro/p2-c2-tw.mp3"
         }
       ],
       "hotspots": [
@@ -546,37 +653,43 @@
             "id": "dlg-p2-crow",
             "english": "Good morning! Let's play together!",
             "twFullText": "早安！我們一起玩吧！",
-            "audioEn": "audio/dlg-p2-crow-en.mp3",
-            "audioTw": "audio/dlg-p2-crow-tw.mp3",
             "tokens": [
               {
                 "id": "dp2c-0",
                 "pyNum": "zao3",
+                "trees": "dsaw3",
                 "pinyin": "Zǎo",
-                "hanzi": "早"
+                "hanzi": "早",
+                "speakTw": "早"
               },
               {
                 "id": "dp2c-1",
                 "pyNum": "an1",
+                "trees": "an",
                 "pinyin": "ān",
-                "hanzi": "安"
+                "hanzi": "安",
+                "speakTw": "安"
               },
               {
                 "id": "dp2c-2",
-                "punct": true,
                 "trees": "!",
                 "pinyin": "!",
-                "hanzi": "！"
+                "hanzi": "！",
+                "speakTw": "",
+                "punct": true
               },
               {
                 "id": "dp2c-3",
                 "pyNum": "wo3",
+                "trees": "wer3",
                 "pinyin": "Wǒ",
-                "hanzi": "我"
+                "hanzi": "我",
+                "speakTw": "我"
               },
               {
                 "id": "dp2c-4",
                 "pyNum": "men5",
+                "trees": "mer-n",
                 "pinyin": "men",
                 "hanzi": "们",
                 "speakTw": "們"
@@ -584,35 +697,46 @@
               {
                 "id": "dp2c-5",
                 "pyNum": "yi1",
+                "trees": "yee",
                 "pinyin": "yī",
-                "hanzi": "一"
+                "hanzi": "一",
+                "speakTw": "一"
               },
               {
                 "id": "dp2c-6",
                 "pyNum": "qi3",
+                "trees": "tsee3",
                 "pinyin": "qǐ",
-                "hanzi": "起"
+                "hanzi": "起",
+                "speakTw": "起"
               },
               {
                 "id": "dp2c-7",
                 "pyNum": "wan2",
+                "trees": "wan2",
                 "pinyin": "wán",
-                "hanzi": "玩"
+                "hanzi": "玩",
+                "speakTw": "玩"
               },
               {
                 "id": "dp2c-8",
                 "pyNum": "ba5",
+                "trees": "bah",
                 "pinyin": "ba",
-                "hanzi": "吧"
+                "hanzi": "吧",
+                "speakTw": "吧"
               },
               {
                 "id": "dp2c-9",
-                "punct": true,
                 "trees": "!",
                 "pinyin": "!",
-                "hanzi": "！"
+                "hanzi": "！",
+                "speakTw": "",
+                "punct": true
               }
-            ]
+            ],
+            "audioEn": "audio/pro/dlg-p2-crow-en.mp3",
+            "audioTw": "audio/pro/dlg-p2-crow-tw.mp3"
           }
         },
         {
@@ -626,53 +750,66 @@
             "id": "dlg-p2-deer",
             "english": "The forest flowers smell so sweet!",
             "twFullText": "森林的花好香喔！",
-            "audioEn": "audio/dlg-p2-deer-en.mp3",
-            "audioTw": "audio/dlg-p2-deer-tw.mp3",
             "tokens": [
               {
                 "id": "dp2d-0",
                 "pyNum": "sen1",
+                "trees": "ser-n",
                 "pinyin": "Sēn",
-                "hanzi": "森"
+                "hanzi": "森",
+                "speakTw": "森"
               },
               {
                 "id": "dp2d-1",
                 "pyNum": "lin2",
+                "trees": "Leen2",
                 "pinyin": "lín",
-                "hanzi": "林"
+                "hanzi": "林",
+                "speakTw": "林"
               },
               {
                 "id": "dp2d-2",
                 "pyNum": "de5",
+                "trees": "der",
                 "pinyin": "de",
-                "hanzi": "的"
+                "hanzi": "的",
+                "speakTw": "的"
               },
               {
                 "id": "dp2d-3",
                 "pyNum": "hua1",
+                "trees": "hooah",
                 "pinyin": "huā",
-                "hanzi": "花"
+                "hanzi": "花",
+                "speakTw": "花"
               },
               {
                 "id": "dp2d-4",
                 "pyNum": "hao3",
+                "trees": "haw3",
                 "pinyin": "hǎo",
-                "hanzi": "好"
+                "hanzi": "好",
+                "speakTw": "好"
               },
               {
                 "id": "dp2d-5",
                 "pyNum": "xiang1",
+                "trees": "seeang",
                 "pinyin": "xiāng",
-                "hanzi": "香"
+                "hanzi": "香",
+                "speakTw": "香"
               },
               {
                 "id": "dp2d-6",
-                "punct": true,
                 "trees": "!",
                 "pinyin": "!",
-                "hanzi": "！"
+                "hanzi": "！",
+                "speakTw": "",
+                "punct": true
               }
-            ]
+            ],
+            "audioEn": "audio/pro/dlg-p2-deer-en.mp3",
+            "audioTw": "audio/pro/dlg-p2-deer-tw.mp3"
           }
         }
       ]
@@ -682,36 +819,41 @@
       "type": "spread",
       "pageLabel": "Page 3",
       "chapterEn": "The Stormy River",
-      "image": "images/page3.webp",
+      "imagePath": "images/page3.webp",
       "cards": [
         {
           "id": "p3-c1",
           "english": "One day, a man falls into the wild river.",
           "twFullText": "一天，有人掉進大河。",
-          "audioEn": "audio/p3-c1-en.mp3",
-          "audioTw": "audio/p3-c1-tw.mp3",
           "tokens": [
             {
               "id": "p3c1-0",
               "pyNum": "you3",
+              "trees": "yoh3",
               "pinyin": "Yǒu",
-              "hanzi": "有"
+              "hanzi": "有",
+              "speakTw": "有"
             },
             {
               "id": "p3c1-1",
               "pyNum": "ren2",
+              "trees": "(r)ther-n2",
               "pinyin": "rén",
-              "hanzi": "人"
+              "hanzi": "人",
+              "speakTw": "人"
             },
             {
               "id": "p3c1-2",
               "pyNum": "diao4",
+              "trees": "deeaw4",
               "pinyin": "diào",
-              "hanzi": "掉"
+              "hanzi": "掉",
+              "speakTw": "掉"
             },
             {
               "id": "p3c1-3",
               "pyNum": "jin4",
+              "trees": "jeen4",
               "pinyin": "jìn",
               "hanzi": "进",
               "speakTw": "進"
@@ -719,46 +861,56 @@
             {
               "id": "p3c1-4",
               "pyNum": "da4",
+              "trees": "dah4",
               "pinyin": "dà",
-              "hanzi": "大"
+              "hanzi": "大",
+              "speakTw": "大"
             },
             {
               "id": "p3c1-5",
               "pyNum": "he2",
+              "trees": "her2",
               "pinyin": "hé",
-              "hanzi": "河"
+              "hanzi": "河",
+              "speakTw": "河"
             },
             {
               "id": "p3c1-6",
-              "punct": true,
               "trees": ".",
               "pinyin": ".",
-              "hanzi": "。"
+              "hanzi": "。",
+              "speakTw": "",
+              "punct": true
             }
-          ]
+          ],
+          "audioEn": "audio/pro/p3-c1-en.mp3",
+          "audioTw": "audio/pro/p3-c1-tw.mp3"
         },
         {
           "id": "p3-c2",
           "english": "He cries out loudly for help!",
           "twFullText": "他大聲喊救命！",
-          "audioEn": "audio/p3-c2-en.mp3",
-          "audioTw": "audio/p3-c2-tw.mp3",
           "tokens": [
             {
               "id": "p3c2-0",
               "pyNum": "ta1",
+              "trees": "tah",
               "pinyin": "Tā",
-              "hanzi": "他"
+              "hanzi": "他",
+              "speakTw": "他"
             },
             {
               "id": "p3c2-1",
               "pyNum": "da4",
+              "trees": "dah4",
               "pinyin": "dà",
-              "hanzi": "大"
+              "hanzi": "大",
+              "speakTw": "大"
             },
             {
               "id": "p3c2-2",
               "pyNum": "sheng1",
+              "trees": "(r)ser-ng",
               "pinyin": "shēng",
               "hanzi": "声",
               "speakTw": "聲"
@@ -766,29 +918,38 @@
             {
               "id": "p3c2-3",
               "pyNum": "han3",
+              "trees": "han3",
               "pinyin": "hǎn",
-              "hanzi": "喊"
+              "hanzi": "喊",
+              "speakTw": "喊"
             },
             {
               "id": "p3c2-4",
               "pyNum": "jiu4",
+              "trees": "jeeoh4",
               "pinyin": "jiù",
-              "hanzi": "救"
+              "hanzi": "救",
+              "speakTw": "救"
             },
             {
               "id": "p3c2-5",
               "pyNum": "ming4",
+              "trees": "ming4",
               "pinyin": "mìng",
-              "hanzi": "命"
+              "hanzi": "命",
+              "speakTw": "命"
             },
             {
               "id": "p3c2-6",
-              "punct": true,
               "trees": "!",
               "pinyin": "!",
-              "hanzi": "！"
+              "hanzi": "！",
+              "speakTw": "",
+              "punct": true
             }
-          ]
+          ],
+          "audioEn": "audio/pro/p3-c2-en.mp3",
+          "audioTw": "audio/pro/p3-c2-tw.mp3"
         }
       ],
       "hotspots": [
@@ -803,54 +964,66 @@
             "id": "dlg-p3-man",
             "english": "Help! Save me, please!",
             "twFullText": "救命啊！誰來救救我！",
-            "audioEn": "audio/dlg-p3-man-en.mp3",
-            "audioTw": "audio/dlg-p3-man-tw.mp3",
             "tokens": [
               {
                 "id": "dp3m-0",
                 "pyNum": "jiu4",
+                "trees": "jeeoh4",
                 "pinyin": "Jiù",
-                "hanzi": "救"
+                "hanzi": "救",
+                "speakTw": "救"
               },
               {
                 "id": "dp3m-1",
                 "pyNum": "ming4",
+                "trees": "ming4",
                 "pinyin": "mìng",
-                "hanzi": "命"
+                "hanzi": "命",
+                "speakTw": "命"
               },
               {
                 "id": "dp3m-2",
-                "punct": true,
                 "trees": "!",
                 "pinyin": "!",
-                "hanzi": "！"
+                "hanzi": "！",
+                "speakTw": "",
+                "punct": true
               },
               {
                 "id": "dp3m-3",
                 "pyNum": "kuai4",
+                "trees": "kooie4",
                 "pinyin": "Kuài",
-                "hanzi": "快"
+                "hanzi": "快",
+                "speakTw": "快"
               },
               {
                 "id": "dp3m-4",
                 "pyNum": "jiu4",
+                "trees": "jeeoh4",
                 "pinyin": "jiù",
-                "hanzi": "救"
+                "hanzi": "救",
+                "speakTw": "救"
               },
               {
                 "id": "dp3m-5",
                 "pyNum": "wo3",
+                "trees": "wer3",
                 "pinyin": "wǒ",
-                "hanzi": "我"
+                "hanzi": "我",
+                "speakTw": "我"
               },
               {
                 "id": "dp3m-6",
-                "punct": true,
                 "trees": "!",
                 "pinyin": "!",
-                "hanzi": "！"
+                "hanzi": "！",
+                "speakTw": "",
+                "punct": true
               }
-            ]
+            ],
+            "audioEn": "audio/pro/dlg-p3-man-en.mp3",
+            "audioTw": "audio/pro/dlg-p3-man-tw.mp3"
           }
         },
         {
@@ -864,12 +1037,11 @@
             "id": "dlg-p3-deer",
             "english": "Don't worry! I am coming!",
             "twFullText": "別怕！我來了！",
-            "audioEn": "audio/dlg-p3-deer-en.mp3",
-            "audioTw": "audio/dlg-p3-deer-tw.mp3",
             "tokens": [
               {
                 "id": "dp3d-0",
                 "pyNum": "bie2",
+                "trees": "beer2",
                 "pinyin": "Bié",
                 "hanzi": "别",
                 "speakTw": "別"
@@ -877,25 +1049,31 @@
               {
                 "id": "dp3d-1",
                 "pyNum": "pa4",
+                "trees": "pah4",
                 "pinyin": "pà",
-                "hanzi": "怕"
+                "hanzi": "怕",
+                "speakTw": "怕"
               },
               {
                 "id": "dp3d-2",
-                "punct": true,
                 "trees": "!",
                 "pinyin": "!",
-                "hanzi": "！"
+                "hanzi": "！",
+                "speakTw": "",
+                "punct": true
               },
               {
                 "id": "dp3d-3",
                 "pyNum": "wo3",
+                "trees": "wer3",
                 "pinyin": "Wǒ",
-                "hanzi": "我"
+                "hanzi": "我",
+                "speakTw": "我"
               },
               {
                 "id": "dp3d-4",
                 "pyNum": "lai2",
+                "trees": "Lie2",
                 "pinyin": "lái",
                 "hanzi": "来",
                 "speakTw": "來"
@@ -903,17 +1081,22 @@
               {
                 "id": "dp3d-5",
                 "pyNum": "Ler",
+                "trees": "Ler",
                 "pinyin": "le",
-                "hanzi": "了"
+                "hanzi": "了",
+                "speakTw": "了"
               },
               {
                 "id": "dp3d-6",
-                "punct": true,
                 "trees": "!",
                 "pinyin": "!",
-                "hanzi": "！"
+                "hanzi": "！",
+                "speakTw": "",
+                "punct": true
               }
-            ]
+            ],
+            "audioEn": "audio/pro/dlg-p3-deer-en.mp3",
+            "audioTw": "audio/pro/dlg-p3-deer-tw.mp3"
           }
         }
       ]
@@ -923,48 +1106,57 @@
       "type": "spread",
       "pageLabel": "Page 4",
       "chapterEn": "The Brave Rescue",
-      "image": "images/page4.webp",
+      "imagePath": "images/page4.webp",
       "cards": [
         {
           "id": "p4-c1",
           "english": "The kind deer leaps into the waves.",
           "twFullText": "善良的鹿跳進河裡。",
-          "audioEn": "audio/p4-c1-en.mp3",
-          "audioTw": "audio/p4-c1-tw.mp3",
           "tokens": [
             {
               "id": "p4c1-0",
               "pyNum": "shan4",
+              "trees": "(r)san4",
               "pinyin": "Shàn",
-              "hanzi": "善"
+              "hanzi": "善",
+              "speakTw": "善"
             },
             {
               "id": "p4c1-1",
               "pyNum": "liang2",
+              "trees": "Leeang2",
               "pinyin": "liáng",
-              "hanzi": "良"
+              "hanzi": "良",
+              "speakTw": "良"
             },
             {
               "id": "p4c1-2",
               "pyNum": "de5",
+              "trees": "der",
               "pinyin": "de",
-              "hanzi": "的"
+              "hanzi": "的",
+              "speakTw": "的"
             },
             {
               "id": "p4c1-3",
               "pyNum": "lu4",
+              "trees": "Loo4",
               "pinyin": "lù",
-              "hanzi": "鹿"
+              "hanzi": "鹿",
+              "speakTw": "鹿"
             },
             {
               "id": "p4c1-4",
               "pyNum": "tiao4",
+              "trees": "teeaw4",
               "pinyin": "tiào",
-              "hanzi": "跳"
+              "hanzi": "跳",
+              "speakTw": "跳"
             },
             {
               "id": "p4c1-5",
               "pyNum": "jin4",
+              "trees": "jeen4",
               "pinyin": "jìn",
               "hanzi": "进",
               "speakTw": "進"
@@ -972,76 +1164,95 @@
             {
               "id": "p4c1-6",
               "pyNum": "he2",
+              "trees": "her2",
               "pinyin": "hé",
-              "hanzi": "河"
+              "hanzi": "河",
+              "speakTw": "河"
             },
             {
               "id": "p4c1-7",
               "pyNum": "li3",
+              "trees": "Lee3",
               "pinyin": "lǐ",
               "hanzi": "里",
               "speakTw": "裡"
             },
             {
               "id": "p4c1-8",
-              "punct": true,
               "trees": ".",
               "pinyin": ".",
-              "hanzi": "。"
+              "hanzi": "。",
+              "speakTw": "",
+              "punct": true
             }
-          ]
+          ],
+          "audioEn": "audio/pro/p4-c1-en.mp3",
+          "audioTw": "audio/pro/p4-c1-tw.mp3"
         },
         {
           "id": "p4-c2",
           "english": "It carries the man safely to shore.",
           "twFullText": "它平安救了那個人。",
-          "audioEn": "audio/p4-c2-en.mp3",
-          "audioTw": "audio/p4-c2-tw.mp3",
           "tokens": [
             {
               "id": "p4c2-0",
               "pyNum": "ta1",
+              "trees": "tah",
               "pinyin": "Tā",
-              "hanzi": "它"
+              "hanzi": "它",
+              "speakTw": "它"
             },
             {
               "id": "p4c2-1",
               "pyNum": "ping2",
+              "trees": "ping2",
               "pinyin": "píng",
-              "hanzi": "平"
+              "hanzi": "平",
+              "speakTw": "平"
             },
             {
               "id": "p4c2-2",
               "pyNum": "an1",
+              "trees": "an",
               "pinyin": "ān",
-              "hanzi": "安"
+              "hanzi": "安",
+              "speakTw": "安"
             },
             {
               "id": "p4c2-3",
               "pyNum": "jiu4",
+              "trees": "jeeoh4",
               "pinyin": "jiù",
-              "hanzi": "救"
+              "hanzi": "救",
+              "speakTw": "救"
             },
             {
               "id": "p4c2-4",
               "pyNum": "Ler",
+              "trees": "Ler",
               "pinyin": "le",
-              "hanzi": "了"
+              "hanzi": "了",
+              "speakTw": "了"
             },
             {
               "id": "p4c2-5",
               "pyNum": "ren2",
+              "trees": "(r)ther-n2",
               "pinyin": "rén",
-              "hanzi": "人"
+              "hanzi": "人",
+              "speakTw": "人"
             },
             {
               "id": "p4c2-6",
-              "punct": true,
               "trees": ".",
               "pinyin": ".",
-              "hanzi": "。"
+              "hanzi": "。",
+              "speakTw": "",
+              "punct": true
             }
-          ]
+          ],
+          "audioEn": "audio/pro/p4-c2-en.mp3",
+          "audioTw": "audio/pro/p4-c2-tw.mp3"
         }
       ],
       "hotspots": [
@@ -1056,18 +1267,19 @@
             "id": "dlg-p4-deer",
             "english": "Hold on tight! We are almost safe!",
             "twFullText": "抓緊我！快上岸了！",
-            "audioEn": "audio/dlg-p4-deer-en.mp3",
-            "audioTw": "audio/dlg-p4-deer-tw.mp3",
             "tokens": [
               {
                 "id": "dp4d-0",
                 "pyNum": "zhua1",
+                "trees": "(r)dsooah",
                 "pinyin": "Zhuā",
-                "hanzi": "抓"
+                "hanzi": "抓",
+                "speakTw": "抓"
               },
               {
                 "id": "dp4d-1",
                 "pyNum": "jin3",
+                "trees": "jeen3",
                 "pinyin": "jǐn",
                 "hanzi": "紧",
                 "speakTw": "緊"
@@ -1075,48 +1287,62 @@
               {
                 "id": "dp4d-2",
                 "pyNum": "wo3",
+                "trees": "wer3",
                 "pinyin": "wǒ",
-                "hanzi": "我"
+                "hanzi": "我",
+                "speakTw": "我"
               },
               {
                 "id": "dp4d-3",
-                "punct": true,
                 "trees": "!",
                 "pinyin": "!",
-                "hanzi": "！"
+                "hanzi": "！",
+                "speakTw": "",
+                "punct": true
               },
               {
                 "id": "dp4d-4",
                 "pyNum": "kuai4",
+                "trees": "kooie4",
                 "pinyin": "Kuài",
-                "hanzi": "快"
+                "hanzi": "快",
+                "speakTw": "快"
               },
               {
                 "id": "dp4d-5",
                 "pyNum": "shang4",
+                "trees": "(r)sang4",
                 "pinyin": "shàng",
-                "hanzi": "上"
+                "hanzi": "上",
+                "speakTw": "上"
               },
               {
                 "id": "dp4d-6",
                 "pyNum": "an4",
+                "trees": "an4",
                 "pinyin": "àn",
-                "hanzi": "岸"
+                "hanzi": "岸",
+                "speakTw": "岸"
               },
               {
                 "id": "dp4d-7",
                 "pyNum": "Ler",
+                "trees": "Ler",
                 "pinyin": "le",
-                "hanzi": "了"
+                "hanzi": "了",
+                "speakTw": "了"
               },
               {
                 "id": "dp4d-8",
-                "punct": true,
                 "trees": "!",
                 "pinyin": "!",
-                "hanzi": "！"
+                "hanzi": "！",
+                "speakTw": "",
+                "punct": true
               }
-            ]
+            ],
+            "audioEn": "audio/pro/dlg-p4-deer-en.mp3",
+            "audioTw": "audio/pro/dlg-p4-deer-tw.mp3"
           }
         },
         {
@@ -1130,59 +1356,74 @@
             "id": "dlg-p4-man",
             "english": "You are so brave and kind!",
             "twFullText": "你真勇敢又善良！",
-            "audioEn": "audio/dlg-p4-man-en.mp3",
-            "audioTw": "audio/dlg-p4-man-tw.mp3",
             "tokens": [
               {
                 "id": "dp4m-0",
                 "pyNum": "ni3",
+                "trees": "nee3",
                 "pinyin": "Nǐ",
-                "hanzi": "你"
+                "hanzi": "你",
+                "speakTw": "你"
               },
               {
                 "id": "dp4m-1",
                 "pyNum": "zhen1",
+                "trees": "(r)dser-n",
                 "pinyin": "zhēn",
-                "hanzi": "真"
+                "hanzi": "真",
+                "speakTw": "真"
               },
               {
                 "id": "dp4m-2",
                 "pyNum": "yong3",
+                "trees": "yer-oong3",
                 "pinyin": "yǒng",
-                "hanzi": "勇"
+                "hanzi": "勇",
+                "speakTw": "勇"
               },
               {
                 "id": "dp4m-3",
                 "pyNum": "gan3",
+                "trees": "gan3",
                 "pinyin": "gǎn",
-                "hanzi": "敢"
+                "hanzi": "敢",
+                "speakTw": "敢"
               },
               {
                 "id": "dp4m-4",
                 "pyNum": "you4",
+                "trees": "yoh4",
                 "pinyin": "yòu",
-                "hanzi": "又"
+                "hanzi": "又",
+                "speakTw": "又"
               },
               {
                 "id": "dp4m-5",
                 "pyNum": "shan4",
+                "trees": "(r)san4",
                 "pinyin": "shàn",
-                "hanzi": "善"
+                "hanzi": "善",
+                "speakTw": "善"
               },
               {
                 "id": "dp4m-6",
                 "pyNum": "liang2",
+                "trees": "Leeang2",
                 "pinyin": "liáng",
-                "hanzi": "良"
+                "hanzi": "良",
+                "speakTw": "良"
               },
               {
                 "id": "dp4m-7",
-                "punct": true,
                 "trees": "!",
                 "pinyin": "!",
-                "hanzi": "！"
+                "hanzi": "！",
+                "speakTw": "",
+                "punct": true
               }
-            ]
+            ],
+            "audioEn": "audio/pro/dlg-p4-man-en.mp3",
+            "audioTw": "audio/pro/dlg-p4-man-tw.mp3"
           }
         }
       ]
@@ -1192,36 +1433,41 @@
       "type": "spread",
       "pageLabel": "Page 5",
       "chapterEn": "A Sacred Promise",
-      "image": "images/page5.webp",
+      "imagePath": "images/page5.webp",
       "cards": [
         {
           "id": "p5-c1",
           "english": "The man kneels and makes a promise.",
           "twFullText": "他跪下許下諾言。",
-          "audioEn": "audio/p5-c1-en.mp3",
-          "audioTw": "audio/p5-c1-tw.mp3",
           "tokens": [
             {
               "id": "p5c1-0",
               "pyNum": "ta1",
+              "trees": "tah",
               "pinyin": "Tā",
-              "hanzi": "他"
+              "hanzi": "他",
+              "speakTw": "他"
             },
             {
               "id": "p5c1-1",
               "pyNum": "gui4",
+              "trees": "gooay4",
               "pinyin": "guì",
-              "hanzi": "跪"
+              "hanzi": "跪",
+              "speakTw": "跪"
             },
             {
               "id": "p5c1-2",
               "pyNum": "xia4",
+              "trees": "seeah4",
               "pinyin": "xià",
-              "hanzi": "下"
+              "hanzi": "下",
+              "speakTw": "下"
             },
             {
               "id": "p5c1-3",
               "pyNum": "xu3",
+              "trees": "see(oo)3",
               "pinyin": "xǔ",
               "hanzi": "许",
               "speakTw": "許"
@@ -1229,12 +1475,15 @@
             {
               "id": "p5c1-4",
               "pyNum": "xia4",
+              "trees": "seeah4",
               "pinyin": "xià",
-              "hanzi": "下"
+              "hanzi": "下",
+              "speakTw": "下"
             },
             {
               "id": "p5c1-5",
               "pyNum": "nuo4",
+              "trees": "nooer4",
               "pinyin": "nuò",
               "hanzi": "诺",
               "speakTw": "諾"
@@ -1242,28 +1491,32 @@
             {
               "id": "p5c1-6",
               "pyNum": "yan2",
+              "trees": "yan2",
               "pinyin": "yán",
-              "hanzi": "言"
+              "hanzi": "言",
+              "speakTw": "言"
             },
             {
               "id": "p5c1-7",
-              "punct": true,
               "trees": ".",
               "pinyin": ".",
-              "hanzi": "。"
+              "hanzi": "。",
+              "speakTw": "",
+              "punct": true
             }
-          ]
+          ],
+          "audioEn": "audio/pro/p5-c1-en.mp3",
+          "audioTw": "audio/pro/p5-c1-tw.mp3"
         },
         {
           "id": "p5-c2",
           "english": "“Thank you! I will keep your secret.”",
           "twFullText": "謝謝你！我會保密。",
-          "audioEn": "audio/p5-c2-en.mp3",
-          "audioTw": "audio/p5-c2-tw.mp3",
           "tokens": [
             {
               "id": "p5c2-0",
               "pyNum": "xie4",
+              "trees": "seer4",
               "pinyin": "Xiè",
               "hanzi": "谢",
               "speakTw": "謝"
@@ -1271,6 +1524,7 @@
             {
               "id": "p5c2-1",
               "pyNum": "xie5",
+              "trees": "seer",
               "pinyin": "xie",
               "hanzi": "谢",
               "speakTw": "謝"
@@ -1278,25 +1532,31 @@
             {
               "id": "p5c2-2",
               "pyNum": "ni3",
+              "trees": "nee3",
               "pinyin": "nǐ",
-              "hanzi": "你"
+              "hanzi": "你",
+              "speakTw": "你"
             },
             {
               "id": "p5c2-3",
-              "punct": true,
               "trees": "!",
               "pinyin": "!",
-              "hanzi": "！"
+              "hanzi": "！",
+              "speakTw": "",
+              "punct": true
             },
             {
               "id": "p5c2-4",
               "pyNum": "wo3",
+              "trees": "wer3",
               "pinyin": "Wǒ",
-              "hanzi": "我"
+              "hanzi": "我",
+              "speakTw": "我"
             },
             {
               "id": "p5c2-5",
               "pyNum": "hui4",
+              "trees": "hooay4",
               "pinyin": "huì",
               "hanzi": "会",
               "speakTw": "會"
@@ -1304,23 +1564,30 @@
             {
               "id": "p5c2-6",
               "pyNum": "bao3",
+              "trees": "baw3",
               "pinyin": "bǎo",
-              "hanzi": "保"
+              "hanzi": "保",
+              "speakTw": "保"
             },
             {
               "id": "p5c2-7",
               "pyNum": "mi4",
+              "trees": "mee4",
               "pinyin": "mì",
-              "hanzi": "密"
+              "hanzi": "密",
+              "speakTw": "密"
             },
             {
               "id": "p5c2-8",
-              "punct": true,
               "trees": ".",
               "pinyin": ".",
-              "hanzi": "。"
+              "hanzi": "。",
+              "speakTw": "",
+              "punct": true
             }
-          ]
+          ],
+          "audioEn": "audio/pro/p5-c2-en.mp3",
+          "audioTw": "audio/pro/p5-c2-tw.mp3"
         }
       ],
       "hotspots": [
@@ -1335,18 +1602,19 @@
             "id": "dlg-p5-man",
             "english": "I promise never to tell anyone!",
             "twFullText": "我發誓絕不告訴別人！",
-            "audioEn": "audio/dlg-p5-man-en.mp3",
-            "audioTw": "audio/dlg-p5-man-tw.mp3",
             "tokens": [
               {
                 "id": "dp5m-0",
                 "pyNum": "wo3",
+                "trees": "wer3",
                 "pinyin": "Wǒ",
-                "hanzi": "我"
+                "hanzi": "我",
+                "speakTw": "我"
               },
               {
                 "id": "dp5m-1",
                 "pyNum": "fa1",
+                "trees": "fah",
                 "pinyin": "fā",
                 "hanzi": "发",
                 "speakTw": "發"
@@ -1354,24 +1622,31 @@
               {
                 "id": "dp5m-2",
                 "pyNum": "shi4",
+                "trees": "(r)s4",
                 "pinyin": "shì",
-                "hanzi": "誓"
+                "hanzi": "誓",
+                "speakTw": "誓"
               },
               {
                 "id": "dp5m-3",
                 "pyNum": "bu4",
+                "trees": "boo4",
                 "pinyin": "bù",
-                "hanzi": "不"
+                "hanzi": "不",
+                "speakTw": "不"
               },
               {
                 "id": "dp5m-4",
                 "pyNum": "gao4",
+                "trees": "gaw4",
                 "pinyin": "gào",
-                "hanzi": "告"
+                "hanzi": "告",
+                "speakTw": "告"
               },
               {
                 "id": "dp5m-5",
                 "pyNum": "su4",
+                "trees": "soo4",
                 "pinyin": "sù",
                 "hanzi": "诉",
                 "speakTw": "訴"
@@ -1379,6 +1654,7 @@
               {
                 "id": "dp5m-6",
                 "pyNum": "bie2",
+                "trees": "beer2",
                 "pinyin": "bié",
                 "hanzi": "别",
                 "speakTw": "別"
@@ -1386,17 +1662,22 @@
               {
                 "id": "dp5m-7",
                 "pyNum": "ren2",
+                "trees": "(r)ther-n2",
                 "pinyin": "rén",
-                "hanzi": "人"
+                "hanzi": "人",
+                "speakTw": "人"
               },
               {
                 "id": "dp5m-8",
-                "punct": true,
                 "trees": "!",
                 "pinyin": "!",
-                "hanzi": "！"
+                "hanzi": "！",
+                "speakTw": "",
+                "punct": true
               }
-            ]
+            ],
+            "audioEn": "audio/pro/dlg-p5-man-en.mp3",
+            "audioTw": "audio/pro/dlg-p5-man-tw.mp3"
           }
         },
         {
@@ -1410,47 +1691,58 @@
             "id": "dlg-p5-deer",
             "english": "Go home safely, my friend.",
             "twFullText": "平安回家吧，我的朋友。",
-            "audioEn": "audio/dlg-p5-deer-en.mp3",
-            "audioTw": "audio/dlg-p5-deer-tw.mp3",
             "tokens": [
               {
                 "id": "dp5d-0",
                 "pyNum": "ping2",
+                "trees": "ping2",
                 "pinyin": "Píng",
-                "hanzi": "平"
+                "hanzi": "平",
+                "speakTw": "平"
               },
               {
                 "id": "dp5d-1",
                 "pyNum": "an1",
+                "trees": "an",
                 "pinyin": "ān",
-                "hanzi": "安"
+                "hanzi": "安",
+                "speakTw": "安"
               },
               {
                 "id": "dp5d-2",
                 "pyNum": "hui2",
+                "trees": "hooay2",
                 "pinyin": "huí",
-                "hanzi": "回"
+                "hanzi": "回",
+                "speakTw": "回"
               },
               {
                 "id": "dp5d-3",
                 "pyNum": "jia1",
+                "trees": "jeeah",
                 "pinyin": "jiā",
-                "hanzi": "家"
+                "hanzi": "家",
+                "speakTw": "家"
               },
               {
                 "id": "dp5d-4",
                 "pyNum": "ba5",
+                "trees": "bah",
                 "pinyin": "ba",
-                "hanzi": "吧"
+                "hanzi": "吧",
+                "speakTw": "吧"
               },
               {
                 "id": "dp5d-5",
-                "punct": true,
                 "trees": ".",
                 "pinyin": ".",
-                "hanzi": "。"
+                "hanzi": "。",
+                "speakTw": "",
+                "punct": true
               }
-            ]
+            ],
+            "audioEn": "audio/pro/dlg-p5-deer-en.mp3",
+            "audioTw": "audio/pro/dlg-p5-deer-tw.mp3"
           }
         }
       ]
@@ -1460,30 +1752,33 @@
       "type": "spread",
       "pageLabel": "Page 6",
       "chapterEn": "The Queen’s Dream",
-      "image": "images/page6.webp",
+      "imagePath": "images/page6.webp",
       "cards": [
         {
           "id": "p6-c1",
           "english": "The queen dreams of the glowing deer.",
           "twFullText": "王后夢見了九色鹿。",
-          "audioEn": "audio/p6-c1-en.mp3",
-          "audioTw": "audio/p6-c1-tw.mp3",
           "tokens": [
             {
               "id": "p6c1-0",
               "pyNum": "wang2",
+              "trees": "wang2",
               "pinyin": "Wáng",
-              "hanzi": "王"
+              "hanzi": "王",
+              "speakTw": "王"
             },
             {
               "id": "p6c1-1",
               "pyNum": "hou4",
+              "trees": "hoh4",
               "pinyin": "hòu",
-              "hanzi": "后"
+              "hanzi": "后",
+              "speakTw": "后"
             },
             {
               "id": "p6c1-2",
               "pyNum": "meng4",
+              "trees": "mer-ng4",
               "pinyin": "mèng",
               "hanzi": "梦",
               "speakTw": "夢"
@@ -1491,6 +1786,7 @@
             {
               "id": "p6c1-3",
               "pyNum": "jian4",
+              "trees": "jeean4",
               "pinyin": "jiàn",
               "hanzi": "见",
               "speakTw": "見"
@@ -1498,58 +1794,72 @@
             {
               "id": "p6c1-4",
               "pyNum": "Ler",
+              "trees": "Ler",
               "pinyin": "le",
-              "hanzi": "了"
+              "hanzi": "了",
+              "speakTw": "了"
             },
             {
               "id": "p6c1-5",
               "pyNum": "jiu3",
+              "trees": "jeeoh3",
               "pinyin": "jiǔ",
-              "hanzi": "九"
+              "hanzi": "九",
+              "speakTw": "九"
             },
             {
               "id": "p6c1-6",
               "pyNum": "se4",
+              "trees": "ser4",
               "pinyin": "sè",
-              "hanzi": "色"
+              "hanzi": "色",
+              "speakTw": "色"
             },
             {
               "id": "p6c1-7",
               "pyNum": "lu4",
+              "trees": "Loo4",
               "pinyin": "lù",
-              "hanzi": "鹿"
+              "hanzi": "鹿",
+              "speakTw": "鹿"
             },
             {
               "id": "p6c1-8",
-              "punct": true,
               "trees": ".",
               "pinyin": ".",
-              "hanzi": "。"
+              "hanzi": "。",
+              "speakTw": "",
+              "punct": true
             }
-          ]
+          ],
+          "audioEn": "audio/pro/p6-c1-en.mp3",
+          "audioTw": "audio/pro/p6-c1-tw.mp3"
         },
         {
           "id": "p6-c2",
           "english": "She offers gold to find it.",
           "twFullText": "她用黃金找神鹿。",
-          "audioEn": "audio/p6-c2-en.mp3",
-          "audioTw": "audio/p6-c2-tw.mp3",
           "tokens": [
             {
               "id": "p6c2-0",
               "pyNum": "ta1",
+              "trees": "tah",
               "pinyin": "Tā",
-              "hanzi": "她"
+              "hanzi": "她",
+              "speakTw": "她"
             },
             {
               "id": "p6c2-1",
               "pyNum": "yong4",
+              "trees": "yer-oong4",
               "pinyin": "yòng",
-              "hanzi": "用"
+              "hanzi": "用",
+              "speakTw": "用"
             },
             {
               "id": "p6c2-2",
               "pyNum": "huang2",
+              "trees": "hooang2",
               "pinyin": "huáng",
               "hanzi": "黄",
               "speakTw": "黃"
@@ -1557,35 +1867,46 @@
             {
               "id": "p6c2-3",
               "pyNum": "jin1",
+              "trees": "jeen",
               "pinyin": "jīn",
-              "hanzi": "金"
+              "hanzi": "金",
+              "speakTw": "金"
             },
             {
               "id": "p6c2-4",
               "pyNum": "zhao3",
+              "trees": "(r)dsaw3",
               "pinyin": "zhǎo",
-              "hanzi": "找"
+              "hanzi": "找",
+              "speakTw": "找"
             },
             {
               "id": "p6c2-5",
               "pyNum": "shen2",
+              "trees": "(r)ser-n2",
               "pinyin": "shén",
-              "hanzi": "神"
+              "hanzi": "神",
+              "speakTw": "神"
             },
             {
               "id": "p6c2-6",
               "pyNum": "lu4",
+              "trees": "Loo4",
               "pinyin": "lù",
-              "hanzi": "鹿"
+              "hanzi": "鹿",
+              "speakTw": "鹿"
             },
             {
               "id": "p6c2-7",
-              "punct": true,
               "trees": ".",
               "pinyin": ".",
-              "hanzi": "。"
+              "hanzi": "。",
+              "speakTw": "",
+              "punct": true
             }
-          ]
+          ],
+          "audioEn": "audio/pro/p6-c2-en.mp3",
+          "audioTw": "audio/pro/p6-c2-tw.mp3"
         }
       ],
       "hotspots": [
@@ -1600,53 +1921,66 @@
             "id": "dlg-p6-queen",
             "english": "I want that glowing nine-colored deer!",
             "twFullText": "我想要那隻九色鹿！",
-            "audioEn": "audio/dlg-p6-queen-en.mp3",
-            "audioTw": "audio/dlg-p6-queen-tw.mp3",
             "tokens": [
               {
                 "id": "dp6q-0",
                 "pyNum": "wo3",
+                "trees": "wer3",
                 "pinyin": "Wǒ",
-                "hanzi": "我"
+                "hanzi": "我",
+                "speakTw": "我"
               },
               {
                 "id": "dp6q-1",
                 "pyNum": "xiang3",
+                "trees": "seeang3",
                 "pinyin": "xiǎng",
-                "hanzi": "想"
+                "hanzi": "想",
+                "speakTw": "想"
               },
               {
                 "id": "dp6q-2",
                 "pyNum": "yao4",
+                "trees": "yaw4",
                 "pinyin": "yào",
-                "hanzi": "要"
+                "hanzi": "要",
+                "speakTw": "要"
               },
               {
                 "id": "dp6q-3",
                 "pyNum": "jiu3",
+                "trees": "jeeoh3",
                 "pinyin": "jiǔ",
-                "hanzi": "九"
+                "hanzi": "九",
+                "speakTw": "九"
               },
               {
                 "id": "dp6q-4",
                 "pyNum": "se4",
+                "trees": "ser4",
                 "pinyin": "sè",
-                "hanzi": "色"
+                "hanzi": "色",
+                "speakTw": "色"
               },
               {
                 "id": "dp6q-5",
                 "pyNum": "lu4",
+                "trees": "Loo4",
                 "pinyin": "lù",
-                "hanzi": "鹿"
+                "hanzi": "鹿",
+                "speakTw": "鹿"
               },
               {
                 "id": "dp6q-6",
-                "punct": true,
                 "trees": "!",
                 "pinyin": "!",
-                "hanzi": "！"
+                "hanzi": "！",
+                "speakTw": "",
+                "punct": true
               }
-            ]
+            ],
+            "audioEn": "audio/pro/dlg-p6-queen-en.mp3",
+            "audioTw": "audio/pro/dlg-p6-queen-tw.mp3"
           }
         },
         {
@@ -1660,36 +1994,43 @@
             "id": "dlg-p6-king",
             "english": "Whoever finds the deer will receive gold!",
             "twFullText": "找到神鹿就賞黃金！",
-            "audioEn": "audio/dlg-p6-king-en.mp3",
-            "audioTw": "audio/dlg-p6-king-tw.mp3",
             "tokens": [
               {
                 "id": "dp6k-0",
                 "pyNum": "zhao3",
+                "trees": "(r)dsaw3",
                 "pinyin": "Zhǎo",
-                "hanzi": "找"
+                "hanzi": "找",
+                "speakTw": "找"
               },
               {
                 "id": "dp6k-1",
                 "pyNum": "dao4",
+                "trees": "daw4",
                 "pinyin": "dào",
-                "hanzi": "到"
+                "hanzi": "到",
+                "speakTw": "到"
               },
               {
                 "id": "dp6k-2",
                 "pyNum": "shen2",
+                "trees": "(r)ser-n2",
                 "pinyin": "shén",
-                "hanzi": "神"
+                "hanzi": "神",
+                "speakTw": "神"
               },
               {
                 "id": "dp6k-3",
                 "pyNum": "lu4",
+                "trees": "Loo4",
                 "pinyin": "lù",
-                "hanzi": "鹿"
+                "hanzi": "鹿",
+                "speakTw": "鹿"
               },
               {
                 "id": "dp6k-4",
                 "pyNum": "shang3",
+                "trees": "(r)sang3",
                 "pinyin": "shǎng",
                 "hanzi": "赏",
                 "speakTw": "賞"
@@ -1697,6 +2038,7 @@
               {
                 "id": "dp6k-5",
                 "pyNum": "huang2",
+                "trees": "hooang2",
                 "pinyin": "huáng",
                 "hanzi": "黄",
                 "speakTw": "黃"
@@ -1704,17 +2046,22 @@
               {
                 "id": "dp6k-6",
                 "pyNum": "jin1",
+                "trees": "jeen",
                 "pinyin": "jīn",
-                "hanzi": "金"
+                "hanzi": "金",
+                "speakTw": "金"
               },
               {
                 "id": "dp6k-7",
-                "punct": true,
                 "trees": "!",
                 "pinyin": "!",
-                "hanzi": "！"
+                "hanzi": "！",
+                "speakTw": "",
+                "punct": true
               }
-            ]
+            ],
+            "audioEn": "audio/pro/dlg-p6-king-en.mp3",
+            "audioTw": "audio/pro/dlg-p6-king-tw.mp3"
           }
         }
       ]
@@ -1724,18 +2071,17 @@
       "type": "spread",
       "pageLabel": "Page 7",
       "chapterEn": "Betrayal & Warning",
-      "image": "images/page7.webp",
+      "imagePath": "images/page7.webp",
       "cards": [
         {
           "id": "p7-c1",
           "english": "The greedy man breaks his promise.",
           "twFullText": "貪心的人違背諾言。",
-          "audioEn": "audio/p7-c1-en.mp3",
-          "audioTw": "audio/p7-c1-tw.mp3",
           "tokens": [
             {
               "id": "p7c1-0",
               "pyNum": "tan1",
+              "trees": "tan",
               "pinyin": "Tān",
               "hanzi": "贪",
               "speakTw": "貪"
@@ -1743,18 +2089,23 @@
             {
               "id": "p7c1-1",
               "pyNum": "xin1",
+              "trees": "seen",
               "pinyin": "xīn",
-              "hanzi": "心"
+              "hanzi": "心",
+              "speakTw": "心"
             },
             {
               "id": "p7c1-2",
               "pyNum": "ren2",
+              "trees": "(r)ther-n2",
               "pinyin": "rén",
-              "hanzi": "人"
+              "hanzi": "人",
+              "speakTw": "人"
             },
             {
               "id": "p7c1-3",
               "pyNum": "wei2",
+              "trees": "way2",
               "pinyin": "wéi",
               "hanzi": "违",
               "speakTw": "違"
@@ -1762,12 +2113,15 @@
             {
               "id": "p7c1-4",
               "pyNum": "bei4",
+              "trees": "bay4",
               "pinyin": "bèi",
-              "hanzi": "背"
+              "hanzi": "背",
+              "speakTw": "背"
             },
             {
               "id": "p7c1-5",
               "pyNum": "nuo4",
+              "trees": "nooer4",
               "pinyin": "nuò",
               "hanzi": "诺",
               "speakTw": "諾"
@@ -1775,34 +2129,40 @@
             {
               "id": "p7c1-6",
               "pyNum": "yan2",
+              "trees": "yan2",
               "pinyin": "yán",
-              "hanzi": "言"
+              "hanzi": "言",
+              "speakTw": "言"
             },
             {
               "id": "p7c1-7",
-              "punct": true,
               "trees": ".",
               "pinyin": ".",
-              "hanzi": "。"
+              "hanzi": "。",
+              "speakTw": "",
+              "punct": true
             }
-          ]
+          ],
+          "audioEn": "audio/pro/p7-c1-en.mp3",
+          "audioTw": "audio/pro/p7-c1-tw.mp3"
         },
         {
           "id": "p7-c2",
           "english": "The little crow flies fast to warn the deer!",
           "twFullText": "小烏鴉飛來報信！",
-          "audioEn": "audio/p7-c2-en.mp3",
-          "audioTw": "audio/p7-c2-tw.mp3",
           "tokens": [
             {
               "id": "p7c2-0",
               "pyNum": "xiao3",
+              "trees": "seeaw3",
               "pinyin": "Xiǎo",
-              "hanzi": "小"
+              "hanzi": "小",
+              "speakTw": "小"
             },
             {
               "id": "p7c2-1",
               "pyNum": "wu1",
+              "trees": "woo",
               "pinyin": "wū",
               "hanzi": "乌",
               "speakTw": "烏"
@@ -1810,6 +2170,7 @@
             {
               "id": "p7c2-2",
               "pyNum": "ya1",
+              "trees": "yah",
               "pinyin": "yā",
               "hanzi": "鸦",
               "speakTw": "鴉"
@@ -1817,6 +2178,7 @@
             {
               "id": "p7c2-3",
               "pyNum": "fei1",
+              "trees": "fay",
               "pinyin": "fēi",
               "hanzi": "飞",
               "speakTw": "飛"
@@ -1824,6 +2186,7 @@
             {
               "id": "p7c2-4",
               "pyNum": "lai2",
+              "trees": "Lie2",
               "pinyin": "lái",
               "hanzi": "来",
               "speakTw": "來"
@@ -1831,6 +2194,7 @@
             {
               "id": "p7c2-5",
               "pyNum": "bao4",
+              "trees": "baw4",
               "pinyin": "bào",
               "hanzi": "报",
               "speakTw": "報"
@@ -1838,17 +2202,22 @@
             {
               "id": "p7c2-6",
               "pyNum": "xin4",
+              "trees": "seen4",
               "pinyin": "xìn",
-              "hanzi": "信"
+              "hanzi": "信",
+              "speakTw": "信"
             },
             {
               "id": "p7c2-7",
-              "punct": true,
               "trees": "!",
               "pinyin": "!",
-              "hanzi": "！"
+              "hanzi": "！",
+              "speakTw": "",
+              "punct": true
             }
-          ]
+          ],
+          "audioEn": "audio/pro/p7-c2-en.mp3",
+          "audioTw": "audio/pro/p7-c2-tw.mp3"
         }
       ],
       "hotspots": [
@@ -1863,37 +2232,43 @@
             "id": "dlg-p7-crow",
             "english": "Wake up! The king's army is coming!",
             "twFullText": "快醒醒！軍隊來了！",
-            "audioEn": "audio/dlg-p7-crow-en.mp3",
-            "audioTw": "audio/dlg-p7-crow-tw.mp3",
             "tokens": [
               {
                 "id": "dp7c-0",
                 "pyNum": "kuai4",
+                "trees": "kooie4",
                 "pinyin": "Kuài",
-                "hanzi": "快"
+                "hanzi": "快",
+                "speakTw": "快"
               },
               {
                 "id": "dp7c-1",
                 "pyNum": "xing3",
+                "trees": "sing3",
                 "pinyin": "xǐng",
-                "hanzi": "醒"
+                "hanzi": "醒",
+                "speakTw": "醒"
               },
               {
                 "id": "dp7c-2",
                 "pyNum": "xing3",
+                "trees": "sing3",
                 "pinyin": "xǐng",
-                "hanzi": "醒"
+                "hanzi": "醒",
+                "speakTw": "醒"
               },
               {
                 "id": "dp7c-3",
-                "punct": true,
                 "trees": "!",
                 "pinyin": "!",
-                "hanzi": "！"
+                "hanzi": "！",
+                "speakTw": "",
+                "punct": true
               },
               {
                 "id": "dp7c-4",
                 "pyNum": "jun1",
+                "trees": "jee(oo)n",
                 "pinyin": "Jūn",
                 "hanzi": "军",
                 "speakTw": "軍"
@@ -1901,6 +2276,7 @@
               {
                 "id": "dp7c-5",
                 "pyNum": "dui4",
+                "trees": "dooay4",
                 "pinyin": "duì",
                 "hanzi": "队",
                 "speakTw": "隊"
@@ -1908,6 +2284,7 @@
               {
                 "id": "dp7c-6",
                 "pyNum": "lai2",
+                "trees": "Lie2",
                 "pinyin": "lái",
                 "hanzi": "来",
                 "speakTw": "來"
@@ -1915,17 +2292,22 @@
               {
                 "id": "dp7c-7",
                 "pyNum": "Ler",
+                "trees": "Ler",
                 "pinyin": "le",
-                "hanzi": "了"
+                "hanzi": "了",
+                "speakTw": "了"
               },
               {
                 "id": "dp7c-8",
-                "punct": true,
                 "trees": "!",
                 "pinyin": "!",
-                "hanzi": "！"
+                "hanzi": "！",
+                "speakTw": "",
+                "punct": true
               }
-            ]
+            ],
+            "audioEn": "audio/pro/dlg-p7-crow-en.mp3",
+            "audioTw": "audio/pro/dlg-p7-crow-tw.mp3"
           }
         },
         {
@@ -1939,67 +2321,82 @@
             "id": "dlg-p7-man",
             "english": "Look! The nine-colored deer is right there!",
             "twFullText": "看！九色鹿就在那裡！",
-            "audioEn": "audio/dlg-p7-man-en.mp3",
-            "audioTw": "audio/dlg-p7-man-tw.mp3",
             "tokens": [
               {
                 "id": "dp7m-0",
                 "pyNum": "kan4",
+                "trees": "kan4",
                 "pinyin": "Kàn",
-                "hanzi": "看"
+                "hanzi": "看",
+                "speakTw": "看"
               },
               {
                 "id": "dp7m-1",
-                "punct": true,
                 "trees": "!",
                 "pinyin": "!",
-                "hanzi": "！"
+                "hanzi": "！",
+                "speakTw": "",
+                "punct": true
               },
               {
                 "id": "dp7m-2",
                 "pyNum": "jiu3",
+                "trees": "jeeoh3",
                 "pinyin": "Jiǔ",
-                "hanzi": "九"
+                "hanzi": "九",
+                "speakTw": "九"
               },
               {
                 "id": "dp7m-3",
                 "pyNum": "se4",
+                "trees": "ser4",
                 "pinyin": "sè",
-                "hanzi": "色"
+                "hanzi": "色",
+                "speakTw": "色"
               },
               {
                 "id": "dp7m-4",
                 "pyNum": "lu4",
+                "trees": "Loo4",
                 "pinyin": "lù",
-                "hanzi": "鹿"
+                "hanzi": "鹿",
+                "speakTw": "鹿"
               },
               {
                 "id": "dp7m-5",
                 "pyNum": "zai4",
+                "trees": "dsie4",
                 "pinyin": "zài",
-                "hanzi": "在"
+                "hanzi": "在",
+                "speakTw": "在"
               },
               {
                 "id": "dp7m-6",
                 "pyNum": "na4",
+                "trees": "nah4",
                 "pinyin": "nà",
-                "hanzi": "那"
+                "hanzi": "那",
+                "speakTw": "那"
               },
               {
                 "id": "dp7m-7",
                 "pyNum": "li3",
+                "trees": "Lee3",
                 "pinyin": "lǐ",
                 "hanzi": "里",
                 "speakTw": "裡"
               },
               {
                 "id": "dp7m-8",
-                "punct": true,
                 "trees": "!",
                 "pinyin": "!",
-                "hanzi": "！"
+                "hanzi": "！",
+                "speakTw": "",
+                "punct": true
               }
-            ]
+            ],
+            "audioEn": "audio/pro/dlg-p7-man-en.mp3",
+            "audioTw": "audio/pro/dlg-p7-man-tw.mp3"
           }
         }
       ]
@@ -2009,36 +2406,41 @@
       "type": "spread",
       "pageLabel": "Page 8",
       "chapterEn": "Truth & Kindness Win",
-      "image": "images/page8.webp",
+      "imagePath": "images/page8.webp",
       "cards": [
         {
           "id": "p8-c1",
           "english": "The deer tells the king the whole truth.",
           "twFullText": "九色鹿說出真相。",
-          "audioEn": "audio/p8-c1-en.mp3",
-          "audioTw": "audio/p8-c1-tw.mp3",
           "tokens": [
             {
               "id": "p8c1-0",
               "pyNum": "jiu3",
+              "trees": "jeeoh3",
               "pinyin": "Jiǔ",
-              "hanzi": "九"
+              "hanzi": "九",
+              "speakTw": "九"
             },
             {
               "id": "p8c1-1",
               "pyNum": "se4",
+              "trees": "ser4",
               "pinyin": "sè",
-              "hanzi": "色"
+              "hanzi": "色",
+              "speakTw": "色"
             },
             {
               "id": "p8c1-2",
               "pyNum": "lu4",
+              "trees": "Loo4",
               "pinyin": "lù",
-              "hanzi": "鹿"
+              "hanzi": "鹿",
+              "speakTw": "鹿"
             },
             {
               "id": "p8c1-3",
               "pyNum": "shuo1",
+              "trees": "(r)sooer",
               "pinyin": "shuō",
               "hanzi": "说",
               "speakTw": "說"
@@ -2046,40 +2448,48 @@
             {
               "id": "p8c1-4",
               "pyNum": "chu1",
+              "trees": "(r)tsoo",
               "pinyin": "chū",
-              "hanzi": "出"
+              "hanzi": "出",
+              "speakTw": "出"
             },
             {
               "id": "p8c1-5",
               "pyNum": "zhen1",
+              "trees": "(r)dser-n",
               "pinyin": "zhēn",
-              "hanzi": "真"
+              "hanzi": "真",
+              "speakTw": "真"
             },
             {
               "id": "p8c1-6",
               "pyNum": "xiang4",
+              "trees": "seeang4",
               "pinyin": "xiàng",
-              "hanzi": "相"
+              "hanzi": "相",
+              "speakTw": "相"
             },
             {
               "id": "p8c1-7",
-              "punct": true,
               "trees": ".",
               "pinyin": ".",
-              "hanzi": "。"
+              "hanzi": "。",
+              "speakTw": "",
+              "punct": true
             }
-          ]
+          ],
+          "audioEn": "audio/pro/p8-c1-en.mp3",
+          "audioTw": "audio/pro/p8-c1-tw.mp3"
         },
         {
           "id": "p8-c2",
           "english": "The king protects it. Kindness wins!",
           "twFullText": "國王保護鹿，善良最美！",
-          "audioEn": "audio/p8-c2-en.mp3",
-          "audioTw": "audio/p8-c2-tw.mp3",
           "tokens": [
             {
               "id": "p8c2-0",
               "pyNum": "guo2",
+              "trees": "gooer2",
               "pinyin": "Guó",
               "hanzi": "国",
               "speakTw": "國"
@@ -2087,18 +2497,23 @@
             {
               "id": "p8c2-1",
               "pyNum": "wang2",
+              "trees": "wang2",
               "pinyin": "wáng",
-              "hanzi": "王"
+              "hanzi": "王",
+              "speakTw": "王"
             },
             {
               "id": "p8c2-2",
               "pyNum": "bao3",
+              "trees": "baw3",
               "pinyin": "bǎo",
-              "hanzi": "保"
+              "hanzi": "保",
+              "speakTw": "保"
             },
             {
               "id": "p8c2-3",
               "pyNum": "hu4",
+              "trees": "hoo4",
               "pinyin": "hù",
               "hanzi": "护",
               "speakTw": "護"
@@ -2106,48 +2521,62 @@
             {
               "id": "p8c2-4",
               "pyNum": "lu4",
+              "trees": "Loo4",
               "pinyin": "lù",
-              "hanzi": "鹿"
+              "hanzi": "鹿",
+              "speakTw": "鹿"
             },
             {
               "id": "p8c2-5",
-              "punct": true,
               "trees": ",",
               "pinyin": ",",
-              "hanzi": "，"
+              "hanzi": "，",
+              "speakTw": "",
+              "punct": true
             },
             {
               "id": "p8c2-6",
               "pyNum": "shan4",
+              "trees": "(r)san4",
               "pinyin": "shàn",
-              "hanzi": "善"
+              "hanzi": "善",
+              "speakTw": "善"
             },
             {
               "id": "p8c2-7",
               "pyNum": "liang2",
+              "trees": "Leeang2",
               "pinyin": "liáng",
-              "hanzi": "良"
+              "hanzi": "良",
+              "speakTw": "良"
             },
             {
               "id": "p8c2-8",
               "pyNum": "zui4",
+              "trees": "dsooay4",
               "pinyin": "zuì",
-              "hanzi": "最"
+              "hanzi": "最",
+              "speakTw": "最"
             },
             {
               "id": "p8c2-9",
               "pyNum": "mei3",
+              "trees": "may3",
               "pinyin": "měi",
-              "hanzi": "美"
+              "hanzi": "美",
+              "speakTw": "美"
             },
             {
               "id": "p8c2-10",
-              "punct": true,
               "trees": "!",
               "pinyin": "!",
-              "hanzi": "！"
+              "hanzi": "！",
+              "speakTw": "",
+              "punct": true
             }
-          ]
+          ],
+          "audioEn": "audio/pro/p8-c2-en.mp3",
+          "audioTw": "audio/pro/p8-c2-tw.mp3"
         }
       ],
       "hotspots": [
@@ -2162,72 +2591,90 @@
             "id": "dlg-p8-deer",
             "english": "I saved his life, yet he broke his word.",
             "twFullText": "我救了他，他卻背叛了我。",
-            "audioEn": "audio/dlg-p8-deer-en.mp3",
-            "audioTw": "audio/dlg-p8-deer-tw.mp3",
             "tokens": [
               {
                 "id": "dp8d-0",
                 "pyNum": "wo3",
+                "trees": "wer3",
                 "pinyin": "Wǒ",
-                "hanzi": "我"
+                "hanzi": "我",
+                "speakTw": "我"
               },
               {
                 "id": "dp8d-1",
                 "pyNum": "jiu4",
+                "trees": "jeeoh4",
                 "pinyin": "jiù",
-                "hanzi": "救"
+                "hanzi": "救",
+                "speakTw": "救"
               },
               {
                 "id": "dp8d-2",
                 "pyNum": "Ler",
+                "trees": "Ler",
                 "pinyin": "le",
-                "hanzi": "了"
+                "hanzi": "了",
+                "speakTw": "了"
               },
               {
                 "id": "dp8d-3",
                 "pyNum": "ta1",
+                "trees": "tah",
                 "pinyin": "tā",
-                "hanzi": "他"
+                "hanzi": "他",
+                "speakTw": "他"
               },
               {
                 "id": "dp8d-4",
-                "punct": true,
                 "trees": ",",
                 "pinyin": ",",
-                "hanzi": "，"
+                "hanzi": "，",
+                "speakTw": "",
+                "punct": true
               },
               {
                 "id": "dp8d-5",
                 "pyNum": "ta1",
+                "trees": "tah",
                 "pinyin": "tā",
-                "hanzi": "他"
+                "hanzi": "他",
+                "speakTw": "他"
               },
               {
                 "id": "dp8d-6",
                 "pyNum": "shi1",
+                "trees": "(r)s",
                 "pinyin": "shī",
-                "hanzi": "失"
+                "hanzi": "失",
+                "speakTw": "失"
               },
               {
                 "id": "dp8d-7",
                 "pyNum": "xin4",
+                "trees": "seen4",
                 "pinyin": "xìn",
-                "hanzi": "信"
+                "hanzi": "信",
+                "speakTw": "信"
               },
               {
                 "id": "dp8d-8",
                 "pyNum": "Ler",
+                "trees": "Ler",
                 "pinyin": "le",
-                "hanzi": "了"
+                "hanzi": "了",
+                "speakTw": "了"
               },
               {
                 "id": "dp8d-9",
-                "punct": true,
                 "trees": ".",
                 "pinyin": ".",
-                "hanzi": "。"
+                "hanzi": "。",
+                "speakTw": "",
+                "punct": true
               }
-            ]
+            ],
+            "audioEn": "audio/pro/dlg-p8-deer-en.mp3",
+            "audioTw": "audio/pro/dlg-p8-deer-tw.mp3"
           }
         },
         {
@@ -2241,18 +2688,19 @@
             "id": "dlg-p8-king",
             "english": "No one shall ever harm this kind deer!",
             "twFullText": "從今以後，永遠保護九色鹿！",
-            "audioEn": "audio/dlg-p8-king-en.mp3",
-            "audioTw": "audio/dlg-p8-king-tw.mp3",
             "tokens": [
               {
                 "id": "dp8k-0",
                 "pyNum": "yong3",
+                "trees": "yer-oong3",
                 "pinyin": "Yǒng",
-                "hanzi": "永"
+                "hanzi": "永",
+                "speakTw": "永"
               },
               {
                 "id": "dp8k-1",
                 "pyNum": "yuan3",
+                "trees": "yee(oo)an3",
                 "pinyin": "yuǎn",
                 "hanzi": "远",
                 "speakTw": "遠"
@@ -2260,12 +2708,15 @@
               {
                 "id": "dp8k-2",
                 "pyNum": "bao3",
+                "trees": "baw3",
                 "pinyin": "bǎo",
-                "hanzi": "保"
+                "hanzi": "保",
+                "speakTw": "保"
               },
               {
                 "id": "dp8k-3",
                 "pyNum": "hu4",
+                "trees": "hoo4",
                 "pinyin": "hù",
                 "hanzi": "护",
                 "speakTw": "護"
@@ -2273,29 +2724,38 @@
               {
                 "id": "dp8k-4",
                 "pyNum": "jiu3",
+                "trees": "jeeoh3",
                 "pinyin": "jiǔ",
-                "hanzi": "九"
+                "hanzi": "九",
+                "speakTw": "九"
               },
               {
                 "id": "dp8k-5",
                 "pyNum": "se4",
+                "trees": "ser4",
                 "pinyin": "sè",
-                "hanzi": "色"
+                "hanzi": "色",
+                "speakTw": "色"
               },
               {
                 "id": "dp8k-6",
                 "pyNum": "lu4",
+                "trees": "Loo4",
                 "pinyin": "lù",
-                "hanzi": "鹿"
+                "hanzi": "鹿",
+                "speakTw": "鹿"
               },
               {
                 "id": "dp8k-7",
-                "punct": true,
                 "trees": "!",
                 "pinyin": "!",
-                "hanzi": "！"
+                "hanzi": "！",
+                "speakTw": "",
+                "punct": true
               }
-            ]
+            ],
+            "audioEn": "audio/pro/dlg-p8-king-en.mp3",
+            "audioTw": "audio/pro/dlg-p8-king-tw.mp3"
           }
         }
       ]
