@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trees Pinyin™ — 4K Storybook Reader</title>
+  <link rel="icon" type="image/png" sizes="48x48" href="../icons/icon48.png" />
+  <link rel="apple-touch-icon" href="../icon.png" />
+  <link rel="stylesheet" href="./reader.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <!-- Ultra-Minimal Single Top Bar: Official Icon + Title | Page Numbers | 3 Icon-Only Controls -->
+    <header class="top-bar">
+      <div class="brand-group">
+        <a href="./index.html" class="brand-home-link" title="Back to Storybook Library">
+          <img src="../icon.png" alt="Trees Pinyin" class="brand-icon" />
+        </a>
+        <h1 id="book-title" class="brand-title">Loading Storybook...</h1>
+      </div>
+
+      <nav id="page-dots" class="page-dots" role="tablist" aria-label="Pages"></nav>
+
+      <div class="toolbar-actions">
+        <button id="btn-read-page" class="icon-btn" aria-label="Read Page" title="Read Page (Space)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+          </svg>
+        </button>
+        <button id="btn-record" class="icon-btn" aria-label="Record Family Video" aria-pressed="false" title="Record Family Reading Video">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="23 7 16 12 23 17 23 7"></polygon>
+            <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+          </svg>
+        </button>
+        <button id="btn-fullscreen" class="icon-btn" aria-label="Fullscreen" title="Fullscreen (F)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 3 21 3 21 9"></polyline>
+            <polyline points="9 21 3 21 3 15"></polyline>
+            <line x1="21" y1="3" x2="14" y2="10"></line>
+            <line x1="3" y1="21" x2="10" y2="14"></line>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Full-Bleed 16:9 Cinema Stage (No Bottom Bar) -->
+    <main class="stage-wrapper">
+      <div id="book-stage" class="book-stage" role="region" aria-label="Interactive 4K Storybook Stage">
+        <div id="artwork-layer" class="artwork-layer"></div>
+        <div id="hotspots-layer" class="hotspots-layer"></div>
+        <div id="content-layer" class="content-layer"></div>
+
+        <!-- Translucent Character Dialogue Bubble (Top-Left Safe Zone, Column-Aligned EN / TP / HP / Hanzi) -->
+        <div id="speech-bubble" class="speech-bubble hidden" role="status" aria-live="polite">
+          <div class="bubble-header">
+            <span id="bubble-speaker" class="bubble-speaker"></span>
+            <button id="bubble-close" class="bubble-close" aria-label="Close">✕</button>
+          </div>
+          <div id="bubble-body" class="bubble-body"></div>
+        </div>
+
+        <!-- Pro Membership Unlock Overlay (Shown when non-subscriber navigates past freePages) -->
+        <div id="pro-paywall" class="pro-paywall hidden" role="dialog" aria-modal="true" aria-labelledby="paywall-title">
+          <div class="paywall-card">
+            <div class="paywall-badge">👑 Trees Pinyin Pro Member</div>
+            <h2 id="paywall-title" class="paywall-title">Unlock the Rest of This Story</h2>
+            <p id="paywall-sub" class="paywall-sub">
+              You have completed the free preview. Become a Pro Member to continue reading in 4K with full dual-track audio, interactive character dialogues, and every upcoming myth &amp; Tang poem.
+            </p>
+            <ul class="paywall-perks">
+              <li>✨ Full access to all chapters &amp; 4K animated scenes</li>
+              <li>🔊 Native English &amp; Mandarin voiceover + tap-to-speak phonics</li>
+              <li>🎥 Unlimited family reading video recording &amp; new monthly books</li>
+            </ul>
+            <div class="paywall-actions">
+              <a id="paywall-subscribe-btn" class="paywall-btn primary" href="../index.html#subscribe">Subscribe to Unlock Full Book →</a>
+              <button id="paywall-back-btn" class="paywall-btn secondary" type="button">← Back to Free Preview</button>
+            </div>
+            <div class="paywall-code-box">
+              <input id="paywall-code-input" class="paywall-code-input" type="text" placeholder="Already a Pro Member? Enter access code..." autocomplete="off" />
+              <button id="paywall-code-btn" class="paywall-code-btn" type="button">Unlock</button>
+            </div>
+            <div id="paywall-code-msg" class="paywall-code-msg"></div>
+          </div>
+        </div>
+
+        <!-- Bottom-Right Family PiP Webcam (Auto-shown during recording, draggable) -->
+        <div id="webcam-pip" class="webcam-pip hidden" title="Drag to move">
+          <video id="webcam-video" autoplay muted playsinline></video>
+          <span id="rec-badge" class="rec-badge hidden">● REC</span>
+          <button id="webcam-close" class="webcam-close" aria-label="Hide camera">✕</button>
+        </div>
+
+        <button id="btn-prev" class="nav-arrow prev" aria-label="Previous Page" title="Previous (←)">‹</button>
+        <button id="btn-next" class="nav-arrow next" aria-label="Next Page" title="Next (→)">›</button>
+      </div>
+    </main>
+  </div>
+
+  <!-- Right-Click Inline Editor for Trees Pinyin -->
+  <div id="edit-modal" class="edit-modal hidden" role="dialog" aria-modal="true" aria-labelledby="edit-title">
+    <div class="edit-card">
+      <h2 id="edit-title">Edit Trees Pinyin</h2>
+      <div class="edit-preview">
+        <span id="edit-hanzi" class="edit-hanzi"></span>
+        <span id="edit-pinyin" class="edit-pinyin"></span>
+      </div>
+      <label class="edit-label" for="edit-input">Custom Trees Pinyin (wrap silent letters in parentheses, e.g. <code>(oo)</code>):</label>
+      <input id="edit-input" class="edit-input" type="text" autocomplete="off" />
+      <div class="edit-actions">
+        <button id="edit-reset" class="modal-btn" type="button">Reset Default</button>
+        <div class="edit-actions-right">
+          <button id="edit-cancel" class="modal-btn" type="button">Cancel</button>
+          <button id="edit-save" class="modal-btn primary" type="button">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 100% Reuse Official Trees Pinyin Core Modules -->
+  <script src="../js/dict.js"></script>
+  <script src="../js/compiler.js"></script>
+  <script src="../js/fun-data.js"></script>
+  <script src="../js/fun-hub.js"></script>
+  <script src="./membership.js"></script>
+  <script src="./reader.js"></script>
+</body>
+</html>

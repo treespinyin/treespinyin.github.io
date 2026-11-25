@@ -1,0 +1,73 @@
+{
+  "version": "1.0",
+  "subscribeUrl": "../index.html#subscribe",
+  "categories": [
+    {
+      "id": "all",
+      "label": "All Stories"
+    },
+    {
+      "id": "myths",
+      "label": "Chinese Myths"
+    },
+    {
+      "id": "poetry",
+      "label": "Tang Poetry"
+    },
+    {
+      "id": "fables",
+      "label": "Classic Fables"
+    }
+  ],
+  "books": [
+    {
+      "id": "nine-colored-deer",
+      "titleEn": "The Nine-Colored Deer",
+      "titleZh": "九色鹿",
+      "subtitleEn": "A timeless Dunhuang mural legend of courage, kindness, and keeping promises.",
+      "category": "myths",
+      "categoryLabel": "Chinese Myths",
+      "ageRange": "Ages 4–10",
+      "pageCount": 9,
+      "coverUrl": "images/cover.webp",
+      "dataUrl": "./books/nine-colored-deer/book.json",
+      "mediaBaseUrl": "https://media.treespinyin.com/books/nine-colored-deer/",
+      "r2MediaBaseUrl": "https://media.treespinyin.com/books/nine-colored-deer/",
+      "freePages": 3,
+      "isPro": true,
+      "status": "published"
+    },
+    {
+      "id": "quiet-night-thought",
+      "titleEn": "Quiet Night Thought (Li Bai)",
+      "titleZh": "靜夜思",
+      "subtitleEn": "Gaze at the bright moonlight and sing China's most beloved Tang poem with phonics.",
+      "category": "poetry",
+      "categoryLabel": "Tang Poetry",
+      "ageRange": "Ages 4–12",
+      "pageCount": 6,
+      "coverUrl": "",
+      "dataUrl": "./books/quiet-night-thought/book.json",
+      "mediaBaseUrl": "https://media.treespinyin.com/books/quiet-night-thought/",
+      "freePages": 3,
+      "isPro": true,
+      "status": "coming_soon"
+    },
+    {
+      "id": "monkey-king-peach-garden",
+      "titleEn": "The Monkey King's Peach Garden",
+      "titleZh": "大鬧蟠桃園",
+      "subtitleEn": "Follow Sun Wukong through the heavenly clouds in a playful 4K phonics adventure.",
+      "category": "myths",
+      "categoryLabel": "Chinese Myths",
+      "ageRange": "Ages 5–11",
+      "pageCount": 10,
+      "coverUrl": "",
+      "dataUrl": "./books/monkey-king-peach-garden/book.json",
+      "mediaBaseUrl": "https://media.treespinyin.com/books/monkey-king-peach-garden/",
+      "freePages": 3,
+      "isPro": true,
+      "status": "coming_soon"
+    }
+  ]
+}

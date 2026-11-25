@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trees Pinyin™ — Interactive 4K Chinese Storybook Library</title>
+  <meta name="description" content="4K interactive Chinese myths and Tang poetry storybooks with Trees Pinyin English phonics, dual-track audio, and character memory tricks for kids and families." />
+  <link rel="icon" type="image/png" sizes="48x48" href="../icons/icon48.png" />
+  <link rel="apple-touch-icon" href="../icon.png" />
+  <style>
+    :root {
+      --bg-deep: #070d14;
+      --bg-card: rgba(16, 27, 42, 0.88);
+      --bg-card-hover: rgba(22, 37, 56, 0.96);
+      --gold: #facc15;
+      --gold-dark: #d97706;
+      --gold-dim: rgba(250, 204, 21, 0.28);
+      --green: #22c55e;
+      --green-dark: #15803d;
+      --text: #f8f2e6;
+      --muted: #94a3b8;
+      --border: rgba(255, 255, 255, 0.1);
+      --font-en: "Inter", "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      background: radial-gradient(circle at 50% 0%, #16283d 0%, #070d14 68%);
+      color: var(--text);
+      font-family: var(--font-en);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Top Header */
+    .shelf-topbar {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 12px 24px;
+      background: rgba(8, 15, 24, 0.86);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--gold-dim);
+      flex-wrap: wrap;
+    }
+
+    .brand-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .brand-link img {
+      width: 36px;
+      height: 36px;
+      border-radius: 9px;
+      object-fit: cover;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+    }
+
+    .brand-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: #fff8e7;
+      letter-spacing: 0.01em;
+    }
+
+    .brand-sub {
+      font-size: 11.5px;
+      color: var(--gold);
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .nav-pill {
+      padding: 7px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.16s ease;
+    }
+
+    .nav-pill:hover {
+      border-color: var(--gold);
+      background: rgba(250, 204, 21, 0.16);
+      color: #fff;
+    }
+
+    .member-badge {
+      padding: 7px 14px;
+      border-radius: 999px;
+      font-size: 12.5px;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      border: 1px solid var(--gold-dim);
+      background: rgba(250, 204, 21, 0.14);
+      color: var(--gold);
+    }
+
+    .member-badge.pro {
+      background: linear-gradient(135deg, #facc15, #d97706);
+      color: #161004;
+      border-color: #fef08a;
+    }
+
+    /* Hero Banner */
+    .hero {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: 40px 24px 20px;
+      text-align: center;
+    }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 14px;
+      border-radius: 999px;
+      background: rgba(250, 204, 21, 0.14);
+      border: 1px solid var(--gold-dim);
+      color: var(--gold);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+
+    .hero h1 {
+      font-size: clamp(28px, 4.2vw, 44px);
+      font-weight: 900;
+      line-height: 1.15;
+      color: #fff8e7;
+      margin-bottom: 12px;
+    }
+
+    .hero p {
+      max-width: 680px;
+      margin: 0 auto 24px;
+      font-size: 15.5px;
+      line-height: 1.6;
+      color: #cbd5e1;
+    }
+
+    /* Category Tabs */
+    .category-bar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 28px;
+    }
+
+    .cat-btn {
+      padding: 8px 18px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: rgba(255, 255, 255, 0.05);
+      color: #e2e8f0;
+      font-size: 13.5px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.16s ease;
+    }
+
+    .cat-btn:hover {
+      border-color: var(--gold);
+      color: #fff;
+    }
+
+    .cat-btn.active {
+      background: linear-gradient(135deg, #facc15, #d97706);
+      color: #161004;
+      border-color: #fef08a;
+    }
+
+    /* Bookshelf Grid */
+    .shelf-main {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: 0 24px 64px;
+    }
+
+    .books-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+      gap: 24px;
+    }
+
+    .book-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 14px 36px rgba(0, 0, 0, 0.35);
+    }
+
+    .book-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(250, 204, 21, 0.55);
+      background: var(--bg-card-hover);
+      box-shadow: 0 22px 48px rgba(0, 0, 0, 0.5);
+    }
+
+    .book-cover-wrap {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 10;
+      overflow: hidden;
+      background: linear-gradient(135deg, #16304c 0%, #0e1e33 52%, #2a2117 100%);
+    }
+
+    .book-cover-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .cover-fallback {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      text-align: center;
+      background: radial-gradient(circle at 65% 32%, rgba(250, 204, 21, 0.24), transparent 55%),
+                  linear-gradient(135deg, #1b3a57 0%, #10243a 60%, #2a1d14 100%);
+    }
+
+    .cover-fallback-zh {
+      font-size: 34px;
+      font-weight: 800;
+      color: var(--gold);
+      text-shadow: 0 4px 16px rgba(0, 0, 0, 0.55);
+      margin-bottom: 6px;
+    }
+
+    .cover-fallback-en {
+      font-size: 14px;
+      font-weight: 700;
+      color: #fff8e7;
+      opacity: 0.92;
+    }
+
+    .badge-row {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      right: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      pointer-events: none;
+    }
+
+    .tier-badge {
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.03em;
+      backdrop-filter: blur(8px);
+    }
+
+    .tier-badge.free {
+      background: rgba(21, 128, 61, 0.92);
+      color: #dcfce7;
+      border: 1px solid rgba(134, 239, 172, 0.6);
+    }
+
+    .tier-badge.pro {
+      background: rgba(217, 119, 6, 0.92);
+      color: #fef9c3;
+      border: 1px solid rgba(254, 240, 138, 0.65);
+    }
+
+    .cat-tag {
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      background: rgba(10, 18, 28, 0.72);
+      color: #e2e8f0;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      backdrop-filter: blur(8px);
+    }
+
+    .book-body {
+      padding: 18px 20px 20px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      gap: 10px;
+    }
+
+    .book-title-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .book-title {
+      font-size: 19px;
+      font-weight: 800;
+      color: #fff8e7;
+    }
+
+    .book-zh {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--gold);
+      white-space: nowrap;
+    }
+
+    .book-desc {
+      font-size: 13.5px;
+      line-height: 1.55;
+      color: #cbd5e1;
+      flex: 1;
+    }
+
+    .book-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .book-cta {
+      margin-top: 6px;
+      width: 100%;
+      padding: 11px 16px;
+      border-radius: 12px;
+      border: none;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: transform 0.14s ease, filter 0.14s ease;
+    }
+
+    .book-cta.primary {
+      background: linear-gradient(135deg, #facc15, #d97706);
+      color: #161004;
+    }
+
+    .book-cta.primary:hover {
+      filter: brightness(1.06);
+      transform: translateY(-1px);
+    }
+
+    .book-cta.disabled {
+      background: rgba(255, 255, 255, 0.08);
+      color: #94a3b8;
+      cursor: default;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    /* Member Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 80;
+      background: rgba(5, 10, 18, 0.72);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-overlay.open { display: flex; }
+
+    .modal-card {
+      width: min(440px, 94vw);
+      background: #101c2c;
+      border: 1.5px solid var(--gold);
+      border-radius: 18px;
+      padding: 24px;
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.65);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .modal-card h2 { font-size: 20px; color: var(--gold); }
+    .modal-card p { font-size: 13.5px; color: #cbd5e1; line-height: 1.55; }
+
+    .code-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .code-input {
+      flex: 1;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(250, 204, 21, 0.45);
+      background: rgba(0, 0, 0, 0.35);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 700;
+      outline: none;
+    }
+
+    .status-msg {
+      font-size: 12.5px;
+      font-weight: 700;
+      min-height: 18px;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+    }
+
+    .btn-ghost {
+      padding: 9px 14px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: transparent;
+      color: #e2e8f0;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .btn-gold {
+      padding: 9px 16px;
+      border-radius: 10px;
+      border: none;
+      background: linear-gradient(135deg, #facc15, #d97706);
+      color: #161004;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .shelf-footer {
+      text-align: center;
+      padding: 20px 24px 36px;
+      font-size: 12.5px;
+      color: var(--muted);
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .shelf-footer a {
+      color: var(--gold);
+      text-decoration: none;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <header class="shelf-topbar">
+    <a class="brand-link" href="../index.html">
+      <img src="../icon.png" alt="Trees Pinyin" />
+      <div>
+        <div class="brand-title">Trees Pinyin™ Storybooks</div>
+        <div class="brand-sub">4K Interactive Mandarin Library</div>
+      </div>
+    </a>
+
+    <div class="topbar-right">
+      <a class="nav-pill" href="../index.html">← AI Studio</a>
+      <button id="memberStatusBtn" class="member-badge" type="button">✨ Pro Membership</button>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="hero-eyebrow">Read Chinese Like English · 4K Family Edition</div>
+    <h1>Magical Chinese Myths &amp; Tang Poetry</h1>
+    <p>
+      Tap any character to hear crystal-clear pronunciation, reveal English-phonics memory tricks,
+      and record family storytime videos together. Every book includes a free 3-page preview.
+    </p>
+    <div id="categoryBar" class="category-bar" role="tablist" aria-label="Storybook Categories"></div>
+  </section>
+
+  <main class="shelf-main">
+    <div id="booksGrid" class="books-grid"></div>
+  </main>
+
+  <footer class="shelf-footer">
+    © 2026 Trees Pinyin™ · <a href="../index.html">Main Translator</a> · <a href="../privacy.html">Privacy Policy</a>
+  </footer>
+
+  <!-- Member Access / Subscription Modal -->
+  <div id="memberModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="memberModalTitle">
+    <div class="modal-card">
+      <h2 id="memberModalTitle">Trees Pinyin Pro Membership</h2>
+      <p id="memberModalDesc">
+        Unlock full access to every 4K interactive storybook, character voice tracks, and all upcoming Chinese myths and Tang poetry releases.
+      </p>
+      <div class="code-row">
+        <input id="memberCodeInput" class="code-input" type="text" placeholder="Have a Member Code? Enter here..." autocomplete="off" />
+        <button id="memberActivateBtn" class="btn-gold" type="button">Unlock</button>
+      </div>
+      <div id="memberStatusMsg" class="status-msg"></div>
+      <div class="modal-actions">
+        <button id="memberLogoutBtn" class="btn-ghost" type="button" style="display:none;">Sign Out Pro</button>
+        <a id="memberSubscribeLink" class="btn-gold" href="../index.html#subscribe">Subscribe to Pro →</a>
+        <button id="memberCloseBtn" class="btn-ghost" type="button">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="./membership.js"></script>
+  <script>
+    (function () {
+      let catalogData = null;
+      let activeCategory = 'all';
+
+      const categoryBar = document.getElementById('categoryBar');
+      const booksGrid = document.getElementById('booksGrid');
+      const memberStatusBtn = document.getElementById('memberStatusBtn');
+      const memberModal = document.getElementById('memberModal');
+      const memberModalDesc = document.getElementById('memberModalDesc');
+      const memberCodeInput = document.getElementById('memberCodeInput');
+      const memberActivateBtn = document.getElementById('memberActivateBtn');
+      const memberStatusMsg = document.getElementById('memberStatusMsg');
+      const memberLogoutBtn = document.getElementById('memberLogoutBtn');
+      const memberSubscribeLink = document.getElementById('memberSubscribeLink');
+      const memberCloseBtn = document.getElementById('memberCloseBtn');
+
+      function updateMemberUI() {
+        const isPro = window.TreesStoriesMembership.isProMember();
+        if (isPro) {
+          memberStatusBtn.textContent = '👑 Pro Member Active';
+          memberStatusBtn.classList.add('pro');
+          memberLogoutBtn.style.display = 'inline-block';
+          memberModalDesc.textContent = 'Your Pro Membership is active! You have unlimited access to every page in the Trees Pinyin Storybook Library.';
+        } else {
+          memberStatusBtn.textContent = '✨ Free Preview · Upgrade to Pro';
+          memberStatusBtn.classList.remove('pro');
+          memberLogoutBtn.style.display = 'none';
+          memberModalDesc.textContent = 'Unlock full access to every 4K interactive storybook, dual-track audio, and all upcoming Chinese myths and Tang poetry releases.';
+        }
+      }
+
+      function renderCategories() {
+        const cats = (catalogData && catalogData.categories) || [{ id: 'all', label: 'All Stories' }];
+        categoryBar.innerHTML = cats.map((c) => `
+          <button type="button"
+                  class="cat-btn ${c.id === activeCategory ? 'active' : ''}"
+                  data-cat="${c.id}"
+                  role="tab"
+                  aria-selected="${c.id === activeCategory}">
+            ${c.label}
+          </button>
+        `).join('');
+
+        categoryBar.querySelectorAll('.cat-btn').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            activeCategory = btn.dataset.cat;
+            renderCategories();
+            renderBooks();
+          });
+        });
+      }
+
+      function renderBooks() {
+        const isPro = window.TreesStoriesMembership.isProMember();
+        const books = (catalogData && catalogData.books) || [];
+        const filtered = activeCategory === 'all'
+          ? books
+          : books.filter((b) => b.category === activeCategory);
+
+        if (!filtered.length) {
+          booksGrid.innerHTML = '<p style="grid-column:1/-1;text-align:center;color:#94a3b8;padding:40px 0;">New stories in this category are coming soon!</p>';
+          return;
+        }
+
+        booksGrid.innerHTML = filtered.map((book) => {
+          const isComingSoon = book.status === 'coming_soon';
+          const freePages = typeof book.freePages === 'number' ? book.freePages : 3;
+          const coverSrc = book.coverUrl
+            ? window.TreesStoriesMembership.resolveMediaUrl(book.mediaBaseUrl, book.coverUrl)
+            : '';
+
+          let tierBadgeHtml = '';
+          if (isPro) {
+            tierBadgeHtml = '<span class="tier-badge free">👑 Pro Unlocked</span>';
+          } else if (book.isPro) {
+            tierBadgeHtml = `<span class="tier-badge pro">Free Preview (${freePages} Pages) · Pro Member</span>`;
+          } else {
+            tierBadgeHtml = '<span class="tier-badge free">Free Storybook</span>';
+          }
+
+          const ctaHtml = isComingSoon
+            ? '<span class="book-cta disabled">Coming Soon</span>'
+            : `<a class="book-cta primary" href="./reader.html?book=${encodeURIComponent(book.id)}">${isPro ? 'Read Full Book →' : 'Start Free Preview →'}</a>`;
+
+          return `
+            <article class="book-card">
+              <div class="book-cover-wrap">
+                <div class="cover-fallback" data-fallback-for="${book.id}">
+                  <div class="cover-fallback-zh">${book.titleZh || '繪本'}</div>
+                  <div class="cover-fallback-en">${book.titleEn}</div>
+                </div>
+                ${coverSrc ? `<img src="${coverSrc}" alt="${book.titleEn}" loading="lazy" style="position:absolute;inset:0;" onerror="this.remove();" />` : ''}
+                <div class="badge-row">
+                  ${tierBadgeHtml}
+                  <span class="cat-tag">${book.categoryLabel || book.category}</span>
+                </div>
+              </div>
+              <div class="book-body">
+                <div class="book-title-row">
+                  <h2 class="book-title">${book.titleEn}</h2>
+                  ${book.titleZh ? `<span class="book-zh">${book.titleZh}</span>` : ''}
+                </div>
+                <p class="book-desc">${book.subtitleEn || ''}</p>
+                <div class="book-meta">
+                  <span>📖 ${book.pageCount || 9} Pages</span>
+                  <span>👶 ${book.ageRange || 'All Ages'}</span>
+                  <span>🔊 Dual Audio</span>
+                </div>
+                ${ctaHtml}
+              </div>
+            </article>
+          `;
+        }).join('');
+      }
+
+      memberStatusBtn.addEventListener('click', () => {
+        memberStatusMsg.textContent = '';
+        memberModal.classList.add('open');
+      });
+
+      memberCloseBtn.addEventListener('click', () => memberModal.classList.remove('open'));
+      memberModal.addEventListener('click', (e) => {
+        if (e.target === memberModal) memberModal.classList.remove('open');
+      });
+
+      memberActivateBtn.addEventListener('click', () => {
+        const res = window.TreesStoriesMembership.activateWithCode(memberCodeInput.value);
+        memberStatusMsg.textContent = res.message;
+        memberStatusMsg.style.color = res.ok ? '#4ade80' : '#f87171';
+        if (res.ok) {
+          memberCodeInput.value = '';
+          updateMemberUI();
+          renderBooks();
+        }
+      });
+
+      memberLogoutBtn.addEventListener('click', () => {
+        window.TreesStoriesMembership.setLocalProStatus(false);
+        memberStatusMsg.textContent = 'Switched back to Free Preview mode.';
+        memberStatusMsg.style.color = '#fbbf24';
+        updateMemberUI();
+        renderBooks();
+      });
+
+      async function init() {
+        updateMemberUI();
+        try {
+          const res = await fetch('./catalog.json', { cache: 'no-store' });
+          catalogData = await res.json();
+          if (catalogData.subscribeUrl) {
+            memberSubscribeLink.href = catalogData.subscribeUrl;
+          }
+          renderCategories();
+          renderBooks();
+        } catch (err) {
+          booksGrid.innerHTML = '<p style="grid-column:1/-1;text-align:center;color:#f87171;padding:40px 0;">Unable to load storybook catalog. Please refresh.</p>';
+        }
+      }
+
+      init();
+    })();
+  </script>
+</body>
+</html>

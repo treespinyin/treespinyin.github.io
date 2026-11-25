@@ -1,0 +1,16 @@
+# Secrets & environment variables (NEVER commit)
+.env
+.env.*
+
+# Local temporary storybook media & build caches
+stories/books/*/media/
+stories/media/
+stories/tmp/
+.r2-cache/
+
+# Python & OS files
+.venv/
+venv/
+__pycache__/
+*.pyc
+.DS_Store
