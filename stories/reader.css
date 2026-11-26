@@ -716,6 +716,34 @@ html, body {
   font-weight: 800;
 }
 
+/* Official site TreesFunHub modals (#tpSubmitMemeModal, #tpContribTermsModal) */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 9999;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+}
+
+.modal-box {
+  background: #fff;
+  color: #111;
+  width: 100%;
+  max-width: 480px;
+  border-radius: 16px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.2);
+}
+
 /* Harmonize official site tpCharMnemonicBar at very bottom without obstructing main artwork */
 #tpCharMnemonicBar.tp-char-mnemonic-bar {
   bottom: 8px !important;

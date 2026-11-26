@@ -38,6 +38,23 @@
       "status": "published"
     },
     {
+      "id": "monkey-king-peach-garden",
+      "titleEn": "Havoc in the Peach Garden",
+      "titleZh": "大鬧蟠桃園",
+      "subtitleEn": "Follow Sun Wukong through the heavenly clouds in a playful 4K phonics adventure.",
+      "category": "myths",
+      "categoryLabel": "Chinese Myths",
+      "ageRange": "Ages 5–11",
+      "pageCount": 9,
+      "coverUrl": "images/cover.webp",
+      "dataUrl": "./books/monkey-king-peach-garden/book.json",
+      "mediaBaseUrl": "https://media.treespinyin.com/books/monkey-king-peach-garden/",
+      "r2MediaBaseUrl": "https://media.treespinyin.com/books/monkey-king-peach-garden/",
+      "freePages": 3,
+      "isPro": true,
+      "status": "published"
+    },
+    {
       "id": "quiet-night-thought",
       "titleEn": "Quiet Night Thought (Li Bai)",
       "titleZh": "靜夜思",
@@ -49,22 +66,6 @@
       "coverUrl": "",
       "dataUrl": "./books/quiet-night-thought/book.json",
       "mediaBaseUrl": "https://media.treespinyin.com/books/quiet-night-thought/",
-      "freePages": 3,
-      "isPro": true,
-      "status": "coming_soon"
-    },
-    {
-      "id": "monkey-king-peach-garden",
-      "titleEn": "The Monkey King's Peach Garden",
-      "titleZh": "大鬧蟠桃園",
-      "subtitleEn": "Follow Sun Wukong through the heavenly clouds in a playful 4K phonics adventure.",
-      "category": "myths",
-      "categoryLabel": "Chinese Myths",
-      "ageRange": "Ages 5–11",
-      "pageCount": 10,
-      "coverUrl": "",
-      "dataUrl": "./books/monkey-king-peach-garden/book.json",
-      "mediaBaseUrl": "https://media.treespinyin.com/books/monkey-king-peach-garden/",
       "freePages": 3,
       "isPro": true,
       "status": "coming_soon"

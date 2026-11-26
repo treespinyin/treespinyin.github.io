@@ -1,0 +1,3500 @@
+{
+  "series": "Trees Pinyin Series",
+  "titleEn": "Havoc in the Peach Garden",
+  "id": "monkey-king-peach-garden",
+  "pages": [
+    {
+      "id": "cover",
+      "type": "cover",
+      "pageLabel": "Cover",
+      "chapterEn": "Havoc in the Peach Garden",
+      "imagePath": "images/cover.webp",
+      "cards": [
+        {
+          "id": "cover-c1",
+          "english": "Havoc in the Peach Garden",
+          "twFullText": "大鬧蟠桃園",
+          "tokens": [
+            {
+              "id": "cov-0",
+              "pyNum": "da4",
+              "trees": "dah4",
+              "pinyin": "Dà",
+              "hanzi": "大",
+              "speakTw": "大"
+            },
+            {
+              "id": "cov-1",
+              "pyNum": "nao4",
+              "trees": "naw4",
+              "pinyin": "nào",
+              "hanzi": "闹",
+              "speakTw": "鬧"
+            },
+            {
+              "id": "cov-2",
+              "pyNum": "pan2",
+              "trees": "pan2",
+              "pinyin": "Pán",
+              "hanzi": "蟠",
+              "speakTw": "蟠"
+            },
+            {
+              "id": "cov-3",
+              "pyNum": "tao2",
+              "trees": "taw2",
+              "pinyin": "táo",
+              "hanzi": "桃",
+              "speakTw": "桃"
+            },
+            {
+              "id": "cov-4",
+              "pyNum": "yuan2",
+              "trees": "yee(oo)an2",
+              "pinyin": "yuán",
+              "hanzi": "园",
+              "speakTw": "園"
+            }
+          ],
+          "audioEn": "audio/pro/cover-c1-en.mp3",
+          "audioTw": "audio/pro/cover-c1-tw.mp3"
+        }
+      ],
+      "hotspots": [
+        {
+          "id": "cover-wukong",
+          "label": "Monkey King",
+          "x": 72,
+          "y": 60,
+          "voiceRole": "wukong_tw",
+          "speaker": "Monkey King",
+          "dialogue": {
+            "id": "dlg-cov-wukong",
+            "english": "I am the Monkey King! Let's play!",
+            "twFullText": "我是美猴王！一起玩吧！",
+            "tokens": [
+              {
+                "id": "dcov-0",
+                "pyNum": "wo3",
+                "trees": "wer3",
+                "pinyin": "Wǒ",
+                "hanzi": "我",
+                "speakTw": "我"
+              },
+              {
+                "id": "dcov-1",
+                "pyNum": "shi4",
+                "trees": "(r)s4",
+                "pinyin": "shì",
+                "hanzi": "是",
+                "speakTw": "是"
+              },
+              {
+                "id": "dcov-2",
+                "pyNum": "mei3",
+                "trees": "may3",
+                "pinyin": "Měi",
+                "hanzi": "美",
+                "speakTw": "美"
+              },
+              {
+                "id": "dcov-3",
+                "pyNum": "hou2",
+                "trees": "hoh2",
+                "pinyin": "hóu",
+                "hanzi": "猴",
+                "speakTw": "猴"
+              },
+              {
+                "id": "dcov-4",
+                "pyNum": "wang2",
+                "trees": "wang2",
+                "pinyin": "wáng",
+                "hanzi": "王",
+                "speakTw": "王"
+              },
+              {
+                "id": "dcov-5",
+                "trees": "!",
+                "pinyin": "!",
+                "hanzi": "！",
+                "speakTw": "",
+                "punct": true
+              },
+              {
+                "id": "dcov-6",
+                "pyNum": "yi4",
+                "trees": "yee4",
+                "pinyin": "Yì",
+                "hanzi": "一",
+                "speakTw": "一"
+              },
+              {
+                "id": "dcov-7",
+                "pyNum": "qi3",
+                "trees": "tsee3",
+                "pinyin": "qǐ",
+                "hanzi": "起",
+                "speakTw": "起"
+              },
+              {
+                "id": "dcov-8",
+                "pyNum": "wan2",
+                "trees": "wan2",
+                "pinyin": "wán",
+                "hanzi": "玩",
+                "speakTw": "玩"
+              },
+              {
+                "id": "dcov-9",
+                "pyNum": "ba5",
+                "trees": "bah",
+                "pinyin": "ba",
+                "hanzi": "吧",
+                "speakTw": "吧"
+              },
+              {
+                "id": "dcov-10",
+                "trees": "!",
+                "pinyin": "!",
+                "hanzi": "！",
+                "speakTw": "",
+                "punct": true
+              }
+            ],
+            "audioEn": "audio/pro/dlg-cov-wukong-en.mp3",
+            "audioTw": "audio/pro/dlg-cov-wukong-tw.mp3"
+          }
+        }
+      ]
+    },
+    {
+      "id": "page1",
+      "type": "spread",
+      "pageLabel": "Page 1",
+      "chapterEn": "Guardian of the Peach Garden",
+      "imagePath": "images/page1.webp",
+      "cards": [
+        {
+          "id": "p1-c1",
+          "english": "The Monkey King guards the Peach Garden.",
+          "twFullText": "孫悟空來看守蟠桃園。",
+          "tokens": [
+            {
+              "id": "p1c1-0",
+              "pyNum": "sun1",
+              "trees": "soon",
+              "pinyin": "Sūn",
+              "hanzi": "孙",
+              "speakTw": "孫"
+            },
+            {
+              "id": "p1c1-1",
+              "pyNum": "wu4",
+              "trees": "woo4",
+              "pinyin": "Wù",
+              "hanzi": "悟",
+              "speakTw": "悟"
+            },
+            {
+              "id": "p1c1-2",
+              "pyNum": "kong1",
+              "trees": "ker-oong",
+              "pinyin": "kōng",
+              "hanzi": "空",
+              "speakTw": "空"
+            },
+            {
+              "id": "p1c1-3",
+              "pyNum": "lai2",
+              "trees": "Lie2",
+              "pinyin": "lái",
+              "hanzi": "来",
+              "speakTw": "來"
+            },
+            {
+              "id": "p1c1-4",
+              "pyNum": "kan1",
+              "trees": "kan",
+              "pinyin": "kān",
+              "hanzi": "看",
+              "speakTw": "看"
+            },
+            {
+              "id": "p1c1-5",
+              "pyNum": "shou3",
+              "trees": "(r)soh3",
+              "pinyin": "shǒu",
+              "hanzi": "守",
+              "speakTw": "守"
+            },
+            {
+              "id": "p1c1-6",
+              "pyNum": "pan2",
+              "trees": "pan2",
+              "pinyin": "Pán",
+              "hanzi": "蟠",
+              "speakTw": "蟠"
+            },
+            {
+              "id": "p1c1-7",
+              "pyNum": "tao2",
+              "trees": "taw2",
+              "pinyin": "táo",
+              "hanzi": "桃",
+              "speakTw": "桃"
+            },
+            {
+              "id": "p1c1-8",
+              "pyNum": "yuan2",
+              "trees": "yee(oo)an2",
+              "pinyin": "yuán",
+              "hanzi": "园",
+              "speakTw": "園"
+            },
+            {
+              "id": "p1c1-9",
+              "trees": ".",
+              "pinyin": ".",
+              "hanzi": "。",
+              "speakTw": "",
+              "punct": true
+            }
+          ],
+          "audioEn": "audio/pro/p1-c1-en.mp3",
+          "audioTw": "audio/pro/p1-c1-tw.mp3"
+        },
+        {
+          "id": "p1-c2",
+          "english": "Sweet pink peaches glow in the clouds.",
+          "twFullText": "粉色仙桃在雲中發光。",
+          "tokens": [
+            {
+              "id": "p1c2-0",
+              "pyNum": "fen3",
+              "trees": "fer-n3",
+              "pinyin": "Fěn",
+              "hanzi": "粉",
+              "speakTw": "粉"
+            },
+            {
+              "id": "p1c2-1",
+              "pyNum": "se4",
+              "trees": "ser4",
+              "pinyin": "sè",
+              "hanzi": "色",
+              "speakTw": "色"
+            },
+            {
+              "id": "p1c2-2",
+              "pyNum": "xian1",
+              "trees": "seean",
+              "pinyin": "xiān",
+              "hanzi": "仙",
+              "speakTw": "仙"
+            },
+            {
+              "id": "p1c2-3",
+              "pyNum": "tao2",
+              "trees": "taw2",
+              "pinyin": "táo",
+              "hanzi": "桃",
+              "speakTw": "桃"
+            },
+            {
+              "id": "p1c2-4",
+              "pyNum": "zai4",
+              "trees": "dsie4",
+              "pinyin": "zài",
+              "hanzi": "在",
+              "speakTw": "在"
+            },
+            {
+              "id": "p1c2-5",
+              "pyNum": "yun2",
+              "trees": "yee(oo)n2",
+              "pinyin": "yún",
+              "hanzi": "云",
+              "speakTw": "雲"
+            },
+            {
+              "id": "p1c2-6",
+              "pyNum": "zhong1",
+              "trees": "(r)dser-oong",
+              "pinyin": "zhōng",
+              "hanzi": "中",
+              "speakTw": "中"
+            },
+            {
+              "id": "p1c2-7",
+              "pyNum": "fa1",
+              "trees": "fah",
+              "pinyin": "fā",
+              "hanzi": "发",
+              "speakTw": "發"
+            },
+            {
+              "id": "p1c2-8",
+              "pyNum": "guang1",
+              "trees": "gooang",
+              "pinyin": "guāng",
+              "hanzi": "光",
+              "speakTw": "光"
+            },
+            {
+              "id": "p1c2-9",
+              "trees": ".",
+              "pinyin": ".",
+              "hanzi": "。",
+              "speakTw": "",
+              "punct": true
+            }
+          ],
+          "audioEn": "audio/pro/p1-c2-en.mp3",
+          "audioTw": "audio/pro/p1-c2-tw.mp3"
+        }
+      ],
+      "hotspots": [
+        {
+          "id": "h1-wukong",
+          "label": "Monkey King",
+          "x": 24,
+          "y": 63,
+          "voiceRole": "wukong_tw",
+          "speaker": "Monkey King",
+          "dialogue": {
+            "id": "dlg-p1-wukong",
+            "english": "Wow! This garden is huge and bright!",
+            "twFullText": "哇！這個園子又大又亮！",
+            "tokens": [
+              {
+                "id": "dp1w-0",
+                "pyNum": "wa1",
+                "trees": "wah",
+                "pinyin": "Wā",
+                "hanzi": "哇",
+                "speakTw": "哇"
+              },
+              {
+                "id": "dp1w-1",
+                "trees": "!",
+                "pinyin": "!",
+                "hanzi": "！",
+                "speakTw": "",
+                "punct": true
+              },
+              {
+                "id": "dp1w-2",
+                "pyNum": "zhe4",
+                "trees": "(r)dser4",
+                "pinyin": "Zhè",
+                "hanzi": "这",
+                "speakTw": "這"
+              },
+              {
+                "id": "dp1w-3",
+                "pyNum": "ge5",
+                "trees": "ger",
+                "pinyin": "ge",
+                "hanzi": "个",
+                "speakTw": "個"
+              },
+              {
+                "id": "dp1w-4",
+                "pyNum": "yuan2",
+                "trees": "yee(oo)an2",
+                "pinyin": "yuán",
+                "hanzi": "园",
+                "speakTw": "園"
+              },
+              {
+                "id": "dp1w-5",
+                "pyNum": "zi5",
+                "trees": "ds",
+                "pinyin": "zi",
+                "hanzi": "子",
+                "speakTw": "子"
+              },
+              {
+                "id": "dp1w-6",
+                "pyNum": "you4",
+                "trees": "yoh4",
+                "pinyin": "yòu",
+                "hanzi": "又",
+                "speakTw": "又"
+              },
+              {
+                "id": "dp1w-7",
+                "pyNum": "da4",
+                "trees": "dah4",
+                "pinyin": "dà",
+                "hanzi": "大",
+                "speakTw": "大"
+              },
+              {
+                "id": "dp1w-8",
+                "pyNum": "you4",
+                "trees": "yoh4",
+                "pinyin": "yòu",
+                "hanzi": "又",
+                "speakTw": "又"
+              },
+              {
+                "id": "dp1w-9",
+                "pyNum": "liang4",
+                "trees": "Leeang4",
+                "pinyin": "liàng",
+                "hanzi": "亮",
+                "speakTw": "亮"
+              },
+              {
+                "id": "dp1w-10",
+                "trees": "!",
+                "pinyin": "!",
+                "hanzi": "！",
+                "speakTw": "",
+                "punct": true
+              }
+            ],
+            "audioEn": "audio/pro/dlg-p1-wukong-en.mp3",
+            "audioTw": "audio/pro/dlg-p1-wukong-tw.mp3"
+          }
+        },
+        {
+          "id": "h1-earthgod",
+          "label": "Earth God",
+          "x": 76,
+          "y": 66,
+          "voiceRole": "earthgod_tw",
+          "speaker": "Earth God",
+          "dialogue": {
+            "id": "dlg-p1-earthgod",
+            "english": "Welcome, Great Sage! Please take good care.",
+            "twFullText": "歡迎大聖！請好好看管。",
+            "tokens": [
+              {
+                "id": "dp1e-0",
+                "pyNum": "huan1",
+                "trees": "hooan",
+                "pinyin": "Huān",
+                "hanzi": "欢",
+                "speakTw": "歡"
+              },
+              {
+                "id": "dp1e-1",
+                "pyNum": "ying2",
+                "trees": "ying2",
+                "pinyin": "yíng",
+                "hanzi": "迎",
+                "speakTw": "迎"
+              },
+              {
+                "id": "dp1e-2",
+                "pyNum": "da4",
+                "trees": "dah4",
+                "pinyin": "Dà",
+                "hanzi": "大",
+                "speakTw": "大"
+              },
+              {
+                "id": "dp1e-3",
+                "pyNum": "sheng4",
+                "trees": "(r)ser-ng4",
+                "pinyin": "shèng",
+                "hanzi": "圣",
+                "speakTw": "聖"
+              },
+              {
+                "id": "dp1e-4",
+                "trees": "!",
+                "pinyin": "!",
+                "hanzi": "！",
+                "speakTw": "",
+                "punct": true
+              },
+              {
+                "id": "dp1e-5",
+                "pyNum": "qing3",
+                "trees": "tsing3",
+                "pinyin": "Qǐng",
+                "hanzi": "请",
+                "speakTw": "請"
+              },
+              {
+                "id": "dp1e-6",
+                "pyNum": "hao3",
+                "trees": "haw3",
+                "pinyin": "hǎo",
+                "hanzi": "好",
+                "speakTw": "好"
+              },
+              {
+                "id": "dp1e-7",
+                "pyNum": "hao3",
+                "trees": "haw3",
+                "pinyin": "hǎo",
+                "hanzi": "好",
+                "speakTw": "好"
+              },
+              {
+                "id": "dp1e-8",
+                "pyNum": "kan1",
+                "trees": "kan",
+                "pinyin": "kān",
+                "hanzi": "看",
+                "speakTw": "看"
+              },
+              {
+                "id": "dp1e-9",
+                "pyNum": "guan3",
+                "trees": "gooan3",
+                "pinyin": "guǎn",
+                "hanzi": "管",
+                "speakTw": "管"
+              },
+              {
+                "id": "dp1e-10",
+                "trees": ".",
+                "pinyin": ".",
+                "hanzi": "。",
+                "speakTw": "",
+                "punct": true
+              }
+            ],
+            "audioEn": "audio/pro/dlg-p1-earthgod-en.mp3",
+            "audioTw": "audio/pro/dlg-p1-earthgod-tw.mp3"
+          }
+        }
+      ]
+    },
+    {
+      "id": "page2",
+      "type": "spread",
+      "pageLabel": "Page 2",
+      "chapterEn": "The Magic Peach Trees",
+      "imagePath": "images/page2.webp",
+      "cards": [
+        {
+          "id": "p2-c1",
+          "english": "The Earth God shows three magic trees.",
+          "twFullText": "土地公介紹三種神樹。",
+          "tokens": [
+            {
+              "id": "p2c1-0",
+              "pyNum": "tu3",
+              "trees": "too3",
+              "pinyin": "Tǔ",
+              "hanzi": "土",
+              "speakTw": "土"
+            },
+            {
+              "id": "p2c1-1",
+              "pyNum": "di4",
+              "trees": "dee4",
+              "pinyin": "dì",
+              "hanzi": "地",
+              "speakTw": "地"
+            },
+            {
+              "id": "p2c1-2",
+              "pyNum": "gong1",
+              "trees": "ger-oong",
+              "pinyin": "gōng",
+              "hanzi": "公",
+              "speakTw": "公"
+            },
+            {
+              "id": "p2c1-3",
+              "pyNum": "jie4",
+              "trees": "jeer4",
+              "pinyin": "jiè",
+              "hanzi": "介",
+              "speakTw": "介"
+            },
+            {
+              "id": "p2c1-4",
+              "pyNum": "shao4",
+              "trees": "(r)saw4",
+              "pinyin": "shào",
+              "hanzi": "绍",
+              "speakTw": "紹"
+            },
+            {
+              "id": "p2c1-5",
+              "pyNum": "san1",
+              "trees": "san",
+              "pinyin": "sān",
+              "hanzi": "三",
+              "speakTw": "三"
+            },
+            {
+              "id": "p2c1-6",
+              "pyNum": "zhong3",
+              "trees": "(r)dser-oong3",
+              "pinyin": "zhǒng",
+              "hanzi": "种",
+              "speakTw": "種"
+            },
+            {
+              "id": "p2c1-7",
+              "pyNum": "shen2",
+              "trees": "(r)ser-n2",
+              "pinyin": "shén",
+              "hanzi": "神",
+              "speakTw": "神"
+            },
+            {
+              "id": "p2c1-8",
+              "pyNum": "shu4",
+              "trees": "(r)soo4",
+              "pinyin": "shù",
+              "hanzi": "树",
+              "speakTw": "樹"
+            },
+            {
+              "id": "p2c1-9",
+              "trees": ".",
+              "pinyin": ".",
+              "hanzi": "。",
+              "speakTw": "",
+              "punct": true
+            }
+          ],
+          "audioEn": "audio/pro/p2-c1-en.mp3",
+          "audioTw": "audio/pro/p2-c1-tw.mp3"
+        },
+        {
+          "id": "p2-c2",
+          "english": "The biggest peaches take nine thousand years.",
+          "twFullText": "大仙桃九千年才成熟。",
+          "tokens": [
+            {
+              "id": "p2c2-0",
+              "pyNum": "da4",
+              "trees": "dah4",
+              "pinyin": "Dà",
+              "hanzi": "大",
+              "speakTw": "大"
+            },
+            {
+              "id": "p2c2-1",
+              "pyNum": "xian1",
+              "trees": "seean",
+              "pinyin": "xiān",
+              "hanzi": "仙",
+              "speakTw": "仙"
+            },
+            {
+              "id": "p2c2-2",
+              "pyNum": "tao2",
+              "trees": "taw2",
+              "pinyin": "táo",
+              "hanzi": "桃",
+              "speakTw": "桃"
+            },
+            {
+              "id": "p2c2-3",
+              "pyNum": "jiu3",
+              "trees": "jeeoh3",
+              "pinyin": "jiǔ",
+              "hanzi": "九",
+              "speakTw": "九"
+            },
+            {
+              "id": "p2c2-4",
+              "pyNum": "qian1",
+              "trees": "tseean",
+              "pinyin": "qiān",
+              "hanzi": "千",
+              "speakTw": "千"
+            },
+            {
+              "id": "p2c2-5",
+              "pyNum": "nian2",
+              "trees": "neean2",
+              "pinyin": "nián",
+              "hanzi": "年",
+              "speakTw": "年"
+            },
+            {
+              "id": "p2c2-6",
+              "pyNum": "cai2",
+              "trees": "tsie2",
+              "pinyin": "cái",
+              "hanzi": "才",
+              "speakTw": "才"
+            },
+            {
+              "id": "p2c2-7",
+              "pyNum": "cheng2",
+              "trees": "(r)tser-ng2",
+              "pinyin": "chéng",
+              "hanzi": "成",
+              "speakTw": "成"
+            },
+            {
+              "id": "p2c2-8",
+              "pyNum": "shu2",
+              "trees": "(r)soo2",
+              "pinyin": "shú",
+              "hanzi": "熟",
+              "speakTw": "熟"
+            },
+            {
+              "id": "p2c2-9",
+              "trees": ".",
+              "pinyin": ".",
+              "hanzi": "。",
+              "speakTw": "",
+              "punct": true
+            }
+          ],
+          "audioEn": "audio/pro/p2-c2-en.mp3",
+          "audioTw": "audio/pro/p2-c2-tw.mp3"
+        }
+      ],
+      "hotspots": [
+        {
+          "id": "h2-earthgod",
+          "label": "Earth God",
+          "x": 23,
+          "y": 67,
+          "voiceRole": "earthgod_tw",
+          "speaker": "Earth God",
+          "dialogue": {
+            "id": "dlg-p2-earthgod",
+            "english": "One bite gives endless health and joy!",
+            "twFullText": "吃一口就能長生不老喔！",
+            "tokens": [
+              {
+                "id": "dp2e-0",
+                "pyNum": "chi1",
+                "trees": "(r)ts",
+                "pinyin": "Chī",
+                "hanzi": "吃",
+                "speakTw": "吃"
+              },
+              {
+                "id": "dp2e-1",
+                "pyNum": "yi4",
+                "trees": "yee4",
+                "pinyin": "yì",
+                "hanzi": "一",
+                "speakTw": "一"
+              },
+              {
+                "id": "dp2e-2",
+                "pyNum": "kou3",
+                "trees": "koh3",
+                "pinyin": "kǒu",
+                "hanzi": "口",
+                "speakTw": "口"
+              },
+              {
+                "id": "dp2e-3",
+                "pyNum": "jiu4",
+                "trees": "jeeoh4",
+                "pinyin": "jiù",
+                "hanzi": "就",
+                "speakTw": "就"
+              },
+              {
+                "id": "dp2e-4",
+                "pyNum": "neng2",
+                "trees": "ner-ng2",
+                "pinyin": "néng",
+                "hanzi": "能",
+                "speakTw": "能"
+              },
+              {
+                "id": "dp2e-5",
+                "pyNum": "chang2",
+                "trees": "(r)tsang2",
+                "pinyin": "cháng",
+                "hanzi": "长",
+                "speakTw": "長"
+              },
+              {
+                "id": "dp2e-6",
+                "pyNum": "sheng1",
+                "trees": "(r)ser-ng",
+                "pinyin": "shēng",
+                "hanzi": "生",
+                "speakTw": "生"
+              },
+              {
+                "id": "dp2e-7",
+                "pyNum": "bu4",
+                "trees": "boo4",
+                "pinyin": "bù",
+                "hanzi": "不",
+                "speakTw": "不"
+              },
+              {
+                "id": "dp2e-8",
+                "pyNum": "lao3",
+                "trees": "Law3",
+                "pinyin": "lǎo",
+                "hanzi": "老",
+                "speakTw": "老"
+              },
+              {
+                "id": "dp2e-9",
+                "pyNum": "o5",
+                "trees": "ooer",
+                "pinyin": "o",
+                "hanzi": "喔",
+                "speakTw": "喔"
+              },
+              {
+                "id": "dp2e-10",
+                "trees": "!",
+                "pinyin": "!",
+                "hanzi": "！",
+                "speakTw": "",
+                "punct": true
+              }
+            ],
+            "audioEn": "audio/pro/dlg-p2-earthgod-en.mp3",
+            "audioTw": "audio/pro/dlg-p2-earthgod-tw.mp3"
+          }
+        },
+        {
+          "id": "h2-wukong",
+          "label": "Monkey King",
+          "x": 77,
+          "y": 64,
+          "voiceRole": "wukong_tw",
+          "speaker": "Monkey King",
+          "dialogue": {
+            "id": "dlg-p2-wukong",
+            "english": "Nine thousand years? They must taste amazing!",
+            "twFullText": "九千年？一定超級好吃！",
+            "tokens": [
+              {
+                "id": "dp2w-0",
+                "pyNum": "jiu3",
+                "trees": "jeeoh3",
+                "pinyin": "Jiǔ",
+                "hanzi": "九",
+                "speakTw": "九"
+              },
+              {
+                "id": "dp2w-1",
+                "pyNum": "qian1",
+                "trees": "tseean",
+                "pinyin": "qiān",
+                "hanzi": "千",
+                "speakTw": "千"
+              },
+              {
+                "id": "dp2w-2",
+                "pyNum": "nian2",
+                "trees": "neean2",
+                "pinyin": "nián",
+                "hanzi": "年",
+                "speakTw": "年"
+              },
+              {
+                "id": "dp2w-3",
+                "trees": "?",
+                "pinyin": "?",
+                "hanzi": "？",
+                "speakTw": "",
+                "punct": true
+              },
+              {
+                "id": "dp2w-4",
+                "pyNum": "yi2",
+                "trees": "yee2",
+                "pinyin": "Yí",
+                "hanzi": "一",
+                "speakTw": "一"
+              },
+              {
+                "id": "dp2w-5",
+                "pyNum": "ding4",
+                "trees": "ding4",
+                "pinyin": "dìng",
+                "hanzi": "定",
+                "speakTw": "定"
+              },
+              {
+                "id": "dp2w-6",
+                "pyNum": "chao1",
+                "trees": "(r)tsaw",
+                "pinyin": "chāo",
+                "hanzi": "超",
+                "speakTw": "超"
+              },
+              {
+                "id": "dp2w-7",
+                "pyNum": "ji2",
+                "trees": "jee2",
+                "pinyin": "jí",
+                "hanzi": "级",
+                "speakTw": "級"
+              },
+              {
+                "id": "dp2w-8",
+                "pyNum": "hao3",
+                "trees": "haw3",
+                "pinyin": "hǎo",
+                "hanzi": "好",
+                "speakTw": "好"
+              },
+              {
+                "id": "dp2w-9",
+                "pyNum": "chi1",
+                "trees": "(r)ts",
+                "pinyin": "chī",
+                "hanzi": "吃",
+                "speakTw": "吃"
+              },
+              {
+                "id": "dp2w-10",
+                "trees": "!",
+                "pinyin": "!",
+                "hanzi": "！",
+                "speakTw": "",
+                "punct": true
+              }
+            ],
+            "audioEn": "audio/pro/dlg-p2-wukong-en.mp3",
+            "audioTw": "audio/pro/dlg-p2-wukong-tw.mp3"
+          }
+        }
+      ]
+    },
+    {
+      "id": "page3",
+      "type": "spread",
+      "pageLabel": "Page 3",
+      "chapterEn": "A Cheeky Feast",
+      "imagePath": "images/page3.webp",
+      "cards": [
+        {
+          "id": "p3-c1",
+          "english": "The Monkey King cannot wait any longer.",
+          "twFullText": "悟空忍不住爬上大桃樹。",
+          "tokens": [
+            {
+              "id": "p3c1-0",
+              "pyNum": "wu4",
+              "trees": "woo4",
+              "pinyin": "Wù",
+              "hanzi": "悟",
+              "speakTw": "悟"
+            },
+            {
+              "id": "p3c1-1",
+              "pyNum": "kong1",
+              "trees": "ker-oong",
+              "pinyin": "kōng",
+              "hanzi": "空",
+              "speakTw": "空"
+            },
+            {
+              "id": "p3c1-2",
+              "pyNum": "ren3",
+              "trees": "(r)ther-n3",
+              "pinyin": "rěn",
+              "hanzi": "忍",
+              "speakTw": "忍"
+            },
+            {
+              "id": "p3c1-3",
+              "pyNum": "bu5",
+              "trees": "boo",
+              "pinyin": "bu",
+              "hanzi": "不",
+              "speakTw": "不"
+            },
+            {
+              "id": "p3c1-4",
+              "pyNum": "zhu4",
+              "trees": "(r)dsoo4",
+              "pinyin": "zhù",
+              "hanzi": "住",
+              "speakTw": "住"
+            },
+            {
+              "id": "p3c1-5",
+              "pyNum": "pa2",
+              "trees": "pah2",
+              "pinyin": "pá",
+              "hanzi": "爬",
+              "speakTw": "爬"
+            },
+            {
+              "id": "p3c1-6",
+              "pyNum": "shang4",
+              "trees": "(r)sang4",
+              "pinyin": "shàng",
+              "hanzi": "上",
+              "speakTw": "上"
+            },
+            {
+              "id": "p3c1-7",
+              "pyNum": "da4",
+              "trees": "dah4",
+              "pinyin": "dà",
+              "hanzi": "大",
+              "speakTw": "大"
+            },
+            {
+              "id": "p3c1-8",
+              "pyNum": "tao2",
+              "trees": "taw2",
+              "pinyin": "táo",
+              "hanzi": "桃",
+              "speakTw": "桃"
+            },
+            {
+              "id": "p3c1-9",
+              "pyNum": "shu4",
+              "trees": "(r)soo4",
+              "pinyin": "shù",
+              "hanzi": "树",
+              "speakTw": "樹"
+            },
+            {
+              "id": "p3c1-10",
+              "trees": ".",
+              "pinyin": ".",
+              "hanzi": "。",
+              "speakTw": "",
+              "punct": true
+            }
+          ],
+          "audioEn": "audio/pro/p3-c1-en.mp3",
+          "audioTw": "audio/pro/p3-c1-tw.mp3"
+        },
+        {
+          "id": "p3-c2",
+          "english": "He picks the ripest, sweetest golden peaches.",
+          "twFullText": "他摘下最甜的大仙桃。",
+          "tokens": [
+            {
+              "id": "p3c2-0",
+              "pyNum": "ta1",
+              "trees": "tah",
+              "pinyin": "Tā",
+              "hanzi": "他",
+              "speakTw": "他"
+            },
+            {
+              "id": "p3c2-1",
+              "pyNum": "zhai1",
+              "trees": "(r)dsie",
+              "pinyin": "zhāi",
+              "hanzi": "摘",
+              "speakTw": "摘"
+            },
+            {
+              "id": "p3c2-2",
+              "pyNum": "xia4",
+              "trees": "seeah4",
+              "pinyin": "xià",
+              "hanzi": "下",
+              "speakTw": "下"
+            },
+            {
+              "id": "p3c2-3",
+              "pyNum": "zui4",
+              "trees": "dsooay4",
+              "pinyin": "zuì",
+              "hanzi": "最",
+              "speakTw": "最"
+            },
+            {
+              "id": "p3c2-4",
+              "pyNum": "tian2",
+              "trees": "teean2",
+              "pinyin": "tián",
+              "hanzi": "甜",
+              "speakTw": "甜"
+            },
+            {
+              "id": "p3c2-5",
+              "pyNum": "de5",
+              "trees": "der",
+              "pinyin": "de",
+              "hanzi": "的",
+              "speakTw": "的"
+            },
+            {
+              "id": "p3c2-6",
+              "pyNum": "da4",
+              "trees": "dah4",
+              "pinyin": "dà",
+              "hanzi": "大",
+              "speakTw": "大"
+            },
+            {
+              "id": "p3c2-7",
+              "pyNum": "xian1",
+              "trees": "seean",
+              "pinyin": "xiān",
+              "hanzi": "仙",
+              "speakTw": "仙"
+            },
+            {
+              "id": "p3c2-8",
+              "pyNum": "tao2",
+              "trees": "taw2",
+              "pinyin": "táo",
+              "hanzi": "桃",
+              "speakTw": "桃"
+            },
+            {
+              "id": "p3c2-9",
+              "trees": ".",
+              "pinyin": ".",
+              "hanzi": "。",
+              "speakTw": "",
+              "punct": true
+            }
+          ],
+          "audioEn": "audio/pro/p3-c2-en.mp3",
+          "audioTw": "audio/pro/p3-c2-tw.mp3"
+        }
+      ],
+      "hotspots": [
+        {
+          "id": "h3-wukong",
+          "label": "Monkey King",
+          "x": 71,
+          "y": 55,
+          "voiceRole": "wukong_tw",
+          "speaker": "Monkey King",
+          "dialogue": {
+            "id": "dlg-p3-wukong",
+            "english": "Yum! So juicy and sweet! One more!",
+            "twFullText": "真香！又甜又多汁！再來一個！",
+            "tokens": [
+              {
+                "id": "dp3w-0",
+                "pyNum": "zhen1",
+                "trees": "(r)dser-n",
+                "pinyin": "Zhēn",
+                "hanzi": "真",
+                "speakTw": "真"
+              },
+              {
+                "id": "dp3w-1",
+                "pyNum": "xiang1",
+                "trees": "seeang",
+                "pinyin": "xiāng",
+                "hanzi": "香",
+                "speakTw": "香"
+              },
+              {
+                "id": "dp3w-2",
+                "trees": "!",
+                "pinyin": "!",
+                "hanzi": "！",
+                "speakTw": "",
+                "punct": true
+              },
+              {
+                "id": "dp3w-3",
+                "pyNum": "you4",
+                "trees": "yoh4",
+                "pinyin": "Yòu",
+                "hanzi": "又",
+                "speakTw": "又"
+              },
+              {
+                "id": "dp3w-4",
+                "pyNum": "tian2",
+                "trees": "teean2",
+                "pinyin": "tián",
+                "hanzi": "甜",
+                "speakTw": "甜"
+              },
+              {
+                "id": "dp3w-5",
+                "pyNum": "you4",
+                "trees": "yoh4",
+                "pinyin": "yòu",
+                "hanzi": "又",
+                "speakTw": "又"
+              },
+              {
+                "id": "dp3w-6",
+                "pyNum": "duo1",
+                "trees": "dooer",
+                "pinyin": "duō",
+                "hanzi": "多",
+                "speakTw": "多"
+              },
+              {
+                "id": "dp3w-7",
+                "pyNum": "zhi1",
+                "trees": "(r)ds",
+                "pinyin": "zhī",
+                "hanzi": "汁",
+                "speakTw": "汁"
+              },
+              {
+                "id": "dp3w-8",
+                "trees": "!",
+                "pinyin": "!",
+                "hanzi": "！",
+                "speakTw": "",
+                "punct": true
+              },
+              {
+                "id": "dp3w-9",
+                "pyNum": "zai4",
+                "trees": "dsie4",
+                "pinyin": "Zài",
+                "hanzi": "再",
+                "speakTw": "再"
+              },
+              {
+                "id": "dp3w-10",
+                "pyNum": "lai2",
+                "trees": "Lie2",
+                "pinyin": "lái",
+                "hanzi": "来",
+                "speakTw": "來"
+              },
+              {
+                "id": "dp3w-11",
+                "pyNum": "yi2",
+                "trees": "yee2",
+                "pinyin": "yí",
+                "hanzi": "一",
+                "speakTw": "一"
+              },
+              {
+                "id": "dp3w-12",
+                "pyNum": "ge4",
+                "trees": "ger4",
+                "pinyin": "gè",
+                "hanzi": "个",
+                "speakTw": "個"
+              },
+              {
+                "id": "dp3w-13",
+                "trees": "!",
+                "pinyin": "!",
+                "hanzi": "！",
+                "speakTw": "",
+                "punct": true
+              }
+            ],
+            "audioEn": "audio/pro/dlg-p3-wukong-en.mp3",
+            "audioTw": "audio/pro/dlg-p3-wukong-tw.mp3"
+          }
+        },
+        {
+          "id": "h3-peach",
+          "label": "Magic Peach",
+          "x": 20,
+          "y": 57,
+          "voiceRole": "peach_tw",
+          "speaker": "Magic Peach",
+          "dialogue": {
+            "id": "dlg-p3-peach",
+            "english": "Golden peach mist fills the sunny sky.",
+            "twFullText": "仙桃香氣飄滿天空。",
+            "tokens": [
+              {
+                "id": "dp3p-0",
+                "pyNum": "xian1",
+                "trees": "seean",
+                "pinyin": "Xiān",
+                "hanzi": "仙",
+                "speakTw": "仙"
+              },
+              {
+                "id": "dp3p-1",
+                "pyNum": "tao2",
+                "trees": "taw2",
+                "pinyin": "táo",
+                "hanzi": "桃",
+                "speakTw": "桃"
+              },
+              {
+                "id": "dp3p-2",
+                "pyNum": "xiang1",
+                "trees": "seeang",
+                "pinyin": "xiāng",
+                "hanzi": "香",
+                "speakTw": "香"
+              },
+              {
+                "id": "dp3p-3",
+                "pyNum": "qi4",
+                "trees": "tsee4",
+                "pinyin": "qì",
+                "hanzi": "气",
+                "speakTw": "氣"
+              },
+              {
+                "id": "dp3p-4",
+                "pyNum": "piao1",
+                "trees": "peeaw",
+                "pinyin": "piāo",
+                "hanzi": "飘",
+                "speakTw": "飄"
+              },
+              {
+                "id": "dp3p-5",
+                "pyNum": "man3",
+                "trees": "man3",
+                "pinyin": "mǎn",
+                "hanzi": "满",
+                "speakTw": "滿"
+              },
+              {
+                "id": "dp3p-6",
+                "pyNum": "tian1",
+                "trees": "teean",
+                "pinyin": "tiān",
+                "hanzi": "天",
+                "speakTw": "天"
+              },
+              {
+                "id": "dp3p-7",
+                "pyNum": "kong1",
+                "trees": "ker-oong",
+                "pinyin": "kōng",
+                "hanzi": "空",
+                "speakTw": "空"
+              },
+              {
+                "id": "dp3p-8",
+                "trees": ".",
+                "pinyin": ".",
+                "hanzi": "。",
+                "speakTw": "",
+                "punct": true
+              }
+            ],
+            "audioEn": "audio/pro/dlg-p3-peach-en.mp3",
+            "audioTw": "audio/pro/dlg-p3-peach-tw.mp3"
+          }
+        }
+      ]
+    },
+    {
+      "id": "page4",
+      "type": "spread",
+      "pageLabel": "Page 4",
+      "chapterEn": "A Nap in the Leaves",
+      "imagePath": "images/page4.webp",
+      "cards": [
+        {
+          "id": "p4-c1",
+          "english": "Full and happy, he naps on a branch.",
+          "twFullText": "吃飽以後，他在樹枝打盹。",
+          "tokens": [
+            {
+              "id": "p4c1-0",
+              "pyNum": "chi1",
+              "trees": "(r)ts",
+              "pinyin": "Chī",
+              "hanzi": "吃",
+              "speakTw": "吃"
+            },
+            {
+              "id": "p4c1-1",
+              "pyNum": "bao3",
+              "trees": "baw3",
+              "pinyin": "bǎo",
+              "hanzi": "饱",
+              "speakTw": "飽"
+            },
+            {
+              "id": "p4c1-2",
+              "pyNum": "yi3",
+              "trees": "yee3",
+              "pinyin": "yǐ",
+              "hanzi": "以",
+              "speakTw": "以"
+            },
+            {
+              "id": "p4c1-3",
+              "pyNum": "hou4",
+              "trees": "hoh4",
+              "pinyin": "hòu",
+              "hanzi": "后",
+              "speakTw": "後"
+            },
+            {
+              "id": "p4c1-4",
+              "trees": ",",
+              "pinyin": ",",
+              "hanzi": "，",
+              "speakTw": "",
+              "punct": true
+            },
+            {
+              "id": "p4c1-5",
+              "pyNum": "ta1",
+              "trees": "tah",
+              "pinyin": "tā",
+              "hanzi": "他",
+              "speakTw": "他"
+            },
+            {
+              "id": "p4c1-6",
+              "pyNum": "zai4",
+              "trees": "dsie4",
+              "pinyin": "zài",
+              "hanzi": "在",
+              "speakTw": "在"
+            },
+            {
+              "id": "p4c1-7",
+              "pyNum": "shu4",
+              "trees": "(r)soo4",
+              "pinyin": "shù",
+              "hanzi": "树",
+              "speakTw": "樹"
+            },
+            {
+              "id": "p4c1-8",
+              "pyNum": "zhi1",
+              "trees": "(r)ds",
+              "pinyin": "zhī",
+              "hanzi": "枝",
+              "speakTw": "枝"
+            },
+            {
+              "id": "p4c1-9",
+              "pyNum": "da3",
+              "trees": "dah3",
+              "pinyin": "dǎ",
+              "hanzi": "打",
+              "speakTw": "打"
+            },
+            {
+              "id": "p4c1-10",
+              "pyNum": "dun3",
+              "trees": "doon3",
+              "pinyin": "dǔn",
+              "hanzi": "盹",
+              "speakTw": "盹"
+            },
+            {
+              "id": "p4c1-11",
+              "trees": ".",
+              "pinyin": ".",
+              "hanzi": "。",
+              "speakTw": "",
+              "punct": true
+            }
+          ],
+          "audioEn": "audio/pro/p4-c1-en.mp3",
+          "audioTw": "audio/pro/p4-c1-tw.mp3"
+        },
+        {
+          "id": "p4-c2",
+          "english": "Soon, seven fairies glide down with baskets.",
+          "twFullText": "七位仙女提著花籃飛來。",
+          "tokens": [
+            {
+              "id": "p4c2-0",
+              "pyNum": "qi1",
+              "trees": "tsee",
+              "pinyin": "Qī",
+              "hanzi": "七",
+              "speakTw": "七"
+            },
+            {
+              "id": "p4c2-1",
+              "pyNum": "wei4",
+              "trees": "way4",
+              "pinyin": "wèi",
+              "hanzi": "位",
+              "speakTw": "位"
+            },
+            {
+              "id": "p4c2-2",
+              "pyNum": "xian1",
+              "trees": "seean",
+              "pinyin": "xiān",
+              "hanzi": "仙",
+              "speakTw": "仙"
+            },
+            {
+              "id": "p4c2-3",
+              "pyNum": "nv3",
+              "trees": "nee(oo)3",
+              "pinyin": "nǚ",
+              "hanzi": "女",
+              "speakTw": "女"
+            },
+            {
+              "id": "p4c2-4",
+              "pyNum": "ti2",
+              "trees": "tee2",
+              "pinyin": "tí",
+              "hanzi": "提",
+              "speakTw": "提"
+            },
+            {
+              "id": "p4c2-5",
+              "pyNum": "zhe5",
+              "trees": "(r)dser",
+              "pinyin": "zhe",
+              "hanzi": "着",
+              "speakTw": "著"
+            },
+            {
+              "id": "p4c2-6",
+              "pyNum": "hua1",
+              "trees": "hooah",
+              "pinyin": "huā",
+              "hanzi": "花",
+              "speakTw": "花"
+            },
+            {
+              "id": "p4c2-7",
+              "pyNum": "lan2",
+              "trees": "Lan2",
+              "pinyin": "lán",
+              "hanzi": "篮",
+              "speakTw": "籃"
+            },
+            {
+              "id": "p4c2-8",
+              "pyNum": "fei1",
+              "trees": "fay",
+              "pinyin": "fēi",
+              "hanzi": "飞",
+              "speakTw": "飛"
+            },
+            {
+              "id": "p4c2-9",
+              "pyNum": "lai2",
+              "trees": "Lie2",
+              "pinyin": "lái",
+              "hanzi": "来",
+              "speakTw": "來"
+            },
+            {
+              "id": "p4c2-10",
+              "trees": ".",
+              "pinyin": ".",
+              "hanzi": "。",
+              "speakTw": "",
+              "punct": true
+            }
+          ],
+          "audioEn": "audio/pro/p4-c2-en.mp3",
+          "audioTw": "audio/pro/p4-c2-tw.mp3"
+        }
+      ],
+      "hotspots": [
+        {
+          "id": "h4-wukong",
+          "label": "Monkey King",
+          "x": 75,
+          "y": 63,
+          "voiceRole": "wukong_tw",
+          "speaker": "Monkey King",
+          "dialogue": {
+            "id": "dlg-p4-wukong",
+            "english": "Zzz, what a cozy afternoon nap!",
+            "twFullText": "呼呼，午睡真舒服！",
+            "tokens": [
+              {
+                "id": "dp4w-0",
+                "pyNum": "hu1",
+                "trees": "hoo",
+                "pinyin": "Hū",
+                "hanzi": "呼",
+                "speakTw": "呼"
+              },
+              {
+                "id": "dp4w-1",
+                "pyNum": "hu1",
+                "trees": "hoo",
+                "pinyin": "hū",
+                "hanzi": "呼",
+                "speakTw": "呼"
+              },
+              {
+                "id": "dp4w-2",
+                "trees": ",",
+                "pinyin": ",",
+                "hanzi": "，",
+                "speakTw": "",
+                "punct": true
+              },
+              {
+                "id": "dp4w-3",
+                "pyNum": "wu3",
+                "trees": "woo3",
+                "pinyin": "wǔ",
+                "hanzi": "午",
+                "speakTw": "午"
+              },
+              {
+                "id": "dp4w-4",
+                "pyNum": "shui4",
+                "trees": "(r)sooay4",
+                "pinyin": "shuì",
+                "hanzi": "睡",
+                "speakTw": "睡"
+              },
+              {
+                "id": "dp4w-5",
+                "pyNum": "zhen1",
+                "trees": "(r)dser-n",
+                "pinyin": "zhēn",
+                "hanzi": "真",
+                "speakTw": "真"
+              },
+              {
+                "id": "dp4w-6",
+                "pyNum": "shu1",
+                "trees": "(r)soo",
+                "pinyin": "shū",
+                "hanzi": "舒",
+                "speakTw": "舒"
+              },
+              {
+                "id": "dp4w-7",
+                "pyNum": "fu5",
+                "trees": "foo",
+                "pinyin": "fu",
+                "hanzi": "服",
+                "speakTw": "服"
+              },
+              {
+                "id": "dp4w-8",
+                "trees": "!",
+                "pinyin": "!",
+                "hanzi": "！",
+                "speakTw": "",
+                "punct": true
+              }
+            ],
+            "audioEn": "audio/pro/dlg-p4-wukong-en.mp3",
+            "audioTw": "audio/pro/dlg-p4-wukong-tw.mp3"
+          }
+        },
+        {
+          "id": "h4-fairy",
+          "label": "Red Fairy",
+          "x": 34,
+          "y": 53,
+          "voiceRole": "fairy_tw",
+          "speaker": "Red Fairy",
+          "dialogue": {
+            "id": "dlg-p4-fairy",
+            "english": "Let's pick fresh peaches for the Peach Banquet!",
+            "twFullText": "為蟠桃盛會採鮮桃！",
+            "tokens": [
+              {
+                "id": "dp4f-0",
+                "pyNum": "wei4",
+                "trees": "way4",
+                "pinyin": "Wèi",
+                "hanzi": "为",
+                "speakTw": "為"
+              },
+              {
+                "id": "dp4f-1",
+                "pyNum": "pan2",
+                "trees": "pan2",
+                "pinyin": "Pán",
+                "hanzi": "蟠",
+                "speakTw": "蟠"
+              },
+              {
+                "id": "dp4f-2",
+                "pyNum": "tao2",
+                "trees": "taw2",
+                "pinyin": "táo",
+                "hanzi": "桃",
+                "speakTw": "桃"
+              },
+              {
+                "id": "dp4f-3",
+                "pyNum": "sheng4",
+                "trees": "(r)ser-ng4",
+                "pinyin": "shèng",
+                "hanzi": "盛",
+                "speakTw": "盛"
+              },
+              {
+                "id": "dp4f-4",
+                "pyNum": "hui4",
+                "trees": "hooay4",
+                "pinyin": "huì",
+                "hanzi": "会",
+                "speakTw": "會"
+              },
+              {
+                "id": "dp4f-5",
+                "pyNum": "cai3",
+                "trees": "tsie3",
+                "pinyin": "cǎi",
+                "hanzi": "采",
+                "speakTw": "採"
+              },
+              {
+                "id": "dp4f-6",
+                "pyNum": "xian1",
+                "trees": "seean",
+                "pinyin": "xiān",
+                "hanzi": "鲜",
+                "speakTw": "鮮"
+              },
+              {
+                "id": "dp4f-7",
+                "pyNum": "tao2",
+                "trees": "taw2",
+                "pinyin": "táo",
+                "hanzi": "桃",
+                "speakTw": "桃"
+              },
+              {
+                "id": "dp4f-8",
+                "trees": "!",
+                "pinyin": "!",
+                "hanzi": "！",
+                "speakTw": "",
+                "punct": true
+              }
+            ],
+            "audioEn": "audio/pro/dlg-p4-fairy-en.mp3",
+            "audioTw": "audio/pro/dlg-p4-fairy-tw.mp3"
+          }
+        }
+      ]
+    },
+    {
+      "id": "page5",
+      "type": "spread",
+      "pageLabel": "Page 5",
+      "chapterEn": "Surprise in the Tree!",
+      "imagePath": "images/page5.webp",
+      "cards": [
+        {
+          "id": "p5-c1",
+          "english": "The red fairy reaches for a peach.",
+          "twFullText": "紅衣仙女伸手去摘桃。",
+          "tokens": [
+            {
+              "id": "p5c1-0",
+              "pyNum": "hong2",
+              "trees": "her-oong2",
+              "pinyin": "Hóng",
+              "hanzi": "红",
+              "speakTw": "紅"
+            },
+            {
+              "id": "p5c1-1",
+              "pyNum": "yi1",
+              "trees": "yee",
+              "pinyin": "yī",
+              "hanzi": "衣",
+              "speakTw": "衣"
+            },
+            {
+              "id": "p5c1-2",
+              "pyNum": "xian1",
+              "trees": "seean",
+              "pinyin": "xiān",
+              "hanzi": "仙",
+              "speakTw": "仙"
+            },
+            {
+              "id": "p5c1-3",
+              "pyNum": "nv3",
+              "trees": "nee(oo)3",
+              "pinyin": "nǚ",
+              "hanzi": "女",
+              "speakTw": "女"
+            },
+            {
+              "id": "p5c1-4",
+              "pyNum": "shen1",
+              "trees": "(r)ser-n",
+              "pinyin": "shēn",
+              "hanzi": "伸",
+              "speakTw": "伸"
+            },
+            {
+              "id": "p5c1-5",
+              "pyNum": "shou3",
+              "trees": "(r)soh3",
+              "pinyin": "shǒu",
+              "hanzi": "手",
+              "speakTw": "手"
+            },
+            {
+              "id": "p5c1-6",
+              "pyNum": "qu4",
+              "trees": "tsee(oo)4",
+              "pinyin": "qù",
+              "hanzi": "去",
+              "speakTw": "去"
+            },
+            {
+              "id": "p5c1-7",
+              "pyNum": "zhai1",
+              "trees": "(r)dsie",
+              "pinyin": "zhāi",
+              "hanzi": "摘",
+              "speakTw": "摘"
+            },
+            {
+              "id": "p5c1-8",
+              "pyNum": "tao2",
+              "trees": "taw2",
+              "pinyin": "táo",
+              "hanzi": "桃",
+              "speakTw": "桃"
+            },
+            {
+              "id": "p5c1-9",
+              "trees": ".",
+              "pinyin": ".",
+              "hanzi": "。",
+              "speakTw": "",
+              "punct": true
+            }
+          ],
+          "audioEn": "audio/pro/p5-c1-en.mp3",
+          "audioTw": "audio/pro/p5-c1-tw.mp3"
+        },
+        {
+          "id": "p5-c2",
+          "english": "Pop! Out jumps the playful Monkey King!",
+          "twFullText": "砰！調皮大聖突然跳出來！",
+          "tokens": [
+            {
+              "id": "p5c2-0",
+              "pyNum": "peng1",
+              "trees": "per-ng",
+              "pinyin": "Pēng",
+              "hanzi": "砰",
+              "speakTw": "砰"
+            },
+            {
+              "id": "p5c2-1",
+              "trees": "!",
+              "pinyin": "!",
+              "hanzi": "！",
+              "speakTw": "",
+              "punct": true
+            },
+            {
+              "id": "p5c2-2",
+              "pyNum": "tiao2",
+              "trees": "teeaw2",
+              "pinyin": "Tiáo",
+              "hanzi": "调",
+              "speakTw": "調"
+            },
+            {
+              "id": "p5c2-3",
+              "pyNum": "pi2",
+              "trees": "pee2",
+              "pinyin": "pí",
+              "hanzi": "皮",
+              "speakTw": "皮"
+            },
+            {
+              "id": "p5c2-4",
+              "pyNum": "da4",
+              "trees": "dah4",
+              "pinyin": "Dà",
+              "hanzi": "大",
+              "speakTw": "大"
+            },
+            {
+              "id": "p5c2-5",
+              "pyNum": "sheng4",
+              "trees": "(r)ser-ng4",
+              "pinyin": "shèng",
+              "hanzi": "圣",
+              "speakTw": "聖"
+            },
+            {
+              "id": "p5c2-6",
+              "pyNum": "tu1",
+              "trees": "too",
+              "pinyin": "tū",
+              "hanzi": "突",
+              "speakTw": "突"
+            },
+            {
+              "id": "p5c2-7",
+              "pyNum": "ran2",
+              "trees": "(r)than2",
+              "pinyin": "rán",
+              "hanzi": "然",
+              "speakTw": "然"
+            },
+            {
+              "id": "p5c2-8",
+              "pyNum": "tiao4",
+              "trees": "teeaw4",
+              "pinyin": "tiào",
+              "hanzi": "跳",
+              "speakTw": "跳"
+            },
+            {
+              "id": "p5c2-9",
+              "pyNum": "chu1",
+              "trees": "(r)tsoo",
+              "pinyin": "chū",
+              "hanzi": "出",
+              "speakTw": "出"
+            },
+            {
+              "id": "p5c2-10",
+              "pyNum": "lai2",
+              "trees": "Lie2",
+              "pinyin": "lái",
+              "hanzi": "来",
+              "speakTw": "來"
+            },
+            {
+              "id": "p5c2-11",
+              "trees": "!",
+              "pinyin": "!",
+              "hanzi": "！",
+              "speakTw": "",
+              "punct": true
+            }
+          ],
+          "audioEn": "audio/pro/p5-c2-en.mp3",
+          "audioTw": "audio/pro/p5-c2-tw.mp3"
+        }
+      ],
+      "hotspots": [
+        {
+          "id": "h5-fairy",
+          "label": "Red Fairy",
+          "x": 26,
+          "y": 65,
+          "voiceRole": "fairy_tw",
+          "speaker": "Red Fairy",
+          "dialogue": {
+            "id": "dlg-p5-fairy",
+            "english": "Oh! Great Sage, you startled us!",
+            "twFullText": "呀！大聖，嚇了我們一跳！",
+            "tokens": [
+              {
+                "id": "dp5f-0",
+                "pyNum": "ya1",
+                "trees": "yah",
+                "pinyin": "Yā",
+                "hanzi": "呀",
+                "speakTw": "呀"
+              },
+              {
+                "id": "dp5f-1",
+                "trees": "!",
+                "pinyin": "!",
+                "hanzi": "！",
+                "speakTw": "",
+                "punct": true
+              },
+              {
+                "id": "dp5f-2",
+                "pyNum": "da4",
+                "trees": "dah4",
+                "pinyin": "Dà",
+                "hanzi": "大",
+                "speakTw": "大"
+              },
+              {
+                "id": "dp5f-3",
+                "pyNum": "sheng4",
+                "trees": "(r)ser-ng4",
+                "pinyin": "shèng",
+                "hanzi": "圣",
+                "speakTw": "聖"
+              },
+              {
+                "id": "dp5f-4",
+                "trees": ",",
+                "pinyin": ",",
+                "hanzi": "，",
+                "speakTw": "",
+                "punct": true
+              },
+              {
+                "id": "dp5f-5",
+                "pyNum": "xia4",
+                "trees": "seeah4",
+                "pinyin": "xià",
+                "hanzi": "吓",
+                "speakTw": "嚇"
+              },
+              {
+                "id": "dp5f-6",
+                "pyNum": "le5",
+                "trees": "Ler",
+                "pinyin": "le",
+                "hanzi": "了",
+                "speakTw": "了"
+              },
+              {
+                "id": "dp5f-7",
+                "pyNum": "wo3",
+                "trees": "wer3",
+                "pinyin": "wǒ",
+                "hanzi": "我",
+                "speakTw": "我"
+              },
+              {
+                "id": "dp5f-8",
+                "pyNum": "men5",
+                "trees": "mer-n",
+                "pinyin": "men",
+                "hanzi": "们",
+                "speakTw": "們"
+              },
+              {
+                "id": "dp5f-9",
+                "pyNum": "yi2",
+                "trees": "yee2",
+                "pinyin": "yí",
+                "hanzi": "一",
+                "speakTw": "一"
+              },
+              {
+                "id": "dp5f-10",
+                "pyNum": "tiao4",
+                "trees": "teeaw4",
+                "pinyin": "tiào",
+                "hanzi": "跳",
+                "speakTw": "跳"
+              },
+              {
+                "id": "dp5f-11",
+                "trees": "!",
+                "pinyin": "!",
+                "hanzi": "！",
+                "speakTw": "",
+                "punct": true
+              }
+            ],
+            "audioEn": "audio/pro/dlg-p5-fairy-en.mp3",
+            "audioTw": "audio/pro/dlg-p5-fairy-tw.mp3"
+          }
+        },
+        {
+          "id": "h5-wukong",
+          "label": "Monkey King",
+          "x": 78,
+          "y": 52,
+          "voiceRole": "wukong_tw",
+          "speaker": "Monkey King",
+          "dialogue": {
+            "id": "dlg-p5-wukong",
+            "english": "Hey! Who told you to pick my peaches?",
+            "twFullText": "嗨！是誰讓你們來摘桃的？",
+            "tokens": [
+              {
+                "id": "dp5w-0",
+                "pyNum": "hai1",
+                "trees": "hie",
+                "pinyin": "Hāi",
+                "hanzi": "嗨",
+                "speakTw": "嗨"
+              },
+              {
+                "id": "dp5w-1",
+                "trees": "!",
+                "pinyin": "!",
+                "hanzi": "！",
+                "speakTw": "",
+                "punct": true
+              },
+              {
+                "id": "dp5w-2",
+                "pyNum": "shi4",
+                "trees": "(r)s4",
+                "pinyin": "Shì",
+                "hanzi": "是",
+                "speakTw": "是"
+              },
+              {
+                "id": "dp5w-3",
+                "pyNum": "shei2",
+                "trees": "(r)say2",
+                "pinyin": "shéi",
+                "hanzi": "谁",
+                "speakTw": "誰"
+              },
+              {
+                "id": "dp5w-4",
+                "pyNum": "rang4",
+                "trees": "(r)thang4",
+                "pinyin": "ràng",
+                "hanzi": "让",
+                "speakTw": "讓"
+              },
+              {
+                "id": "dp5w-5",
+                "pyNum": "ni3",
+                "trees": "nee3",
+                "pinyin": "nǐ",
+                "hanzi": "你",
+                "speakTw": "你"
+              },
+              {
+                "id": "dp5w-6",
+                "pyNum": "men5",
+                "trees": "mer-n",
+                "pinyin": "men",
+                "hanzi": "们",
+                "speakTw": "們"
+              },
+              {
+                "id": "dp5w-7",
+                "pyNum": "lai2",
+                "trees": "Lie2",
+                "pinyin": "lái",
+                "hanzi": "来",
+                "speakTw": "來"
+              },
+              {
+                "id": "dp5w-8",
+                "pyNum": "zhai1",
+                "trees": "(r)dsie",
+                "pinyin": "zhāi",
+                "hanzi": "摘",
+                "speakTw": "摘"
+              },
+              {
+                "id": "dp5w-9",
+                "pyNum": "tao2",
+                "trees": "taw2",
+                "pinyin": "táo",
+                "hanzi": "桃",
+                "speakTw": "桃"
+              },
+              {
+                "id": "dp5w-10",
+                "pyNum": "de5",
+                "trees": "der",
+                "pinyin": "de",
+                "hanzi": "的",
+                "speakTw": "的"
+              },
+              {
+                "id": "dp5w-11",
+                "trees": "?",
+                "pinyin": "?",
+                "hanzi": "？",
+                "speakTw": "",
+                "punct": true
+              }
+            ],
+            "audioEn": "audio/pro/dlg-p5-wukong-en.mp3",
+            "audioTw": "audio/pro/dlg-p5-wukong-tw.mp3"
+          }
+        }
+      ]
+    },
+    {
+      "id": "page6",
+      "type": "spread",
+      "pageLabel": "Page 6",
+      "chapterEn": "The Royal Banquet News",
+      "imagePath": "images/page6.webp",
+      "cards": [
+        {
+          "id": "p6-c1",
+          "english": "The Queen Mother holds a grand banquet.",
+          "twFullText": "王母娘娘要辦蟠桃盛會。",
+          "tokens": [
+            {
+              "id": "p6c1-0",
+              "pyNum": "wang2",
+              "trees": "wang2",
+              "pinyin": "Wáng",
+              "hanzi": "王",
+              "speakTw": "王"
+            },
+            {
+              "id": "p6c1-1",
+              "pyNum": "mu3",
+              "trees": "moo3",
+              "pinyin": "mǔ",
+              "hanzi": "母",
+              "speakTw": "母"
+            },
+            {
+              "id": "p6c1-2",
+              "pyNum": "niang2",
+              "trees": "neeang2",
+              "pinyin": "niáng",
+              "hanzi": "娘",
+              "speakTw": "娘"
+            },
+            {
+              "id": "p6c1-3",
+              "pyNum": "niang5",
+              "trees": "neeang",
+              "pinyin": "niang",
+              "hanzi": "娘",
+              "speakTw": "娘"
+            },
+            {
+              "id": "p6c1-4",
+              "pyNum": "yao4",
+              "trees": "yaw4",
+              "pinyin": "yào",
+              "hanzi": "要",
+              "speakTw": "要"
+            },
+            {
+              "id": "p6c1-5",
+              "pyNum": "ban4",
+              "trees": "ban4",
+              "pinyin": "bàn",
+              "hanzi": "办",
+              "speakTw": "辦"
+            },
+            {
+              "id": "p6c1-6",
+              "pyNum": "pan2",
+              "trees": "pan2",
+              "pinyin": "Pán",
+              "hanzi": "蟠",
+              "speakTw": "蟠"
+            },
+            {
+              "id": "p6c1-7",
+              "pyNum": "tao2",
+              "trees": "taw2",
+              "pinyin": "táo",
+              "hanzi": "桃",
+              "speakTw": "桃"
+            },
+            {
+              "id": "p6c1-8",
+              "pyNum": "sheng4",
+              "trees": "(r)ser-ng4",
+              "pinyin": "shèng",
+              "hanzi": "盛",
+              "speakTw": "盛"
+            },
+            {
+              "id": "p6c1-9",
+              "pyNum": "hui4",
+              "trees": "hooay4",
+              "pinyin": "huì",
+              "hanzi": "会",
+              "speakTw": "會"
+            },
+            {
+              "id": "p6c1-10",
+              "trees": ".",
+              "pinyin": ".",
+              "hanzi": "。",
+              "speakTw": "",
+              "punct": true
+            }
+          ],
+          "audioEn": "audio/pro/p6-c1-en.mp3",
+          "audioTw": "audio/pro/p6-c1-tw.mp3"
+        },
+        {
+          "id": "p6-c2",
+          "english": "Wait! The Monkey King was not invited!",
+          "twFullText": "什麼？居然沒有請大聖！",
+          "tokens": [
+            {
+              "id": "p6c2-0",
+              "pyNum": "shen2",
+              "trees": "(r)ser-n2",
+              "pinyin": "Shén",
+              "hanzi": "什",
+              "speakTw": "什"
+            },
+            {
+              "id": "p6c2-1",
+              "pyNum": "me5",
+              "trees": "mer",
+              "pinyin": "me",
+              "hanzi": "么",
+              "speakTw": "麼"
+            },
+            {
+              "id": "p6c2-2",
+              "trees": "?",
+              "pinyin": "?",
+              "hanzi": "？",
+              "speakTw": "",
+              "punct": true
+            },
+            {
+              "id": "p6c2-3",
+              "pyNum": "ju1",
+              "trees": "jee(oo)",
+              "pinyin": "Jū",
+              "hanzi": "居",
+              "speakTw": "居"
+            },
+            {
+              "id": "p6c2-4",
+              "pyNum": "ran2",
+              "trees": "(r)than2",
+              "pinyin": "rán",
+              "hanzi": "然",
+              "speakTw": "然"
+            },
+            {
+              "id": "p6c2-5",
+              "pyNum": "mei2",
+              "trees": "may2",
+              "pinyin": "méi",
+              "hanzi": "没",
+              "speakTw": "沒"
+            },
+            {
+              "id": "p6c2-6",
+              "pyNum": "you3",
+              "trees": "yoh3",
+              "pinyin": "yǒu",
+              "hanzi": "有",
+              "speakTw": "有"
+            },
+            {
+              "id": "p6c2-7",
+              "pyNum": "qing3",
+              "trees": "tsing3",
+              "pinyin": "qǐng",
+              "hanzi": "请",
+              "speakTw": "請"
+            },
+            {
+              "id": "p6c2-8",
+              "pyNum": "da4",
+              "trees": "dah4",
+              "pinyin": "Dà",
+              "hanzi": "大",
+              "speakTw": "大"
+            },
+            {
+              "id": "p6c2-9",
+              "pyNum": "sheng4",
+              "trees": "(r)ser-ng4",
+              "pinyin": "shèng",
+              "hanzi": "圣",
+              "speakTw": "聖"
+            },
+            {
+              "id": "p6c2-10",
+              "trees": "!",
+              "pinyin": "!",
+              "hanzi": "！",
+              "speakTw": "",
+              "punct": true
+            }
+          ],
+          "audioEn": "audio/pro/p6-c2-en.mp3",
+          "audioTw": "audio/pro/p6-c2-tw.mp3"
+        }
+      ],
+      "hotspots": [
+        {
+          "id": "h6-fairy",
+          "label": "Red Fairy",
+          "x": 41,
+          "y": 60,
+          "voiceRole": "fairy_tw",
+          "speaker": "Red Fairy",
+          "dialogue": {
+            "id": "dlg-p6-fairy",
+            "english": "Sorry, Great Sage! Your name wasn't listed.",
+            "twFullText": "抱歉大聖，名單裡沒有您。",
+            "tokens": [
+              {
+                "id": "dp6f-0",
+                "pyNum": "bao4",
+                "trees": "baw4",
+                "pinyin": "Bào",
+                "hanzi": "抱",
+                "speakTw": "抱"
+              },
+              {
+                "id": "dp6f-1",
+                "pyNum": "qian4",
+                "trees": "tseean4",
+                "pinyin": "qiàn",
+                "hanzi": "歉",
+                "speakTw": "歉"
+              },
+              {
+                "id": "dp6f-2",
+                "pyNum": "da4",
+                "trees": "dah4",
+                "pinyin": "Dà",
+                "hanzi": "大",
+                "speakTw": "大"
+              },
+              {
+                "id": "dp6f-3",
+                "pyNum": "sheng4",
+                "trees": "(r)ser-ng4",
+                "pinyin": "shèng",
+                "hanzi": "圣",
+                "speakTw": "聖"
+              },
+              {
+                "id": "dp6f-4",
+                "trees": ",",
+                "pinyin": ",",
+                "hanzi": "，",
+                "speakTw": "",
+                "punct": true
+              },
+              {
+                "id": "dp6f-5",
+                "pyNum": "ming2",
+                "trees": "ming2",
+                "pinyin": "míng",
+                "hanzi": "名",
+                "speakTw": "名"
+              },
+              {
+                "id": "dp6f-6",
+                "pyNum": "dan1",
+                "trees": "dan",
+                "pinyin": "dān",
+                "hanzi": "单",
+                "speakTw": "單"
+              },
+              {
+                "id": "dp6f-7",
+                "pyNum": "li3",
+                "trees": "Lee3",
+                "pinyin": "lǐ",
+                "hanzi": "里",
+                "speakTw": "裡"
+              },
+              {
+                "id": "dp6f-8",
+                "pyNum": "mei2",
+                "trees": "may2",
+                "pinyin": "méi",
+                "hanzi": "没",
+                "speakTw": "沒"
+              },
+              {
+                "id": "dp6f-9",
+                "pyNum": "you3",
+                "trees": "yoh3",
+                "pinyin": "yǒu",
+                "hanzi": "有",
+                "speakTw": "有"
+              },
+              {
+                "id": "dp6f-10",
+                "pyNum": "nin2",
+                "trees": "neen2",
+                "pinyin": "nín",
+                "hanzi": "您",
+                "speakTw": "您"
+              },
+              {
+                "id": "dp6f-11",
+                "trees": ".",
+                "pinyin": ".",
+                "hanzi": "。",
+                "speakTw": "",
+                "punct": true
+              }
+            ],
+            "audioEn": "audio/pro/dlg-p6-fairy-en.mp3",
+            "audioTw": "audio/pro/dlg-p6-fairy-tw.mp3"
+          }
+        },
+        {
+          "id": "h6-wukong",
+          "label": "Monkey King",
+          "x": 72,
+          "y": 58,
+          "voiceRole": "wukong_tw",
+          "speaker": "Monkey King",
+          "dialogue": {
+            "id": "dlg-p6-wukong",
+            "english": "Not invited? That's not fair at all!",
+            "twFullText": "竟然不請我？太不公平啦！",
+            "tokens": [
+              {
+                "id": "dp6w-0",
+                "pyNum": "jing4",
+                "trees": "jing4",
+                "pinyin": "Jìng",
+                "hanzi": "竟",
+                "speakTw": "竟"
+              },
+              {
+                "id": "dp6w-1",
+                "pyNum": "ran2",
+                "trees": "(r)than2",
+                "pinyin": "rán",
+                "hanzi": "然",
+                "speakTw": "然"
+              },
+              {
+                "id": "dp6w-2",
+                "pyNum": "bu4",
+                "trees": "boo4",
+                "pinyin": "bù",
+                "hanzi": "不",
+                "speakTw": "不"
+              },
+              {
+                "id": "dp6w-3",
+                "pyNum": "qing3",
+                "trees": "tsing3",
+                "pinyin": "qǐng",
+                "hanzi": "请",
+                "speakTw": "請"
+              },
+              {
+                "id": "dp6w-4",
+                "pyNum": "wo3",
+                "trees": "wer3",
+                "pinyin": "wǒ",
+                "hanzi": "我",
+                "speakTw": "我"
+              },
+              {
+                "id": "dp6w-5",
+                "trees": "?",
+                "pinyin": "?",
+                "hanzi": "？",
+                "speakTw": "",
+                "punct": true
+              },
+              {
+                "id": "dp6w-6",
+                "pyNum": "tai4",
+                "trees": "tie4",
+                "pinyin": "Tài",
+                "hanzi": "太",
+                "speakTw": "太"
+              },
+              {
+                "id": "dp6w-7",
+                "pyNum": "bu4",
+                "trees": "boo4",
+                "pinyin": "bù",
+                "hanzi": "不",
+                "speakTw": "不"
+              },
+              {
+                "id": "dp6w-8",
+                "pyNum": "gong1",
+                "trees": "ger-oong",
+                "pinyin": "gōng",
+                "hanzi": "公",
+                "speakTw": "公"
+              },
+              {
+                "id": "dp6w-9",
+                "pyNum": "ping2",
+                "trees": "ping2",
+                "pinyin": "píng",
+                "hanzi": "平",
+                "speakTw": "平"
+              },
+              {
+                "id": "dp6w-10",
+                "pyNum": "la5",
+                "trees": "Lah",
+                "pinyin": "la",
+                "hanzi": "啦",
+                "speakTw": "啦"
+              },
+              {
+                "id": "dp6w-11",
+                "trees": "!",
+                "pinyin": "!",
+                "hanzi": "！",
+                "speakTw": "",
+                "punct": true
+              }
+            ],
+            "audioEn": "audio/pro/dlg-p6-wukong-en.mp3",
+            "audioTw": "audio/pro/dlg-p6-wukong-tw.mp3"
+          }
+        }
+      ]
+    },
+    {
+      "id": "page7",
+      "type": "spread",
+      "pageLabel": "Page 7",
+      "chapterEn": "The Magic Freeze Spell",
+      "imagePath": "images/page7.webp",
+      "cards": [
+        {
+          "id": "p7-c1",
+          "english": "The Monkey King waves his magic hand.",
+          "twFullText": "悟空揮手施展神奇法術。",
+          "tokens": [
+            {
+              "id": "p7c1-0",
+              "pyNum": "wu4",
+              "trees": "woo4",
+              "pinyin": "Wù",
+              "hanzi": "悟",
+              "speakTw": "悟"
+            },
+            {
+              "id": "p7c1-1",
+              "pyNum": "kong1",
+              "trees": "ker-oong",
+              "pinyin": "kōng",
+              "hanzi": "空",
+              "speakTw": "空"
+            },
+            {
+              "id": "p7c1-2",
+              "pyNum": "hui1",
+              "trees": "hooay",
+              "pinyin": "huī",
+              "hanzi": "挥",
+              "speakTw": "揮"
+            },
+            {
+              "id": "p7c1-3",
+              "pyNum": "shou3",
+              "trees": "(r)soh3",
+              "pinyin": "shǒu",
+              "hanzi": "手",
+              "speakTw": "手"
+            },
+            {
+              "id": "p7c1-4",
+              "pyNum": "shi1",
+              "trees": "(r)s",
+              "pinyin": "shī",
+              "hanzi": "施",
+              "speakTw": "施"
+            },
+            {
+              "id": "p7c1-5",
+              "pyNum": "zhan3",
+              "trees": "(r)dsan3",
+              "pinyin": "zhǎn",
+              "hanzi": "展",
+              "speakTw": "展"
+            },
+            {
+              "id": "p7c1-6",
+              "pyNum": "shen2",
+              "trees": "(r)ser-n2",
+              "pinyin": "shén",
+              "hanzi": "神",
+              "speakTw": "神"
+            },
+            {
+              "id": "p7c1-7",
+              "pyNum": "qi2",
+              "trees": "tsee2",
+              "pinyin": "qí",
+              "hanzi": "奇",
+              "speakTw": "奇"
+            },
+            {
+              "id": "p7c1-8",
+              "pyNum": "fa3",
+              "trees": "fah3",
+              "pinyin": "fǎ",
+              "hanzi": "法",
+              "speakTw": "法"
+            },
+            {
+              "id": "p7c1-9",
+              "pyNum": "shu4",
+              "trees": "(r)soo4",
+              "pinyin": "shù",
+              "hanzi": "术",
+              "speakTw": "術"
+            },
+            {
+              "id": "p7c1-10",
+              "trees": ".",
+              "pinyin": ".",
+              "hanzi": "。",
+              "speakTw": "",
+              "punct": true
+            }
+          ],
+          "audioEn": "audio/pro/p7-c1-en.mp3",
+          "audioTw": "audio/pro/p7-c1-tw.mp3"
+        },
+        {
+          "id": "p7-c2",
+          "english": "Sparkling light freezes the fairies in place!",
+          "twFullText": "金光閃閃把仙女定住啦！",
+          "tokens": [
+            {
+              "id": "p7c2-0",
+              "pyNum": "jin1",
+              "trees": "jeen",
+              "pinyin": "Jīn",
+              "hanzi": "金",
+              "speakTw": "金"
+            },
+            {
+              "id": "p7c2-1",
+              "pyNum": "guang1",
+              "trees": "gooang",
+              "pinyin": "guāng",
+              "hanzi": "光",
+              "speakTw": "光"
+            },
+            {
+              "id": "p7c2-2",
+              "pyNum": "shan3",
+              "trees": "(r)san3",
+              "pinyin": "shǎn",
+              "hanzi": "闪",
+              "speakTw": "閃"
+            },
+            {
+              "id": "p7c2-3",
+              "pyNum": "shan3",
+              "trees": "(r)san3",
+              "pinyin": "shǎn",
+              "hanzi": "闪",
+              "speakTw": "閃"
+            },
+            {
+              "id": "p7c2-4",
+              "pyNum": "ba3",
+              "trees": "bah3",
+              "pinyin": "bǎ",
+              "hanzi": "把",
+              "speakTw": "把"
+            },
+            {
+              "id": "p7c2-5",
+              "pyNum": "xian1",
+              "trees": "seean",
+              "pinyin": "xiān",
+              "hanzi": "仙",
+              "speakTw": "仙"
+            },
+            {
+              "id": "p7c2-6",
+              "pyNum": "nv3",
+              "trees": "nee(oo)3",
+              "pinyin": "nǚ",
+              "hanzi": "女",
+              "speakTw": "女"
+            },
+            {
+              "id": "p7c2-7",
+              "pyNum": "ding4",
+              "trees": "ding4",
+              "pinyin": "dìng",
+              "hanzi": "定",
+              "speakTw": "定"
+            },
+            {
+              "id": "p7c2-8",
+              "pyNum": "zhu4",
+              "trees": "(r)dsoo4",
+              "pinyin": "zhù",
+              "hanzi": "住",
+              "speakTw": "住"
+            },
+            {
+              "id": "p7c2-9",
+              "pyNum": "la5",
+              "trees": "Lah",
+              "pinyin": "la",
+              "hanzi": "啦",
+              "speakTw": "啦"
+            },
+            {
+              "id": "p7c2-10",
+              "trees": "!",
+              "pinyin": "!",
+              "hanzi": "！",
+              "speakTw": "",
+              "punct": true
+            }
+          ],
+          "audioEn": "audio/pro/p7-c2-en.mp3",
+          "audioTw": "audio/pro/p7-c2-tw.mp3"
+        }
+      ],
+      "hotspots": [
+        {
+          "id": "h7-wukong",
+          "label": "Monkey King",
+          "x": 75,
+          "y": 55,
+          "voiceRole": "wukong_tw",
+          "speaker": "Monkey King",
+          "dialogue": {
+            "id": "dlg-p7-wukong",
+            "english": "Stay right there! I'll visit the banquet!",
+            "twFullText": "先別動！我去盛會瞧一瞧！",
+            "tokens": [
+              {
+                "id": "dp7w-0",
+                "pyNum": "xian1",
+                "trees": "seean",
+                "pinyin": "Xiān",
+                "hanzi": "先",
+                "speakTw": "先"
+              },
+              {
+                "id": "dp7w-1",
+                "pyNum": "bie2",
+                "trees": "beer2",
+                "pinyin": "bié",
+                "hanzi": "别",
+                "speakTw": "別"
+              },
+              {
+                "id": "dp7w-2",
+                "pyNum": "dong4",
+                "trees": "der-oong4",
+                "pinyin": "dòng",
+                "hanzi": "动",
+                "speakTw": "動"
+              },
+              {
+                "id": "dp7w-3",
+                "trees": "!",
+                "pinyin": "!",
+                "hanzi": "！",
+                "speakTw": "",
+                "punct": true
+              },
+              {
+                "id": "dp7w-4",
+                "pyNum": "wo3",
+                "trees": "wer3",
+                "pinyin": "Wǒ",
+                "hanzi": "我",
+                "speakTw": "我"
+              },
+              {
+                "id": "dp7w-5",
+                "pyNum": "qu4",
+                "trees": "tsee(oo)4",
+                "pinyin": "qù",
+                "hanzi": "去",
+                "speakTw": "去"
+              },
+              {
+                "id": "dp7w-6",
+                "pyNum": "sheng4",
+                "trees": "(r)ser-ng4",
+                "pinyin": "shèng",
+                "hanzi": "盛",
+                "speakTw": "盛"
+              },
+              {
+                "id": "dp7w-7",
+                "pyNum": "hui4",
+                "trees": "hooay4",
+                "pinyin": "huì",
+                "hanzi": "会",
+                "speakTw": "會"
+              },
+              {
+                "id": "dp7w-8",
+                "pyNum": "qiao2",
+                "trees": "tseeaw2",
+                "pinyin": "qiáo",
+                "hanzi": "瞧",
+                "speakTw": "瞧"
+              },
+              {
+                "id": "dp7w-9",
+                "pyNum": "yi4",
+                "trees": "yee4",
+                "pinyin": "yì",
+                "hanzi": "一",
+                "speakTw": "一"
+              },
+              {
+                "id": "dp7w-10",
+                "pyNum": "qiao2",
+                "trees": "tseeaw2",
+                "pinyin": "qiáo",
+                "hanzi": "瞧",
+                "speakTw": "瞧"
+              },
+              {
+                "id": "dp7w-11",
+                "trees": "!",
+                "pinyin": "!",
+                "hanzi": "！",
+                "speakTw": "",
+                "punct": true
+              }
+            ],
+            "audioEn": "audio/pro/dlg-p7-wukong-en.mp3",
+            "audioTw": "audio/pro/dlg-p7-wukong-tw.mp3"
+          }
+        },
+        {
+          "id": "h7-fairy",
+          "label": "Red Fairy",
+          "x": 35,
+          "y": 64,
+          "voiceRole": "fairy_tw",
+          "speaker": "Red Fairy",
+          "dialogue": {
+            "id": "dlg-p7-fairy",
+            "english": "Hey! Come back and undo the spell!",
+            "twFullText": "喂！快回來幫我們解開呀！",
+            "tokens": [
+              {
+                "id": "dp7f-0",
+                "pyNum": "wei4",
+                "trees": "way4",
+                "pinyin": "Wèi",
+                "hanzi": "喂",
+                "speakTw": "喂"
+              },
+              {
+                "id": "dp7f-1",
+                "trees": "!",
+                "pinyin": "!",
+                "hanzi": "！",
+                "speakTw": "",
+                "punct": true
+              },
+              {
+                "id": "dp7f-2",
+                "pyNum": "kuai4",
+                "trees": "kooie4",
+                "pinyin": "Kuài",
+                "hanzi": "快",
+                "speakTw": "快"
+              },
+              {
+                "id": "dp7f-3",
+                "pyNum": "hui2",
+                "trees": "hooay2",
+                "pinyin": "huí",
+                "hanzi": "回",
+                "speakTw": "回"
+              },
+              {
+                "id": "dp7f-4",
+                "pyNum": "lai2",
+                "trees": "Lie2",
+                "pinyin": "lái",
+                "hanzi": "来",
+                "speakTw": "來"
+              },
+              {
+                "id": "dp7f-5",
+                "pyNum": "bang1",
+                "trees": "bang",
+                "pinyin": "bāng",
+                "hanzi": "帮",
+                "speakTw": "幫"
+              },
+              {
+                "id": "dp7f-6",
+                "pyNum": "wo3",
+                "trees": "wer3",
+                "pinyin": "wǒ",
+                "hanzi": "我",
+                "speakTw": "我"
+              },
+              {
+                "id": "dp7f-7",
+                "pyNum": "men5",
+                "trees": "mer-n",
+                "pinyin": "men",
+                "hanzi": "们",
+                "speakTw": "們"
+              },
+              {
+                "id": "dp7f-8",
+                "pyNum": "jie3",
+                "trees": "jeer3",
+                "pinyin": "jiě",
+                "hanzi": "解",
+                "speakTw": "解"
+              },
+              {
+                "id": "dp7f-9",
+                "pyNum": "kai1",
+                "trees": "kie",
+                "pinyin": "kāi",
+                "hanzi": "开",
+                "speakTw": "開"
+              },
+              {
+                "id": "dp7f-10",
+                "pyNum": "ya5",
+                "trees": "yah",
+                "pinyin": "ya",
+                "hanzi": "呀",
+                "speakTw": "呀"
+              },
+              {
+                "id": "dp7f-11",
+                "trees": "!",
+                "pinyin": "!",
+                "hanzi": "！",
+                "speakTw": "",
+                "punct": true
+              }
+            ],
+            "audioEn": "audio/pro/dlg-p7-fairy-en.mp3",
+            "audioTw": "audio/pro/dlg-p7-fairy-tw.mp3"
+          }
+        }
+      ]
+    },
+    {
+      "id": "page8",
+      "type": "spread",
+      "pageLabel": "Page 8",
+      "chapterEn": "Off on the Somersault Cloud!",
+      "imagePath": "images/page8.webp",
+      "cards": [
+        {
+          "id": "p8-c1",
+          "english": "He leaps onto his golden Somersault Cloud.",
+          "twFullText": "他跳上金光閃閃筋斗雲。",
+          "tokens": [
+            {
+              "id": "p8c1-0",
+              "pyNum": "ta1",
+              "trees": "tah",
+              "pinyin": "Tā",
+              "hanzi": "他",
+              "speakTw": "他"
+            },
+            {
+              "id": "p8c1-1",
+              "pyNum": "tiao4",
+              "trees": "teeaw4",
+              "pinyin": "tiào",
+              "hanzi": "跳",
+              "speakTw": "跳"
+            },
+            {
+              "id": "p8c1-2",
+              "pyNum": "shang4",
+              "trees": "(r)sang4",
+              "pinyin": "shàng",
+              "hanzi": "上",
+              "speakTw": "上"
+            },
+            {
+              "id": "p8c1-3",
+              "pyNum": "jin1",
+              "trees": "jeen",
+              "pinyin": "jīn",
+              "hanzi": "金",
+              "speakTw": "金"
+            },
+            {
+              "id": "p8c1-4",
+              "pyNum": "guang1",
+              "trees": "gooang",
+              "pinyin": "guāng",
+              "hanzi": "光",
+              "speakTw": "光"
+            },
+            {
+              "id": "p8c1-5",
+              "pyNum": "shan3",
+              "trees": "(r)san3",
+              "pinyin": "shǎn",
+              "hanzi": "闪",
+              "speakTw": "閃"
+            },
+            {
+              "id": "p8c1-6",
+              "pyNum": "shan3",
+              "trees": "(r)san3",
+              "pinyin": "shǎn",
+              "hanzi": "闪",
+              "speakTw": "閃"
+            },
+            {
+              "id": "p8c1-7",
+              "pyNum": "jin1",
+              "trees": "jeen",
+              "pinyin": "jīn",
+              "hanzi": "筋",
+              "speakTw": "筋"
+            },
+            {
+              "id": "p8c1-8",
+              "pyNum": "dou3",
+              "trees": "doh3",
+              "pinyin": "dǒu",
+              "hanzi": "斗",
+              "speakTw": "斗"
+            },
+            {
+              "id": "p8c1-9",
+              "pyNum": "yun2",
+              "trees": "yee(oo)n2",
+              "pinyin": "yún",
+              "hanzi": "云",
+              "speakTw": "雲"
+            },
+            {
+              "id": "p8c1-10",
+              "trees": ".",
+              "pinyin": ".",
+              "hanzi": "。",
+              "speakTw": "",
+              "punct": true
+            }
+          ],
+          "audioEn": "audio/pro/p8-c1-en.mp3",
+          "audioTw": "audio/pro/p8-c1-tw.mp3"
+        },
+        {
+          "id": "p8-c2",
+          "english": "Laughing loudly, the Monkey King zooms away!",
+          "twFullText": "美猴王大笑著飛向雲端！",
+          "tokens": [
+            {
+              "id": "p8c2-0",
+              "pyNum": "mei3",
+              "trees": "may3",
+              "pinyin": "Měi",
+              "hanzi": "美",
+              "speakTw": "美"
+            },
+            {
+              "id": "p8c2-1",
+              "pyNum": "hou2",
+              "trees": "hoh2",
+              "pinyin": "hóu",
+              "hanzi": "猴",
+              "speakTw": "猴"
+            },
+            {
+              "id": "p8c2-2",
+              "pyNum": "wang2",
+              "trees": "wang2",
+              "pinyin": "wáng",
+              "hanzi": "王",
+              "speakTw": "王"
+            },
+            {
+              "id": "p8c2-3",
+              "pyNum": "da4",
+              "trees": "dah4",
+              "pinyin": "dà",
+              "hanzi": "大",
+              "speakTw": "大"
+            },
+            {
+              "id": "p8c2-4",
+              "pyNum": "xiao4",
+              "trees": "seeaw4",
+              "pinyin": "xiào",
+              "hanzi": "笑",
+              "speakTw": "笑"
+            },
+            {
+              "id": "p8c2-5",
+              "pyNum": "zhe5",
+              "trees": "(r)dser",
+              "pinyin": "zhe",
+              "hanzi": "着",
+              "speakTw": "著"
+            },
+            {
+              "id": "p8c2-6",
+              "pyNum": "fei1",
+              "trees": "fay",
+              "pinyin": "fēi",
+              "hanzi": "飞",
+              "speakTw": "飛"
+            },
+            {
+              "id": "p8c2-7",
+              "pyNum": "xiang4",
+              "trees": "seeang4",
+              "pinyin": "xiàng",
+              "hanzi": "向",
+              "speakTw": "向"
+            },
+            {
+              "id": "p8c2-8",
+              "pyNum": "yun2",
+              "trees": "yee(oo)n2",
+              "pinyin": "yún",
+              "hanzi": "云",
+              "speakTw": "雲"
+            },
+            {
+              "id": "p8c2-9",
+              "pyNum": "duan1",
+              "trees": "dooan",
+              "pinyin": "duān",
+              "hanzi": "端",
+              "speakTw": "端"
+            },
+            {
+              "id": "p8c2-10",
+              "trees": "!",
+              "pinyin": "!",
+              "hanzi": "！",
+              "speakTw": "",
+              "punct": true
+            }
+          ],
+          "audioEn": "audio/pro/p8-c2-en.mp3",
+          "audioTw": "audio/pro/p8-c2-tw.mp3"
+        }
+      ],
+      "hotspots": [
+        {
+          "id": "h8-wukong",
+          "label": "Monkey King",
+          "x": 74,
+          "y": 47,
+          "voiceRole": "wukong_tw",
+          "speaker": "Monkey King",
+          "dialogue": {
+            "id": "dlg-p8-wukong",
+            "english": "Haha! Time for a grand sky adventure!",
+            "twFullText": "哈哈！天空大冒險出發啦！",
+            "tokens": [
+              {
+                "id": "dp8w-0",
+                "pyNum": "ha1",
+                "trees": "hah",
+                "pinyin": "Hā",
+                "hanzi": "哈",
+                "speakTw": "哈"
+              },
+              {
+                "id": "dp8w-1",
+                "pyNum": "ha1",
+                "trees": "hah",
+                "pinyin": "hā",
+                "hanzi": "哈",
+                "speakTw": "哈"
+              },
+              {
+                "id": "dp8w-2",
+                "trees": "!",
+                "pinyin": "!",
+                "hanzi": "！",
+                "speakTw": "",
+                "punct": true
+              },
+              {
+                "id": "dp8w-3",
+                "pyNum": "tian1",
+                "trees": "teean",
+                "pinyin": "Tiān",
+                "hanzi": "天",
+                "speakTw": "天"
+              },
+              {
+                "id": "dp8w-4",
+                "pyNum": "kong1",
+                "trees": "ker-oong",
+                "pinyin": "kōng",
+                "hanzi": "空",
+                "speakTw": "空"
+              },
+              {
+                "id": "dp8w-5",
+                "pyNum": "da4",
+                "trees": "dah4",
+                "pinyin": "dà",
+                "hanzi": "大",
+                "speakTw": "大"
+              },
+              {
+                "id": "dp8w-6",
+                "pyNum": "mao4",
+                "trees": "maw4",
+                "pinyin": "mào",
+                "hanzi": "冒",
+                "speakTw": "冒"
+              },
+              {
+                "id": "dp8w-7",
+                "pyNum": "xian3",
+                "trees": "seean3",
+                "pinyin": "xiǎn",
+                "hanzi": "险",
+                "speakTw": "險"
+              },
+              {
+                "id": "dp8w-8",
+                "pyNum": "chu1",
+                "trees": "(r)tsoo",
+                "pinyin": "chū",
+                "hanzi": "出",
+                "speakTw": "出"
+              },
+              {
+                "id": "dp8w-9",
+                "pyNum": "fa1",
+                "trees": "fah",
+                "pinyin": "fā",
+                "hanzi": "发",
+                "speakTw": "發"
+              },
+              {
+                "id": "dp8w-10",
+                "pyNum": "la5",
+                "trees": "Lah",
+                "pinyin": "la",
+                "hanzi": "啦",
+                "speakTw": "啦"
+              },
+              {
+                "id": "dp8w-11",
+                "trees": "!",
+                "pinyin": "!",
+                "hanzi": "！",
+                "speakTw": "",
+                "punct": true
+              }
+            ],
+            "audioEn": "audio/pro/dlg-p8-wukong-en.mp3",
+            "audioTw": "audio/pro/dlg-p8-wukong-tw.mp3"
+          }
+        },
+        {
+          "id": "h8-palace",
+          "label": "Yaochi Palace",
+          "x": 19,
+          "y": 34,
+          "voiceRole": "peach_tw",
+          "speaker": "Yaochi Palace",
+          "dialogue": {
+            "id": "dlg-p8-palace",
+            "english": "The grand Yaochi Banquet awaits ahead!",
+            "twFullText": "前方就是熱鬧的瑤池盛會！",
+            "tokens": [
+              {
+                "id": "dp8p-0",
+                "pyNum": "qian2",
+                "trees": "tseean2",
+                "pinyin": "Qián",
+                "hanzi": "前",
+                "speakTw": "前"
+              },
+              {
+                "id": "dp8p-1",
+                "pyNum": "fang1",
+                "trees": "fang",
+                "pinyin": "fāng",
+                "hanzi": "方",
+                "speakTw": "方"
+              },
+              {
+                "id": "dp8p-2",
+                "pyNum": "jiu4",
+                "trees": "jeeoh4",
+                "pinyin": "jiù",
+                "hanzi": "就",
+                "speakTw": "就"
+              },
+              {
+                "id": "dp8p-3",
+                "pyNum": "shi4",
+                "trees": "(r)s4",
+                "pinyin": "shì",
+                "hanzi": "是",
+                "speakTw": "是"
+              },
+              {
+                "id": "dp8p-4",
+                "pyNum": "re4",
+                "trees": "(r)ther4",
+                "pinyin": "rè",
+                "hanzi": "热",
+                "speakTw": "熱"
+              },
+              {
+                "id": "dp8p-5",
+                "pyNum": "nao5",
+                "trees": "naw",
+                "pinyin": "nao",
+                "hanzi": "闹",
+                "speakTw": "鬧"
+              },
+              {
+                "id": "dp8p-6",
+                "pyNum": "de5",
+                "trees": "der",
+                "pinyin": "de",
+                "hanzi": "的",
+                "speakTw": "的"
+              },
+              {
+                "id": "dp8p-7",
+                "pyNum": "yao2",
+                "trees": "yaw2",
+                "pinyin": "Yáo",
+                "hanzi": "瑶",
+                "speakTw": "瑤"
+              },
+              {
+                "id": "dp8p-8",
+                "pyNum": "chi2",
+                "trees": "(r)ts2",
+                "pinyin": "chí",
+                "hanzi": "池",
+                "speakTw": "池"
+              },
+              {
+                "id": "dp8p-9",
+                "pyNum": "sheng4",
+                "trees": "(r)ser-ng4",
+                "pinyin": "shèng",
+                "hanzi": "盛",
+                "speakTw": "盛"
+              },
+              {
+                "id": "dp8p-10",
+                "pyNum": "hui4",
+                "trees": "hooay4",
+                "pinyin": "huì",
+                "hanzi": "会",
+                "speakTw": "會"
+              },
+              {
+                "id": "dp8p-11",
+                "trees": "!",
+                "pinyin": "!",
+                "hanzi": "！",
+                "speakTw": "",
+                "punct": true
+              }
+            ],
+            "audioEn": "audio/pro/dlg-p8-palace-en.mp3",
+            "audioTw": "audio/pro/dlg-p8-palace-tw.mp3"
+          }
+        }
+      ]
+    }
+  ]
+}
