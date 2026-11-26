@@ -101,6 +101,53 @@ const MAX_MEMORY_TURNS = 3;
 let conversationHistory = [];
 let lastInteractionTime = 0;
 const FREE_PUBLIC_REMINDER_THRESHOLD = 6;
+
+// 三檔長文本與配額策略（前端體驗提示；真正的防繞過硬上限由 Cloudflare Worker 同步校驗）
+const TP_TIER_LIMITS = {
+  free: { aiMaxChars: 300, transMaxChars: 2000 },
+  pro:  { aiMaxChars: 2000, transMaxChars: 15000 },
+  byok: { aiMaxChars: 8000, transMaxChars: 30000 }
+};
+
+function isStudioProMember() {
+  try {
+    if (window.TreesStoriesMembership && typeof window.TreesStoriesMembership.isProMember === 'function') {
+      if (window.TreesStoriesMembership.isProMember()) return true;
+    }
+    const keys = ['tp_pro_member', 'tp_subscription_active', 'tp_member_token'];
+    for (const k of keys) {
+      const val = (localStorage.getItem(k) || '').trim().toLowerCase();
+      if (val && val !== '0' && val !== 'false' && val !== 'none' && val !== 'expired') return true;
+    }
+    const rawProfile = localStorage.getItem('tp_member_profile');
+    if (rawProfile) {
+      const p = JSON.parse(rawProfile);
+      if (p && (p.isPro === true || p.tier === 'pro' || p.status === 'active')) return true;
+    }
+  } catch (e) {}
+  return false;
+}
+
+function getProAuthToken() {
+  try {
+    return (localStorage.getItem('tp_member_token') || localStorage.getItem('tp_subscription_active') || '').trim();
+  } catch (e) {
+    return '';
+  }
+}
+
+function getActiveUserTier() {
+  const hasKey = (typeof getActiveUserApiKey === 'function')
+    ? !!getActiveUserApiKey()
+    : !!((backupKey || '').trim());
+  if (hasKey) return 'byok';
+  if (isStudioProMember()) return 'pro';
+  return 'free';
+}
+
+function getActiveTierLimits() {
+  return TP_TIER_LIMITS[getActiveUserTier()] || TP_TIER_LIMITS.free;
+}
 let currentScriptMode = 'trad';
 let openccToSimp = null;
 let openccToTrad = null;
@@ -248,6 +295,51 @@ function injectStudioKeyUIAndReorderLayout() {
         margin-bottom: 6px;
       }
       .tp-api-limit-box b { color: #b45309; }
+      .tp-input-limit-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        flex-wrap: wrap;
+        font-size: 0.76rem;
+        color: #475569;
+        padding: 4px 4px 2px;
+      }
+      .tp-tier-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 2px 9px;
+        border-radius: 999px;
+        background: #f1f5f9;
+        border: 1px solid #cbd5e1;
+        color: #334155;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.15s;
+      }
+      .tp-tier-pill:hover {
+        background: #e8f5e9;
+        border-color: #2e7d32;
+        color: #1b5e20;
+      }
+      .tp-tier-pill.tier-byok {
+        background: #e8f5e9;
+        border-color: #81c784;
+        color: #1b5e20;
+      }
+      .tp-tier-pill.tier-pro {
+        background: #fef3c7;
+        border-color: #f59e0b;
+        color: #92400e;
+      }
+      .tp-char-counter {
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+        color: #64748b;
+      }
+      .tp-char-counter.warn { color: #b45309; }
+      .tp-char-counter.over { color: #b91c1c; }
       .selection-icon-only {
         position: absolute;
         display: none;
@@ -529,6 +621,62 @@ function injectStudioKeyUIAndReorderLayout() {
     });
   }
 
+  // 2.5 自動注入輸入框下方的即時字數統計與額度狀態列 (#tpInputLimitBar)
+  const smartDropEl = document.getElementById('smartDropPanel');
+  const searchBoxEl = smartDropEl ? smartDropEl.querySelector('.search-box') : null;
+  if (smartDropEl && searchBoxEl && !document.getElementById('tpInputLimitBar')) {
+    const limitBar = document.createElement('div');
+    limitBar.id = 'tpInputLimitBar';
+    limitBar.className = 'tp-input-limit-bar no-print';
+    limitBar.innerHTML = `
+      <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+        <button type="button" id="tpTierBadgeBtn" class="tp-tier-pill" title="Manage API Key or Pro Membership"></button>
+      </div>
+      <span id="tpCharCounterText" class="tp-char-counter"></span>
+    `;
+    searchBoxEl.parentNode.insertBefore(limitBar, searchBoxEl.nextSibling);
+    document.getElementById('tpTierBadgeBtn').addEventListener('click', () => {
+      const tier = getActiveUserTier();
+      if (tier === 'byok') openStudioKeyModal();
+      else openStudioProModal();
+    });
+  }
+
+  // 2.6 自動注入 Pro 訂閱 / 額度方案說明彈窗 (#tpProModal)
+  if (!document.getElementById('tpProModal')) {
+    const proModal = document.createElement('div');
+    proModal.id = 'tpProModal';
+    proModal.style.cssText = 'display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.55); z-index:99999; justify-content:center; align-items:center; padding:16px;';
+    proModal.innerHTML = `
+      <div style="background:#fff; width:100%; max-width:440px; border-radius:16px; padding:20px; display:flex; flex-direction:column; gap:12px; box-shadow:0 10px 30px rgba(0,0,0,0.22); font-family:inherit; color:#1e293b;">
+        <h3 id="tpProModalTitle" style="margin:0; font-size:1.05rem; color:#1b5e20;">💎 Unlock Longer Text & Higher AI Limits</h3>
+        <div id="tpProModalBody" style="font-size:0.84rem; line-height:1.58; background:#f8fafc; padding:12px 14px; border-radius:10px; border:1px solid #e2e8f0;">
+          <div style="margin-bottom:8px;"><b>Choose how you want to continue:</b></div>
+          <ul style="margin:0; padding-left:18px; display:flex; flex-direction:column; gap:5px;">
+            <li><b>🔑 Bring Your Own API Key (Free):</b> Add your own Google Gemini API Key for up to <b>8,000 chars</b> AI Q&amp;A &amp; unlimited daily use on your own quota.</li>
+            <li><b>💎 Trees Pinyin Pro (No Key Setup):</b> Up to <b>2,000 chars</b> per AI reply, <b>15,000 chars</b> translation, generous Fair-Use daily/monthly quota, plus full Storybook Library access.</li>
+          </ul>
+        </div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button type="button" id="btnProOpenKeyModal" style="flex:1; min-width:160px; height:40px; border:1.5px solid #2e7d32; border-radius:10px; background:#e8f5e9; color:#1b5e20; font-size:0.88rem; font-weight:700; cursor:pointer;">🔑 Use My Own API Key</button>
+          <a id="btnProGoStories" href="stories/index.html" style="flex:1; min-width:160px; height:40px; border:none; border-radius:10px; background:#1b5e20; color:#fff; font-size:0.88rem; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; text-decoration:none;">💎 Explore Pro Plan ↗</a>
+        </div>
+        <button type="button" id="btnCloseProModal" style="width:100%; height:36px; border:1px solid #cbd5e1; border-radius:10px; background:#f1f5f9; color:#334155; font-size:0.86rem; font-weight:700; cursor:pointer;">Close</button>
+      </div>
+    `;
+    proModal.addEventListener('click', (e) => {
+      if (e.target === proModal) proModal.style.display = 'none';
+    });
+    document.body.appendChild(proModal);
+    document.getElementById('btnProOpenKeyModal').addEventListener('click', () => {
+      proModal.style.display = 'none';
+      openStudioKeyModal();
+    });
+    document.getElementById('btnCloseProModal').addEventListener('click', () => {
+      proModal.style.display = 'none';
+    });
+  }
+
   // 3. 自動注入「多平台社交 App 分享彈窗 (shareAppModal)」
   if (!document.getElementById('shareAppModal')) {
     const shareModal = document.createElement('div');
@@ -706,6 +854,7 @@ function injectStudioKeyUIAndReorderLayout() {
   safeSetHtml('uiAuthorNoteText', UI_TEXT[currentLang].authorNote);
   refreshKeyBtnStyle();
   setVoiceLangMode(spokenLang);
+  updateInputCharCounter();
 }
 
 // =========================================================================
@@ -783,18 +932,94 @@ function handleActivateFriendCode() {
   safeSetText('rewardStatusMsg', `🎉 Friend code ${code} applied! Thank you for sharing Trees Pinyin!`);
 }
 
+function openStudioProModal() {
+  const modal = document.getElementById('tpProModal');
+  if (!modal) return;
+  const isZh = (currentLang === 'zh');
+  safeSetText('tpProModalTitle', isZh ? '💎 解鎖長文本與更高 AI 額度' : '💎 Unlock Longer Text & Higher AI Limits');
+  safeSetHtml('tpProModalBody', isZh
+    ? `<div style="margin-bottom:8px;"><b>選擇適合您的方式繼續：</b></div>
+       <ul style="margin:0; padding-left:18px; display:flex; flex-direction:column; gap:5px;">
+         <li><b>🔑 填入自有 API Key（免費）：</b>使用自己的 Google Gemini API Key，單次 AI 問答最高 <b>8,000 字</b>，消耗個人免費額度、不限次。</li>
+         <li><b>💎 訂閱 Trees Pinyin Pro（免設定 Key）：</b>單次 AI 問答最高 <b>2,000 字</b>、長文翻譯最高 <b>15,000 字</b>，享有充裕的公平使用日/月額度，並解鎖全站繪本庫。</li>
+       </ul>`
+    : `<div style="margin-bottom:8px;"><b>Choose how you want to continue:</b></div>
+       <ul style="margin:0; padding-left:18px; display:flex; flex-direction:column; gap:5px;">
+         <li><b>🔑 Bring Your Own API Key (Free):</b> Add your own Google Gemini API Key for up to <b>8,000 chars</b> AI Q&amp;A &amp; unlimited daily use on your own quota.</li>
+         <li><b>💎 Trees Pinyin Pro (No Key Setup):</b> Up to <b>2,000 chars</b> per AI reply, <b>15,000 chars</b> translation, generous Fair-Use daily/monthly quota, plus full Storybook Library access.</li>
+       </ul>`);
+  safeSetText('btnProOpenKeyModal', isZh ? '🔑 填入自己的 API Key' : '🔑 Use My Own API Key');
+  safeSetText('btnProGoStories', isZh ? '💎 查看 Pro 訂閱方案 ↗' : '💎 Explore Pro Plan ↗');
+  safeSetText('btnCloseProModal', isZh ? '關閉' : 'Close');
+  modal.style.display = 'flex';
+}
+
+function updateInputCharCounter() {
+  const inputEl = document.getElementById('userInput');
+  const badgeBtn = document.getElementById('tpTierBadgeBtn');
+  const counterEl = document.getElementById('tpCharCounterText');
+  if (!badgeBtn && !counterEl) return;
+
+  const tier = getActiveUserTier();
+  const limits = TP_TIER_LIMITS[tier] || TP_TIER_LIMITS.free;
+  const len = inputEl ? inputEl.value.trim().length : 0;
+  const isZh = (currentLang === 'zh');
+
+  if (badgeBtn) {
+    badgeBtn.classList.remove('tier-byok', 'tier-pro');
+    if (tier === 'byok') {
+      badgeBtn.classList.add('tier-byok');
+      badgeBtn.textContent = isZh
+        ? `🔑 自有 API Key · AI 上限 ${limits.aiMaxChars.toLocaleString()} 字`
+        : `🔑 Own API Key · AI up to ${limits.aiMaxChars.toLocaleString()} chars`;
+    } else if (tier === 'pro') {
+      badgeBtn.classList.add('tier-pro');
+      badgeBtn.textContent = isZh
+        ? `💎 Pro 會員 · AI ≤ ${limits.aiMaxChars.toLocaleString()} 字`
+        : `💎 Pro Member · AI ≤ ${limits.aiMaxChars.toLocaleString()} chars`;
+    } else {
+      badgeBtn.textContent = isZh
+        ? `🆓 免費池 · AI ≤ ${limits.aiMaxChars} 字 · 點此擴容`
+        : `🆓 Free Pool · AI ≤ ${limits.aiMaxChars} chars · Upgrade / Add Key`;
+    }
+  }
+
+  if (counterEl) {
+    counterEl.classList.remove('warn', 'over');
+    if (len === 0) {
+      counterEl.textContent = isZh
+        ? `0 / ${limits.aiMaxChars.toLocaleString()} 字（翻譯上限 ${limits.transMaxChars.toLocaleString()}）`
+        : `0 / ${limits.aiMaxChars.toLocaleString()} (Translate ≤ ${limits.transMaxChars.toLocaleString()})`;
+    } else if (len > limits.transMaxChars) {
+      counterEl.classList.add('over');
+      counterEl.textContent = isZh
+        ? `${len.toLocaleString()} / ${limits.transMaxChars.toLocaleString()} 字（已超上限）`
+        : `${len.toLocaleString()} / ${limits.transMaxChars.toLocaleString()} chars (Over limit)`;
+    } else if (len > limits.aiMaxChars) {
+      counterEl.classList.add('warn');
+      counterEl.textContent = isZh
+        ? `${len.toLocaleString()} 字 · 可用免費翻譯（AI 限 ${limits.aiMaxChars.toLocaleString()} 字）`
+        : `${len.toLocaleString()} chars · Translate OK (AI limit ${limits.aiMaxChars.toLocaleString()})`;
+    } else {
+      counterEl.textContent = `${len.toLocaleString()} / ${limits.aiMaxChars.toLocaleString()}`;
+    }
+  }
+}
+
 function refreshKeyBtnStyle() {
   const btn = document.getElementById('uiKeyBtn');
-  if (!btn) return;
-  if (backupKey) {
-    btn.style.borderColor = '#2e7d32';
-    btn.style.color = '#1b5e20';
-    btn.style.background = '#e8f5e9';
-  } else {
-    btn.style.borderColor = '';
-    btn.style.color = '';
-    btn.style.background = '';
+  if (btn) {
+    if (backupKey) {
+      btn.style.borderColor = '#2e7d32';
+      btn.style.color = '#1b5e20';
+      btn.style.background = '#e8f5e9';
+    } else {
+      btn.style.borderColor = '';
+      btn.style.color = '';
+      btn.style.background = '';
+    }
   }
+  updateInputCharCounter();
 }
 
 // 智慧版本號降序演算法：自動適配未來 Gemini 4.0 / 5.0 與新一代 Gemma，永遠免改程式碼！

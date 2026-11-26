@@ -794,9 +794,26 @@ async function handleUnifiedFileUpload(file) {
       return;
     }
 
-    const clipped = clean.slice(0, 5000);
-    document.getElementById('userInput').value = clipped;
-    await runDirectTranslate(clipped);
+    const maxChars = (typeof getActiveTierLimits === 'function') ? getActiveTierLimits().transMaxChars : 2000;
+    const clipped = clean.slice(0, maxChars);
+    const uIn = document.getElementById('userInput');
+    if (uIn) {
+      uIn.value = clipped;
+      if (typeof handleUserInputChange === 'function') handleUserInputChange(uIn);
+    }
+    await runDirectTranslate(clipped, { skipLengthCheck: true });
+    if (clean.length > maxChars && replyBox) {
+      replyBox.style.display = 'block';
+      replyBox.style.cursor = 'pointer';
+      replyBox.innerHTML = currentLang === 'zh'
+        ? `📏 文件共 ${clean.length.toLocaleString()} 字，已為您翻譯前 ${maxChars.toLocaleString()} 字。點擊此處填入自有 <b>🔑 API Key</b> 或升級 <b>💎 Pro</b> 解鎖更長文檔。`
+        : `📏 Document has ${clean.length.toLocaleString()} chars — translated the first ${maxChars.toLocaleString()}. Click here to add your own <b>🔑 API Key</b> or upgrade to <b>💎 Pro</b> for longer files.`;
+      replyBox.onclick = () => {
+        replyBox.onclick = null;
+        replyBox.style.cursor = '';
+        if (typeof openStudioProModal === 'function') openStudioProModal();
+      };
+    }
   } catch (err) {
     replyBox.textContent = '⚠️ Error reading file.';
   }
@@ -881,9 +898,14 @@ async function handleFetchCloudLink() {
         return;
       }
       if (res && res.ok && res.text && res.text.trim()) {
-        const clipped = res.text.trim().slice(0, 5000);
-        document.getElementById('userInput').value = clipped;
-        await runDirectTranslate(clipped);
+        const maxChars = (typeof getActiveTierLimits === 'function') ? getActiveTierLimits().transMaxChars : 2000;
+        const clipped = res.text.trim().slice(0, maxChars);
+        const uIn = document.getElementById('userInput');
+        if (uIn) {
+          uIn.value = clipped;
+          if (typeof handleUserInputChange === 'function') handleUserInputChange(uIn);
+        }
+        await runDirectTranslate(clipped, { skipLengthCheck: true });
       } else if (res && res.ok && res.base64DataUrl) {
         const fetchRes = await fetch(res.base64DataUrl);
         const blob = await fetchRes.blob();
@@ -902,9 +924,14 @@ async function handleFetchCloudLink() {
   try {
     const text = await fetchCloudDocWeb(rawUrl);
     if (text && text.trim()) {
-      const clipped = text.trim().slice(0, 5000);
-      document.getElementById('userInput').value = clipped;
-      await runDirectTranslate(clipped);
+      const maxChars = (typeof getActiveTierLimits === 'function') ? getActiveTierLimits().transMaxChars : 2000;
+      const clipped = text.trim().slice(0, maxChars);
+      const uIn = document.getElementById('userInput');
+      if (uIn) {
+        uIn.value = clipped;
+        if (typeof handleUserInputChange === 'function') handleUserInputChange(uIn);
+      }
+      await runDirectTranslate(clipped, { skipLengthCheck: true });
     } else {
       replyBox.textContent = currentLang === 'en'
         ? '⚠️ Could not read link directly. Make sure the Google Doc is set to "Anyone with the link can view"!'
@@ -948,6 +975,7 @@ function setVoiceLangMode(mode) {
 
 function handleUserInputChange(el) {
   autoResizeTextarea(el);
+  if (typeof updateInputCharCounter === 'function') updateInputCharCounter();
 }
 
 function toggleVoiceLang() {

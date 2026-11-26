@@ -428,14 +428,20 @@ async function fetchFastAccurateAI(systemRules, userQuestion = '', cacheKeyForCl
 
   // 2. 免 Key 公共商業池：Cloudflare Worker 全球邊緣快取 (0.02s 秒回) + 支援真 SSE 流式
   let hitFreeLimit = false;
+  let hitTextTooLong = false;
+  const proToken = (typeof getProAuthToken === 'function') ? getProAuthToken() : '';
+  const workerHeaders = { 'Content-Type': 'application/json' };
+  if (proToken) workerHeaders['Authorization'] = `Bearer ${proToken}`;
+
   for (let i = 0; i < CF_WORKER_ENDPOINTS.length; i++) {
     try {
       const wantStream = !dataUrl && typeof onStreamLine === 'function';
       const r = await fetchWithTimeout(CF_WORKER_ENDPOINTS[i], {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: workerHeaders,
         body: JSON.stringify({
           prompt: fullPromptText,
+          userQuestion: userQuestion || '',
           image: dataUrl,
           mode: (dataUrl && !requireBilingual) ? 'ocr_only' : undefined,
           cacheKey: dataUrl ? '' : cacheKeyForCloud,
@@ -457,6 +463,7 @@ async function fetchFastAccurateAI(systemRules, userQuestion = '', cacheKeyForCl
       if (!r.ok) {
         const detail = d?.detail || d?.error || `HTTP ${r.status}`;
         if (r.status === 429 || /LIMIT_REACHED/i.test(String(detail))) hitFreeLimit = true;
+        if (r.status === 400 && /TEXT_TOO_LONG/i.test(String(detail))) hitTextTooLong = true;
         errorLogs.push(`[Worker: ${detail}]`);
         if (r.status === 429 || r.status === 400 || r.status === 500 || r.status === 502 || r.status === 503) break;
         continue;
@@ -483,6 +490,10 @@ async function fetchFastAccurateAI(systemRules, userQuestion = '', cacheKeyForCl
   }
 
   // 已移除非 Google 的 pollinations.ai 保底，確保 100% Google 品質與極速響應
+
+  if (hitTextTooLong) {
+    return { text: '', source: 'text_too_long', diagError: errorLogs.join(' | '), usedPublicPool: true, textTooLong: true, streamed: false };
+  }
 
   if (hitFreeLimit) {
     return { text: '', source: 'limit', diagError: errorLogs.join(' | '), usedPublicPool: true, limitReached: true, streamed: false };
@@ -1311,6 +1322,104 @@ async function renderBilingualAIOutput(aiText) {
   return { ok: renderedPairs > 0, correctedQuery };
 }
 
+// 長文本攔截與分流引導卡片（保護公共 API 池，引導使用免費翻譯 / 自有 API Key / Pro 訂閱）
+function showLongTextLimitCard(mode, rawText, tier, limits) {
+  const replyBox = document.getElementById('aiReplyBox');
+  const limitBox = document.getElementById('apiLimitBox');
+  if (limitBox) limitBox.style.display = 'none';
+  if (!replyBox) return;
+
+  const isZh = (currentLang === 'zh');
+  const maxChars = (mode === 'ai') ? limits.aiMaxChars : limits.transMaxChars;
+  const curLen = rawText.length;
+
+  let titleHtml = '';
+  let descHtml = '';
+  if (mode === 'ai') {
+    if (tier === 'free') {
+      titleHtml = isZh
+        ? `📏 免費公共 AI 單次上限為 ${maxChars} 字（目前 ${curLen.toLocaleString()} 字）`
+        : `📏 Free public AI is limited to ${maxChars} chars per question (yours: ${curLen.toLocaleString()})`;
+      descHtml = isZh
+        ? '為防止公共 API 額度被長文耗盡，長段文字請改用 <b>免費「翻譯與注音」</b>，或填入自己的免費 Gemini API Key / 升級 Pro 訂閱解鎖更長額度。'
+        : 'To protect our shared AI pool from long-text abuse, please use <b>Free Translate &amp; Pinyin</b>, add your own free Gemini API Key, or upgrade to Pro.';
+    } else if (tier === 'pro') {
+      titleHtml = isZh
+        ? `📏 Pro 會員單次 AI 問答上限為 ${maxChars.toLocaleString()} 字（目前 ${curLen.toLocaleString()} 字）`
+        : `📏 Pro AI Q&amp;A limit is ${maxChars.toLocaleString()} chars per request (yours: ${curLen.toLocaleString()})`;
+      descHtml = isZh
+        ? '超長內容請改用「翻譯與注音」（最高 15,000 字），或填入自己的 API Key 處理超長文本。'
+        : 'For extra-long passages, use Translate &amp; Pinyin (up to 15,000 chars) or add your own API Key.';
+    } else {
+      titleHtml = isZh
+        ? `📏 單次 AI 提問建議不超過 ${maxChars.toLocaleString()} 字（目前 ${curLen.toLocaleString()} 字）`
+        : `📏 Single AI prompt exceeds ${maxChars.toLocaleString()} chars (yours: ${curLen.toLocaleString()})`;
+      descHtml = isZh
+        ? '過長文本可能觸發模型逾時，建議分段提問或改用「翻譯與注音」。'
+        : 'Very long prompts may time out. Please split into shorter parts or use Translate &amp; Pinyin.';
+    }
+  } else {
+    titleHtml = isZh
+      ? `📏 當前方案單次翻譯上限為 ${maxChars.toLocaleString()} 字（目前 ${curLen.toLocaleString()} 字）`
+      : `📏 Translation limit for your current tier is ${maxChars.toLocaleString()} chars (yours: ${curLen.toLocaleString()})`;
+    descHtml = isZh
+      ? '您可以先翻譯前段內容，或填入自己的免費 API Key / 升級 Pro 解鎖更長文檔。'
+      : 'You can translate the first portion right now, or add your own API Key / upgrade to Pro for longer documents.';
+  }
+
+  const showFreeTransBtn = (mode === 'ai');
+  const showTruncatedTransBtn = (mode === 'translate');
+  const showKeyBtn = (tier !== 'byok');
+  const showProBtn = (tier === 'free');
+
+  replyBox.onclick = null;
+  replyBox.style.cursor = '';
+  replyBox.style.display = 'block';
+  replyBox.innerHTML = `
+    <div style="display:flex; flex-direction:column; align-items:center; gap:8px; text-align:center;">
+      <div style="font-weight:800; color:#b45309; font-size:0.92rem;">${titleHtml}</div>
+      <div style="font-size:0.83rem; color:#374151; max-width:640px; line-height:1.5;">${descHtml}</div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:center; margin-top:2px;">
+        ${showFreeTransBtn ? `<button type="button" id="tpLimitSwitchTransBtn" style="padding:7px 14px; border:none; border-radius:999px; background:#1b5e20; color:#fff; font-weight:700; font-size:12.5px; cursor:pointer;">📝 ${isZh ? '改用免費翻譯與注音' : 'Use Free Translate & Pinyin'}</button>` : ''}
+        ${showTruncatedTransBtn ? `<button type="button" id="tpLimitClipTransBtn" style="padding:7px 14px; border:none; border-radius:999px; background:#1b5e20; color:#fff; font-weight:700; font-size:12.5px; cursor:pointer;">✂️ ${isZh ? `先翻譯前 ${maxChars.toLocaleString()} 字` : `Translate First ${maxChars.toLocaleString()} Chars`}</button>` : ''}
+        ${showKeyBtn ? `<button type="button" id="tpLimitOpenKeyBtn" style="padding:7px 14px; border:1.5px solid #2e7d32; border-radius:999px; background:#e8f5e9; color:#1b5e20; font-weight:700; font-size:12.5px; cursor:pointer;">🔑 ${isZh ? '填入自己的免費 API Key' : 'Add Own Free API Key'}</button>` : ''}
+        ${showProBtn ? `<button type="button" id="tpLimitOpenProBtn" style="padding:7px 14px; border:1.5px solid #d97706; border-radius:999px; background:#fef3c7; color:#92400e; font-weight:700; font-size:12.5px; cursor:pointer;">💎 ${isZh ? '升級 Pro 訂閱' : 'Upgrade to Pro'}</button>` : ''}
+      </div>
+    </div>
+  `;
+
+  const swBtn = document.getElementById('tpLimitSwitchTransBtn');
+  if (swBtn) {
+    swBtn.addEventListener('click', () => {
+      runDirectTranslate(rawText);
+    });
+  }
+  const clipBtn = document.getElementById('tpLimitClipTransBtn');
+  if (clipBtn) {
+    clipBtn.addEventListener('click', () => {
+      const clipped = rawText.slice(0, maxChars);
+      const uIn = document.getElementById('userInput');
+      if (uIn) {
+        uIn.value = clipped;
+        if (typeof handleUserInputChange === 'function') handleUserInputChange(uIn);
+      }
+      runDirectTranslate(clipped, { skipLengthCheck: true });
+    });
+  }
+  const keyBtn = document.getElementById('tpLimitOpenKeyBtn');
+  if (keyBtn) {
+    keyBtn.addEventListener('click', () => {
+      if (typeof openStudioKeyModal === 'function') openStudioKeyModal();
+    });
+  }
+  const proBtn = document.getElementById('tpLimitOpenProBtn');
+  if (proBtn) {
+    proBtn.addEventListener('click', () => {
+      if (typeof openStudioProModal === 'function') openStudioProModal();
+    });
+  }
+}
+
 async function runDirectTranslate(inputOverride, options = {}) {
   const raw = (inputOverride !== undefined ? inputOverride : document.getElementById('userInput').value).trim();
   if (!raw) return;
@@ -1318,6 +1427,16 @@ async function runDirectTranslate(inputOverride, options = {}) {
 
   const isOcr = !!(options && options.isOcr);
   const keepPreview = !!(options && options.keepPreview);
+  const skipLengthCheck = !!(options && options.skipLengthCheck);
+
+  if (!isOcr && !skipLengthCheck && typeof getActiveUserTier === 'function') {
+    const tier = getActiveUserTier();
+    const limits = getActiveTierLimits();
+    if (raw.length > limits.transMaxChars) {
+      showLongTextLimitCard('translate', raw, tier, limits);
+      return;
+    }
+  }
 
   const prevImg = document.getElementById('previewImg');
   if (prevImg && !keepPreview) prevImg.style.display = 'none';
@@ -1488,6 +1607,17 @@ async function runSmartAI(overrideInput, voiceAlts = [], fromVoice = false) {
   if (!fromVoice) latestVoiceCandidates = [];
   if (!q) return;
 
+  // 長文本硬保護：防止免費公共池被超長文本消耗大量 Token；攔截時保留輸入框內容並引導分流
+  if (typeof getActiveUserTier === 'function') {
+    const tier = getActiveUserTier();
+    const limits = getActiveTierLimits();
+    if (q.length > limits.aiMaxChars) {
+      lastFailedAiQuestion = q;
+      showLongTextLimitCard('ai', q, tier, limits);
+      return;
+    }
+  }
+
   // 800ms 內對完全相同問題的連點直接攔截，防止誤觸消耗雙倍配額
   const now = Date.now();
   if (q === lastSubmittedQuery && (now - lastSubmittedTime < 800)) {
@@ -1504,6 +1634,7 @@ async function runSmartAI(overrideInput, voiceAlts = [], fromVoice = false) {
     // 送出後立刻清空輸入框，避免下次提問混入前文；改由回答區頂端顯示本次提問並保留 3 輪記憶
     inputEl.value = '';
     autoResizeTextarea(inputEl);
+    if (typeof updateInputCharCounter === 'function') updateInputCharCounter();
   }
 
   const limitBox = document.getElementById('apiLimitBox');
@@ -1787,7 +1918,7 @@ async function runSmartAI(overrideInput, voiceAlts = [], fromVoice = false) {
     }
   };
 
-  const { text: aiText, source, diagError, usedPublicPool, limitReached, userKeyFailed, usedLocalNano } = await fetchFastAccurateAI(
+  const { text: aiText, source, diagError, usedPublicPool, limitReached, textTooLong, userKeyFailed, usedLocalNano } = await fetchFastAccurateAI(
     systemRules,
     q,
     cloudCacheKey,
@@ -1797,6 +1928,17 @@ async function runSmartAI(overrideInput, voiceAlts = [], fromVoice = false) {
   );
 
   if (currentSeq !== activeRequestSeq) return;
+
+  if (textTooLong && typeof getActiveUserTier === 'function') {
+    lastFailedAiQuestion = q;
+    const uIn = document.getElementById('userInput');
+    if (uIn && !uIn.value) {
+      uIn.value = q;
+      if (typeof handleUserInputChange === 'function') handleUserInputChange(uIn);
+    }
+    showLongTextLimitCard('ai', q, getActiveUserTier(), getActiveTierLimits());
+    return;
+  }
 
   if (aiText) {
     let ok = streamedPairsCount > 0;

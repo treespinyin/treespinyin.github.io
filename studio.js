@@ -175,6 +175,7 @@ function toggleLang() {
   safeSetText('btnCloseFileMenu', t.fileMenuCancel);
   safeSetText('uiChkTrad', currentLang === 'zh' ? '繁體中文' : 'Traditional Chinese');
   safeSetText('uiChkSimp', currentLang === 'zh' ? '簡體中文' : 'Simplified Chinese');
+  if (typeof updateInputCharCounter === 'function') updateInputCharCounter();
 }
 
 document.addEventListener('DOMContentLoaded', () => {
