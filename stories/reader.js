@@ -176,9 +176,13 @@
       );
     }
 
-    // Default & single-character voice: Taiwan Female (Meijia / HsiaoChen / HsiaoYu / zh-TW female)
+    // Default & single-character voice: 100% unified site-wide Taiwan Female voice via TreesTextUtils
+    if (window.TreesTextUtils && typeof window.TreesTextUtils.pickTaiwanFemaleVoice === "function") {
+      const tw = window.TreesTextUtils.pickTaiwanFemaleVoice();
+      if (tw) return tw;
+    }
     return (
-      voices.find((v) => /meijia|美佳|hsiaochen|曉臻|hsiaoyu|曉雨/i.test(v.name)) ||
+      voices.find((v) => /meijia|美佳|hsiaochen|曉臻|hsiaoyu|曉雨|google 國語/i.test(v.name)) ||
       voices.find((v) => /zh[-_]TW/i.test(v.lang) && !MALE_OR_NOVELTY_RE.test(v.name)) ||
       voices.find((v) => /tingting|婷婷|sinji|善怡|xiaoxiao|曉曉/i.test(v.name)) ||
       voices.find((v) => /zh/i.test(v.lang) && !MALE_OR_NOVELTY_RE.test(v.name)) ||
@@ -187,14 +191,14 @@
   }
 
   const ROLE_TUNING = {
-    narrator_en: { lang: "en-US", rate: 0.94, pitch: 1.04 },
-    narrator_tw: { lang: "zh-TW", rate: 0.88, pitch: 1.12 },
-    deer_tw:     { lang: "zh-TW", rate: 0.86, pitch: 1.16 },
-    crow_tw:     { lang: "zh-TW", rate: 1.08, pitch: 1.32 },
-    lotus_tw:    { lang: "zh-TW", rate: 0.84, pitch: 1.08 },
-    queen_tw:    { lang: "zh-TW", rate: 0.94, pitch: 1.04 },
-    man_tw:      { lang: "zh-TW", rate: 0.90, pitch: 0.78 },
-    king_tw:     { lang: "zh-TW", rate: 0.84, pitch: 0.72 },
+    narrator_en: { lang: "en-US", rate: 0.92, pitch: 1.0 },
+    narrator_tw: { lang: "zh-TW", rate: 0.86, pitch: 1.04 },
+    deer_tw:     { lang: "zh-TW", rate: 0.86, pitch: 1.04 },
+    crow_tw:     { lang: "zh-TW", rate: 0.92, pitch: 1.08 },
+    lotus_tw:    { lang: "zh-TW", rate: 0.84, pitch: 1.04 },
+    queen_tw:    { lang: "zh-TW", rate: 0.88, pitch: 1.04 },
+    man_tw:      { lang: "zh-TW", rate: 0.90, pitch: 0.82 },
+    king_tw:     { lang: "zh-TW", rate: 0.84, pitch: 0.78 },
   };
 
   function resolveBookMedia(relPath) {
@@ -251,8 +255,12 @@
       const tuning = ROLE_TUNING[role] || ROLE_TUNING.narrator_tw;
       const utter = new SpeechSynthesisUtterance(text);
       const voice = pickVoiceForRole(role);
-      if (voice) utter.voice = voice;
-      utter.lang = tuning.lang;
+      if (voice) {
+        utter.voice = voice;
+        utter.lang = voice.lang || tuning.lang;
+      } else {
+        utter.lang = tuning.lang;
+      }
       utter.rate = tuning.rate;
       utter.pitch = tuning.pitch;
       utter.onend = finish;
