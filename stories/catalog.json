@@ -72,6 +72,23 @@
       "status": "published"
     },
     {
+      "id": "change-flies-to-the-moon",
+      "titleEn": "Chang'e Flies to the Moon",
+      "titleZh": "嫦娥奔月",
+      "subtitleEn": "Experience China's beloved Mid-Autumn legend of Hou Yi, Chang'e, and the Jade Rabbit in lifelike 4K cinema.",
+      "category": "myths",
+      "categoryLabel": "Chinese Myths",
+      "ageRange": "Ages 5–12",
+      "pageCount": 9,
+      "coverUrl": "images/cover.webp",
+      "dataUrl": "./books/change-flies-to-the-moon/book.json",
+      "mediaBaseUrl": "https://media.treespinyin.com/books/change-flies-to-the-moon/",
+      "r2MediaBaseUrl": "https://media.treespinyin.com/books/change-flies-to-the-moon/",
+      "freePages": 3,
+      "isPro": true,
+      "status": "published"
+    },
+    {
       "id": "quiet-night-thought",
       "titleEn": "Quiet Night Thought (Li Bai)",
       "titleZh": "靜夜思",
