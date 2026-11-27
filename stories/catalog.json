@@ -55,6 +55,23 @@
       "status": "published"
     },
     {
+      "id": "nezha-conquers-the-sea",
+      "titleEn": "Nezha Conquers the Sea",
+      "titleZh": "哪吒鬧海",
+      "subtitleEn": "Join brave Lotus Hero Nezha as he rides the Wind-Fire Wheels to calm the East Sea.",
+      "category": "myths",
+      "categoryLabel": "Chinese Myths",
+      "ageRange": "Ages 5–11",
+      "pageCount": 9,
+      "coverUrl": "images/cover.webp",
+      "dataUrl": "./books/nezha-conquers-the-sea/book.json",
+      "mediaBaseUrl": "https://media.treespinyin.com/books/nezha-conquers-the-sea/",
+      "r2MediaBaseUrl": "https://media.treespinyin.com/books/nezha-conquers-the-sea/",
+      "freePages": 3,
+      "isPro": true,
+      "status": "published"
+    },
+    {
       "id": "quiet-night-thought",
       "titleEn": "Quiet Night Thought (Li Bai)",
       "titleZh": "靜夜思",
